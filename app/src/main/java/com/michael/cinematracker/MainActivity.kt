@@ -93,10 +93,10 @@ class MainActivity : AppCompatActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                "Jadwal & Presale Bioskop Indo",
+                "Jadwal Bioskop Indonesia",
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
-                description = "Notifikasi rilis film hype dan pembukaan tiket presale XXI, CGV, Cinépolis"
+                description = "Notifikasi rilis film teater dan presale XXI, CGV, Cinépolis"
                 enableLights(true)
                 lightColor = Color.BLUE
                 enableVibration(true)

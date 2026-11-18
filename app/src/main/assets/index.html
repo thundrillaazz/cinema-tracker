@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Cinema Tracker ID</title>
+  <title>Cinema Tracker</title>
   <style>
     :root {
       --bg: #f8fafc;
@@ -16,58 +16,57 @@
       --blue-soft: #eff6ff;
       --rose: #e11d48;
       --rose-soft: #fff1f2;
-      --teal: #0d9488;
       --emerald: #16a34a;
       --emerald-soft: #dcfce7;
-      --amber: #f59e0b;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     body {
       background: var(--bg);
       color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      padding-bottom: 76px;
-      line-height: 1.4;
+      padding-bottom: 72px;
+      line-height: 1.45;
     }
 
     header {
       position: sticky;
       top: 0;
       z-index: 30;
-      background: rgba(255, 255, 255, 0.96);
-      backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
     }
     .header-top {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 12px 14px 10px;
-      gap: 8px;
+      padding: 12px 16px 10px;
+      gap: 12px;
     }
     .brand {
       display: flex;
       align-items: center;
-      gap: 9px;
+      gap: 10px;
       min-width: 0;
     }
     .brand-icon {
-      width: 34px;
-      height: 34px;
-      border-radius: 10px;
-      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: var(--text);
       color: #fff;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 800;
-      font-size: 15px;
+      font-weight: 700;
+      font-size: 13px;
       flex-shrink: 0;
     }
     .brand-title {
-      font-size: 16px;
-      font-weight: 800;
+      font-size: 15px;
+      font-weight: 700;
       color: var(--text);
+      letter-spacing: -0.01em;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -85,38 +84,29 @@
       gap: 6px;
       flex-shrink: 0;
     }
-    .region-pill {
-      background: var(--rose-soft);
-      color: var(--rose);
-      font-size: 11px;
-      font-weight: 800;
-      padding: 4px 7px;
-      border-radius: 7px;
-      border: 1px solid #fecdd3;
-    }
     .icon-btn {
       position: relative;
       width: 34px;
       height: 34px;
-      border-radius: 9px;
+      border-radius: 8px;
       background: var(--surface-2);
       border: 1px solid var(--border);
       color: var(--text);
-      font-size: 15px;
+      font-size: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
     }
-    .icon-btn:active { transform: scale(0.95); }
+    .icon-btn:active { background: var(--border); }
     .bell-badge {
       position: absolute;
       top: -4px;
       right: -4px;
-      background: var(--rose);
+      background: var(--blue);
       color: #fff;
-      font-size: 10px;
-      font-weight: 800;
+      font-size: 9.5px;
+      font-weight: 700;
       min-width: 16px;
       height: 16px;
       border-radius: 99px;
@@ -128,14 +118,14 @@
 
     .search-bar {
       display: none;
-      padding: 0 14px 10px;
+      padding: 0 16px 10px;
     }
     .search-bar.open { display: block; }
     .search-input {
       width: 100%;
       background: var(--surface-2);
       border: 1px solid var(--border);
-      border-radius: 10px;
+      border-radius: 8px;
       padding: 9px 12px;
       font-size: 13px;
       color: var(--text);
@@ -150,50 +140,48 @@
       background: #fff;
     }
     .mode-tab {
-      padding: 11px 8px;
+      padding: 10px 8px;
       text-align: center;
       font-size: 12px;
-      font-weight: 800;
-      letter-spacing: 0.02em;
+      font-weight: 600;
       color: var(--muted);
       background: transparent;
       border: none;
-      border-bottom: 2.5px solid transparent;
+      border-bottom: 2px solid transparent;
       cursor: pointer;
     }
     .mode-tab.active {
-      color: var(--blue);
-      border-bottom-color: var(--blue);
-      background: #f8faff;
+      color: var(--text);
+      border-bottom-color: var(--text);
     }
 
     .filter-section {
       background: #fff;
       border-bottom: 1px solid var(--border);
-      padding: 10px 14px;
+      padding: 10px 16px;
     }
     .chips-row {
       display: flex;
-      gap: 7px;
+      gap: 6px;
       overflow-x: auto;
       scrollbar-width: none;
       padding-bottom: 8px;
     }
     .chips-row::-webkit-scrollbar { display: none; }
     .chip {
-      padding: 6px 12px;
+      padding: 5px 11px;
       border-radius: 999px;
-      font-size: 12px;
-      font-weight: 700;
+      font-size: 11.5px;
+      font-weight: 500;
       border: 1px solid var(--border);
       background: var(--surface-2);
-      color: #334155;
+      color: var(--muted);
       white-space: nowrap;
       cursor: pointer;
     }
     .chip.active {
-      background: #0f172a;
-      border-color: #0f172a;
+      background: var(--text);
+      border-color: var(--text);
       color: #fff;
     }
     .controls-row {
@@ -201,70 +189,46 @@
       align-items: center;
       justify-content: space-between;
       gap: 8px;
-      font-size: 12px;
+      font-size: 11.5px;
       color: var(--muted);
     }
     .checkbox-label {
       display: flex;
       align-items: center;
       gap: 6px;
-      font-weight: 600;
-      color: #334155;
+      font-weight: 500;
+      color: var(--muted);
       cursor: pointer;
     }
     .sort-select {
       background: var(--surface-2);
       border: 1px solid var(--border);
-      border-radius: 8px;
+      border-radius: 6px;
       padding: 5px 8px;
       font-size: 11.5px;
-      font-weight: 700;
-      color: #334155;
+      font-weight: 500;
+      color: var(--text);
       outline: none;
     }
 
     .status-banner {
-      margin: 10px 14px 2px;
+      margin: 12px 16px 4px;
       padding: 8px 12px;
       background: #fff;
       border: 1px solid var(--border);
-      border-radius: 10px;
+      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       font-size: 11.5px;
-      color: #334155;
-      gap: 8px;
-    }
-    .status-left {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-weight: 600;
-      min-width: 0;
-    }
-    .dot-green {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--emerald);
-      flex-shrink: 0;
-    }
-    .count-pill {
-      background: var(--blue-soft);
-      color: var(--blue);
-      font-weight: 800;
-      padding: 2px 8px;
-      border-radius: 999px;
-      font-size: 11px;
-      flex-shrink: 0;
+      color: var(--muted);
     }
 
     .movie-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 12px;
-      padding: 10px 14px 16px;
+      padding: 10px 16px 20px;
     }
     @media (min-width: 640px) {
       .movie-grid { grid-template-columns: repeat(3, 1fr); }
@@ -272,15 +236,13 @@
     .movie-card {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 14px;
+      border-radius: 10px;
       overflow: hidden;
-      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
       display: flex;
       flex-direction: column;
       cursor: pointer;
-      transition: transform 0.12s ease;
     }
-    .movie-card:active { transform: scale(0.985); }
+    .movie-card:active { opacity: 0.9; }
     .poster-box {
       position: relative;
       width: 100%;
@@ -297,65 +259,42 @@
     .poster-art {
       width: 100%;
       height: 100%;
-      padding: 14px 12px;
+      padding: 14px 10px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       color: #fff;
-      position: relative;
-    }
-    .poster-art-sub {
-      font-size: 9px;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      opacity: 0.78;
-      margin-top: 26px;
-      text-align: center;
     }
     .poster-art-title {
-      font-size: 16px;
-      font-weight: 900;
-      letter-spacing: 0.04em;
+      font-size: 14px;
+      font-weight: 700;
       text-transform: uppercase;
       text-align: center;
-      line-height: 1.2;
-      text-shadow: 0 2px 10px rgba(0,0,0,0.6);
-    }
-    .poster-art-footer {
-      font-size: 9px;
-      text-align: center;
-      opacity: 0.75;
-      letter-spacing: 0.08em;
+      line-height: 1.25;
     }
     .poster-badge {
       position: absolute;
-      top: 8px;
-      left: 8px;
+      top: 6px;
+      left: 6px;
       z-index: 3;
-      font-size: 10px;
-      font-weight: 800;
-      padding: 4px 8px;
-      border-radius: 7px;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+      font-size: 9.5px;
+      font-weight: 600;
+      padding: 3px 6px;
+      border-radius: 4px;
+      background: rgba(15, 23, 42, 0.85);
+      color: #fff;
     }
-    .badge-presale { background: var(--teal); color: #fff; }
-    .badge-hype { background: rgba(15, 23, 42, 0.86); color: #fff; }
-    .badge-id { background: rgba(225, 29, 72, 0.92); color: #fff; }
     .heart-btn {
       position: absolute;
-      top: 8px;
-      right: 8px;
+      top: 6px;
+      right: 6px;
       z-index: 4;
-      width: 30px;
-      height: 30px;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.94);
+      background: rgba(255, 255, 255, 0.9);
       border: none;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-      font-size: 15px;
+      font-size: 13px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -365,103 +304,60 @@
       padding: 10px;
       display: flex;
       flex-direction: column;
-      gap: 5px;
+      gap: 4px;
       flex: 1;
       justify-content: space-between;
     }
     .meta-top {
       display: flex;
       align-items: center;
-      gap: 5px;
-      font-size: 10.5px;
+      gap: 4px;
+      font-size: 10px;
       color: var(--muted);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
     .age-pill {
       background: var(--surface-2);
       border: 1px solid var(--border);
-      color: #334155;
-      font-weight: 800;
-      font-size: 9.5px;
-      padding: 1px 5px;
-      border-radius: 4px;
-      flex-shrink: 0;
+      color: var(--text);
+      font-weight: 600;
+      font-size: 9px;
+      padding: 1px 4px;
+      border-radius: 3px;
     }
     .card-title {
-      font-size: 13px;
-      font-weight: 800;
+      font-size: 12.5px;
+      font-weight: 700;
       color: var(--text);
-      line-height: 1.28;
+      line-height: 1.3;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
-    .card-date {
-      font-size: 11.5px;
-      font-weight: 700;
+    .card-footer {
+      font-size: 11px;
       color: var(--blue);
-      margin-top: 2px;
-    }
-    .card-rating {
-      font-size: 11.5px;
-      font-weight: 800;
-      color: #d97706;
+      font-weight: 500;
       margin-top: 2px;
     }
 
-    .view-container { display: none; padding: 14px; }
+    .view-container { display: none; padding: 16px; }
     .view-container.active { display: block; }
-    .radar-hero {
-      background: linear-gradient(135deg, #0f172a, #1e293b);
-      color: #fff;
-      border-radius: 16px;
-      padding: 16px;
-      margin-bottom: 14px;
-    }
-    .radar-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 10px;
-    }
-    .radar-tag {
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 0.08em;
-      color: #38bdf8;
-      text-transform: uppercase;
-      margin-bottom: 4px;
-    }
-    .radar-hero h2 { font-size: 17px; font-weight: 800; margin-bottom: 6px; }
-    .radar-hero p { font-size: 12px; color: #cbd5e1; }
-    .test-notif-pill {
-      background: var(--blue);
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      padding: 8px 11px;
-      font-size: 11px;
-      font-weight: 800;
-      white-space: nowrap;
-      cursor: pointer;
-    }
+    
     .watch-item {
       background: #fff;
       border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 11px;
+      border-radius: 10px;
+      padding: 10px;
       display: flex;
-      gap: 11px;
-      margin-bottom: 10px;
+      gap: 10px;
+      margin-bottom: 8px;
       align-items: center;
     }
     .watch-thumb {
-      width: 56px;
-      height: 80px;
-      border-radius: 9px;
+      width: 50px;
+      height: 72px;
+      border-radius: 6px;
       overflow: hidden;
       flex-shrink: 0;
       background: #0f172a;
@@ -469,80 +365,65 @@
     }
     .watch-thumb img { width: 100%; height: 100%; object-fit: cover; }
     .watch-body { flex: 1; min-width: 0; }
-    .watch-title { font-size: 13.5px; font-weight: 800; color: var(--text); margin-bottom: 2px; }
-    .watch-date { font-size: 11.5px; font-weight: 700; color: var(--blue); margin-bottom: 8px; }
-    .watch-toggles { display: flex; gap: 6px; flex-wrap: wrap; }
+    .watch-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+    .watch-date { font-size: 11px; color: var(--muted); margin-bottom: 6px; }
+    .watch-toggles { display: flex; gap: 6px; }
     .toggle-pill {
-      font-size: 11px;
-      font-weight: 700;
-      padding: 5px 9px;
-      border-radius: 8px;
+      font-size: 10.5px;
+      font-weight: 500;
+      padding: 4px 8px;
+      border-radius: 6px;
       border: 1px solid var(--border);
       background: var(--surface-2);
       color: var(--muted);
       cursor: pointer;
     }
-    .toggle-pill.on-presale {
-      background: #fef3c7;
-      border-color: #fcd34d;
-      color: #b45309;
-    }
-    .toggle-pill.on-day {
-      background: var(--emerald-soft);
-      border-color: #86efac;
-      color: var(--emerald);
+    .toggle-pill.active {
+      background: var(--blue-soft);
+      border-color: #bfdbfe;
+      color: var(--blue);
     }
 
     .info-card {
       background: #fff;
       border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 15px;
+      border-radius: 10px;
+      padding: 14px;
       margin-bottom: 12px;
     }
-    .info-card h3 { font-size: 15px; font-weight: 800; margin-bottom: 6px; }
-    .info-card p { font-size: 12.5px; color: var(--muted); margin-bottom: 10px; }
-    .source-list { list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 12.5px; }
-    .source-list li {
-      background: var(--surface-2);
-      padding: 9px 11px;
-      border-radius: 9px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-    }
+    .info-card h3 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+    .info-card p { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
     .text-input {
       width: 100%;
       background: var(--surface-2);
       border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 11px 12px;
-      font-size: 13px;
-      margin-bottom: 10px;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 12.5px;
+      margin-bottom: 8px;
       outline: none;
     }
     .btn-full {
       width: 100%;
-      background: var(--blue);
+      background: var(--text);
       color: #fff;
       border: none;
-      border-radius: 10px;
-      padding: 12px;
-      font-size: 13.5px;
-      font-weight: 800;
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 12.5px;
+      font-weight: 600;
       cursor: pointer;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
     .btn-outline {
       width: 100%;
       background: #fff;
       color: var(--text);
       border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 11px;
-      font-size: 13px;
-      font-weight: 700;
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 12.5px;
+      font-weight: 600;
       cursor: pointer;
     }
 
@@ -565,30 +446,30 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 3px;
-      font-size: 11px;
-      font-weight: 700;
+      gap: 2px;
+      font-size: 10.5px;
+      font-weight: 500;
       color: var(--muted);
       cursor: pointer;
     }
-    .nav-item.active { color: var(--blue); }
-    .nav-icon { font-size: 18px; position: relative; }
+    .nav-item.active { color: var(--text); font-weight: 700; }
+    .nav-icon { font-size: 16px; position: relative; }
     .nav-badge {
       position: absolute;
       top: -3px;
-      right: -10px;
-      background: var(--rose);
+      right: -8px;
+      background: var(--blue);
       color: #fff;
-      font-size: 9.5px;
-      font-weight: 800;
-      padding: 1px 5px;
+      font-size: 9px;
+      font-weight: 700;
+      padding: 1px 4px;
       border-radius: 99px;
     }
 
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(15, 23, 42, 0.65);
+      background: rgba(15, 23, 42, 0.5);
       z-index: 60;
       display: none;
       align-items: flex-end;
@@ -597,195 +478,129 @@
     .modal-overlay.open { display: flex; }
     .detail-sheet {
       width: 100%;
-      max-width: 560px;
-      max-height: 90vh;
+      max-width: 520px;
+      max-height: 85vh;
       overflow-y: auto;
       background: #ffffff;
-      border-radius: 22px 22px 0 0;
-      padding: 18px 16px 26px;
+      border-radius: 16px 16px 0 0;
+      padding: 16px 16px 24px;
       position: relative;
-      animation: slideUp 0.18s ease-out;
-    }
-    @keyframes slideUp {
-      from { transform: translateY(30px); opacity: 0.6; }
-      to { transform: translateY(0); opacity: 1; }
     }
     .close-sheet {
       position: absolute;
-      top: 14px;
-      right: 14px;
-      width: 32px;
-      height: 32px;
+      top: 12px;
+      right: 12px;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
       background: var(--surface-2);
       border: 1px solid var(--border);
-      font-size: 16px;
-      font-weight: 700;
+      font-size: 13px;
       color: var(--text);
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .detail-header {
       display: flex;
-      gap: 13px;
-      margin-bottom: 14px;
-      padding-right: 32px;
+      gap: 12px;
+      margin-bottom: 12px;
     }
     .detail-poster {
-      width: 88px;
-      height: 130px;
-      border-radius: 11px;
+      width: 80px;
+      height: 116px;
+      border-radius: 8px;
       overflow: hidden;
       flex-shrink: 0;
       background: #0f172a;
     }
     .detail-poster img { width: 100%; height: 100%; object-fit: cover; }
-    .detail-badges { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 6px; }
-    .confirmed-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      background: var(--emerald-soft);
-      color: var(--emerald);
-      font-size: 11px;
-      font-weight: 800;
-      padding: 3px 8px;
-      border-radius: 6px;
-      margin-bottom: 5px;
-    }
-    .detail-title { font-size: 17px; font-weight: 900; color: var(--text); line-height: 1.25; margin-bottom: 6px; }
-    .hype-row {
-      display: flex;
-      justify-content: space-between;
-      font-size: 11.5px;
-      font-weight: 700;
-      color: #ea580c;
-      margin-bottom: 4px;
-    }
-    .hype-bar {
-      width: 100%;
-      height: 6px;
-      background: #e2e8f0;
-      border-radius: 99px;
-      overflow: hidden;
-      margin-bottom: 6px;
-    }
-    .hype-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #f59e0b, #ef4444);
-      border-radius: 99px;
-    }
-    .detail-subcast { font-size: 11.5px; color: var(--muted); }
+    .detail-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .detail-sub { font-size: 11.5px; color: var(--muted); margin-bottom: 2px; }
 
     .verify-box {
-      background: #f8fafc;
-      border: 1px solid #cbd5e1;
-      border-radius: 13px;
-      padding: 12px;
-      margin-bottom: 13px;
-    }
-    .verify-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 6px;
-      margin-bottom: 6px;
-    }
-    .verify-label { font-size: 10px; font-weight: 800; color: var(--muted); letter-spacing: 0.04em; }
-    .verify-source {
-      font-size: 10.5px;
-      font-weight: 700;
-      background: #e0e7ff;
-      color: #3730a3;
-      padding: 2px 7px;
-      border-radius: 5px;
-    }
-    .verify-date { font-size: 13px; font-weight: 800; color: var(--blue); margin-bottom: 3px; }
-    .verify-presale { font-size: 12px; color: #334155; margin-bottom: 8px; }
-    .chains-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: 11.5px; font-weight: 700; }
-    .chain-chip {
-      background: #fff;
+      background: var(--surface-2);
       border: 1px solid var(--border);
-      padding: 3px 9px;
-      border-radius: 6px;
-      font-weight: 800;
-      color: #0f172a;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 10px;
+      font-size: 11.5px;
     }
-
-    .credits-block { font-size: 12.5px; color: #334155; margin-bottom: 13px; }
-    .credits-block p { margin-bottom: 5px; }
-    .credits-block strong { color: var(--text); }
+    .verify-date { font-weight: 700; color: var(--blue); margin-bottom: 2px; }
 
     .quick-verify-bar {
       display: flex;
       gap: 6px;
-      margin-bottom: 13px;
+      margin-bottom: 12px;
     }
     .verify-link-btn {
       flex: 1;
-      background: var(--surface-2);
+      background: #fff;
       border: 1px solid var(--border);
-      border-radius: 9px;
-      padding: 8px 6px;
+      border-radius: 6px;
+      padding: 7px 4px;
       font-size: 11px;
-      font-weight: 800;
-      color: #0f172a;
+      font-weight: 600;
+      color: var(--text);
       text-align: center;
       cursor: pointer;
     }
 
+    .credits-block { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
+    .credits-block p { margin-bottom: 3px; }
+    .credits-block strong { color: var(--text); }
+
     .reminder-box {
-      background: #f8fafc;
+      background: var(--surface-2);
       border: 1px solid var(--border);
-      border-radius: 13px;
-      padding: 12px;
-      margin-bottom: 14px;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 12px;
     }
-    .reminder-box h4 { font-size: 13px; font-weight: 800; margin-bottom: 9px; }
     .rem-option {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 10px;
-      padding: 8px 0;
-      border-top: 1px solid var(--border);
+      gap: 8px;
+      padding: 6px 0;
+      font-size: 11.5px;
       cursor: pointer;
     }
-    .rem-option:first-of-type { border-top: none; padding-top: 0; }
-    .rem-title { font-size: 12.5px; font-weight: 700; color: var(--text); }
-    .rem-desc { font-size: 11px; color: var(--muted); }
-    .rem-check { width: 18px; height: 18px; accent-color: var(--blue); }
+    .rem-title { font-weight: 600; color: var(--text); }
+    .rem-check { width: 16px; height: 16px; accent-color: var(--text); }
 
     .detail-actions {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
+      gap: 8px;
     }
     .btn-cal {
-      background: #0f172a;
+      background: var(--text);
       color: #fff;
       border: none;
-      border-radius: 11px;
-      padding: 12px 10px;
-      font-size: 12.5px;
-      font-weight: 800;
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 12px;
+      font-weight: 600;
       cursor: pointer;
     }
     .btn-push {
-      background: var(--blue-soft);
-      color: var(--blue);
-      border: 1px solid #bfdbfe;
-      border-radius: 11px;
-      padding: 12px 10px;
-      font-size: 12.5px;
-      font-weight: 800;
+      background: var(--surface-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 12px;
+      font-weight: 600;
       cursor: pointer;
     }
     .empty-msg {
       grid-column: 1 / -1;
       text-align: center;
-      padding: 36px 16px;
+      padding: 32px 16px;
       color: var(--muted);
-      font-size: 13px;
+      font-size: 12.5px;
     }
   </style>
 </head>
@@ -794,24 +609,23 @@
   <header>
     <div class="header-top">
       <div class="brand">
-        <div class="brand-icon">🎬</div>
+        <div class="brand-icon">CT</div>
         <div>
-          <div class="brand-title">Cinema Tracker ID</div>
-          <div class="brand-sub">XXI • CGV • Cinépolis • LSF • TMDB</div>
+          <div class="brand-title">Cinema Tracker</div>
+          <div class="brand-sub">ID Theatrical Release</div>
         </div>
       </div>
       <div class="header-actions">
-        <span class="region-pill">ID</span>
-        <button class="icon-btn" onclick="toggleSearch()" title="Cari Film">🔍</button>
-        <button class="icon-btn" onclick="switchBottomTab('watchlist')" title="Watchlist & Reminder">
+        <button class="icon-btn" onclick="toggleSearch()" title="Cari">🔍</button>
+        <button class="icon-btn" onclick="switchBottomTab('watchlist')" title="Watchlist">
           🔔
-          <span id="headerBellBadge" class="bell-badge">0</span>
+          <span id="headerBellBadge" class="bell-badge" style="display:none;">0</span>
         </button>
-        <button class="icon-btn" onclick="forceQuickSync()" title="Refresh Poster & Jadwal">🔄</button>
+        <button class="icon-btn" onclick="forceQuickSync()" title="Refresh">🔄</button>
       </div>
     </div>
     <div id="searchBar" class="search-bar">
-      <input id="searchInput" class="search-input" type="text" placeholder="Cari judul film, sutradara, pemeran, atau bioskop..." oninput="renderMovies()" />
+      <input id="searchInput" class="search-input" type="text" placeholder="Cari film, sutradara, atau pemeran..." oninput="renderMovies()" />
     </div>
     <div id="modeTabsBar" class="mode-tabs">
       <button id="tabNow" class="mode-tab active" onclick="setMode('now')">SEDANG TAYANG (<span id="countNow">0</span>)</button>
@@ -819,17 +633,15 @@
     </div>
   </header>
 
-  <!-- VIEW 1: FILM BIOSKOP -->
   <div id="viewCatalog" class="view-container active" style="padding:0;">
     <div class="filter-section">
       <div class="chips-row">
-        <button class="chip active" data-chip="all" onclick="setChip('all', this)">Semua Film</button>
-        <button class="chip" data-chip="id" onclick="setChip('id', this)">🇮🇩 Film Indonesia</button>
-        <button class="chip" data-chip="hype" onclick="setChip('hype', this)">🔥 High Hype</button>
+        <button class="chip active" data-chip="all" onclick="setChip('all', this)">Semua</button>
+        <button class="chip" data-chip="id" onclick="setChip('id', this)">Lokal ID</button>
+        <button class="chip" data-chip="hype" onclick="setChip('hype', this)">High Hype</button>
         <button class="chip" data-chip="imax" onclick="setChip('imax', this)">IMAX</button>
         <button class="chip" data-chip="XXI" onclick="setChip('XXI', this)">XXI</button>
         <button class="chip" data-chip="CGV" onclick="setChip('CGV', this)">CGV</button>
-        <button class="chip" data-chip="Cinépolis" onclick="setChip('Cinépolis', this)">Cinépolis</button>
       </div>
       <div class="controls-row">
         <label class="checkbox-label">
@@ -837,73 +649,52 @@
           Sembunyikan TBA
         </label>
         <select id="sortSelect" class="sort-select" onchange="renderMovies()">
-          <option value="date">Urut: Jadwal Rilis</option>
-          <option value="hype">Urut: Tingkat Hype</option>
-          <option value="title">Urut: Judul A-Z</option>
+          <option value="date">Urut: Tanggal Rilis</option>
+          <option value="hype">Urut: Hype</option>
+          <option value="title">Urut: Judul</option>
         </select>
       </div>
     </div>
 
     <div class="status-banner">
-      <div class="status-left">
-        <span class="dot-green"></span>
-        <span id="bannerLabel">Sedang Tayang di Bioskop Indonesia (November 2026)</span>
-      </div>
-      <span id="bannerCount" class="count-pill">0 Film</span>
+      <span id="bannerLabel">Jadwal Teater Indonesia (November 2026)</span>
+      <span id="bannerCount">0 Film</span>
     </div>
 
     <main id="movieGrid" class="movie-grid"></main>
   </div>
 
-  <!-- VIEW 2: WATCHLIST & REMINDER -->
   <div id="viewWatchlist" class="view-container">
-    <div class="radar-hero">
-      <div class="radar-top">
-        <div>
-          <div class="radar-tag">PRESALE & RELEASE RADAR</div>
-          <h2>Watchlist & Pengingat Tiket</h2>
-          <p>Pantau film incaranmu agar langsung tahu saat tiket presale IMAX / Regular buka di TIX ID, M-TIX, CGV & Cinépolis.</p>
-        </div>
-        <button class="test-notif-pill" onclick="sendGlobalTestNotif()">🔔 Test Notif HP</button>
-      </div>
+    <div class="info-card" style="background:#0f172a; color:#fff; border:none; margin-bottom:12px;">
+      <h3 style="color:#fff; margin-bottom:4px;">Watchlist & Radar Presale</h3>
+      <p style="color:#cbd5e1; margin-bottom:10px;">Pantau jadwal rilis dan pembukaan presale tiket bioskop Indonesia.</p>
+      <button class="btn-outline" style="background:transparent; color:#fff; border-color:#334155;" onclick="sendGlobalTestNotif()">Test Notifikasi HP</button>
     </div>
     <div id="watchlistContainer"></div>
   </div>
 
-  <!-- VIEW 3: SUMBER & TMDB -->
   <div id="viewSources" class="view-container">
     <div class="info-card">
-      <h3>🔄 Sinkronisasi Live Multi-Source (TMDB ID + LSF)</h3>
-      <p>Cukup simpan TMDB API Key (v3) satu kali. Aplikasi otomatis memfilter rilis bioskop Indonesia yang akurat dan bersih dari film lama/VOD.</p>
-      <input id="tmdbKeyInput" class="text-input" type="text" placeholder="Tempel TMDB API Key v3 di sini..." />
-      <button class="btn-full" onclick="syncTmdbLive(true)">Simpan Key & Sync Jadwal Bioskop ID</button>
-      <button class="btn-outline" onclick="sendGlobalTestNotif()">🔔 Tes Notifikasi Android Sekarang</button>
-      <p id="syncFeedback" style="margin-top:8px; margin-bottom:0; font-weight:700; color:#2563eb;"></p>
-    </div>
-
-    <div class="info-card">
-      <h3>📡 Sumber Data & Filter Bioskop Indonesia</h3>
-      <p>Pembersihan otomatis film lama (seperti rilis tahun 2025) agar tab Sedang Tayang benar-benar akurat bulan November 2026.</p>
-      <ul class="source-list">
-        <li><span><strong>Filter Ketat November 2026</strong><br><small>Memblokir film lama / VOD luar negeri yang nyasar</small></span><span class="confirmed-pill">Active</span></li>
-        <li><span><strong>TMDB Credits API</strong><br><small>Menarik nama Sutradara & Pemeran Asli</small></span><span class="confirmed-pill">Active</span></li>
-        <li><span><strong>Jaringan XXI, CGV & Cinépolis</strong><br><small>Verifikasi penayangan teater reguler dan IMAX</small></span><span class="confirmed-pill">Verified</span></li>
-      </ul>
+      <h3>Pengaturan TMDB API Key</h3>
+      <p>Masukkan TMDB API Key v3 untuk sinkronisasi otomatis jadwal bioskop Indonesia.</p>
+      <input id="tmdbKeyInput" class="text-input" type="text" placeholder="Tempel API Key di sini..." />
+      <button class="btn-full" onclick="syncTmdbLive(true)">Simpan & Sinkronisasi</button>
+      <p id="syncFeedback" style="margin-top:6px; font-weight:600; font-size:12px; color:var(--blue);"></p>
     </div>
   </div>
 
   <nav class="bottom-nav">
     <button id="navCatalog" class="nav-item active" onclick="switchBottomTab('catalog')">
       <span class="nav-icon">🎬</span>
-      <span>Film Bioskop</span>
+      <span>Bioskop</span>
     </button>
     <button id="navWatchlist" class="nav-item" onclick="switchBottomTab('watchlist')">
-      <span class="nav-icon">❤️<span id="navWatchBadge" class="nav-badge">0</span></span>
-      <span>Watchlist & Reminder</span>
+      <span class="nav-icon">❤️<span id="navWatchBadge" class="nav-badge" style="display:none;">0</span></span>
+      <span>Watchlist</span>
     </button>
     <button id="navSources" class="nav-item" onclick="switchBottomTab('sources')">
       <span class="nav-icon">⚙️</span>
-      <span>Sumber & TMDB</span>
+      <span>Pengaturan</span>
     </button>
   </nav>
 
@@ -919,594 +710,173 @@
       28: "Action", 12: "Adventure", 16: "Animation", 35: "Comedy",
       80: "Crime", 99: "Documentary", 18: "Drama", 10751: "Family",
       14: "Fantasy", 36: "History", 27: "Horror", 10402: "Music",
-      9648: "Mystery", 10749: "Romance", 878: "Sci-Fi", 53: "Thriller",
-      10752: "War", 37: "Western"
+      9648: "Mystery", 10749: "Romance", 878: "Sci-Fi", 53: "Thriller"
     };
 
-    // STRICT CURATED NOW SHOWING IN INDONESIA (NOVEMBER 2026 ONLY - NO 2025/OLD MOVIES)
     const CURATED_NOW_MOVIES = [
       {
-        id: "now_1",
-        status: "now",
-        isIndonesian: true,
-        title: "HAMKA: AWAL MULA (VOL. 3)",
-        searchQuery: "Buya Hamka Vol 3",
-        releaseDate: "2026-11-12",
-        dateLabel: "Sedang Tayang",
-        confirmedText: "Sedang Tayang di XXI, CGV & Cinépolis sejak 12 Nov 2026",
-        presaleText: "Tiket reguler tersedia hari ini di TIX ID, M-TIX & CGV App.",
-        sourceBadge: "Now Showing ID • LSF SU",
-        age: "SU",
-        runtime: "128m",
-        genre: "Biopic, Drama",
-        hype: 88,
-        rating: "8.8",
-        presale: false,
-        imax: false,
-        tba: false,
-        chains: ["XXI", "CGV", "Cinépolis"],
-        director: "Fajar Bustomi",
-        cast: "Vino G. Bastian, Laudya Cynthia Bella",
-        synopsis: "Babak penutup perjalanan hidup Buya Hamka dalam memperjuangkan persatuan bangsa dan karya sastra Indonesia.",
-        poster: "",
-        gradient: "linear-gradient(145deg, #b45309, #1e293b)"
+        id: "now_1", status: "now", isIndonesian: true, title: "HAMKA: AWAL MULA (VOL. 3)", searchQuery: "Buya Hamka Vol 3",
+        releaseDate: "2026-11-12", dateLabel: "Sedang Tayang", confirmedText: "Sedang tayang di XXI, CGV & Cinépolis",
+        presaleText: "Tiket tersedia di TIX ID, M-TIX & CGV.", sourceBadge: "XXI • LSF SU", age: "SU", runtime: "128m",
+        genre: "Biopic, Drama", hype: 88, rating: "8.8", presale: false, imax: false, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        director: "Fajar Bustomi", cast: "Vino G. Bastian, Laudya Cynthia Bella", synopsis: "Babak penutup perjalanan hidup Buya Hamka.", poster: ""
       },
       {
-        id: "now_2",
-        status: "now",
-        isIndonesian: false,
-        title: "THE HUNGER GAMES: SUNRISE ON THE REAPING",
-        searchQuery: "Sunrise on the Reaping",
-        releaseDate: "2026-11-18",
-        dateLabel: "Sedang Tayang",
-        confirmedText: "Sedang Tayang di IMAX XXI, CGV & Cinépolis sejak 18 Nov 2026",
-        presaleText: "Tersedia format IMAX Laser, 4DX & Regular hari ini.",
-        sourceBadge: "Now Showing IMAX ID",
-        age: "R 13+",
-        runtime: "144m",
-        genre: "Action, Fantasy",
-        hype: 96,
-        rating: "9.4",
-        presale: false,
-        imax: true,
-        tba: false,
-        chains: ["XXI", "CGV", "Cinépolis"],
-        director: "Francis Lawrence",
-        cast: "Joseph Zada, Whitney Peak, Ralph Fiennes",
-        synopsis: "Mengisahkan Quarter Quell ke-50 saat Haymitch Abernathy muda harus bertahan hidup di arena dengan jumlah peserta dua kali lipat.",
-        poster: "",
-        gradient: "linear-gradient(145deg, #9a3412, #0f172a)"
+        id: "now_2", status: "now", isIndonesian: false, title: "THE HUNGER GAMES: SUNRISE ON THE REAPING", searchQuery: "Sunrise on the Reaping",
+        releaseDate: "2026-11-18", dateLabel: "Sedang Tayang", confirmedText: "Sedang tayang di IMAX XXI & CGV",
+        presaleText: "Tersedia format IMAX & Regular.", sourceBadge: "IMAX ID", age: "R 13+", runtime: "144m",
+        genre: "Action, Fantasy", hype: 96, rating: "9.4", presale: false, imax: true, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        director: "Francis Lawrence", cast: "Joseph Zada, Whitney Peak", synopsis: "Kisah Quarter Quell ke-50 Haymitch Abernathy.", poster: ""
       },
       {
-        id: "now_3",
-        status: "now",
-        isIndonesian: false,
-        title: "LOOK BACK (LIVE-ACTION)",
-        searchQuery: "Look Back",
-        releaseDate: "2026-11-11",
-        dateLabel: "Sedang Tayang",
-        confirmedText: "Sedang Tayang di CGV & Cinépolis Indonesia",
-        presaleText: "Tersedia di jaringan CGV Grand Indonesia, AEON & Cinépolis Lippo.",
-        sourceBadge: "Now Showing CGV / Cinépolis",
-        age: "R 13+",
-        runtime: "110m",
-        genre: "Drama",
-        hype: 95,
-        rating: "9.3",
-        presale: false,
-        imax: false,
-        tba: false,
-        chains: ["CGV", "Cinépolis"],
-        director: "Hirokazu Kore-eda",
-        cast: "Mana Ashida, Mizuki Yoshida",
-        synopsis: "Adaptasi live-action karya Tatsuki Fujimoto tentang dua gadis muda yang dipersatukan oleh kecintaan menggambar manga.",
-        poster: "",
-        gradient: "linear-gradient(145deg, #0284c7, #1e293b)"
+        id: "now_3", status: "now", isIndonesian: false, title: "LOOK BACK (LIVE-ACTION)", searchQuery: "Look Back",
+        releaseDate: "2026-11-11", dateLabel: "Sedang Tayang", confirmedText: "Sedang tayang di CGV & Cinépolis",
+        presaleText: "Tersedia di jaringan CGV.", sourceBadge: "CGV / Cinépolis", age: "R 13+", runtime: "110m",
+        genre: "Drama", hype: 95, rating: "9.3", presale: false, imax: false, tba: false, chains: ["CGV", "Cinépolis"],
+        director: "Hirokazu Kore-eda", cast: "Mana Ashida, Mizuki Yoshida", synopsis: "Adaptasi live-action manga Tatsuki Fujimoto.", poster: ""
       },
       {
-        id: "now_4",
-        status: "now",
-        isIndonesian: true,
-        title: "SEPORSI MIE AYAM SEBELUM MATI",
-        searchQuery: "Seporsi Mie Ayam Sebelum Mati",
-        releaseDate: "2026-11-12",
-        dateLabel: "Sedang Tayang",
-        confirmedText: "Sedang Tayang di XXI, CGV & Cinépolis",
-        presaleText: "Tiket tersedia di seluruh bioskop Indonesia hari ini.",
-        sourceBadge: "Now Showing ID • LSF R13+",
-        age: "R 13+",
-        runtime: "105m",
-        genre: "Drama",
-        hype: 90,
-        rating: "8.9",
-        presale: false,
-        imax: false,
-        tba: false,
-        chains: ["XXI", "CGV", "Cinépolis"],
-        director: "Yandy Laurens",
-        cast: "Baskara Mahendra, Rachel Amanda",
-        synopsis: "Adaptasi novel Brian Khrisna tentang seorang pria yang menunda niat mengakhiri hidup demi menyantap semangkuk mie ayam terakhir.",
-        poster: "",
-        gradient: "linear-gradient(145deg, #dc2626, #1f2937)"
+        id: "now_4", status: "now", isIndonesian: true, title: "SEPORSI MIE AYAM SEBELUM MATI", searchQuery: "Seporsi Mie Ayam Sebelum Mati",
+        releaseDate: "2026-11-12", dateLabel: "Sedang Tayang", confirmedText: "Sedang tayang di XXI, CGV & Cinépolis",
+        presaleText: "Tiket tersedia di bioskop.", sourceBadge: "LSF R13+", age: "R 13+", runtime: "105m",
+        genre: "Drama", hype: 90, rating: "8.9", presale: false, imax: false, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        director: "Yandy Laurens", cast: "Baskara Mahendra, Rachel Amanda", synopsis: "Adaptasi novel Brian Khrisna.", poster: ""
       },
       {
-        id: "now_5",
-        status: "now",
-        isIndonesian: false,
-        title: "NOW YOU SEE ME: NOW YOU DON'T",
-        searchQuery: "Now You See Me Now You Don't",
-        releaseDate: "2026-11-11",
-        dateLabel: "Sedang Tayang",
-        confirmedText: "Sedang Tayang di XXI, CGV & Cinépolis",
-        presaleText: "Tiket tersedia di seluruh jaringan bioskop.",
-        sourceBadge: "Now Showing ID",
-        age: "R 13+",
-        runtime: "122m",
-        genre: "Action, Mystery",
-        hype: 87,
-        rating: "8.4",
-        presale: false,
-        imax: false,
-        tba: false,
-        chains: ["XXI", "CGV", "Cinépolis"],
-        director: "Ruben Fleischer",
-        cast: "Jesse Eisenberg, Woody Harrelson, Isla Fisher, Rosamund Pike",
-        synopsis: "Para Four Horsemen kembali beraksi dengan generasi pesulap baru dalam pencurian berlian paling mustahil.",
-        poster: "",
-        gradient: "linear-gradient(145deg, #4338ca, #09090b)"
+        id: "now_5", status: "now", isIndonesian: false, title: "NOW YOU SEE ME: NOW YOU DON'T", searchQuery: "Now You See Me Now You Don't",
+        releaseDate: "2026-11-11", dateLabel: "Sedang Tayang", confirmedText: "Sedang tayang di XXI, CGV & Cinépolis",
+        presaleText: "Tiket tersedia di bioskop.", sourceBadge: "XXI ID", age: "R 13+", runtime: "122m",
+        genre: "Action, Mystery", hype: 87, rating: "8.4", presale: false, imax: false, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        director: "Ruben Fleischer", cast: "Jesse Eisenberg, Woody Harrelson", synopsis: "Aksi pencurian baru Four Horsemen.", poster: ""
       }
     ];
 
     const CURATED_UPCOMING_MOVIES = [
       {
-        id: "up_1",
-        status: "upcoming",
-        isIndonesian: false,
-        title: "BLUE LOCK: EPISODE NAGI - STAGE 2",
-        searchQuery: "Blue Lock Episode Nagi",
-        releaseDate: "2026-11-20",
-        dateLabel: "20 Nov",
-        confirmedText: "Confirmed ID: Jumat, 20 Nov 2026 (Rilis Serentak)",
-        presaleText: "Tiket Presale sudah dibuka di TIX ID, M-TIX & CGV.",
-        sourceBadge: "Verified Cinema XXI / CGV",
-        age: "R 13+",
-        runtime: "108m",
-        genre: "Anime, Sports",
-        hype: 92,
-        presale: true,
-        imax: false,
-        tba: false,
-        chains: ["XXI", "CGV", "Cinépolis"],
-        director: "Shunsuke Ishikawa",
-        cast: "Nobunaga Shimazaki, Yuma Uchida, Kazuki Ura",
-        synopsis: "Babak lanjutan proyek Blue Lock mempertemukan striker egois terbaik Jepang dalam seleksi Neo Egoist League di layar lebar.",
-        poster: "",
-        gradient: "linear-gradient(145deg, #1d4ed8, #0f172a)"
+        id: "up_1", status: "upcoming", isIndonesian: false, title: "BLUE LOCK: EPISODE NAGI - STAGE 2", searchQuery: "Blue Lock Episode Nagi",
+        releaseDate: "2026-11-20", dateLabel: "20 Nov", confirmedText: "Jumat, 20 Nov 2026",
+        presaleText: "Presale dibuka di TIX ID & CGV.", sourceBadge: "XXI / CGV", age: "R 13+", runtime: "108m",
+        genre: "Anime, Sports", hype: 92, presale: true, imax: false, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        director: "Shunsuke Ishikawa", cast: "Nobunaga Shimazaki, Yuma Uchida", synopsis: "Neo Egoist League.", poster: ""
       },
       {
-        id: "up_2",
-        status: "upcoming",
-        isIndonesian: false,
-        title: "HOW TO ROB A BANK",
-        searchQuery: "How to Rob a Bank",
-        releaseDate: "2026-11-20",
-        dateLabel: "20 Nov",
-        confirmedText: "Confirmed ID: Jumat, 20 Nov 2026",
-        presaleText: "Presale tersedia untuk penayangan akhir pekan di XXI & CGV.",
-        sourceBadge: "Verified Cinema XXI / LSF",
-        age: "D 17+",
-        runtime: "118m",
-        genre: "Action, Crime",
-        hype: 88,
-        presale: true,
-        imax: false,
-        tba: false,
-        chains: ["XXI", "CGV", "Cinépolis"],
-        director: "David Leitch",
-        cast: "Nicholas Hoult, Zoë Kravitz, Anna Sawai",
-        synopsis: "Sekelompok perampok profesional merencanakan aksi berisiko tinggi yang berubah menjadi pengejaran brutal di pusat kota.",
-        poster: "",
-        gradient: "linear-gradient(145deg, #be123c, #1e1b4b)"
+        id: "up_2", status: "upcoming", isIndonesian: false, title: "HOW TO ROB A BANK", searchQuery: "How to Rob a Bank",
+        releaseDate: "2026-11-20", dateLabel: "20 Nov", confirmedText: "Jumat, 20 Nov 2026",
+        presaleText: "Presale akhir pekan di XXI & CGV.", sourceBadge: "XXI ID", age: "D 17+", runtime: "118m",
+        genre: "Action, Crime", hype: 88, presale: true, imax: false, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        director: "David Leitch", cast: "Nicholas Hoult, Zoë Kravitz", synopsis: "Perampokan berisiko tinggi.", poster: ""
       },
       {
-        id: "up_3",
-        status: "upcoming",
-        isIndonesian: false,
-        title: "THE FURTHER MIS-ADVENTURES OF CLIFF BOOTH",
-        searchQuery: "The Adventures of Cliff Booth",
-        releaseDate: "2026-11-25",
-        dateLabel: "25 Nov",
-        confirmedText: "Confirmed ID: Rabu, 25 Nov 2026 (Jadwal Rabu ID)",
-        presaleText: "Estimasi Presale buka 21 Nov 2026 di TIX ID & M-TIX.",
-        sourceBadge: "Verified Cinema XXI / LSF",
-        age: "D 17+",
-        runtime: "136m",
-        genre: "Drama, Crime",
-        hype: 95,
-        presale: false,
-        imax: true,
-        tba: false,
-        chains: ["XXI", "CGV", "Cinépolis"],
-        director: "David Fincher",
-        cast: "Brad Pitt, Elizabeth Debicki, Scott Caan",
-        synopsis: "Kisah lanjutan pemeran pengganti legendaris Cliff Booth menavigasi sisi gelap industri film Hollywood era 1970-an.",
-        poster: "",
-        gradient: "linear-gradient(145deg, #b45309, #1c1917)"
+        id: "up_3", status: "upcoming", isIndonesian: false, title: "THE FURTHER MIS-ADVENTURES OF CLIFF BOOTH", searchQuery: "The Adventures of Cliff Booth",
+        releaseDate: "2026-11-25", dateLabel: "25 Nov", confirmedText: "Rabu, 25 Nov 2026",
+        presaleText: "Estimasi presale 21 Nov di TIX ID.", sourceBadge: "XXI / LSF", age: "D 17+", runtime: "136m",
+        genre: "Drama, Crime", hype: 95, presale: false, imax: true, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        director: "David Fincher", cast: "Brad Pitt, Elizabeth Debicki", synopsis: "Hollywood era 1970-an.", poster: ""
       },
       {
-        id: "up_4",
-        status: "upcoming",
-        isIndonesian: false,
-        title: "FOCKER-IN-LAW",
-        searchQuery: "Focker-in-Law",
-        releaseDate: "2026-11-27",
-        dateLabel: "27 Nov",
-        confirmedText: "Confirmed ID: Jumat, 27 Nov 2026",
-        presaleText: "Estimasi Presale buka 24 Nov 2026 di M-TIX & CGV.",
-        sourceBadge: "Verified LSF / XXI",
-        age: "R 13+",
-        runtime: "110m",
-        genre: "Comedy",
-        hype: 81,
-        presale: false,
-        imax: false,
-        tba: false,
-        chains: ["XXI", "CGV", "Cinépolis"],
-        director: "John Hamburg",
-        cast: "Robert De Niro, Ben Stiller, Ariana Grande",
-        synopsis: "Keluarga Byrnes kembali menghadapi kekacauan baru saat rencana pernikahan generasi berikutnya memicu uji kesabaran.",
-        poster: "",
-        gradient: "linear-gradient(145deg, #0369a1, #1e293b)"
+        id: "up_4", status: "upcoming", isIndonesian: false, title: "FOCKER-IN-LAW", searchQuery: "Focker-in-Law",
+        releaseDate: "2026-11-27", dateLabel: "27 Nov", confirmedText: "Jumat, 27 Nov 2026",
+        presaleText: "Estimasi presale 24 Nov di M-TIX.", sourceBadge: "LSF / XXI", age: "R 13+", runtime: "110m",
+        genre: "Comedy", hype: 81, presale: false, imax: false, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        director: "John Hamburg", cast: "Robert De Niro, Ben Stiller", synopsis: "Keluarga Byrnes kembali.", poster: ""
       },
       {
-        id: "up_5",
-        status: "upcoming",
-        isIndonesian: false,
-        title: "HEXED",
-        searchQuery: "Hexed",
-        releaseDate: "2026-11-27",
-        dateLabel: "27 Nov",
-        confirmedText: "Confirmed ID: Jumat, 27 Nov 2026 (2 hari setelah US)",
-        presaleText: "Estimasi Presale IMAX buka 23 Nov 2026 di TIX ID.",
-        sourceBadge: "Verified Cinema XXI / IMAX",
-        age: "SU",
-        runtime: "104m",
-        genre: "Animation, Fantasy",
-        hype: 91,
-        presale: false,
-        imax: true,
-        tba: false,
-        chains: ["XXI", "CGV", "Cinépolis"],
-        director: "Josie Trinidad, Jason Hand",
-        cast: "Walt Disney Animation Studios",
-        synopsis: "Petualangan fantasi penuh sihir tentang seorang remaja canggung dan ibunya yang menemukan dunia tersembunyi di balik mantra.",
-        poster: "",
-        gradient: "linear-gradient(145deg, #6d28d9, #0f172a)"
+        id: "up_5", status: "upcoming", isIndonesian: false, title: "HEXED", searchQuery: "Hexed",
+        releaseDate: "2026-11-27", dateLabel: "27 Nov", confirmedText: "Jumat, 27 Nov 2026",
+        presaleText: "Estimasi presale IMAX 23 Nov.", sourceBadge: "IMAX XXI", age: "SU", runtime: "104m",
+        genre: "Animation, Fantasy", hype: 91, presale: false, imax: true, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        director: "Josie Trinidad", cast: "Disney Animation", synopsis: "Petualangan sihir remaja.", poster: ""
       },
       {
-        id: "up_6",
-        status: "upcoming",
-        isIndonesian: false,
-        title: "VIOLENT NIGHT 2",
-        searchQuery: "Violent Night 2",
-        releaseDate: "2026-12-02",
-        dateLabel: "2 Des",
-        confirmedText: "Confirmed ID: Rabu, 2 Des 2026 (2 hari lebih awal dari US)",
-        presaleText: "Estimasi Presale buka 28 Nov 2026 di TIX ID & CGV.",
-        sourceBadge: "Verified Cinema XXI / LSF",
-        age: "D 17+",
-        runtime: "115m",
-        genre: "Action, Thriller",
-        hype: 90,
-        presale: false,
-        imax: false,
-        tba: false,
-        chains: ["XXI", "CGV", "Cinépolis"],
-        director: "Tommy Wirkola",
-        cast: "David Harbour, Kristen Bell, Daniela Melchior",
-        synopsis: "Santa Claus kembali beraksi dengan palu perangnya untuk menyelamatkan keluarga sandera dari sindikat tentara bayaran malam Natal.",
-        poster: "",
-        gradient: "linear-gradient(145deg, #991b1b, #09090b)"
+        id: "up_6", status: "upcoming", isIndonesian: false, title: "VIOLENT NIGHT 2", searchQuery: "Violent Night 2",
+        releaseDate: "2026-12-02", dateLabel: "2 Des", confirmedText: "Rabu, 2 Des 2026",
+        presaleText: "Estimasi presale 28 Nov di TIX ID.", sourceBadge: "XXI / LSF", age: "D 17+", runtime: "115m",
+        genre: "Action, Thriller", hype: 90, presale: false, imax: false, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        director: "Tommy Wirkola", cast: "David Harbour, Kristen Bell", synopsis: "Santa Claus kembali beraksi.", poster: ""
       },
       {
-        id: "up_7",
-        status: "upcoming",
-        isIndonesian: true,
-        title: "3726 MDPL",
-        searchQuery: "3726 MDPL",
-        releaseDate: "2026-12-03",
-        dateLabel: "3 Des",
-        confirmedText: "Confirmed ID: Kamis, 3 Des 2026 (Film Indonesia)",
-        presaleText: "Estimasi Presale buka 30 Nov 2026 di M-TIX & TIX ID.",
-        sourceBadge: "Verified LSF / XXI",
-        age: "R 13+",
-        runtime: "116m",
-        genre: "Adventure, Romance",
-        hype: 86,
-        presale: false,
-        imax: false,
-        tba: false,
-        chains: ["XXI", "CGV", "Cinépolis"],
-        director: "Rako Prijanto",
-        cast: "Angga Yunanda, Syifa Hadju",
-        synopsis: "Perjalanan pendakian menuju puncak Gunung Rinjani menguji janji, persahabatan, dan perasaan yang lama terpendam.",
-        poster: "",
-        gradient: "linear-gradient(145deg, #0f766e, #0f172a)"
+        id: "up_7", status: "upcoming", isIndonesian: true, title: "3726 MDPL", searchQuery: "3726 MDPL",
+        releaseDate: "2026-12-03", dateLabel: "3 Des", confirmedText: "Kamis, 3 Des 2026",
+        presaleText: "Estimasi presale 30 Nov di M-TIX.", sourceBadge: "LSF / XXI", age: "R 13+", runtime: "116m",
+        genre: "Adventure, Romance", hype: 86, presale: false, imax: false, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        director: "Rako Prijanto", cast: "Angga Yunanda, Syifa Hadju", synopsis: "Pendakian Gunung Rinjani.", poster: ""
       },
       {
-        id: "up_8",
-        status: "upcoming",
-        isIndonesian: false,
-        title: "DUNE: PART TWO (IMAX RE-RELEASE)",
-        searchQuery: "Dune Part Two",
-        releaseDate: "2026-12-09",
-        dateLabel: "9 Des",
-        confirmedText: "Confirmed ID: Rabu, 9 Des 2026 (Menjelang Part Three)",
-        presaleText: "Presale khusus layar IMAX Laser XXI & CGV buka 4 Des 2026.",
-        sourceBadge: "Verified IMAX Indonesia",
-        age: "R 13+",
-        runtime: "166m",
-        genre: "Sci-Fi, Adventure",
-        hype: 94,
-        presale: false,
-        imax: true,
-        tba: false,
-        chains: ["XXI", "CGV"],
-        director: "Denis Villeneuve",
-        cast: "Timothée Chalamet, Zendaya, Rebecca Ferguson",
-        synopsis: "Penayangan ulang spesial layar IMAX menjelang perilisan Dune: Part Three di bioskop Indonesia.",
-        poster: "",
-        gradient: "linear-gradient(145deg, #c2410c, #1c1917)"
+        id: "up_8", status: "upcoming", isIndonesian: false, title: "DUNE: PART TWO (IMAX RE-RELEASE)", searchQuery: "Dune Part Two",
+        releaseDate: "2026-12-09", dateLabel: "9 Des", confirmedText: "Rabu, 9 Des 2026",
+        presaleText: "Presale IMAX buka 4 Des.", sourceBadge: "IMAX Indonesia", age: "R 13+", runtime: "166m",
+        genre: "Sci-Fi, Adventure", hype: 94, presale: false, imax: true, tba: false, chains: ["XXI", "CGV"],
+        director: "Denis Villeneuve", cast: "Timothée Chalamet, Zendaya", synopsis: "Penayangan ulang spesial IMAX.", poster: ""
       },
       {
-        id: "up_9",
-        status: "upcoming",
-        isIndonesian: true,
-        title: "POK AME AME",
-        searchQuery: "Pok Ame Ame",
-        releaseDate: "2026-12-10",
-        dateLabel: "10 Des",
-        confirmedText: "Confirmed ID: Kamis, 10 Des 2026 (Film Indonesia)",
-        presaleText: "Estimasi Presale buka 7 Des 2026 di TIX ID & M-TIX.",
-        sourceBadge: "Verified LSF / XXI",
-        age: "D 17+",
-        runtime: "102m",
-        genre: "Horror, Mystery",
-        hype: 84,
-        presale: false,
-        imax: false,
-        tba: false,
-        chains: ["XXI", "CGV", "Cinépolis"],
-        director: "Charles Gozali",
-        cast: "Taskya Namya, Aghniny Haque",
-        synopsis: "Permainan lagu masa kecil berubah menjadi teror kutukan turun-temurun di sebuah rumah tua Jawa Tengah.",
-        poster: "",
-        gradient: "linear-gradient(145deg, #7f1d1d, #09090b)"
+        id: "up_9", status: "upcoming", isIndonesian: true, title: "POK AME AME", searchQuery: "Pok Ame Ame",
+        releaseDate: "2026-12-10", dateLabel: "10 Des", confirmedText: "Kamis, 10 Des 2026",
+        presaleText: "Estimasi presale 7 Des.", sourceBadge: "LSF / XXI", age: "D 17+", runtime: "102m",
+        genre: "Horror, Mystery", hype: 84, presale: false, imax: false, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        director: "Charles Gozali", cast: "Taskya Namya, Aghniny Haque", synopsis: "Teror kutukan rumah tua.", poster: ""
       },
       {
-        id: "up_10",
-        status: "upcoming",
-        isIndonesian: false,
-        title: "DUNE: PART THREE",
-        searchQuery: "Dune Part Three",
-        releaseDate: "2026-12-16",
-        dateLabel: "16 Des",
-        confirmedText: "Confirmed ID: Rabu, 16 Des 2026 (2 hari lebih awal dari US)",
-        presaleText: "Estimasi Presale IMAX buka 9 Des 2026 di TIX ID & M-TIX.",
-        sourceBadge: "Verified Cinema XXI / IMAX",
-        age: "R 13+",
-        runtime: "162m",
-        genre: "Sci-Fi, Action, Adventure",
-        hype: 98,
-        presale: false,
-        imax: true,
-        tba: false,
-        chains: ["XXI", "CGV", "Cinépolis"],
-        director: "Denis Villeneuve",
-        cast: "Timothée Chalamet, Zendaya, Florence Pugh, Anya Taylor-Joy",
-        synopsis: "Babak puncak adaptasi Dune Messiah saat Kaisar Paul Atreides menghadapi konsekuensi perang suci di seluruh semesta.",
-        poster: "",
-        gradient: "linear-gradient(145deg, #d97706, #1e1b4b)"
+        id: "up_10", status: "upcoming", isIndonesian: false, title: "DUNE: PART THREE", searchQuery: "Dune Part Three",
+        releaseDate: "2026-12-16", dateLabel: "16 Des", confirmedText: "Rabu, 16 Des 2026",
+        presaleText: "Estimasi presale IMAX 9 Des.", sourceBadge: "IMAX XXI", age: "R 13+", runtime: "162m",
+        genre: "Sci-Fi, Action", hype: 98, presale: false, imax: true, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        director: "Denis Villeneuve", cast: "Timothée Chalamet, Zendaya", synopsis: "Babak puncak Dune Messiah.", poster: ""
       },
       {
-        id: "up_11",
-        status: "upcoming",
-        isIndonesian: false,
-        title: "AVENGERS: DOOMSDAY",
-        searchQuery: "Avengers Doomsday",
-        releaseDate: "2026-12-16",
-        dateLabel: "16 Des",
-        confirmedText: "Confirmed ID: Rabu, 16 Des 2026 (Jadwal Rabu ID)",
-        presaleText: "Estimasi Presale Midnight & IMAX buka 8 Des 2026 di TIX ID.",
-        sourceBadge: "Verified Cinema XXI / IMAX",
-        age: "R 13+",
-        runtime: "158m",
-        genre: "Action, Superhero",
-        hype: 99,
-        presale: false,
-        imax: true,
-        tba: false,
-        chains: ["XXI", "CGV", "Cinépolis"],
-        director: "Anthony Russo, Joe Russo",
-        cast: "Robert Downey Jr., Pedro Pascal, Vanessa Kirby, Chris Hemsworth",
-        synopsis: "Para pahlawan bumi dan Fantastic Four bersatu menghadapi ancaman multiversal Victor Von Doom.",
-        poster: "",
-        gradient: "linear-gradient(145deg, #15803d, #09090b)"
+        id: "up_11", status: "upcoming", isIndonesian: false, title: "AVENGERS: DOOMSDAY", searchQuery: "Avengers Doomsday",
+        releaseDate: "2026-12-16", dateLabel: "16 Des", confirmedText: "Rabu, 16 Des 2026",
+        presaleText: "Estimasi presale IMAX 8 Des.", sourceBadge: "IMAX XXI", age: "R 13+", runtime: "158m",
+        genre: "Action, Superhero", hype: 99, presale: false, imax: true, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        director: "Anthony & Joe Russo", cast: "Robert Downey Jr., Pedro Pascal", synopsis: "Menghadapi Victor Von Doom.", poster: ""
       },
       {
-        id: "up_12",
-        status: "upcoming",
-        isIndonesian: true,
-        title: "5 CM: REVOLUSI HATI",
-        searchQuery: "5 cm",
-        releaseDate: "2026-12-24",
-        dateLabel: "24 Des",
-        confirmedText: "Confirmed ID: Kamis, 24 Des 2026 (Libur Akhir Tahun)",
-        presaleText: "Estimasi Presale buka 19 Des 2026 di M-TIX & TIX ID.",
-        sourceBadge: "Verified LSF / XXI",
-        age: "R 13+",
-        runtime: "124m",
-        genre: "Drama, Adventure",
-        hype: 87,
-        presale: false,
-        imax: false,
-        tba: false,
-        chains: ["XXI", "CGV", "Cinépolis"],
-        director: "Rizal Mantovani",
-        cast: "Herjunot Ali, Fedi Nuril, Raline Shah, Pevita Pearce",
-        synopsis: "Reuni sahabat lama menghadapi babak baru kehidupan dan persahabatan sepuluh tahun setelah puncak Mahameru.",
-        poster: "",
-        gradient: "linear-gradient(145deg, #1d4ed8, #0f172a)"
+        id: "up_12", status: "upcoming", isIndonesian: true, title: "5 CM: REVOLUSI HATI", searchQuery: "5 cm",
+        releaseDate: "2026-12-24", dateLabel: "24 Des", confirmedText: "Kamis, 24 Des 2026",
+        presaleText: "Estimasi presale 19 Des.", sourceBadge: "LSF / XXI", age: "R 13+", runtime: "124m",
+        genre: "Drama, Adventure", hype: 87, presale: false, imax: false, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        director: "Rizal Mantovani", cast: "Herjunot Ali, Fedi Nuril", synopsis: "Reuni sahabat Mahameru.", poster: ""
       },
       {
-        id: "up_13",
-        status: "upcoming",
-        isIndonesian: true,
-        title: "FILOSOFI TERAS",
-        searchQuery: "Filosofi Teras",
-        releaseDate: "2026-12-24",
-        dateLabel: "24 Des",
-        confirmedText: "Confirmed ID: Kamis, 24 Des 2026 (Film Indonesia)",
-        presaleText: "Estimasi Presale buka 20 Des 2026 di TIX ID & CGV.",
-        sourceBadge: "Verified LSF / XXI",
-        age: "R 13+",
-        runtime: "114m",
-        genre: "Drama",
-        hype: 91,
-        presale: false,
-        imax: false,
-        tba: false,
-        chains: ["XXI", "CGV", "Cinépolis"],
-        director: "Affandi Abdul Rachman",
-        cast: "Sherina Munaf, Zee Asadel, Ge Pamungkas",
-        synopsis: "Adaptasi buku fenomenal Stoikisme tentang bagaimana mengendalikan emosi dan kecemasan di tengah tekanan hidup modern.",
-        poster: "",
-        gradient: "linear-gradient(145deg, #ca8a04, #0f172a)"
+        id: "up_13", status: "upcoming", isIndonesian: true, title: "FILOSOFI TERAS", searchQuery: "Filosofi Teras",
+        releaseDate: "2026-12-24", dateLabel: "24 Des", confirmedText: "Kamis, 24 Des 2026",
+        presaleText: "Estimasi presale 20 Des.", sourceBadge: "LSF / XXI", age: "R 13+", runtime: "114m",
+        genre: "Drama", hype: 91, presale: false, imax: false, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        director: "Affandi Abdul Rachman", cast: "Sherina Munaf, Zee Asadel", synopsis: "Adaptasi buku Stoikisme.", poster: ""
       },
       {
-        id: "up_14",
-        status: "upcoming",
-        isIndonesian: true,
-        title: "DATANG AKAN PERGI",
-        searchQuery: "Datang Akan Pergi",
-        releaseDate: "2026-12-24",
-        dateLabel: "24 Des",
-        confirmedText: "Confirmed ID: Kamis, 24 Des 2026",
-        presaleText: "Estimasi Presale buka 20 Des 2026 di XXI & Cinépolis.",
-        sourceBadge: "Verified LSF / XXI",
-        age: "D 17+",
-        runtime: "106m",
-        genre: "Drama, Horror",
-        hype: 83,
-        presale: false,
-        imax: false,
-        tba: false,
-        chains: ["XXI", "CGV", "Cinépolis"],
-        director: "Sidharta Tata",
-        cast: "Marthino Lio, Della Dartyan",
-        synopsis: "Sebuah kampung terpencil menyimpan perjanjian gaib bahwa setiap tamu yang datang membawa konsekuensi bagi penghuninya.",
-        poster: "",
-        gradient: "linear-gradient(145deg, #334155, #09090b)"
+        id: "up_14", status: "upcoming", isIndonesian: true, title: "DATANG AKAN PERGI", searchQuery: "Datang Akan Pergi",
+        releaseDate: "2026-12-24", dateLabel: "24 Des", confirmedText: "Kamis, 24 Des 2026",
+        presaleText: "Estimasi presale 20 Des.", sourceBadge: "LSF / XXI", age: "D 17+", runtime: "106m",
+        genre: "Drama, Horror", hype: 83, presale: false, imax: false, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        director: "Sidharta Tata", cast: "Marthino Lio, Della Dartyan", synopsis: "Perjanjian gaib kampung.", poster: ""
       },
       {
-        id: "up_15",
-        status: "upcoming",
-        isIndonesian: false,
-        title: "THE BEEKEEPER 2",
-        searchQuery: "The Beekeeper 2",
-        releaseDate: "2027-01-13",
-        dateLabel: "13 Jan 2027",
-        confirmedText: "Confirmed ID: Rabu, 13 Jan 2027 (2 hari lebih awal dari US 15 Jan)",
-        presaleText: "Estimasi Presale buka 9 Jan 2027 di TIX ID & M-TIX.",
-        sourceBadge: "Verified Cinema XXI / LSF",
-        age: "D 17+",
-        runtime: "112m",
-        genre: "Action, Thriller",
-        hype: 95,
-        presale: false,
-        imax: true,
-        tba: false,
-        chains: ["XXI", "CGV", "Cinépolis"],
-        director: "Timo Tjahjanto",
-        cast: "Jason Statham, Pom Klementieff, Jeremy Irons",
-        synopsis: "Disutradarai sineas Indonesia Timo Tjahjanto, Jason Statham kembali sebagai mantan agen rahasia Beekeeper dalam aksi balas dendam tanpa ampun.",
-        poster: "",
-        gradient: "linear-gradient(145deg, #b45309, #09090b)"
+        id: "up_15", status: "upcoming", isIndonesian: false, title: "THE BEEKEEPER 2", searchQuery: "The Beekeeper 2",
+        releaseDate: "2027-01-13", dateLabel: "13 Jan 2027", confirmedText: "Rabu, 13 Jan 2027",
+        presaleText: "Estimasi presale 9 Jan.", sourceBadge: "XXI / LSF", age: "D 17+", runtime: "112m",
+        genre: "Action, Thriller", hype: 95, presale: false, imax: true, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        director: "Timo Tjahjanto", cast: "Jason Statham, Pom Klementieff", synopsis: "Disutradarai Timo Tjahjanto.", poster: ""
       },
       {
-        id: "up_16",
-        status: "upcoming",
-        isIndonesian: true,
-        title: "ZONA MERAH: THE MOVIE",
-        searchQuery: "Zona Merah",
-        releaseDate: "2027-01-14",
-        dateLabel: "14 Jan 2027",
-        confirmedText: "Confirmed ID: Kamis, 14 Jan 2027",
-        presaleText: "Estimasi Presale buka 10 Jan 2027 di TIX ID & M-TIX.",
-        sourceBadge: "Verified LSF / XXI",
-        age: "D 17+",
-        runtime: "119m",
-        genre: "Action, Horror",
-        hype: 92,
-        presale: false,
-        imax: false,
-        tba: false,
-        chains: ["XXI", "CGV", "Cinépolis"],
-        director: "Sidharta Tata",
-        cast: "Aghniny Haque, Andri Mashadi, Lukman Sardi",
-        synopsis: "Wabah mayat hidup kembali meluas keluar karantina dan memaksa para penyintas bertarung menembus kota yang terkunci.",
-        poster: "",
-        gradient: "linear-gradient(145deg, #991b1b, #111827)"
+        id: "up_16", status: "upcoming", isIndonesian: true, title: "ZONA MERAH: THE MOVIE", searchQuery: "Zona Merah",
+        releaseDate: "2027-01-14", dateLabel: "14 Jan 2027", confirmedText: "Kamis, 14 Jan 2027",
+        presaleText: "Estimasi presale 10 Jan.", sourceBadge: "LSF / XXI", age: "D 17+", runtime: "119m",
+        genre: "Action, Horror", hype: 92, presale: false, imax: false, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        director: "Sidharta Tata", cast: "Aghniny Haque, Andri Mashadi", synopsis: "Wabah mayat hidup.", poster: ""
       },
       {
-        id: "up_17",
-        status: "upcoming",
-        isIndonesian: false,
-        title: "THE MANDALORIAN AND GROGU",
-        searchQuery: "The Mandalorian and Grogu",
-        releaseDate: "2027-01-20",
-        dateLabel: "20 Jan 2027",
-        confirmedText: "Confirmed ID: Rabu, 20 Jan 2027 (IMAX Laser)",
-        presaleText: "Estimasi Presale IMAX buka 15 Jan 2027 di TIX ID & M-TIX.",
-        sourceBadge: "Verified Cinema XXI / IMAX",
-        age: "R 13+",
-        runtime: "130m",
-        genre: "Sci-Fi, Adventure",
-        hype: 94,
-        presale: false,
-        imax: true,
-        tba: false,
-        chains: ["XXI", "CGV", "Cinépolis"],
-        director: "Jon Favreau",
-        cast: "Pedro Pascal, Sigourney Weaver, Jeremy Allen White",
-        synopsis: "Din Djarin dan Grogu menjalankan misi berbahaya bagi New Republic untuk memburu sisa-sisa panglima perang Imperial.",
-        poster: "",
-        gradient: "linear-gradient(145deg, #1e3a8a, #09090b)"
+        id: "up_17", status: "upcoming", isIndonesian: false, title: "THE MANDALORIAN AND GROGU", searchQuery: "The Mandalorian and Grogu",
+        releaseDate: "2027-01-20", dateLabel: "20 Jan 2027", confirmedText: "Rabu, 20 Jan 2027",
+        presaleText: "Estimasi presale IMAX 15 Jan.", sourceBadge: "IMAX XXI", age: "R 13+", runtime: "130m",
+        genre: "Sci-Fi, Adventure", hype: 94, presale: false, imax: true, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        director: "Jon Favreau", cast: "Pedro Pascal, Sigourney Weaver", synopsis: "Misi baru New Republic.", poster: ""
       },
       {
-        id: "up_18",
-        status: "upcoming",
-        isIndonesian: false,
-        title: "28 YEARS LATER: THE BONE TEMPLE",
-        searchQuery: "28 Years Later The Bone Temple",
-        releaseDate: "2027-01-27",
-        dateLabel: "27 Jan 2027",
-        confirmedText: "Confirmed ID: Rabu, 27 Jan 2027",
-        presaleText: "Estimasi Presale buka 23 Jan 2027 di CGV & XXI.",
-        sourceBadge: "Verified LSF / CGV",
-        age: "D 17+",
-        runtime: "121m",
-        genre: "Horror, Thriller",
-        hype: 89,
-        presale: false,
-        imax: false,
-        tba: false,
-        chains: ["XXI", "CGV", "Cinépolis"],
-        director: "Nia DaCosta",
-        cast: "Ralph Fiennes, Jack O'Connell, Cillian Murphy",
-        synopsis: "Kelanjutan saga virus Rage menyoroti sekte misterius di daratan Inggris yang terisolasi selama hampir tiga dekade.",
-        poster: "",
-        gradient: "linear-gradient(145deg, #3f3f46, #09090b)"
+        id: "up_18", status: "upcoming", isIndonesian: false, title: "28 YEARS LATER: THE BONE TEMPLE", searchQuery: "28 Years Later The Bone Temple",
+        releaseDate: "2027-01-27", dateLabel: "27 Jan 2027", confirmedText: "Rabu, 27 Jan 2027",
+        presaleText: "Estimasi presale 23 Jan.", sourceBadge: "LSF / CGV", age: "D 17+", runtime: "121m",
+        genre: "Horror, Thriller", hype: 89, presale: false, imax: false, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        director: "Nia DaCosta", cast: "Ralph Fiennes, Jack O'Connell", synopsis: "Sekte misterius virus Rage.", poster: ""
       }
     ];
 
@@ -1514,8 +884,8 @@
     let activeMode = "now";
     let activeChip = "all";
     let allMovies = [];
-    let posterCache = JSON.parse(localStorage.getItem("ct_v31_poster_cache") || "{}");
-    let creditsCache = JSON.parse(localStorage.getItem("ct_v31_credits_cache") || "{}");
+    let posterCache = JSON.parse(localStorage.getItem("ct_v32_poster_cache") || "{}");
+    let creditsCache = JSON.parse(localStorage.getItem("ct_v32_credits_cache") || "{}");
     let watchlistMap = JSON.parse(localStorage.getItem("ct_v2_watchlist") || "{}");
 
     function normalizeKey(str) {
@@ -1534,8 +904,8 @@
         localStorage.setItem("ct_v2_initialized", "1");
       }
 
-      const liveNow = JSON.parse(localStorage.getItem("ct_v31_live_now") || "[]");
-      const liveUpcoming = JSON.parse(localStorage.getItem("ct_v31_live_upcoming") || "[]");
+      const liveNow = JSON.parse(localStorage.getItem("ct_v32_live_now") || "[]");
+      const liveUpcoming = JSON.parse(localStorage.getItem("ct_v32_live_upcoming") || "[]");
       
       const combinedCurated = [...CURATED_NOW_MOVIES, ...CURATED_UPCOMING_MOVIES];
       const combinedLive = [...liveNow, ...liveUpcoming];
@@ -1564,7 +934,6 @@
 
       curated.forEach(item => {
         const m = { ...item };
-        // Strict boundary: 'now' items must have releaseDate <= TODAY_ISO and within 45 days
         if (m.status === "now") {
           if (m.releaseDate > TODAY_ISO) m.status = "upcoming";
         }
@@ -1577,7 +946,6 @@
 
       live.forEach(item => {
         const m = { ...item };
-        // Block any old movies prior to Oct 2026 or post 2027
         if (m.releaseDate < "2026-10-01" || m.releaseDate > "2027-12-31") return;
         if (m.releaseDate <= TODAY_ISO) {
           m.status = "now";
@@ -1606,7 +974,7 @@
         }
       });
 
-      localStorage.setItem("ct_v31_poster_cache", JSON.stringify(posterCache));
+      localStorage.setItem("ct_v32_poster_cache", JSON.stringify(posterCache));
       return Array.from(map.values());
     }
 
@@ -1617,8 +985,17 @@
       document.getElementById("countUpcoming").textContent = upList.length;
 
       const watchCount = Object.keys(watchlistMap).length;
-      document.getElementById("headerBellBadge").textContent = watchCount;
-      document.getElementById("navWatchBadge").textContent = watchCount;
+      const bell = document.getElementById("headerBellBadge");
+      const navBadge = document.getElementById("navWatchBadge");
+      if (watchCount > 0) {
+        bell.style.display = "flex";
+        bell.textContent = watchCount;
+        navBadge.style.display = "flex";
+        navBadge.textContent = watchCount;
+      } else {
+        bell.style.display = "none";
+        navBadge.style.display = "none";
+      }
     }
 
     function toggleSearch() {
@@ -1679,10 +1056,10 @@
         if (activeChip === "id" && !m.isIndonesian) return false;
         if (activeChip === "hype" && m.hype < 88) return false;
         if (activeChip === "imax" && !m.imax) return false;
-        if (["XXI", "CGV", "Cinépolis"].includes(activeChip) && !(m.chains || []).includes(activeChip)) return false;
+        if (["XXI", "CGV"].includes(activeChip) && !(m.chains || []).includes(activeChip)) return false;
 
         if (q) {
-          const hay = `${m.title} ${m.genre} ${m.director} ${m.cast} ${(m.chains || []).join(" ")}`.toLowerCase();
+          const hay = `${m.title} ${m.genre} ${m.director} ${m.cast}`.toLowerCase();
           if (!hay.includes(q)) return false;
         }
         return true;
@@ -1697,51 +1074,32 @@
       }
 
       document.getElementById("bannerLabel").textContent = activeMode === "now"
-        ? "Sedang Tayang di Bioskop Indonesia (November 2026)"
-        : "Jadwal Bioskop Indonesia (Theatrical Only)";
+        ? "Sedang Tayang di Bioskop Indonesia"
+        : "Jadwal Rilis Teater";
       document.getElementById("bannerCount").textContent = `${list.length} Film`;
 
       if (list.length === 0) {
-        grid.innerHTML = `<div class="empty-msg">Tidak ada film yang cocok dengan filter ini.</div>`;
+        grid.innerHTML = `<div class="empty-msg">Tidak ada film ditemukan.</div>`;
         return;
       }
 
       grid.innerHTML = list.map(m => {
         const isWatched = Boolean(watchlistMap[m.id]);
-        let topBadge = "";
-        if (m.presale) {
-          topBadge = `<span class="poster-badge badge-presale">🎟️ PRESALE</span>`;
-        } else if (m.isIndonesian) {
-          topBadge = `<span class="poster-badge badge-id">🇮🇩 ID • ${m.hype}%</span>`;
-        } else if (m.imax) {
-          topBadge = `<span class="poster-badge badge-hype">IMAX • ${m.hype}%</span>`;
-        } else {
-          topBadge = `<span class="poster-badge badge-hype">🔥 ${m.hype}%</span>`;
-        }
-
-        const fallbackArt = `<div class="poster-art" style="background:${m.gradient || 'linear-gradient(145deg,#1e293b,#09090b)'}">
-               <div class="poster-art-sub">INDONESIA THEATRICAL</div>
-               <div class="poster-art-title">${m.title}</div>
-               <div class="poster-art-footer">${(m.chains || ['XXI','CGV']).join(' • ')}</div>
-             </div>`;
+        let badgeText = "";
+        if (m.presale) badgeText = "PRESALE";
+        else if (m.imax) badgeText = "IMAX";
+        else if (m.isIndonesian) badgeText = "LOKAL";
 
         const posterHtml = m.poster
-          ? `<img src="${m.poster}" alt="${m.title}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-             <div class="poster-art" style="display:none; background:${m.gradient || 'linear-gradient(145deg,#1e293b,#09090b)'}">
-               <div class="poster-art-sub">INDONESIA THEATRICAL</div>
-               <div class="poster-art-title">${m.title}</div>
-               <div class="poster-art-footer">${(m.chains || ['XXI','CGV']).join(' • ')}</div>
-             </div>`
-          : fallbackArt;
+          ? `<img src="${m.poster}" alt="${m.title}" loading="lazy" />`
+          : `<div class="poster-art"><div class="poster-art-title">${m.title}</div></div>`;
 
-        const bottomLine = activeMode === "upcoming"
-          ? `<div class="card-date">Tanggal rilis: ${m.dateLabel}</div>`
-          : `<div class="card-rating">★★★★★ ${m.rating || '8.8'}</div>`;
+        const footerText = activeMode === "upcoming" ? `Rilis: ${m.dateLabel}` : `Rating ${m.rating || '8.8'}`;
 
         return `
           <article class="movie-card" onclick="openDetail('${m.id}')">
             <div class="poster-box">
-              ${topBadge}
+              ${badgeText ? `<span class="poster-badge">${badgeText}</span>` : ''}
               <button class="heart-btn" onclick="event.stopPropagation(); toggleWatch('${m.id}')" aria-label="Watchlist">
                 ${isWatched ? "❤️" : "🤍"}
               </button>
@@ -1755,7 +1113,7 @@
                 </div>
                 <div class="card-title">${m.title}</div>
               </div>
-              ${bottomLine}
+              <div class="card-footer">${footerText}</div>
             </div>
           </article>
         `;
@@ -1776,14 +1134,11 @@
 
     function openTicketSearch(platform, movieTitle) {
       const q = encodeURIComponent(movieTitle);
-      let url = `https://www.google.com/search?q=${encodeURIComponent(movieTitle + " jadwal bioskop " + platform)}`;
-      if (platform === "TIX ID") {
-        url = `https://www.tix.id/search?q=${q}`;
-      } else if (platform === "XXI") {
-        url = `https://21cineplex.com/`;
-      } else if (platform === "CGV") {
-        url = `https://www.cgv.id/en/movies/now_playing`;
-      }
+      let url = `https://www.google.com/search?q=${encodeURIComponent(movieTitle + " bioskop " + platform)}`;
+      if (platform === "TIX ID") url = `https://www.tix.id/search?q=${q}`;
+      else if (platform === "XXI") url = `https://21cineplex.com/`;
+      else if (platform === "CGV") url = `https://www.cgv.id/en/movies/now_playing`;
+
       if (window.AndroidBridge && typeof window.AndroidBridge.openExternalUrl === "function") {
         window.AndroidBridge.openExternalUrl(url);
       } else {
@@ -1795,14 +1150,7 @@
       const watchCfg = watchlistMap[m.id] || { presaleAlert: false, dayAlert: false };
       const posterHtml = m.poster
         ? `<img src="${m.poster}" alt="${m.title}" />`
-        : `<div class="poster-art" style="background:${m.gradient || '#0f172a'}; padding:8px;">
-             <div class="poster-art-sub" style="margin-top:10px; font-size:7px;">${m.age}</div>
-             <div class="poster-art-title" style="font-size:11px;">${m.title}</div>
-             <div class="poster-art-footer" style="font-size:7px;">ID CINEMA</div>
-           </div>`;
-
-      const chainsHtml = (m.chains || ["XXI", "CGV", "Cinépolis"])
-        .map(c => `<span class="chain-chip">${c}</span>`).join("");
+        : `<div class="poster-art" style="padding:10px;"><div class="poster-art-title" style="font-size:11px;">${m.title}</div></div>`;
 
       const safeTitle = m.title.replace(/'/g, "\'");
 
@@ -1811,69 +1159,48 @@
         <div class="detail-header">
           <div class="detail-poster">${posterHtml}</div>
           <div style="flex:1; min-width:0;">
-            <div class="detail-badges">
+            <div style="display:flex; gap:4px; margin-bottom:4px;">
               <span class="age-pill">${m.age || 'R 13+'}</span>
               <span class="age-pill">${m.runtime || 'TBA'}</span>
               ${m.imax ? '<span class="age-pill" style="background:#0f172a;color:#fff;">IMAX</span>' : ''}
-              ${m.isIndonesian ? '<span class="age-pill" style="background:#fff1f2;color:#e11d48;border-color:#fecdd3;">🇮🇩 ID</span>' : ''}
             </div>
-            <div class="confirmed-pill">✓ Confirmed ID</div>
             <div class="detail-title">${m.title}</div>
-            <div class="hype-row">
-              <span>🔥 Tingkat Hype Penonton</span>
-              <span>${m.hype}%</span>
-            </div>
-            <div class="hype-bar"><div class="hype-fill" style="width:${m.hype}%"></div></div>
-            <div class="detail-subcast">Sutradara: ${m.director || 'Memuat...'}</div>
+            <div style="font-size:12px; color:var(--muted); margin-bottom:4px;">Genre: ${m.genre}</div>
+            <div style="font-size:12px; font-weight:600; color:var(--text);">Hype Index: ${m.hype}%</div>
           </div>
         </div>
 
         <div class="verify-box">
-          <div class="verify-top">
-            <span class="verify-label">VERIFIKASI JADWAL INDONESIA</span>
-            <span class="verify-source">${m.sourceBadge || 'Verified Cinema XXI / LSF'}</span>
-          </div>
-          <div class="verify-date">${m.confirmedText || ('Confirmed ID: ' + m.releaseDate)}</div>
-          <div class="verify-presale">${m.presaleText || 'Pantau pembukaan tiket presale di TIX ID & M-TIX.'}</div>
-          <div class="chains-row">
-            <span>Jaringan:</span>
-            ${chainsHtml}
-          </div>
+          <div class="verify-date">${m.confirmedText || ('Rilis: ' + m.releaseDate)}</div>
+          <div style="color:var(--muted);">${m.presaleText || 'Cek presale di platform resmi.'}</div>
         </div>
 
         <div class="quick-verify-bar">
-          <button class="verify-link-btn" onclick="openTicketSearch('TIX ID', '${safeTitle}')">🎟️ Cek TIX ID</button>
-          <button class="verify-link-btn" onclick="openTicketSearch('XXI', '${safeTitle}')">🎬 Cinema XXI</button>
-          <button class="verify-link-btn" onclick="openTicketSearch('CGV', '${safeTitle}')">🍿 CGV ID</button>
+          <button class="verify-link-btn" onclick="openTicketSearch('TIX ID', '${safeTitle}')">TIX ID</button>
+          <button class="verify-link-btn" onclick="openTicketSearch('XXI', '${safeTitle}')">Cinema XXI</button>
+          <button class="verify-link-btn" onclick="openTicketSearch('CGV', '${safeTitle}')">CGV ID</button>
         </div>
 
         <div class="credits-block">
           <p><strong>Sutradara:</strong> ${m.director || 'Memuat...'}</p>
           <p><strong>Pemeran:</strong> ${m.cast || 'Memuat...'}</p>
-          <p style="margin-top:8px;"><strong>Sinopsis:</strong><br>${m.synopsis}</p>
+          <p style="margin-top:6px;"><strong>Sinopsis:</strong><br>${m.synopsis}</p>
         </div>
 
         <div class="reminder-box">
-          <h4>Pengingat Otomatis (Presale & Rilis)</h4>
           <label class="rem-option">
-            <div>
-              <div class="rem-title">🔔 Ingatkan Presale Tiket (H-7 / Saat Buka)</div>
-              <div class="rem-desc">Notifikasi saat tiket presale buka di TIX ID & M-TIX</div>
-            </div>
+            <span class="rem-title">Notifikasi Presale Tiket</span>
             <input type="checkbox" class="rem-check" ${watchCfg.presaleAlert ? 'checked' : ''} onchange="updateReminder('${m.id}', 'presaleAlert', this.checked)" />
           </label>
           <label class="rem-option">
-            <div>
-              <div class="rem-title">🎬 Ingatkan Hari-H Rilis Bioskop</div>
-              <div class="rem-desc">Pengingat pagi hari saat film perdana tayang di Indonesia</div>
-            </div>
+            <span class="rem-title">Notifikasi Hari-H Rilis</span>
             <input type="checkbox" class="rem-check" ${watchCfg.dayAlert ? 'checked' : ''} onchange="updateReminder('${m.id}', 'dayAlert', this.checked)" />
           </label>
         </div>
 
         <div class="detail-actions">
-          <button class="btn-cal" onclick="saveMovieToCalendar('${m.id}')">📅 Simpan Kalender (.ics)</button>
-          <button class="btn-push" onclick="testMoviePush('${m.id}')">🔔 Test Push Notif</button>
+          <button class="btn-cal" onclick="saveMovieToCalendar('${m.id}')">Simpan Kalender</button>
+          <button class="btn-push" onclick="testMoviePush('${m.id}')">Test Notif</button>
         </div>
       `;
     }
@@ -1892,19 +1219,15 @@
             const res = await fetch(`https://api.themoviedb.org/3/movie/${m.tmdbId}?api_key=${encodeURIComponent(key)}&append_to_response=credits`);
             if (res.ok) {
               const d = await res.json();
-              const directors = ((d.credits && d.credits.crew) || [])
-                .filter(c => c.job === "Director")
-                .map(c => c.name);
-              const topCast = ((d.credits && d.credits.cast) || [])
-                .slice(0, 4)
-                .map(c => c.name);
+              const directors = ((d.credits && d.credits.crew) || []).filter(c => c.job === "Director").map(c => c.name);
+              const topCast = ((d.credits && d.credits.cast) || []).slice(0, 4).map(c => c.name);
 
-              m.director = directors.length ? directors.join(", ") : "Tidak tercantum di TMDB";
-              m.cast = topCast.length ? topCast.join(", ") : "Pemeran segera diumumkan";
+              m.director = directors.length ? directors.join(", ") : "Tidak tercantum";
+              m.cast = topCast.length ? topCast.join(", ") : "Segera diumumkan";
               if (d.runtime && d.runtime > 0) m.runtime = `${d.runtime}m`;
 
               creditsCache[m.id] = { director: m.director, cast: m.cast, runtime: m.runtime };
-              localStorage.setItem("ct_v31_credits_cache", JSON.stringify(creditsCache));
+              localStorage.setItem("ct_v32_credits_cache", JSON.stringify(creditsCache));
               renderDetailHtml(m);
             }
           } catch (_) {}
@@ -1946,8 +1269,8 @@
       const container = document.getElementById("watchlistContainer");
       const ids = Object.keys(watchlistMap);
       if (ids.length === 0) {
-        container.innerHTML = `<div class="info-card" style="text-align:center; padding:28px 16px;">
-          <p style="margin:0;">Belum ada film di Watchlist. Ketuk ikon 🤍 pada poster film untuk menyalakan radar presale & hari-H.</p>
+        container.innerHTML = `<div class="info-card" style="text-align:center; padding:24px 16px;">
+          <p style="margin:0;">Watchlist kosong. Ketuk ikon 🤍 pada poster film untuk memantau rilis.</p>
         </div>`;
         return;
       }
@@ -1958,19 +1281,19 @@
         const cfg = watchlistMap[id];
         const thumb = m.poster
           ? `<img src="${m.poster}" alt="${m.title}" />`
-          : `<div style="width:100%;height:100%;background:${m.gradient || '#0f172a'};color:#fff;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;text-align:center;padding:4px;">${m.title}</div>`;
+          : `<div style="width:100%;height:100%;background:#0f172a;color:#fff;font-size:9px;display:flex;align-items:center;justify-content:center;text-align:center;padding:2px;">${m.title}</div>`;
 
         return `
           <div class="watch-item">
             <div class="watch-thumb" onclick="openDetail('${m.id}')">${thumb}</div>
             <div class="watch-body">
               <div class="watch-title" onclick="openDetail('${m.id}')">${m.title}</div>
-              <div class="watch-date">Rilis ID: ${m.dateLabel} (${m.releaseDate})</div>
+              <div class="watch-date">Rilis: ${m.dateLabel} (${m.releaseDate})</div>
               <div class="watch-toggles">
-                <button class="toggle-pill ${cfg.presaleAlert ? 'on-presale' : ''}" onclick="updateReminder('${m.id}', 'presaleAlert', ${!cfg.presaleAlert})">
-                  🔔 Presale Alert ${cfg.presaleAlert ? 'ON' : 'OFF'}
+                <button class="toggle-pill ${cfg.presaleAlert ? 'active' : ''}" onclick="updateReminder('${m.id}', 'presaleAlert', ${!cfg.presaleAlert})">
+                  Presale ${cfg.presaleAlert ? 'ON' : 'OFF'}
                 </button>
-                <button class="toggle-pill ${cfg.dayAlert ? 'on-day' : ''}" onclick="updateReminder('${m.id}', 'dayAlert', ${!cfg.dayAlert})">
+                <button class="toggle-pill ${cfg.dayAlert ? 'active' : ''}" onclick="updateReminder('${m.id}', 'dayAlert', ${!cfg.dayAlert})">
                   Hari-H ${cfg.dayAlert ? 'ON' : 'OFF'}
                 </button>
               </div>
@@ -1985,21 +1308,21 @@
       if (!m) return;
       const startMillis = new Date(m.releaseDate + "T10:00:00+07:00").getTime();
       const title = `Nonton Bioskop: ${m.title}`;
-      const desc = `${m.confirmedText}\n${m.presaleText}\nJaringan: ${(m.chains || []).join(', ')}`;
-      const loc = "Cinema XXI / CGV / Cinépolis Indonesia";
+      const desc = `${m.confirmedText}\n${m.presaleText}`;
+      const loc = "Bioskop Indonesia";
 
       if (window.AndroidBridge && typeof window.AndroidBridge.addCalendarEvent === "function") {
         window.AndroidBridge.addCalendarEvent(title, desc, loc, startMillis);
       } else {
-        alert(`Jadwal ${m.title} (${m.releaseDate}) siap ditambahkan ke kalender.`);
+        alert(`Jadwal ${m.title} (${m.releaseDate}) siap disimpan.`);
       }
     }
 
     function testMoviePush(id) {
       const m = allMovies.find(item => item.id === id);
       if (!m) return;
-      const title = `🎟️ Presale & Rilis ID: ${m.title}`;
-      const body = `${m.confirmedText} • Cek tiket di TIX ID, M-TIX, CGV & Cinépolis!`;
+      const title = `Rilis Bioskop: ${m.title}`;
+      const body = `${m.confirmedText} • Cek tiket di TIX ID, M-TIX, atau CGV.`;
       if (window.AndroidBridge && typeof window.AndroidBridge.sendCustomNotification === "function") {
         window.AndroidBridge.sendCustomNotification(title, body);
       } else {
@@ -2008,8 +1331,8 @@
     }
 
     function sendGlobalTestNotif() {
-      const title = "🎬 Radar Cinema Tracker ID Aktif!";
-      const body = "Siap memantau jadwal rilis & pembukaan tiket presale XXI, CGV & Cinépolis di S24 FE.";
+      const title = "Cinema Tracker Aktif";
+      const body = "Sistem pemantau jadwal bioskop Indonesia berjalan di latar belakang.";
       if (window.AndroidBridge && typeof window.AndroidBridge.sendCustomNotification === "function") {
         window.AndroidBridge.sendCustomNotification(title, body);
       } else {
@@ -2034,7 +1357,7 @@
         } catch (_) {}
       }));
 
-      localStorage.setItem("ct_v31_poster_cache", JSON.stringify(posterCache));
+      localStorage.setItem("ct_v32_poster_cache", JSON.stringify(posterCache));
     }
 
     async function fetchMovieCreditsBatch(apiKey, movieItems) {
@@ -2046,12 +1369,8 @@
           const res = await fetch(`https://api.themoviedb.org/3/movie/${m.tmdbId}?api_key=${encodeURIComponent(apiKey)}&append_to_response=credits`);
           if (!res.ok) return;
           const d = await res.json();
-          const directors = ((d.credits && d.credits.crew) || [])
-            .filter(c => c.job === "Director")
-            .map(c => c.name);
-          const topCast = ((d.credits && d.credits.cast) || [])
-            .slice(0, 4)
-            .map(c => c.name);
+          const directors = ((d.credits && d.credits.crew) || []).filter(c => c.job === "Director").map(c => c.name);
+          const topCast = ((d.credits && d.credits.cast) || []).slice(0, 4).map(c => c.name);
 
           creditsCache[m.id] = {
             director: directors.length ? directors.join(", ") : "Tidak tercantum",
@@ -2061,17 +1380,16 @@
         } catch (_) {}
       }));
 
-      localStorage.setItem("ct_v31_credits_cache", JSON.stringify(creditsCache));
+      localStorage.setItem("ct_v32_credits_cache", JSON.stringify(creditsCache));
     }
 
     async function syncTmdbLive(showFeedback = true) {
       const key = document.getElementById("tmdbKeyInput").value.trim() || localStorage.getItem("ct_tmdb_key") || "";
       const fb = document.getElementById("syncFeedback");
-      const bannerLabel = document.getElementById("bannerLabel");
 
       if (!key) {
         if (showFeedback) {
-          fb.textContent = "Masukkan TMDB API Key v3 terlebih dahulu.";
+          fb.textContent = "Masukkan TMDB API Key terlebih dahulu.";
           fb.style.color = "#e11d48";
         }
         return;
@@ -2083,16 +1401,14 @@
       }
 
       if (showFeedback) {
-        fb.textContent = "Menyinkronkan jadwal bioskop Indonesia & pembersihan film lama...";
+        fb.textContent = "Menyinkronkan jadwal...";
         fb.style.color = "#2563eb";
       }
-      bannerLabel.textContent = "Menyinkronkan jadwal bioskop ID...";
 
       try {
         await enrichPosters(key, CURATED_NOW_MOVIES);
         await enrichPosters(key, CURATED_UPCOMING_MOVIES);
 
-        // Fetch live now playing & upcoming with strict date filtering (block 2025/old films)
         const nowUrl = `https://api.themoviedb.org/3/movie/now_playing?api_key=${encodeURIComponent(key)}&region=ID&page=1`;
         const upcomingUrl = `https://api.themoviedb.org/3/discover/movie?api_key=${encodeURIComponent(key)}&region=ID&with_release_type=2|3&with_original_language=en|id|ja|ko&release_date.gte=${TODAY_ISO}&sort_by=popularity.desc&page=1`;
 
@@ -2114,45 +1430,25 @@
             .map(item => {
               const dObj = new Date(item.release_date + "T00:00:00");
               const dateLabel = statusType === "now" ? "Sedang Tayang" : dObj.toLocaleDateString("id-ID", {
-                day: "numeric",
-                month: "short",
-                year: item.release_date.startsWith("2027") ? "numeric" : undefined
+                day: "numeric", month: "short", year: item.release_date.startsWith("2027") ? "numeric" : undefined
               });
               const hypeScore = Math.min(97, Math.max(76, Math.round(74 + Math.min(23, (item.popularity || 10) / 4))));
-              const genresText = (item.genre_ids || [])
-                .slice(0, 2)
-                .map(gid => GENRE_MAP[gid])
-                .filter(Boolean)
-                .join(", ") || (item.original_language === "id" ? "Film Indonesia" : "Theatrical ID");
+              const genresText = (item.genre_ids || []).slice(0, 2).map(gid => GENRE_MAP[gid]).filter(Boolean).join(", ") || "Theatrical";
 
               const idKey = "tmdb_" + item.id;
               const cachedCred = creditsCache[idKey] || {};
 
               return {
-                id: idKey,
-                tmdbId: item.id,
-                status: statusType,
-                isIndonesian: item.original_language === "id",
-                title: (item.title || item.original_title || "").toUpperCase(),
-                releaseDate: item.release_date,
-                dateLabel: dateLabel,
-                confirmedText: statusType === "now" ? `Sedang Tayang di Bioskop Indonesia` : `Confirmed ID: ${item.release_date}`,
-                presaleText: "Pantau tiket reguler & presale di TIX ID, M-TIX, CGV & Cinépolis.",
-                sourceBadge: item.original_language === "id" ? "LSF / Cinema XXI ID" : "TMDB Theatrical ID",
-                age: item.adult ? "D 17+" : "R 13+",
-                runtime: cachedCred.runtime || "TBA",
-                genre: genresText,
-                hype: hypeScore,
-                rating: ((item.vote_average || 8.2)).toFixed(1),
-                presale: false,
-                imax: (item.popularity || 0) >= 65,
-                tba: false,
-                chains: ["XXI", "CGV", "Cinépolis"],
-                director: cachedCred.director || "Memuat...",
-                cast: cachedCred.cast || "Memuat...",
-                synopsis: item.overview || "Jadwal tayang resmi layar lebar bioskop Indonesia.",
-                poster: `https://image.tmdb.org/t/p/w500${item.poster_path}`,
-                gradient: "linear-gradient(145deg, #1d4ed8, #0f172a)"
+                id: idKey, tmdbId: item.id, status: statusType, isIndonesian: item.original_language === "id",
+                title: (item.title || item.original_title || "").toUpperCase(), releaseDate: item.release_date,
+                dateLabel: dateLabel, confirmedText: statusType === "now" ? "Sedang tayang di bioskop Indonesia" : `Rilis: ${item.release_date}`,
+                presaleText: "Cek presale di TIX ID, M-TIX, atau CGV.", sourceBadge: "TMDB ID",
+                age: item.adult ? "D 17+" : "R 13+", runtime: cachedCred.runtime || "TBA", genre: genresText,
+                hype: hypeScore, rating: ((item.vote_average || 8.2)).toFixed(1), presale: false,
+                imax: (item.popularity || 0) >= 65, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+                director: cachedCred.director || "Memuat...", cast: cachedCred.cast || "Memuat...",
+                synopsis: item.overview || "Jadwal tayang layar lebar Indonesia.",
+                poster: `https://image.tmdb.org/t/p/w500${item.poster_path}`
               };
             });
         };
@@ -2160,8 +1456,8 @@
         const liveNow = parseItems(dataNow.results, "now");
         const liveUpcoming = parseItems(dataUpcoming.results, "upcoming");
 
-        localStorage.setItem("ct_v31_live_now", JSON.stringify(liveNow));
-        localStorage.setItem("ct_v31_live_upcoming", JSON.stringify(liveUpcoming));
+        localStorage.setItem("ct_v32_live_now", JSON.stringify(liveNow));
+        localStorage.setItem("ct_v32_live_upcoming", JSON.stringify(liveUpcoming));
 
         await fetchMovieCreditsBatch(key, [...liveNow, ...liveUpcoming, ...CURATED_NOW_MOVIES, ...CURATED_UPCOMING_MOVIES]);
 
@@ -2171,13 +1467,13 @@
         if (activeBottomTab === "watchlist") renderWatchlist();
 
         if (showFeedback) {
-          fb.textContent = `Sukses! Daftar bioskop Indonesia diperbarui (bersih dari film lama).`;
+          fb.textContent = "Sinkronisasi berhasil.";
           fb.style.color = "#16a34a";
         }
       } catch (e) {
         renderMovies();
         if (showFeedback) {
-          fb.textContent = "Gagal sync: " + e.message;
+          fb.textContent = "Gagal sinkronisasi.";
           fb.style.color = "#e11d48";
         }
       }

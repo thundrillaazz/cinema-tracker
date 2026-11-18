@@ -90,8 +90,8 @@ class CinemaCheckWorker(
 
         val notification = NotificationCompat.Builder(appContext, MainActivity.CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle("🎟️ Jadwal Bioskop Indo: $title")
-            .setContentText("Rilis ID: $releaseDate • Cek presale tiket di TIX ID / M-TIX / CGV!")
+            .setContentTitle("Rilis Bioskop: $title")
+            .setContentText("Tayang $releaseDate • Cek presale di TIX ID / M-TIX / CGV")
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
