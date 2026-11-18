@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Cinema Tracker ID</title>
+  <style>
+    :root {
+      --bg: #09090b;
+      --surface: #131318;
+      --surface-2: #1c1c24;
+      --border: #272732;
+      --text: #f4f4f6;
+      --muted: #9ca3af;
+      --accent: #e11d48;
+      --accent-soft: rgba(225, 29, 72, 0.16);
+      --gold: #f59e0b;
+      --emerald: #10b981;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      padding-bottom: 36px;
+      line-height: 1.45;
+    }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      background: rgba(9, 9, 11, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 16px;
+    }
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .logo-badge {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #e11d48, #9f1239);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 16px;
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(225, 29, 72, 0.35);
+    }
+    .brand h1 { font-size: 17px; font-weight: 700; letter-spacing: -0.02em; }
+    .brand p { font-size: 11px; color: var(--muted); }
+    .icon-btn {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+    .icon-btn:active { transform: scale(0.97); }
+    .search-wrap { margin-top: 12px; }
+    .search-input {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+    }
+    .search-input:focus { border-color: var(--accent); }
+    .tabs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 12px 16px 4px;
+      scrollbar-width: none;
+    }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 7px 13px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .tab.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+    .status-strip {
+      margin: 10px 16px 0;
+      padding: 9px 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--emerald);
+      margin-right: 6px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      padding: 14px 16px;
+    }
+    @media (min-width: 640px) {
+      .grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .poster {
+      height: 155px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      background-size: cover;
+      background-position: center;
+    }
+    .poster::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(19,19,24,0.98) 5%, rgba(19,19,24,0.25) 60%, rgba(9,9,11,0.55) 100%);
+    }
+    .poster-top, .poster-bottom { position: relative; z-index: 2; }
+    .poster-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 4px; }
+    .badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 7px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .badge-hype { background: rgba(225, 29, 72, 0.9); color: #fff; }
+    .badge-imax { background: rgba(245, 158, 11, 0.92); color: #09090b; }
+    .badge-live { background: rgba(16, 185, 129, 0.92); color: #09090b; }
+    .watch-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(9,9,11,0.72);
+      color: #fff;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .watch-btn.saved {
+      background: var(--gold);
+      color: #09090b;
+      border-color: var(--gold);
+    }
+    .card-body { padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 6px; flex: 1; justify-content: space-between; }
+    .movie-title { font-size: 14px; font-weight: 700; color: var(--text); line-height: 1.3; }
+    .movie-meta { font-size: 11px; color: var(--muted); }
+    .movie-genre { font-size: 11px; color: #cbd5e1; background: var(--surface-2); padding: 4px 8px; border-radius: 6px; display: inline-block; width: fit-content; }
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.78);
+      z-index: 50;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal {
+      width: 100%;
+      max-width: 520px;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-radius: 20px 20px 0 0;
+      padding: 20px 18px 28px;
+    }
+    .modal h2 { font-size: 17px; font-weight: 700; margin-bottom: 6px; }
+    .modal p { font-size: 13px; color: var(--muted); margin-bottom: 14px; }
+    .modal input {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 11px 12px;
+      color: var(--text);
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+    .btn-primary {
+      width: 100%;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-bottom: 8px;
+    }
+    .btn-secondary {
+      width: 100%;
+      background: var(--surface-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 11px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 8px;
+    }
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 40px 16px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="top-bar">
+      <div class="brand">
+        <div class="logo-badge">CT</div>
+        <div>
+          <h1>Cinema Tracker ID</h1>
+          <p>Radar Tayang & Presale Bioskop Indonesia</p>
+        </div>
+      </div>
+      <button class="icon-btn" onclick="openSyncModal()" title="Sync TMDB API">
+        🔄 Sync
+      </button>
+    </div>
+    <div class="search-wrap">
+      <input id="searchInput" class="search-input" type="text" placeholder="Cari judul film, sutradara, atau format IMAX..." oninput="renderMovies()" />
+    </div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" data-filter="all" onclick="setFilter('all', this)">Semua Film</button>
+    <button class="tab" data-filter="hype" onclick="setFilter('hype', this)">🔥 Hype Tinggi</button>
+    <button class="tab" data-filter="imax" onclick="setFilter('imax', this)">🎟️ IMAX / Presale</button>
+    <button class="tab" data-filter="watchlist" onclick="setFilter('watchlist', this)">⭐ Watchlist (<span id="watchCount">0</span>)</button>
+  </div>
+
+  <div class="status-strip">
+    <span><span class="dot"></span><span id="syncStatusText">24 Jadwal Rilis Utama (Nov 2026 – Jan 2027)</span></span>
+    <span id="apiStatusBadge">Offline Ready</span>
+  </div>
+
+  <main id="movieGrid" class="grid"></main>
+
+  <div id="syncModal" class="modal-backdrop" onclick="closeModalOnBackdrop(event)">
+    <div class="modal">
+      <h2>🔄 Sync Jadwal Indonesia (TMDB API)</h2>
+      <p>Masukkan TMDB API Key (v3) gratis agar background worker mengecek jadwal rilis baru khusus region Indonesia setiap 6 jam dan mengirim notifikasi otomatis.</p>
+      <input id="tmdbKeyInput" type="text" placeholder="Tempel TMDB API Key v3 kamu di sini..." />
+      <button class="btn-primary" onclick="saveAndSyncTmdb()">Simpan Key & Sync Jadwal Indonesia</button>
+      <button class="btn-secondary" onclick="triggerTestNotification()">🔔 Tes Notifikasi Android Sekarang</button>
+      <button class="btn-secondary" onclick="closeSyncModal()">Tutup</button>
+    </div>
+  </div>
+
+  <script>
+    const BUILTIN_MOVIES = [
+      { id: "m1", title: "Dune: Messiah", date: "18 Des 2026", format: "IMAX Laser • XXI & CGV", hype: true, imax: true, color: "#9a3412", poster: "" },
+      { id: "m2", title: "The Odyssey (Christopher Nolan)", date: "17 Jul 2026 • Re-run IMAX", format: "IMAX 70mm / Laser", hype: true, imax: true, color: "#1d4ed8", poster: "" },
+      { id: "m3", title: "Avengers: Doomsday (Special Event)", date: "18 Des 2026", format: "IMAX 3D • Presale Alert", hype: true, imax: true, color: "#b91c1c", poster: "" },
+      { id: "m4", title: "The Batman Part II", date: "02 Okt 2026 • Extended", format: "Dolby Atmos • IMAX", hype: true, imax: true, color: "#374151", poster: "" },
+      { id: "m5", title: "Spider-Man: Brand New Day", date: "24 Jul 2026 • Encore", format: "IMAX • 4DX • ScreenX", hype: true, imax: true, color: "#dc2626", poster: "" },
+      { id: "m6", title: "Project Hail Mary", date: "20 Nov 2026", format: "IMAX • XXI Premiere", hype: true, imax: true, color: "#0369a1", poster: "" },
+      { id: "m7", title: "Wicked: For Good", date: "21 Nov 2026", format: "Dolby Atmos • XXI", hype: true, imax: false, color: "#15803d", poster: "" },
+      { id: "m8", title: "Zootopia 2", date: "26 Nov 2026", format: "2D / 3D • Semua Bioskop", hype: true, imax: false, color: "#c2410c", poster: "" },
+      { id: "m9", title: "Now You See Me: Now You Don't", date: "14 Nov 2026", format: "2D • XXI & CGV", hype: false, imax: false, color: "#4338ca", poster: "" },
+      { id: "m10", title: "The Running Man", date: "21 Nov 2026", format: "IMAX • Action Thriller", hype: true, imax: true, color: "#b45309", poster: "" },
+      { id: "m11", title: "Avatar: Fire and Ash", date: "19 Des 2026", format: "IMAX 3D HFR • Presale", hype: true, imax: true, color: "#be123c", poster: "" },
+      { id: "m12", title: "Jumanji 3", date: "11 Des 2026", format: "IMAX • 4DX • XXI", hype: true, imax: true, color: "#4d7c0f", poster: "" },
+      { id: "m13", title: "Shrek 5", date: "23 Des 2026", format: "2D • Libur Akhir Tahun", hype: true, imax: false, color: "#65a30d", poster: "" },
+      { id: "m14", title: "The Hunger Games: Sunrise on the Reaping", date: "20 Nov 2026", format: "IMAX • XXI & Cinépolis", hype: true, imax: true, color: "#a16207", poster: "" },
+      { id: "m15", title: "Narnia: The Magician's Nephew", date: "26 Nov 2026", format: "IMAX Special Theatrical", hype: true, imax: true, color: "#6d28d9", poster: "" },
+      { id: "m16", title: "Violent Night 2", date: "04 Des 2026", format: "2D • CGV & Cinépolis", hype: false, imax: false, color: "#991b1b", poster: "" },
+      { id: "m17", title: "Scream 7", date: "27 Nov 2026", format: "2D • Midnight Show", hype: false, imax: false, color: "#1f2937", poster: "" },
+      { id: "m18", title: "Supergirl: Woman of Tomorrow", date: "26 Jun 2026 • IMAX Fest", format: "IMAX • Dolby Atmos", hype: true, imax: true, color: "#1e40af", poster: "" },
+      { id: "m19", title: "Toy Story 5", date: "19 Jun 2026 • Holiday", format: "2D • Semua Bioskop", hype: true, imax: false, color: "#0284c7", poster: "" },
+      { id: "m20", title: "Moana (Live-Action)", date: "10 Jul 2026 • Encore", format: "IMAX • Dolby Atmos", hype: false, imax: true, color: "#0f766e", poster: "" },
+      { id: "m21", title: "Mortal Kombat II", date: "08 Jan 2027", format: "IMAX • 4DX", hype: true, imax: true, color: "#7f1d1d", poster: "" },
+      { id: "m22", title: "28 Years Later: The Bone Temple", date: "15 Jan 2027", format: "2D • XXI & CGV", hype: true, imax: false, color: "#3f3f46", poster: "" },
+      { id: "m23", title: "The Mandalorian and Grogu", date: "22 Jan 2027 (ID)", format: "IMAX Laser • Presale", hype: true, imax: true, color: "#334155", poster: "" },
+      { id: "m24", title: "Ice Age: Boiling Point", date: "29 Jan 2027", format: "2D / 3D • Family", hype: false, imax: false, color: "#0369a1", poster: "" }
+    ];
+
+    let currentFilter = "all";
+    let movies = [];
+    let watchlist = JSON.parse(localStorage.getItem("ct_watchlist") || "[]");
+
+    function initApp() {
+      const cachedLive = JSON.parse(localStorage.getItem("ct_live_movies") || "[]");
+      movies = mergeMovies(BUILTIN_MOVIES, cachedLive);
+
+      let savedKey = localStorage.getItem("ct_tmdb_key") || "";
+      if (!savedKey && window.AndroidBridge && typeof window.AndroidBridge.getTmdbApiKey === "function") {
+        savedKey = window.AndroidBridge.getTmdbApiKey() || "";
+        if (savedKey) localStorage.setItem("ct_tmdb_key", savedKey);
+      }
+
+      if (savedKey) {
+        document.getElementById("tmdbKeyInput").value = savedKey;
+        document.getElementById("apiStatusBadge").textContent = "TMDB ID Aktif";
+        document.getElementById("apiStatusBadge").style.color = "#10b981";
+      }
+
+      updateWatchCount();
+      renderMovies();
+    }
+
+    function mergeMovies(baseList, liveList) {
+      const map = new Map();
+      liveList.forEach(m => map.set(m.id, m));
+      baseList.forEach(m => {
+        if (!map.has(m.id)) map.set(m.id, m);
+      });
+      return Array.from(map.values());
+    }
+
+    function setFilter(filter, btn) {
+      currentFilter = filter;
+      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+      btn.classList.add("active");
+      renderMovies();
+    }
+
+    function toggleWatchlist(id) {
+      if (watchlist.includes(id)) {
+        watchlist = watchlist.filter(item => item !== id);
+      } else {
+        watchlist.push(id);
+      }
+      localStorage.setItem("ct_watchlist", JSON.stringify(watchlist));
+      updateWatchCount();
+      renderMovies();
+    }
+
+    function updateWatchCount() {
+      document.getElementById("watchCount").textContent = watchlist.length;
+    }
+
+    function renderMovies() {
+      const grid = document.getElementById("movieGrid");
+      const query = document.getElementById("searchInput").value.toLowerCase().trim();
+
+      const filtered = movies.filter(m => {
+        const matchQuery = m.title.toLowerCase().includes(query) || m.format.toLowerCase().includes(query) || m.date.toLowerCase().includes(query);
+        if (!matchQuery) return false;
+        if (currentFilter === "hype") return m.hype;
+        if (currentFilter === "imax") return m.imax;
+        if (currentFilter === "watchlist") return watchlist.includes(m.id);
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div class="empty-state">Tidak ada film yang cocok dengan filter ini.</div>`;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(m => {
+        const isSaved = watchlist.includes(m.id);
+        const bgStyle = m.poster
+          ? `background-image: url('${m.poster}');`
+          : `background: linear-gradient(135deg, ${m.color || '#1e1b4b'}, #09090b);`;
+
+        let badgeHtml = "";
+        if (m.isLive) {
+          badgeHtml = `<span class="badge badge-live">LIVE ID</span>`;
+        } else if (m.imax) {
+          badgeHtml = `<span class="badge badge-imax">IMAX</span>`;
+        } else if (m.hype) {
+          badgeHtml = `<span class="badge badge-hype">HYPE</span>`;
+        }
+
+        return `
+          <article class="card">
+            <div class="poster" style="${bgStyle}">
+              <div class="poster-top">
+                <div>${badgeHtml}</div>
+                <button class="watch-btn ${isSaved ? 'saved' : ''}" onclick="toggleWatchlist('${m.id}')" aria-label="Watchlist">
+                  ${isSaved ? '★' : '☆'}
+                </button>
+              </div>
+              <div class="poster-bottom">
+                <div class="movie-title">${m.title}</div>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="movie-meta">📅 ${m.date}</div>
+              <div class="movie-genre">${m.format}</div>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function openSyncModal() {
+      document.getElementById("syncModal").classList.add("open");
+    }
+
+    function closeSyncModal() {
+      document.getElementById("syncModal").classList.remove("open");
+    }
+
+    function closeModalOnBackdrop(e) {
+      if (e.target.id === "syncModal") closeSyncModal();
+    }
+
+    function triggerTestNotification() {
+      if (window.AndroidBridge && typeof window.AndroidBridge.sendTestNotification === "function") {
+        window.AndroidBridge.sendTestNotification();
+      } else {
+        alert("Fitur notifikasi native aktif setelah aplikasi di-install sebagai APK di Android.");
+      }
+    }
+
+    async function saveAndSyncTmdb() {
+      const key = document.getElementById("tmdbKeyInput").value.trim();
+      if (!key) {
+        alert("Masukkan TMDB API Key v3 terlebih dahulu.");
+        return;
+      }
+
+      localStorage.setItem("ct_tmdb_key", key);
+      if (window.AndroidBridge && typeof window.AndroidBridge.saveTmdbApiKey === "function") {
+        window.AndroidBridge.saveTmdbApiKey(key);
+      }
+
+      const statusEl = document.getElementById("syncStatusText");
+      statusEl.textContent = "Menyinkronkan jadwal bioskop Indonesia...";
+
+      try {
+        const res = await fetch(`https://api.themoviedb.org/3/movie/upcoming?api_key=${encodeURIComponent(key)}&region=ID&page=1`);
+        if (!res.ok) throw new Error("API Key tidak valid atau gagal koneksi");
+        const data = await res.json();
+
+        const liveMapped = (data.results || []).map(item => ({
+          id: "tmdb_" + item.id,
+          title: item.title || item.original_title,
+          date: item.release_date || "Segera Tayang",
+          format: `TMDB ★ ${(item.vote_average || 0).toFixed(1)} • Region ID`,
+          hype: (item.popularity || 0) >= 35 || (item.vote_average || 0) >= 7.0,
+          imax: (item.popularity || 0) >= 75,
+          isLive: true,
+          color: "#881337",
+          poster: item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : ""
+        }));
+
+        localStorage.setItem("ct_live_movies", JSON.stringify(liveMapped));
+        movies = mergeMovies(BUILTIN_MOVIES, liveMapped);
+        document.getElementById("apiStatusBadge").textContent = "TMDB ID Aktif";
+        document.getElementById("apiStatusBadge").style.color = "#10b981";
+        statusEl.textContent = `Tersinkron: ${movies.length} film (Jadwal Indonesia)`;
+        renderMovies();
+        closeSyncModal();
+      } catch (err) {
+        statusEl.textContent = "Gagal sync TMDB. Cek koneksi / API key.";
+        alert("Gagal mengambil data TMDB: " + err.message);
+      }
+    }
+
+    initApp();
+  </script>
+</body>
+</html>
