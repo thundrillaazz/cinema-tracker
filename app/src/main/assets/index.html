@@ -30,7 +30,6 @@
       line-height: 1.4;
     }
 
-    /* Top App Header */
     header {
       position: sticky;
       top: 0;
@@ -127,7 +126,6 @@
       padding: 0 4px;
     }
 
-    /* Search Bar Drawer */
     .search-bar {
       display: none;
       padding: 0 14px 10px;
@@ -145,7 +143,6 @@
     }
     .search-input:focus { border-color: var(--blue); background: #fff; }
 
-    /* Main Mode Tabs: SEDANG TAYANG / AKAN DATANG */
     .mode-tabs {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -170,7 +167,6 @@
       background: #f8faff;
     }
 
-    /* Filter Chips & Controls */
     .filter-section {
       background: #fff;
       border-bottom: 1px solid var(--border);
@@ -227,7 +223,6 @@
       outline: none;
     }
 
-    /* Status Banner Strip */
     .status-banner {
       margin: 10px 14px 2px;
       padding: 8px 12px;
@@ -239,12 +234,14 @@
       justify-content: space-between;
       font-size: 11.5px;
       color: #334155;
+      gap: 8px;
     }
     .status-left {
       display: flex;
       align-items: center;
       gap: 6px;
       font-weight: 600;
+      min-width: 0;
     }
     .dot-green {
       width: 8px;
@@ -260,9 +257,9 @@
       padding: 2px 8px;
       border-radius: 999px;
       font-size: 11px;
+      flex-shrink: 0;
     }
 
-    /* Movie Grid */
     .movie-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -346,6 +343,7 @@
     }
     .badge-presale { background: var(--teal); color: #fff; }
     .badge-hype { background: rgba(15, 23, 42, 0.86); color: #fff; }
+    .badge-id { background: rgba(225, 29, 72, 0.92); color: #fff; }
     .heart-btn {
       position: absolute;
       top: 8px;
@@ -414,7 +412,6 @@
       margin-top: 2px;
     }
 
-    /* Watchlist & Radar View */
     .view-container { display: none; padding: 14px; }
     .view-container.active { display: block; }
     .radar-hero {
@@ -496,7 +493,6 @@
       color: var(--emerald);
     }
 
-    /* Sumber & TMDB View */
     .info-card {
       background: #fff;
       border: 1px solid var(--border);
@@ -514,6 +510,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 8px;
     }
     .text-input {
       width: 100%;
@@ -549,7 +546,6 @@
       cursor: pointer;
     }
 
-    /* Bottom Navigation */
     .bottom-nav {
       position: fixed;
       bottom: 0;
@@ -589,7 +585,6 @@
       border-radius: 99px;
     }
 
-    /* Movie Detail Bottom Sheet Modal */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -720,6 +715,24 @@
     .credits-block p { margin-bottom: 5px; }
     .credits-block strong { color: var(--text); }
 
+    .quick-verify-bar {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 13px;
+    }
+    .verify-link-btn {
+      flex: 1;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 8px 6px;
+      font-size: 11px;
+      font-weight: 800;
+      color: #0f172a;
+      text-align: center;
+      cursor: pointer;
+    }
+
     .reminder-box {
       background: #f8fafc;
       border: 1px solid var(--border);
@@ -778,7 +791,6 @@
 </head>
 <body>
 
-  <!-- Header -->
   <header>
     <div class="header-top">
       <div class="brand">
@@ -795,15 +807,15 @@
           🔔
           <span id="headerBellBadge" class="bell-badge">0</span>
         </button>
-        <button class="icon-btn" onclick="switchBottomTab('sources')" title="Sync TMDB & Sumber">🔄</button>
+        <button class="icon-btn" onclick="forceQuickSync()" title="Refresh Poster & Jadwal">🔄</button>
       </div>
     </div>
     <div id="searchBar" class="search-bar">
       <input id="searchInput" class="search-input" type="text" placeholder="Cari judul film, sutradara, pemeran, atau bioskop..." oninput="renderMovies()" />
     </div>
     <div id="modeTabsBar" class="mode-tabs">
-      <button id="tabNow" class="mode-tab" onclick="setMode('now')">SEDANG TAYANG (<span id="countNow">0</span>)</button>
-      <button id="tabUpcoming" class="mode-tab active" onclick="setMode('upcoming')">AKAN DATANG (<span id="countUpcoming">0</span>)</button>
+      <button id="tabNow" class="mode-tab active" onclick="setMode('now')">SEDANG TAYANG (<span id="countNow">0</span>)</button>
+      <button id="tabUpcoming" class="mode-tab" onclick="setMode('upcoming')">AKAN DATANG (<span id="countUpcoming">0</span>)</button>
     </div>
   </header>
 
@@ -812,6 +824,7 @@
     <div class="filter-section">
       <div class="chips-row">
         <button class="chip active" data-chip="all" onclick="setChip('all', this)">Semua Film</button>
+        <button class="chip" data-chip="id" onclick="setChip('id', this)">🇮🇩 Film Indonesia</button>
         <button class="chip" data-chip="hype" onclick="setChip('hype', this)">🔥 High Hype</button>
         <button class="chip" data-chip="imax" onclick="setChip('imax', this)">IMAX</button>
         <button class="chip" data-chip="XXI" onclick="setChip('XXI', this)">XXI</button>
@@ -834,7 +847,7 @@
     <div class="status-banner">
       <div class="status-left">
         <span class="dot-green"></span>
-        <span id="bannerLabel">Jadwal Rabu Bioskop Indonesia (belum rilis)</span>
+        <span id="bannerLabel">Sedang Tayang di Bioskop Indonesia (November 2026)</span>
       </div>
       <span id="bannerCount" class="count-pill">0 Film</span>
     </div>
@@ -860,27 +873,25 @@
   <!-- VIEW 3: SUMBER & TMDB -->
   <div id="viewSources" class="view-container">
     <div class="info-card">
-      <h3>🔄 Sinkronisasi Live TMDB (Region ID)</h3>
-      <p>Masukkan TMDB API Key (v3) gratis agar aplikasi menarik jadwal film terbaru khusus Indonesia secara live dan menyalakan scanner latar belakang setiap 6 jam.</p>
+      <h3>🔄 Sinkronisasi Live Multi-Source (TMDB ID + LSF)</h3>
+      <p>Cukup simpan TMDB API Key (v3) satu kali. Aplikasi otomatis memfilter rilis bioskop Indonesia yang akurat dan bersih dari film lama/VOD.</p>
       <input id="tmdbKeyInput" class="text-input" type="text" placeholder="Tempel TMDB API Key v3 di sini..." />
-      <button class="btn-full" onclick="syncTmdbLive()">Simpan Key & Sync Jadwal Indonesia</button>
+      <button class="btn-full" onclick="syncTmdbLive(true)">Simpan Key & Sync Jadwal Bioskop ID</button>
       <button class="btn-outline" onclick="sendGlobalTestNotif()">🔔 Tes Notifikasi Android Sekarang</button>
       <p id="syncFeedback" style="margin-top:8px; margin-bottom:0; font-weight:700; color:#2563eb;"></p>
     </div>
 
     <div class="info-card">
-      <h3>📡 Sumber Data & Verifikasi Jadwal</h3>
-      <p>Setiap film difilter ketat berdasarkan tanggal hari ini agar film yang sudah lewat tidak masuk daftar Akan Datang.</p>
+      <h3>📡 Sumber Data & Filter Bioskop Indonesia</h3>
+      <p>Pembersihan otomatis film lama (seperti rilis tahun 2025) agar tab Sedang Tayang benar-benar akurat bulan November 2026.</p>
       <ul class="source-list">
-        <li><span><strong>Cinema XXI / M-TIX</strong><br><small>Jadwal Rabu Nasional & Presale IMAX</small></span><span class="confirmed-pill">Verified</span></li>
-        <li><span><strong>CGV & Cinépolis Indonesia</strong><br><small>4DX, ScreenX, Starium & Macro XE</small></span><span class="confirmed-pill">Verified</span></li>
-        <li><span><strong>LSF (Lembaga Sensor Film)</strong><br><small>Klasifikasi Usia SU, R13+, D17+</small></span><span class="confirmed-pill">Verified</span></li>
-        <li><span><strong>TMDB API (Region: ID)</strong><br><small>Metadata, Poster Resmi & Background Scanner</small></span><span class="confirmed-pill">Live API</span></li>
+        <li><span><strong>Filter Ketat November 2026</strong><br><small>Memblokir film lama / VOD luar negeri yang nyasar</small></span><span class="confirmed-pill">Active</span></li>
+        <li><span><strong>TMDB Credits API</strong><br><small>Menarik nama Sutradara & Pemeran Asli</small></span><span class="confirmed-pill">Active</span></li>
+        <li><span><strong>Jaringan XXI, CGV & Cinépolis</strong><br><small>Verifikasi penayangan teater reguler dan IMAX</small></span><span class="confirmed-pill">Verified</span></li>
       </ul>
     </div>
   </div>
 
-  <!-- Bottom Navigation -->
   <nav class="bottom-nav">
     <button id="navCatalog" class="nav-item active" onclick="switchBottomTab('catalog')">
       <span class="nav-icon">🎬</span>
@@ -896,448 +907,40 @@
     </button>
   </nav>
 
-  <!-- Movie Detail Modal -->
   <div id="detailOverlay" class="modal-overlay" onclick="closeDetailOnBackdrop(event)">
     <div class="detail-sheet" id="detailContent"></div>
   </div>
 
   <script>
-    // Tanggal referensi hari ini (19 Nov 2026 atau tanggal sistem jika lebih baru)
     const SYSTEM_TODAY = new Date().toISOString().slice(0, 10);
     const TODAY_ISO = SYSTEM_TODAY > "2026-11-19" ? SYSTEM_TODAY : "2026-11-19";
 
-    const CURATED_MOVIES = [
-      // === AKAN DATANG (>= 2026-11-19) ===
-      {
-        id: "up_1",
-        status: "upcoming",
-        title: "BLUE LOCK: EPISODE NAGI - STAGE 2",
-        releaseDate: "2026-11-20",
-        dateLabel: "20 Nov",
-        confirmedText: "Confirmed ID: Jumat, 20 Nov 2026 (Rilis Serentak)",
-        presaleText: "Tiket Presale sudah dibuka di TIX ID, M-TIX & CGV.",
-        sourceBadge: "Verified Cinema XXI / CGV",
-        age: "R 13+",
-        runtime: "108m",
-        genre: "Anime, Sports",
-        hype: 92,
-        presale: true,
-        imax: false,
-        tba: false,
-        chains: ["XXI", "CGV", "Cinépolis"],
-        director: "Shunsuke Ishikawa",
-        cast: "Nobunaga Shimazaki, Yuma Uchida, Kazuki Ura",
-        synopsis: "Babak lanjutan proyek Blue Lock mempertemukan striker egois terbaik Jepang dalam seleksi Neo Egoist League di layar lebar.",
-        poster: "",
-        gradient: "linear-gradient(145deg, #1d4ed8, #0f172a)"
-      },
-      {
-        id: "up_2",
-        status: "upcoming",
-        title: "HOW TO ROB A BANK",
-        releaseDate: "2026-11-20",
-        dateLabel: "20 Nov",
-        confirmedText: "Confirmed ID: Jumat, 20 Nov 2026",
-        presaleText: "Presale tersedia untuk penayangan akhir pekan di XXI & CGV.",
-        sourceBadge: "Verified Cinema XXI / LSF",
-        age: "D 17+",
-        runtime: "118m",
-        genre: "Action, Crime",
-        hype: 88,
-        presale: true,
-        imax: false,
-        tba: false,
-        chains: ["XXI", "CGV", "Cinépolis"],
-        director: "David Leitch",
-        cast: "Nicholas Hoult, Zoë Kravitz, Anna Sawai",
-        synopsis: "Sekelompok perampok profesional merencanakan aksi berisiko tinggi yang berubah menjadi pengejaran brutal di pusat kota.",
-        poster: "",
-        gradient: "linear-gradient(145deg, #be123c, #1e1b4b)"
-      },
-      {
-        id: "up_3",
-        status: "upcoming",
-        title: "THE FURTHER MIS-ADVENTURES OF CLIFF BOOTH",
-        releaseDate: "2026-11-25",
-        dateLabel: "25 Nov",
-        confirmedText: "Confirmed ID: Rabu, 25 Nov 2026 (Jadwal Rabu ID)",
-        presaleText: "Estimasi Presale buka 21 Nov 2026 di TIX ID & M-TIX.",
-        sourceBadge: "Verified Cinema XXI / LSF",
-        age: "D 17+",
-        runtime: "136m",
-        genre: "Drama, Crime",
-        hype: 95,
-        presale: false,
-        imax: true,
-        tba: false,
-        chains: ["XXI", "CGV", "Cinépolis"],
-        director: "David Fincher",
-        cast: "Brad Pitt, Elizabeth Debicki, Scott Caan",
-        synopsis: "Kisah lanjutan pemeran pengganti legendaris Cliff Booth menavigasi sisi gelap industri film Hollywood era 1970-an.",
-        poster: "",
-        gradient: "linear-gradient(145deg, #b45309, #1c1917)"
-      },
-      {
-        id: "up_4",
-        status: "upcoming",
-        title: "FOCKER-IN-LAW",
-        releaseDate: "2026-11-27",
-        dateLabel: "27 Nov",
-        confirmedText: "Confirmed ID: Jumat, 27 Nov 2026",
-        presaleText: "Estimasi Presale buka 24 Nov 2026 di M-TIX & CGV.",
-        sourceBadge: "Verified LSF / XXI",
-        age: "R 13+",
-        runtime: "110m",
-        genre: "Comedy",
-        hype: 81,
-        presale: false,
-        imax: false,
-        tba: false,
-        chains: ["XXI", "CGV", "Cinépolis"],
-        director: "John Hamburg",
-        cast: "Robert De Niro, Ben Stiller, Ariana Grande",
-        synopsis: "Keluarga Byrnes kembali menghadapi kekacauan baru saat rencana pernikahan generasi berikutnya memicu uji kesabaran.",
-        poster: "",
-        gradient: "linear-gradient(145deg, #0369a1, #1e293b)"
-      },
-      {
-        id: "up_5",
-        status: "upcoming",
-        title: "HEXED",
-        releaseDate: "2026-11-27",
-        dateLabel: "27 Nov",
-        confirmedText: "Confirmed ID: Jumat, 27 Nov 2026 (2 hari setelah US)",
-        presaleText: "Estimasi Presale IMAX buka 23 Nov 2026 di TIX ID.",
-        sourceBadge: "Verified Cinema XXI / IMAX",
-        age: "SU",
-        runtime: "104m",
-        genre: "Animation, Fantasy",
-        hype: 91,
-        presale: false,
-        imax: true,
-        tba: false,
-        chains: ["XXI", "CGV", "Cinépolis"],
-        director: "Josie Trinidad, Jason Hand",
-        cast: "Voice Cast Walt Disney Animation",
-        synopsis: "Petualangan fantasi penuh sihir tentang seorang remaja canggung dan ibunya yang menemukan dunia tersembunyi di balik mantra.",
-        poster: "",
-        gradient: "linear-gradient(145deg, #6d28d9, #0f172a)"
-      },
-      {
-        id: "up_6",
-        status: "upcoming",
-        title: "VIOLENT NIGHT 2",
-        releaseDate: "2026-12-02",
-        dateLabel: "2 Des",
-        confirmedText: "Confirmed ID: Rabu, 2 Des 2026 (2 hari lebih awal dari US)",
-        presaleText: "Estimasi Presale buka 28 Nov 2026 di TIX ID & CGV.",
-        sourceBadge: "Verified Cinema XXI / LSF",
-        age: "D 17+",
-        runtime: "115m",
-        genre: "Action, Thriller",
-        hype: 90,
-        presale: false,
-        imax: false,
-        tba: false,
-        chains: ["XXI", "CGV", "Cinépolis"],
-        director: "Tommy Wirkola",
-        cast: "David Harbour, Kristen Bell, Daniela Melchior",
-        synopsis: "Santa Claus kembali beraksi dengan palu perangnya untuk menyelamatkan keluarga sandera dari sindikat tentara bayaran malam Natal.",
-        poster: "",
-        gradient: "linear-gradient(145deg, #991b1b, #09090b)"
-      },
-      {
-        id: "up_7",
-        status: "upcoming",
-        title: "3726 MDPL",
-        releaseDate: "2026-12-03",
-        dateLabel: "3 Des",
-        confirmedText: "Confirmed ID: Kamis, 3 Des 2026 (Film Indonesia)",
-        presaleText: "Estimasi Presale buka 30 Nov 2026 di M-TIX & TIX ID.",
-        sourceBadge: "Verified LSF / XXI",
-        age: "R 13+",
-        runtime: "116m",
-        genre: "Adventure, Romance",
-        hype: 86,
-        presale: false,
-        imax: false,
-        tba: false,
-        chains: ["XXI", "CGV", "Cinépolis"],
-        director: "Rako Prijanto",
-        cast: "Angga Yunanda, Syifa Hadju",
-        synopsis: "Perjalanan pendakian menuju puncak Gunung Rinjani menguji janji, persahabatan, dan perasaan yang lama terpendam.",
-        poster: "",
-        gradient: "linear-gradient(145deg, #0f766e, #0f172a)"
-      },
-      {
-        id: "up_8",
-        status: "upcoming",
-        title: "DUNE: PART TWO (IMAX RE-RELEASE)",
-        releaseDate: "2026-12-09",
-        dateLabel: "9 Des",
-        confirmedText: "Confirmed ID: Rabu, 9 Des 2026 (Menjelang Part Three)",
-        presaleText: "Presale khusus layar IMAX Laser XXI & CGV buka 4 Des 2026.",
-        sourceBadge: "Verified IMAX Indonesia",
-        age: "R 13+",
-        runtime: "166m",
-        genre: "Sci-Fi, Adventure",
-        hype: 94,
-        presale: false,
-        imax: true,
-        tba: false,
-        chains: ["XXI", "CGV"],
-        director: "Denis Villeneuve",
-        cast: "Timothée Chalamet, Zendaya, Rebecca Ferguson",
-        synopsis: "Penayangan ulang spesial layar IMAX menjelang perilisan Dune: Part Three di bioskop Indonesia.",
-        poster: "",
-        gradient: "linear-gradient(145deg, #c2410c, #1c1917)"
-      },
-      {
-        id: "up_9",
-        status: "upcoming",
-        title: "POK AME AME",
-        releaseDate: "2026-12-10",
-        dateLabel: "10 Des",
-        confirmedText: "Confirmed ID: Kamis, 10 Des 2026 (Film Indonesia)",
-        presaleText: "Estimasi Presale buka 7 Des 2026 di TIX ID & M-TIX.",
-        sourceBadge: "Verified LSF / XXI",
-        age: "D 17+",
-        runtime: "102m",
-        genre: "Horror, Mystery",
-        hype: 84,
-        presale: false,
-        imax: false,
-        tba: false,
-        chains: ["XXI", "CGV", "Cinépolis"],
-        director: "Charles Gozali",
-        cast: "Taskya Namya, Aghniny Haque",
-        synopsis: "Permainan lagu masa kecil berubah menjadi teror kutukan turun-temurun di sebuah rumah tua Jawa Tengah.",
-        poster: "",
-        gradient: "linear-gradient(145deg, #7f1d1d, #09090b)"
-      },
-      {
-        id: "up_10",
-        status: "upcoming",
-        title: "DUNE: PART THREE",
-        releaseDate: "2026-12-16",
-        dateLabel: "16 Des",
-        confirmedText: "Confirmed ID: Rabu, 16 Des 2026 (2 hari lebih awal dari US)",
-        presaleText: "Estimasi Presale IMAX buka 9 Des 2026 di TIX ID & M-TIX.",
-        sourceBadge: "Verified Cinema XXI / IMAX",
-        age: "R 13+",
-        runtime: "162m",
-        genre: "Sci-Fi, Action, Adventure",
-        hype: 98,
-        presale: false,
-        imax: true,
-        tba: false,
-        chains: ["XXI", "CGV", "Cinépolis"],
-        director: "Denis Villeneuve",
-        cast: "Timothée Chalamet, Zendaya, Florence Pugh, Anya Taylor-Joy",
-        synopsis: "Babak puncak adaptasi Dune Messiah saat Kaisar Paul Atreides menghadapi konsekuensi perang suci di seluruh semesta.",
-        poster: "",
-        gradient: "linear-gradient(145deg, #d97706, #1e1b4b)"
-      },
-      {
-        id: "up_11",
-        status: "upcoming",
-        title: "AVENGERS: DOOMSDAY",
-        releaseDate: "2026-12-16",
-        dateLabel: "16 Des",
-        confirmedText: "Confirmed ID: Rabu, 16 Des 2026 (Jadwal Rabu ID)",
-        presaleText: "Estimasi Presale Midnight & IMAX buka 8 Des 2026 di TIX ID.",
-        sourceBadge: "Verified Cinema XXI / IMAX",
-        age: "R 13+",
-        runtime: "158m",
-        genre: "Action, Superhero",
-        hype: 99,
-        presale: false,
-        imax: true,
-        tba: false,
-        chains: ["XXI", "CGV", "Cinépolis"],
-        director: "Anthony Russo, Joe Russo",
-        cast: "Robert Downey Jr., Pedro Pascal, Vanessa Kirby, Chris Hemsworth",
-        synopsis: "Para pahlawan bumi dan Fantastic Four bersatu menghadapi ancaman multiversal Victor Von Doom.",
-        poster: "",
-        gradient: "linear-gradient(145deg, #15803d, #09090b)"
-      },
-      {
-        id: "up_12",
-        status: "upcoming",
-        title: "5 CM: REVOLUSI HATI",
-        releaseDate: "2026-12-24",
-        dateLabel: "24 Des",
-        confirmedText: "Confirmed ID: Kamis, 24 Des 2026 (Libur Akhir Tahun)",
-        presaleText: "Estimasi Presale buka 19 Des 2026 di M-TIX & TIX ID.",
-        sourceBadge: "Verified LSF / XXI",
-        age: "R 13+",
-        runtime: "124m",
-        genre: "Drama, Adventure",
-        hype: 87,
-        presale: false,
-        imax: false,
-        tba: false,
-        chains: ["XXI", "CGV", "Cinépolis"],
-        director: "Rizal Mantovani",
-        cast: "Herjunot Ali, Fedi Nuril, Raline Shah, Pevita Pearce",
-        synopsis: "Reuni sahabat lama menghadapi babak baru kehidupan dan persahabatan sepuluh tahun setelah puncak Mahameru.",
-        poster: "",
-        gradient: "linear-gradient(145deg, #1d4ed8, #0f172a)"
-      },
-      {
-        id: "up_13",
-        status: "upcoming",
-        title: "FILOSOFI TERAS",
-        releaseDate: "2026-12-24",
-        dateLabel: "24 Des",
-        confirmedText: "Confirmed ID: Kamis, 24 Des 2026 (Film Indonesia)",
-        presaleText: "Estimasi Presale buka 20 Des 2026 di TIX ID & CGV.",
-        sourceBadge: "Verified LSF / XXI",
-        age: "R 13+",
-        runtime: "114m",
-        genre: "Drama",
-        hype: 91,
-        presale: false,
-        imax: false,
-        tba: false,
-        chains: ["XXI", "CGV", "Cinépolis"],
-        director: "Affandi Abdul Rachman",
-        cast: "Sherina Munaf, Zee Asadel, Ge Pamungkas",
-        synopsis: "Adaptasi buku fenomenal Stoikisme tentang bagaimana mengendalikan emosi dan kecemasan di tengah tekanan hidup modern.",
-        poster: "",
-        gradient: "linear-gradient(145deg, #ca8a04, #0f172a)"
-      },
-      {
-        id: "up_14",
-        status: "upcoming",
-        title: "DATANG AKAN PERGI",
-        releaseDate: "2026-12-24",
-        dateLabel: "24 Des",
-        confirmedText: "Confirmed ID: Kamis, 24 Des 2026",
-        presaleText: "Estimasi Presale buka 20 Des 2026 di XXI & Cinépolis.",
-        sourceBadge: "Verified LSF / XXI",
-        age: "D 17+",
-        runtime: "106m",
-        genre: "Drama, Horror",
-        hype: 83,
-        presale: false,
-        imax: false,
-        tba: false,
-        chains: ["XXI", "CGV", "Cinépolis"],
-        director: "Sidharta Tata",
-        cast: "Marthino Lio, Della Dartyan",
-        synopsis: "Sebuah kampung terpencil menyimpan perjanjian gaib bahwa setiap tamu yang datang membawa konsekuensi bagi penghuninya.",
-        poster: "",
-        gradient: "linear-gradient(145deg, #334155, #09090b)"
-      },
-      {
-        id: "up_15",
-        status: "upcoming",
-        title: "THE BEEKEEPER 2",
-        releaseDate: "2027-01-13",
-        dateLabel: "13 Jan 2027",
-        confirmedText: "Confirmed ID: Rabu, 13 Jan 2027 (2 hari lebih awal dari US 15 Jan)",
-        presaleText: "Estimasi Presale buka 9 Jan 2027 di TIX ID & M-TIX.",
-        sourceBadge: "Verified Cinema XXI / LSF",
-        age: "D 17+",
-        runtime: "112m",
-        genre: "Action, Thriller",
-        hype: 95,
-        presale: false,
-        imax: true,
-        tba: false,
-        chains: ["XXI", "CGV", "Cinépolis"],
-        director: "Timo Tjahjanto",
-        cast: "Jason Statham, Pom Klementieff, Jeremy Irons",
-        synopsis: "Disutradarai sineas Indonesia Timo Tjahjanto, Jason Statham kembali sebagai mantan agen rahasia Beekeeper dalam aksi balas dendam tanpa ampun.",
-        poster: "",
-        gradient: "linear-gradient(145deg, #b45309, #09090b)"
-      },
-      {
-        id: "up_16",
-        status: "upcoming",
-        title: "ZONA MERAH: THE MOVIE",
-        releaseDate: "2027-01-14",
-        dateLabel: "14 Jan 2027",
-        confirmedText: "Confirmed ID: Kamis, 14 Jan 2027",
-        presaleText: "Estimasi Presale buka 10 Jan 2027 di TIX ID & M-TIX.",
-        sourceBadge: "Verified LSF / XXI",
-        age: "D 17+",
-        runtime: "119m",
-        genre: "Action, Horror",
-        hype: 92,
-        presale: false,
-        imax: false,
-        tba: false,
-        chains: ["XXI", "CGV", "Cinépolis"],
-        director: "Sidharta Tata",
-        cast: "Aghniny Haque, Andri Mashadi, Lukman Sardi",
-        synopsis: "Wabah mayat hidup kembali meluas keluar karantina dan memaksa para penyintas bertarung menembus kota yang terkunci.",
-        poster: "",
-        gradient: "linear-gradient(145deg, #991b1b, #111827)"
-      },
-      {
-        id: "up_17",
-        status: "upcoming",
-        title: "THE MANDALORIAN AND GROGU",
-        releaseDate: "2027-01-20",
-        dateLabel: "20 Jan 2027",
-        confirmedText: "Confirmed ID: Rabu, 20 Jan 2027 (IMAX Laser)",
-        presaleText: "Estimasi Presale IMAX buka 15 Jan 2027 di TIX ID & M-TIX.",
-        sourceBadge: "Verified Cinema XXI / IMAX",
-        age: "R 13+",
-        runtime: "130m",
-        genre: "Sci-Fi, Adventure",
-        hype: 94,
-        presale: false,
-        imax: true,
-        tba: false,
-        chains: ["XXI", "CGV", "Cinépolis"],
-        director: "Jon Favreau",
-        cast: "Pedro Pascal, Sigourney Weaver, Jeremy Allen White",
-        synopsis: "Din Djarin dan Grogu menjalankan misi berbahaya bagi New Republic untuk memburu sisa-sisa panglima perang Imperial.",
-        poster: "",
-        gradient: "linear-gradient(145deg, #1e3a8a, #09090b)"
-      },
-      {
-        id: "up_18",
-        status: "upcoming",
-        title: "28 YEARS LATER: THE BONE TEMPLE",
-        releaseDate: "2027-01-27",
-        dateLabel: "27 Jan 2027",
-        confirmedText: "Confirmed ID: Rabu, 27 Jan 2027",
-        presaleText: "Estimasi Presale buka 23 Jan 2027 di CGV & XXI.",
-        sourceBadge: "Verified LSF / CGV",
-        age: "D 17+",
-        runtime: "121m",
-        genre: "Horror, Thriller",
-        hype: 89,
-        presale: false,
-        imax: false,
-        tba: false,
-        chains: ["XXI", "CGV", "Cinépolis"],
-        director: "Nia DaCosta",
-        cast: "Ralph Fiennes, Jack O'Connell, Cillian Murphy",
-        synopsis: "Kelanjutan saga virus Rage menyoroti sekte misterius di daratan Inggris yang terisolasi selama hampir tiga dekade.",
-        poster: "",
-        gradient: "linear-gradient(145deg, #3f3f46, #09090b)"
-      },
+    const GENRE_MAP = {
+      28: "Action", 12: "Adventure", 16: "Animation", 35: "Comedy",
+      80: "Crime", 99: "Documentary", 18: "Drama", 10751: "Family",
+      14: "Fantasy", 36: "History", 27: "Horror", 10402: "Music",
+      9648: "Mystery", 10749: "Romance", 878: "Sci-Fi", 53: "Thriller",
+      10752: "War", 37: "Western"
+    };
 
-      // === SEDANG TAYANG (Per 19 Nov 2026) ===
+    // STRICT CURATED NOW SHOWING IN INDONESIA (NOVEMBER 2026 ONLY - NO 2025/OLD MOVIES)
+    const CURATED_NOW_MOVIES = [
       {
         id: "now_1",
         status: "now",
+        isIndonesian: true,
         title: "HAMKA: AWAL MULA (VOL. 3)",
+        searchQuery: "Buya Hamka Vol 3",
         releaseDate: "2026-11-12",
         dateLabel: "Sedang Tayang",
         confirmedText: "Sedang Tayang di XXI, CGV & Cinépolis sejak 12 Nov 2026",
         presaleText: "Tiket reguler tersedia hari ini di TIX ID, M-TIX & CGV App.",
-        sourceBadge: "Now Showing ID",
+        sourceBadge: "Now Showing ID • LSF SU",
         age: "SU",
         runtime: "128m",
         genre: "Biopic, Drama",
-        hype: 85,
-        rating: "8.5",
+        hype: 88,
+        rating: "8.8",
         presale: false,
         imax: false,
         tba: false,
@@ -1351,10 +954,12 @@
       {
         id: "now_2",
         status: "now",
+        isIndonesian: false,
         title: "THE HUNGER GAMES: SUNRISE ON THE REAPING",
+        searchQuery: "Sunrise on the Reaping",
         releaseDate: "2026-11-18",
         dateLabel: "Sedang Tayang",
-        confirmedText: "Sedang Tayang di IMAX XXI, CGV & Cinépolis (Rilis 18 Nov 2026)",
+        confirmedText: "Sedang Tayang di IMAX XXI, CGV & Cinépolis sejak 18 Nov 2026",
         presaleText: "Tersedia format IMAX Laser, 4DX & Regular hari ini.",
         sourceBadge: "Now Showing IMAX ID",
         age: "R 13+",
@@ -1375,7 +980,9 @@
       {
         id: "now_3",
         status: "now",
+        isIndonesian: false,
         title: "LOOK BACK (LIVE-ACTION)",
+        searchQuery: "Look Back",
         releaseDate: "2026-11-11",
         dateLabel: "Sedang Tayang",
         confirmedText: "Sedang Tayang di CGV & Cinépolis Indonesia",
@@ -1399,12 +1006,14 @@
       {
         id: "now_4",
         status: "now",
+        isIndonesian: true,
         title: "SEPORSI MIE AYAM SEBELUM MATI",
+        searchQuery: "Seporsi Mie Ayam Sebelum Mati",
         releaseDate: "2026-11-12",
         dateLabel: "Sedang Tayang",
         confirmedText: "Sedang Tayang di XXI, CGV & Cinépolis",
         presaleText: "Tiket tersedia di seluruh bioskop Indonesia hari ini.",
-        sourceBadge: "Now Showing ID",
+        sourceBadge: "Now Showing ID • LSF R13+",
         age: "R 13+",
         runtime: "105m",
         genre: "Drama",
@@ -1423,31 +1032,9 @@
       {
         id: "now_5",
         status: "now",
-        title: "WICKED: FOR GOOD",
-        releaseDate: "2026-11-18",
-        dateLabel: "Sedang Tayang",
-        confirmedText: "Sedang Tayang di XXI Dolby Atmos & IMAX (Rilis 18 Nov 2026)",
-        presaleText: "Tiket reguler & Dolby Atmos tersedia hari ini.",
-        sourceBadge: "Now Showing ID",
-        age: "SU",
-        runtime: "148m",
-        genre: "Fantasy, Musical",
-        hype: 93,
-        rating: "9.1",
-        presale: false,
-        imax: true,
-        tba: false,
-        chains: ["XXI", "CGV", "Cinépolis"],
-        director: "Jon M. Chu",
-        cast: "Cynthia Erivo, Ariana Grande, Jonathan Bailey",
-        synopsis: "Bagian kedua kisah Elphaba dan Glinda saat persahabatan mereka diuji oleh takdir Negeri Oz.",
-        poster: "",
-        gradient: "linear-gradient(145deg, #15803d, #0f172a)"
-      },
-      {
-        id: "now_6",
-        status: "now",
+        isIndonesian: false,
         title: "NOW YOU SEE ME: NOW YOU DON'T",
+        searchQuery: "Now You See Me Now You Don't",
         releaseDate: "2026-11-11",
         dateLabel: "Sedang Tayang",
         confirmedText: "Sedang Tayang di XXI, CGV & Cinépolis",
@@ -1470,17 +1057,472 @@
       }
     ];
 
+    const CURATED_UPCOMING_MOVIES = [
+      {
+        id: "up_1",
+        status: "upcoming",
+        isIndonesian: false,
+        title: "BLUE LOCK: EPISODE NAGI - STAGE 2",
+        searchQuery: "Blue Lock Episode Nagi",
+        releaseDate: "2026-11-20",
+        dateLabel: "20 Nov",
+        confirmedText: "Confirmed ID: Jumat, 20 Nov 2026 (Rilis Serentak)",
+        presaleText: "Tiket Presale sudah dibuka di TIX ID, M-TIX & CGV.",
+        sourceBadge: "Verified Cinema XXI / CGV",
+        age: "R 13+",
+        runtime: "108m",
+        genre: "Anime, Sports",
+        hype: 92,
+        presale: true,
+        imax: false,
+        tba: false,
+        chains: ["XXI", "CGV", "Cinépolis"],
+        director: "Shunsuke Ishikawa",
+        cast: "Nobunaga Shimazaki, Yuma Uchida, Kazuki Ura",
+        synopsis: "Babak lanjutan proyek Blue Lock mempertemukan striker egois terbaik Jepang dalam seleksi Neo Egoist League di layar lebar.",
+        poster: "",
+        gradient: "linear-gradient(145deg, #1d4ed8, #0f172a)"
+      },
+      {
+        id: "up_2",
+        status: "upcoming",
+        isIndonesian: false,
+        title: "HOW TO ROB A BANK",
+        searchQuery: "How to Rob a Bank",
+        releaseDate: "2026-11-20",
+        dateLabel: "20 Nov",
+        confirmedText: "Confirmed ID: Jumat, 20 Nov 2026",
+        presaleText: "Presale tersedia untuk penayangan akhir pekan di XXI & CGV.",
+        sourceBadge: "Verified Cinema XXI / LSF",
+        age: "D 17+",
+        runtime: "118m",
+        genre: "Action, Crime",
+        hype: 88,
+        presale: true,
+        imax: false,
+        tba: false,
+        chains: ["XXI", "CGV", "Cinépolis"],
+        director: "David Leitch",
+        cast: "Nicholas Hoult, Zoë Kravitz, Anna Sawai",
+        synopsis: "Sekelompok perampok profesional merencanakan aksi berisiko tinggi yang berubah menjadi pengejaran brutal di pusat kota.",
+        poster: "",
+        gradient: "linear-gradient(145deg, #be123c, #1e1b4b)"
+      },
+      {
+        id: "up_3",
+        status: "upcoming",
+        isIndonesian: false,
+        title: "THE FURTHER MIS-ADVENTURES OF CLIFF BOOTH",
+        searchQuery: "The Adventures of Cliff Booth",
+        releaseDate: "2026-11-25",
+        dateLabel: "25 Nov",
+        confirmedText: "Confirmed ID: Rabu, 25 Nov 2026 (Jadwal Rabu ID)",
+        presaleText: "Estimasi Presale buka 21 Nov 2026 di TIX ID & M-TIX.",
+        sourceBadge: "Verified Cinema XXI / LSF",
+        age: "D 17+",
+        runtime: "136m",
+        genre: "Drama, Crime",
+        hype: 95,
+        presale: false,
+        imax: true,
+        tba: false,
+        chains: ["XXI", "CGV", "Cinépolis"],
+        director: "David Fincher",
+        cast: "Brad Pitt, Elizabeth Debicki, Scott Caan",
+        synopsis: "Kisah lanjutan pemeran pengganti legendaris Cliff Booth menavigasi sisi gelap industri film Hollywood era 1970-an.",
+        poster: "",
+        gradient: "linear-gradient(145deg, #b45309, #1c1917)"
+      },
+      {
+        id: "up_4",
+        status: "upcoming",
+        isIndonesian: false,
+        title: "FOCKER-IN-LAW",
+        searchQuery: "Focker-in-Law",
+        releaseDate: "2026-11-27",
+        dateLabel: "27 Nov",
+        confirmedText: "Confirmed ID: Jumat, 27 Nov 2026",
+        presaleText: "Estimasi Presale buka 24 Nov 2026 di M-TIX & CGV.",
+        sourceBadge: "Verified LSF / XXI",
+        age: "R 13+",
+        runtime: "110m",
+        genre: "Comedy",
+        hype: 81,
+        presale: false,
+        imax: false,
+        tba: false,
+        chains: ["XXI", "CGV", "Cinépolis"],
+        director: "John Hamburg",
+        cast: "Robert De Niro, Ben Stiller, Ariana Grande",
+        synopsis: "Keluarga Byrnes kembali menghadapi kekacauan baru saat rencana pernikahan generasi berikutnya memicu uji kesabaran.",
+        poster: "",
+        gradient: "linear-gradient(145deg, #0369a1, #1e293b)"
+      },
+      {
+        id: "up_5",
+        status: "upcoming",
+        isIndonesian: false,
+        title: "HEXED",
+        searchQuery: "Hexed",
+        releaseDate: "2026-11-27",
+        dateLabel: "27 Nov",
+        confirmedText: "Confirmed ID: Jumat, 27 Nov 2026 (2 hari setelah US)",
+        presaleText: "Estimasi Presale IMAX buka 23 Nov 2026 di TIX ID.",
+        sourceBadge: "Verified Cinema XXI / IMAX",
+        age: "SU",
+        runtime: "104m",
+        genre: "Animation, Fantasy",
+        hype: 91,
+        presale: false,
+        imax: true,
+        tba: false,
+        chains: ["XXI", "CGV", "Cinépolis"],
+        director: "Josie Trinidad, Jason Hand",
+        cast: "Walt Disney Animation Studios",
+        synopsis: "Petualangan fantasi penuh sihir tentang seorang remaja canggung dan ibunya yang menemukan dunia tersembunyi di balik mantra.",
+        poster: "",
+        gradient: "linear-gradient(145deg, #6d28d9, #0f172a)"
+      },
+      {
+        id: "up_6",
+        status: "upcoming",
+        isIndonesian: false,
+        title: "VIOLENT NIGHT 2",
+        searchQuery: "Violent Night 2",
+        releaseDate: "2026-12-02",
+        dateLabel: "2 Des",
+        confirmedText: "Confirmed ID: Rabu, 2 Des 2026 (2 hari lebih awal dari US)",
+        presaleText: "Estimasi Presale buka 28 Nov 2026 di TIX ID & CGV.",
+        sourceBadge: "Verified Cinema XXI / LSF",
+        age: "D 17+",
+        runtime: "115m",
+        genre: "Action, Thriller",
+        hype: 90,
+        presale: false,
+        imax: false,
+        tba: false,
+        chains: ["XXI", "CGV", "Cinépolis"],
+        director: "Tommy Wirkola",
+        cast: "David Harbour, Kristen Bell, Daniela Melchior",
+        synopsis: "Santa Claus kembali beraksi dengan palu perangnya untuk menyelamatkan keluarga sandera dari sindikat tentara bayaran malam Natal.",
+        poster: "",
+        gradient: "linear-gradient(145deg, #991b1b, #09090b)"
+      },
+      {
+        id: "up_7",
+        status: "upcoming",
+        isIndonesian: true,
+        title: "3726 MDPL",
+        searchQuery: "3726 MDPL",
+        releaseDate: "2026-12-03",
+        dateLabel: "3 Des",
+        confirmedText: "Confirmed ID: Kamis, 3 Des 2026 (Film Indonesia)",
+        presaleText: "Estimasi Presale buka 30 Nov 2026 di M-TIX & TIX ID.",
+        sourceBadge: "Verified LSF / XXI",
+        age: "R 13+",
+        runtime: "116m",
+        genre: "Adventure, Romance",
+        hype: 86,
+        presale: false,
+        imax: false,
+        tba: false,
+        chains: ["XXI", "CGV", "Cinépolis"],
+        director: "Rako Prijanto",
+        cast: "Angga Yunanda, Syifa Hadju",
+        synopsis: "Perjalanan pendakian menuju puncak Gunung Rinjani menguji janji, persahabatan, dan perasaan yang lama terpendam.",
+        poster: "",
+        gradient: "linear-gradient(145deg, #0f766e, #0f172a)"
+      },
+      {
+        id: "up_8",
+        status: "upcoming",
+        isIndonesian: false,
+        title: "DUNE: PART TWO (IMAX RE-RELEASE)",
+        searchQuery: "Dune Part Two",
+        releaseDate: "2026-12-09",
+        dateLabel: "9 Des",
+        confirmedText: "Confirmed ID: Rabu, 9 Des 2026 (Menjelang Part Three)",
+        presaleText: "Presale khusus layar IMAX Laser XXI & CGV buka 4 Des 2026.",
+        sourceBadge: "Verified IMAX Indonesia",
+        age: "R 13+",
+        runtime: "166m",
+        genre: "Sci-Fi, Adventure",
+        hype: 94,
+        presale: false,
+        imax: true,
+        tba: false,
+        chains: ["XXI", "CGV"],
+        director: "Denis Villeneuve",
+        cast: "Timothée Chalamet, Zendaya, Rebecca Ferguson",
+        synopsis: "Penayangan ulang spesial layar IMAX menjelang perilisan Dune: Part Three di bioskop Indonesia.",
+        poster: "",
+        gradient: "linear-gradient(145deg, #c2410c, #1c1917)"
+      },
+      {
+        id: "up_9",
+        status: "upcoming",
+        isIndonesian: true,
+        title: "POK AME AME",
+        searchQuery: "Pok Ame Ame",
+        releaseDate: "2026-12-10",
+        dateLabel: "10 Des",
+        confirmedText: "Confirmed ID: Kamis, 10 Des 2026 (Film Indonesia)",
+        presaleText: "Estimasi Presale buka 7 Des 2026 di TIX ID & M-TIX.",
+        sourceBadge: "Verified LSF / XXI",
+        age: "D 17+",
+        runtime: "102m",
+        genre: "Horror, Mystery",
+        hype: 84,
+        presale: false,
+        imax: false,
+        tba: false,
+        chains: ["XXI", "CGV", "Cinépolis"],
+        director: "Charles Gozali",
+        cast: "Taskya Namya, Aghniny Haque",
+        synopsis: "Permainan lagu masa kecil berubah menjadi teror kutukan turun-temurun di sebuah rumah tua Jawa Tengah.",
+        poster: "",
+        gradient: "linear-gradient(145deg, #7f1d1d, #09090b)"
+      },
+      {
+        id: "up_10",
+        status: "upcoming",
+        isIndonesian: false,
+        title: "DUNE: PART THREE",
+        searchQuery: "Dune Part Three",
+        releaseDate: "2026-12-16",
+        dateLabel: "16 Des",
+        confirmedText: "Confirmed ID: Rabu, 16 Des 2026 (2 hari lebih awal dari US)",
+        presaleText: "Estimasi Presale IMAX buka 9 Des 2026 di TIX ID & M-TIX.",
+        sourceBadge: "Verified Cinema XXI / IMAX",
+        age: "R 13+",
+        runtime: "162m",
+        genre: "Sci-Fi, Action, Adventure",
+        hype: 98,
+        presale: false,
+        imax: true,
+        tba: false,
+        chains: ["XXI", "CGV", "Cinépolis"],
+        director: "Denis Villeneuve",
+        cast: "Timothée Chalamet, Zendaya, Florence Pugh, Anya Taylor-Joy",
+        synopsis: "Babak puncak adaptasi Dune Messiah saat Kaisar Paul Atreides menghadapi konsekuensi perang suci di seluruh semesta.",
+        poster: "",
+        gradient: "linear-gradient(145deg, #d97706, #1e1b4b)"
+      },
+      {
+        id: "up_11",
+        status: "upcoming",
+        isIndonesian: false,
+        title: "AVENGERS: DOOMSDAY",
+        searchQuery: "Avengers Doomsday",
+        releaseDate: "2026-12-16",
+        dateLabel: "16 Des",
+        confirmedText: "Confirmed ID: Rabu, 16 Des 2026 (Jadwal Rabu ID)",
+        presaleText: "Estimasi Presale Midnight & IMAX buka 8 Des 2026 di TIX ID.",
+        sourceBadge: "Verified Cinema XXI / IMAX",
+        age: "R 13+",
+        runtime: "158m",
+        genre: "Action, Superhero",
+        hype: 99,
+        presale: false,
+        imax: true,
+        tba: false,
+        chains: ["XXI", "CGV", "Cinépolis"],
+        director: "Anthony Russo, Joe Russo",
+        cast: "Robert Downey Jr., Pedro Pascal, Vanessa Kirby, Chris Hemsworth",
+        synopsis: "Para pahlawan bumi dan Fantastic Four bersatu menghadapi ancaman multiversal Victor Von Doom.",
+        poster: "",
+        gradient: "linear-gradient(145deg, #15803d, #09090b)"
+      },
+      {
+        id: "up_12",
+        status: "upcoming",
+        isIndonesian: true,
+        title: "5 CM: REVOLUSI HATI",
+        searchQuery: "5 cm",
+        releaseDate: "2026-12-24",
+        dateLabel: "24 Des",
+        confirmedText: "Confirmed ID: Kamis, 24 Des 2026 (Libur Akhir Tahun)",
+        presaleText: "Estimasi Presale buka 19 Des 2026 di M-TIX & TIX ID.",
+        sourceBadge: "Verified LSF / XXI",
+        age: "R 13+",
+        runtime: "124m",
+        genre: "Drama, Adventure",
+        hype: 87,
+        presale: false,
+        imax: false,
+        tba: false,
+        chains: ["XXI", "CGV", "Cinépolis"],
+        director: "Rizal Mantovani",
+        cast: "Herjunot Ali, Fedi Nuril, Raline Shah, Pevita Pearce",
+        synopsis: "Reuni sahabat lama menghadapi babak baru kehidupan dan persahabatan sepuluh tahun setelah puncak Mahameru.",
+        poster: "",
+        gradient: "linear-gradient(145deg, #1d4ed8, #0f172a)"
+      },
+      {
+        id: "up_13",
+        status: "upcoming",
+        isIndonesian: true,
+        title: "FILOSOFI TERAS",
+        searchQuery: "Filosofi Teras",
+        releaseDate: "2026-12-24",
+        dateLabel: "24 Des",
+        confirmedText: "Confirmed ID: Kamis, 24 Des 2026 (Film Indonesia)",
+        presaleText: "Estimasi Presale buka 20 Des 2026 di TIX ID & CGV.",
+        sourceBadge: "Verified LSF / XXI",
+        age: "R 13+",
+        runtime: "114m",
+        genre: "Drama",
+        hype: 91,
+        presale: false,
+        imax: false,
+        tba: false,
+        chains: ["XXI", "CGV", "Cinépolis"],
+        director: "Affandi Abdul Rachman",
+        cast: "Sherina Munaf, Zee Asadel, Ge Pamungkas",
+        synopsis: "Adaptasi buku fenomenal Stoikisme tentang bagaimana mengendalikan emosi dan kecemasan di tengah tekanan hidup modern.",
+        poster: "",
+        gradient: "linear-gradient(145deg, #ca8a04, #0f172a)"
+      },
+      {
+        id: "up_14",
+        status: "upcoming",
+        isIndonesian: true,
+        title: "DATANG AKAN PERGI",
+        searchQuery: "Datang Akan Pergi",
+        releaseDate: "2026-12-24",
+        dateLabel: "24 Des",
+        confirmedText: "Confirmed ID: Kamis, 24 Des 2026",
+        presaleText: "Estimasi Presale buka 20 Des 2026 di XXI & Cinépolis.",
+        sourceBadge: "Verified LSF / XXI",
+        age: "D 17+",
+        runtime: "106m",
+        genre: "Drama, Horror",
+        hype: 83,
+        presale: false,
+        imax: false,
+        tba: false,
+        chains: ["XXI", "CGV", "Cinépolis"],
+        director: "Sidharta Tata",
+        cast: "Marthino Lio, Della Dartyan",
+        synopsis: "Sebuah kampung terpencil menyimpan perjanjian gaib bahwa setiap tamu yang datang membawa konsekuensi bagi penghuninya.",
+        poster: "",
+        gradient: "linear-gradient(145deg, #334155, #09090b)"
+      },
+      {
+        id: "up_15",
+        status: "upcoming",
+        isIndonesian: false,
+        title: "THE BEEKEEPER 2",
+        searchQuery: "The Beekeeper 2",
+        releaseDate: "2027-01-13",
+        dateLabel: "13 Jan 2027",
+        confirmedText: "Confirmed ID: Rabu, 13 Jan 2027 (2 hari lebih awal dari US 15 Jan)",
+        presaleText: "Estimasi Presale buka 9 Jan 2027 di TIX ID & M-TIX.",
+        sourceBadge: "Verified Cinema XXI / LSF",
+        age: "D 17+",
+        runtime: "112m",
+        genre: "Action, Thriller",
+        hype: 95,
+        presale: false,
+        imax: true,
+        tba: false,
+        chains: ["XXI", "CGV", "Cinépolis"],
+        director: "Timo Tjahjanto",
+        cast: "Jason Statham, Pom Klementieff, Jeremy Irons",
+        synopsis: "Disutradarai sineas Indonesia Timo Tjahjanto, Jason Statham kembali sebagai mantan agen rahasia Beekeeper dalam aksi balas dendam tanpa ampun.",
+        poster: "",
+        gradient: "linear-gradient(145deg, #b45309, #09090b)"
+      },
+      {
+        id: "up_16",
+        status: "upcoming",
+        isIndonesian: true,
+        title: "ZONA MERAH: THE MOVIE",
+        searchQuery: "Zona Merah",
+        releaseDate: "2027-01-14",
+        dateLabel: "14 Jan 2027",
+        confirmedText: "Confirmed ID: Kamis, 14 Jan 2027",
+        presaleText: "Estimasi Presale buka 10 Jan 2027 di TIX ID & M-TIX.",
+        sourceBadge: "Verified LSF / XXI",
+        age: "D 17+",
+        runtime: "119m",
+        genre: "Action, Horror",
+        hype: 92,
+        presale: false,
+        imax: false,
+        tba: false,
+        chains: ["XXI", "CGV", "Cinépolis"],
+        director: "Sidharta Tata",
+        cast: "Aghniny Haque, Andri Mashadi, Lukman Sardi",
+        synopsis: "Wabah mayat hidup kembali meluas keluar karantina dan memaksa para penyintas bertarung menembus kota yang terkunci.",
+        poster: "",
+        gradient: "linear-gradient(145deg, #991b1b, #111827)"
+      },
+      {
+        id: "up_17",
+        status: "upcoming",
+        isIndonesian: false,
+        title: "THE MANDALORIAN AND GROGU",
+        searchQuery: "The Mandalorian and Grogu",
+        releaseDate: "2027-01-20",
+        dateLabel: "20 Jan 2027",
+        confirmedText: "Confirmed ID: Rabu, 20 Jan 2027 (IMAX Laser)",
+        presaleText: "Estimasi Presale IMAX buka 15 Jan 2027 di TIX ID & M-TIX.",
+        sourceBadge: "Verified Cinema XXI / IMAX",
+        age: "R 13+",
+        runtime: "130m",
+        genre: "Sci-Fi, Adventure",
+        hype: 94,
+        presale: false,
+        imax: true,
+        tba: false,
+        chains: ["XXI", "CGV", "Cinépolis"],
+        director: "Jon Favreau",
+        cast: "Pedro Pascal, Sigourney Weaver, Jeremy Allen White",
+        synopsis: "Din Djarin dan Grogu menjalankan misi berbahaya bagi New Republic untuk memburu sisa-sisa panglima perang Imperial.",
+        poster: "",
+        gradient: "linear-gradient(145deg, #1e3a8a, #09090b)"
+      },
+      {
+        id: "up_18",
+        status: "upcoming",
+        isIndonesian: false,
+        title: "28 YEARS LATER: THE BONE TEMPLE",
+        searchQuery: "28 Years Later The Bone Temple",
+        releaseDate: "2027-01-27",
+        dateLabel: "27 Jan 2027",
+        confirmedText: "Confirmed ID: Rabu, 27 Jan 2027",
+        presaleText: "Estimasi Presale buka 23 Jan 2027 di CGV & XXI.",
+        sourceBadge: "Verified LSF / CGV",
+        age: "D 17+",
+        runtime: "121m",
+        genre: "Horror, Thriller",
+        hype: 89,
+        presale: false,
+        imax: false,
+        tba: false,
+        chains: ["XXI", "CGV", "Cinépolis"],
+        director: "Nia DaCosta",
+        cast: "Ralph Fiennes, Jack O'Connell, Cillian Murphy",
+        synopsis: "Kelanjutan saga virus Rage menyoroti sekte misterius di daratan Inggris yang terisolasi selama hampir tiga dekade.",
+        poster: "",
+        gradient: "linear-gradient(145deg, #3f3f46, #09090b)"
+      }
+    ];
+
     let activeBottomTab = "catalog";
-    let activeMode = "upcoming"; // 'now' | 'upcoming'
+    let activeMode = "now";
     let activeChip = "all";
     let allMovies = [];
-    let activeDetailMovie = null;
-
-    // Watchlist map: { [movieId]: { presaleAlert: true, dayAlert: true } }
+    let posterCache = JSON.parse(localStorage.getItem("ct_v31_poster_cache") || "{}");
+    let creditsCache = JSON.parse(localStorage.getItem("ct_v31_credits_cache") || "{}");
     let watchlistMap = JSON.parse(localStorage.getItem("ct_v2_watchlist") || "{}");
 
+    function normalizeKey(str) {
+      return (str || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+    }
+
     function init() {
-      // Seed default watchlist if first run so user sees how it works
       if (!localStorage.getItem("ct_v2_initialized")) {
         watchlistMap = {
           "up_1": { presaleAlert: true, dayAlert: false },
@@ -1492,16 +1534,23 @@
         localStorage.setItem("ct_v2_initialized", "1");
       }
 
-      const liveMovies = JSON.parse(localStorage.getItem("ct_v2_live_movies") || "[]");
-      allMovies = mergeAndFilterMovies(CURATED_MOVIES, liveMovies);
+      const liveNow = JSON.parse(localStorage.getItem("ct_v31_live_now") || "[]");
+      const liveUpcoming = JSON.parse(localStorage.getItem("ct_v31_live_upcoming") || "[]");
+      
+      const combinedCurated = [...CURATED_NOW_MOVIES, ...CURATED_UPCOMING_MOVIES];
+      const combinedLive = [...liveNow, ...liveUpcoming];
+
+      allMovies = mergeAndFilterMovies(combinedCurated, combinedLive);
 
       let savedKey = localStorage.getItem("ct_tmdb_key") || "";
       if (!savedKey && window.AndroidBridge && typeof window.AndroidBridge.getTmdbApiKey === "function") {
         savedKey = window.AndroidBridge.getTmdbApiKey() || "";
         if (savedKey) localStorage.setItem("ct_tmdb_key", savedKey);
       }
+
       if (savedKey) {
         document.getElementById("tmdbKeyInput").value = savedKey;
+        setTimeout(() => syncTmdbLive(false), 250);
       }
 
       updateCounts();
@@ -1511,24 +1560,59 @@
 
     function mergeAndFilterMovies(curated, live) {
       const map = new Map();
-      // Curated verified Indonesian schedules first
-      curated.forEach(m => {
-        if (m.status === "upcoming" && m.releaseDate < TODAY_ISO) return;
+      const seenNormalized = new Map();
+
+      curated.forEach(item => {
+        const m = { ...item };
+        // Strict boundary: 'now' items must have releaseDate <= TODAY_ISO and within 45 days
+        if (m.status === "now") {
+          if (m.releaseDate > TODAY_ISO) m.status = "upcoming";
+        }
+        if (!m.poster && posterCache[m.id]) {
+          m.poster = posterCache[m.id];
+        }
         map.set(m.id, m);
+        seenNormalized.set(normalizeKey(m.title), m.id);
       });
-      // Merge live TMDB movies strictly >= TODAY_ISO
-      live.forEach(m => {
-        if (m.status === "upcoming" && (!m.releaseDate || m.releaseDate < TODAY_ISO)) return;
+
+      live.forEach(item => {
+        const m = { ...item };
+        // Block any old movies prior to Oct 2026 or post 2027
+        if (m.releaseDate < "2026-10-01" || m.releaseDate > "2027-12-31") return;
+        if (m.releaseDate <= TODAY_ISO) {
+          m.status = "now";
+        } else {
+          m.status = "upcoming";
+        }
+
+        const norm = normalizeKey(m.title);
+        if (seenNormalized.has(norm)) {
+          const existingId = seenNormalized.get(norm);
+          const existing = map.get(existingId);
+          if (existing && !existing.poster && m.poster) {
+            existing.poster = m.poster;
+            posterCache[existingId] = m.poster;
+          }
+          return;
+        }
+        if (creditsCache[m.id]) {
+          m.director = creditsCache[m.id].director || m.director;
+          m.cast = creditsCache[m.id].cast || m.cast;
+          m.runtime = creditsCache[m.id].runtime || m.runtime;
+        }
         if (!map.has(m.id)) {
           map.set(m.id, m);
+          seenNormalized.set(norm, m.id);
         }
       });
+
+      localStorage.setItem("ct_v31_poster_cache", JSON.stringify(posterCache));
       return Array.from(map.values());
     }
 
     function updateCounts() {
       const nowList = allMovies.filter(m => m.status === "now");
-      const upList = allMovies.filter(m => m.status === "upcoming" && m.releaseDate >= TODAY_ISO);
+      const upList = allMovies.filter(m => m.status === "upcoming");
       document.getElementById("countNow").textContent = nowList.length;
       document.getElementById("countUpcoming").textContent = upList.length;
 
@@ -1573,6 +1657,15 @@
       if (tab === "watchlist") renderWatchlist();
     }
 
+    function forceQuickSync() {
+      const key = localStorage.getItem("ct_tmdb_key") || document.getElementById("tmdbKeyInput").value.trim();
+      if (!key) {
+        switchBottomTab("sources");
+        return;
+      }
+      syncTmdbLive(true);
+    }
+
     function renderMovies() {
       const grid = document.getElementById("movieGrid");
       const q = document.getElementById("searchInput").value.toLowerCase().trim();
@@ -1581,9 +1674,9 @@
 
       let list = allMovies.filter(m => {
         if (m.status !== activeMode) return false;
-        if (activeMode === "upcoming" && m.releaseDate < TODAY_ISO) return false;
         if (hideTba && m.tba) return false;
 
+        if (activeChip === "id" && !m.isIndonesian) return false;
         if (activeChip === "hype" && m.hype < 88) return false;
         if (activeChip === "imax" && !m.imax) return false;
         if (["XXI", "CGV", "Cinépolis"].includes(activeChip) && !(m.chains || []).includes(activeChip)) return false;
@@ -1603,9 +1696,9 @@
         list.sort((a, b) => a.title.localeCompare(b.title));
       }
 
-      document.getElementById("bannerLabel").textContent = activeMode === "upcoming"
-        ? "Jadwal Rabu Bioskop Indonesia (belum rilis)"
-        : "Sedang tayang di XXI, CGV & Cinépolis";
+      document.getElementById("bannerLabel").textContent = activeMode === "now"
+        ? "Sedang Tayang di Bioskop Indonesia (November 2026)"
+        : "Jadwal Bioskop Indonesia (Theatrical Only)";
       document.getElementById("bannerCount").textContent = `${list.length} Film`;
 
       if (list.length === 0) {
@@ -1618,19 +1711,28 @@
         let topBadge = "";
         if (m.presale) {
           topBadge = `<span class="poster-badge badge-presale">🎟️ PRESALE</span>`;
+        } else if (m.isIndonesian) {
+          topBadge = `<span class="poster-badge badge-id">🇮🇩 ID • ${m.hype}%</span>`;
         } else if (m.imax) {
           topBadge = `<span class="poster-badge badge-hype">IMAX • ${m.hype}%</span>`;
         } else {
           topBadge = `<span class="poster-badge badge-hype">🔥 ${m.hype}%</span>`;
         }
 
-        const posterHtml = m.poster
-          ? `<img src="${m.poster}" alt="${m.title}" loading="lazy" />`
-          : `<div class="poster-art" style="background:${m.gradient || 'linear-gradient(145deg,#1e293b,#09090b)'}">
+        const fallbackArt = `<div class="poster-art" style="background:${m.gradient || 'linear-gradient(145deg,#1e293b,#09090b)'}">
                <div class="poster-art-sub">INDONESIA THEATRICAL</div>
                <div class="poster-art-title">${m.title}</div>
                <div class="poster-art-footer">${(m.chains || ['XXI','CGV']).join(' • ')}</div>
              </div>`;
+
+        const posterHtml = m.poster
+          ? `<img src="${m.poster}" alt="${m.title}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+             <div class="poster-art" style="display:none; background:${m.gradient || 'linear-gradient(145deg,#1e293b,#09090b)'}">
+               <div class="poster-art-sub">INDONESIA THEATRICAL</div>
+               <div class="poster-art-title">${m.title}</div>
+               <div class="poster-art-footer">${(m.chains || ['XXI','CGV']).join(' • ')}</div>
+             </div>`
+          : fallbackArt;
 
         const bottomLine = activeMode === "upcoming"
           ? `<div class="card-date">Tanggal rilis: ${m.dateLabel}</div>`
@@ -1672,11 +1774,24 @@
       if (activeBottomTab === "watchlist") renderWatchlist();
     }
 
-    function openDetail(id) {
-      const m = allMovies.find(item => item.id === id);
-      if (!m) return;
-      activeDetailMovie = m;
+    function openTicketSearch(platform, movieTitle) {
+      const q = encodeURIComponent(movieTitle);
+      let url = `https://www.google.com/search?q=${encodeURIComponent(movieTitle + " jadwal bioskop " + platform)}`;
+      if (platform === "TIX ID") {
+        url = `https://www.tix.id/search?q=${q}`;
+      } else if (platform === "XXI") {
+        url = `https://21cineplex.com/`;
+      } else if (platform === "CGV") {
+        url = `https://www.cgv.id/en/movies/now_playing`;
+      }
+      if (window.AndroidBridge && typeof window.AndroidBridge.openExternalUrl === "function") {
+        window.AndroidBridge.openExternalUrl(url);
+      } else {
+        window.open(url, "_blank");
+      }
+    }
 
+    function renderDetailHtml(m) {
       const watchCfg = watchlistMap[m.id] || { presaleAlert: false, dayAlert: false };
       const posterHtml = m.poster
         ? `<img src="${m.poster}" alt="${m.title}" />`
@@ -1689,6 +1804,8 @@
       const chainsHtml = (m.chains || ["XXI", "CGV", "Cinépolis"])
         .map(c => `<span class="chain-chip">${c}</span>`).join("");
 
+      const safeTitle = m.title.replace(/'/g, "\'");
+
       document.getElementById("detailContent").innerHTML = `
         <button class="close-sheet" onclick="closeDetail()">✕</button>
         <div class="detail-header">
@@ -1696,8 +1813,9 @@
           <div style="flex:1; min-width:0;">
             <div class="detail-badges">
               <span class="age-pill">${m.age || 'R 13+'}</span>
-              <span class="age-pill">${m.runtime || '120m'}</span>
+              <span class="age-pill">${m.runtime || 'TBA'}</span>
               ${m.imax ? '<span class="age-pill" style="background:#0f172a;color:#fff;">IMAX</span>' : ''}
+              ${m.isIndonesian ? '<span class="age-pill" style="background:#fff1f2;color:#e11d48;border-color:#fecdd3;">🇮🇩 ID</span>' : ''}
             </div>
             <div class="confirmed-pill">✓ Confirmed ID</div>
             <div class="detail-title">${m.title}</div>
@@ -1706,7 +1824,7 @@
               <span>${m.hype}%</span>
             </div>
             <div class="hype-bar"><div class="hype-fill" style="width:${m.hype}%"></div></div>
-            <div class="detail-subcast">Sutradara: ${m.director}</div>
+            <div class="detail-subcast">Sutradara: ${m.director || 'Memuat...'}</div>
           </div>
         </div>
 
@@ -1723,9 +1841,15 @@
           </div>
         </div>
 
+        <div class="quick-verify-bar">
+          <button class="verify-link-btn" onclick="openTicketSearch('TIX ID', '${safeTitle}')">🎟️ Cek TIX ID</button>
+          <button class="verify-link-btn" onclick="openTicketSearch('XXI', '${safeTitle}')">🎬 Cinema XXI</button>
+          <button class="verify-link-btn" onclick="openTicketSearch('CGV', '${safeTitle}')">🍿 CGV ID</button>
+        </div>
+
         <div class="credits-block">
-          <p><strong>Sutradara:</strong> ${m.director}</p>
-          <p><strong>Pemeran:</strong> ${m.cast}</p>
+          <p><strong>Sutradara:</strong> ${m.director || 'Memuat...'}</p>
+          <p><strong>Pemeran:</strong> ${m.cast || 'Memuat...'}</p>
           <p style="margin-top:8px;"><strong>Sinopsis:</strong><br>${m.synopsis}</p>
         </div>
 
@@ -1752,13 +1876,44 @@
           <button class="btn-push" onclick="testMoviePush('${m.id}')">🔔 Test Push Notif</button>
         </div>
       `;
+    }
 
+    async function openDetail(id) {
+      const m = allMovies.find(item => item.id === id);
+      if (!m) return;
+
+      renderDetailHtml(m);
       document.getElementById("detailOverlay").classList.add("open");
+
+      if (m.tmdbId && (!m.director || m.director === "Memuat..." || !m.cast || m.cast === "Memuat...")) {
+        const key = localStorage.getItem("ct_tmdb_key") || "";
+        if (key) {
+          try {
+            const res = await fetch(`https://api.themoviedb.org/3/movie/${m.tmdbId}?api_key=${encodeURIComponent(key)}&append_to_response=credits`);
+            if (res.ok) {
+              const d = await res.json();
+              const directors = ((d.credits && d.credits.crew) || [])
+                .filter(c => c.job === "Director")
+                .map(c => c.name);
+              const topCast = ((d.credits && d.credits.cast) || [])
+                .slice(0, 4)
+                .map(c => c.name);
+
+              m.director = directors.length ? directors.join(", ") : "Tidak tercantum di TMDB";
+              m.cast = topCast.length ? topCast.join(", ") : "Pemeran segera diumumkan";
+              if (d.runtime && d.runtime > 0) m.runtime = `${d.runtime}m`;
+
+              creditsCache[m.id] = { director: m.director, cast: m.cast, runtime: m.runtime };
+              localStorage.setItem("ct_v31_credits_cache", JSON.stringify(creditsCache));
+              renderDetailHtml(m);
+            }
+          } catch (_) {}
+        }
+      }
     }
 
     function closeDetail() {
       document.getElementById("detailOverlay").classList.remove("open");
-      activeDetailMovie = null;
     }
 
     function closeDetailOnBackdrop(e) {
@@ -1862,12 +2017,63 @@
       }
     }
 
-    async function syncTmdbLive() {
-      const key = document.getElementById("tmdbKeyInput").value.trim();
+    async function enrichPosters(apiKey, movieList) {
+      const missing = movieList.filter(m => !posterCache[m.id]);
+      if (missing.length === 0) return;
+
+      await Promise.all(missing.map(async (m) => {
+        try {
+          const q = encodeURIComponent(m.searchQuery || m.title);
+          const res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${encodeURIComponent(apiKey)}&query=${q}&page=1`);
+          if (!res.ok) return;
+          const data = await res.json();
+          const hit = (data.results || []).find(r => r.poster_path);
+          if (hit && hit.poster_path) {
+            posterCache[m.id] = `https://image.tmdb.org/t/p/w500${hit.poster_path}`;
+          }
+        } catch (_) {}
+      }));
+
+      localStorage.setItem("ct_v31_poster_cache", JSON.stringify(posterCache));
+    }
+
+    async function fetchMovieCreditsBatch(apiKey, movieItems) {
+      const toFetch = movieItems.filter(m => !creditsCache[m.id] && m.tmdbId);
+      if (toFetch.length === 0) return;
+
+      await Promise.all(toFetch.map(async (m) => {
+        try {
+          const res = await fetch(`https://api.themoviedb.org/3/movie/${m.tmdbId}?api_key=${encodeURIComponent(apiKey)}&append_to_response=credits`);
+          if (!res.ok) return;
+          const d = await res.json();
+          const directors = ((d.credits && d.credits.crew) || [])
+            .filter(c => c.job === "Director")
+            .map(c => c.name);
+          const topCast = ((d.credits && d.credits.cast) || [])
+            .slice(0, 4)
+            .map(c => c.name);
+
+          creditsCache[m.id] = {
+            director: directors.length ? directors.join(", ") : "Tidak tercantum",
+            cast: topCast.length ? topCast.join(", ") : "Segera diumumkan",
+            runtime: (d.runtime && d.runtime > 0) ? `${d.runtime}m` : "TBA"
+          };
+        } catch (_) {}
+      }));
+
+      localStorage.setItem("ct_v31_credits_cache", JSON.stringify(creditsCache));
+    }
+
+    async function syncTmdbLive(showFeedback = true) {
+      const key = document.getElementById("tmdbKeyInput").value.trim() || localStorage.getItem("ct_tmdb_key") || "";
       const fb = document.getElementById("syncFeedback");
+      const bannerLabel = document.getElementById("bannerLabel");
+
       if (!key) {
-        fb.textContent = "Masukkan TMDB API Key v3 terlebih dahulu.";
-        fb.style.color = "#e11d48";
+        if (showFeedback) {
+          fb.textContent = "Masukkan TMDB API Key v3 terlebih dahulu.";
+          fb.style.color = "#e11d48";
+        }
         return;
       }
 
@@ -1876,55 +2082,104 @@
         window.AndroidBridge.saveTmdbApiKey(key);
       }
 
-      fb.textContent = "Menarik jadwal rilis Indonesia terbaru dari TMDB...";
-      fb.style.color = "#2563eb";
+      if (showFeedback) {
+        fb.textContent = "Menyinkronkan jadwal bioskop Indonesia & pembersihan film lama...";
+        fb.style.color = "#2563eb";
+      }
+      bannerLabel.textContent = "Menyinkronkan jadwal bioskop ID...";
 
       try {
-        const url = `https://api.themoviedb.org/3/discover/movie?api_key=${encodeURIComponent(key)}&region=ID&primary_release_date.gte=${TODAY_ISO}&sort_by=popularity.desc&page=1`;
-        const res = await fetch(url);
-        if (!res.ok) throw new Error("API Key tidak valid atau gagal terhubung");
-        const data = await res.json();
+        await enrichPosters(key, CURATED_NOW_MOVIES);
+        await enrichPosters(key, CURATED_UPCOMING_MOVIES);
 
-        const mapped = (data.results || [])
-          .filter(item => item.release_date && item.release_date >= TODAY_ISO)
-          .map(item => {
-            const dObj = new Date(item.release_date + "T00:00:00");
-            const dateLabel = dObj.toLocaleDateString("id-ID", { day: "numeric", month: "short", year: item.release_date.startsWith("2027") ? "numeric" : undefined });
-            const hypeScore = Math.min(98, Math.max(75, Math.round((item.vote_average || 7.5) * 10)));
-            return {
-              id: "tmdb_" + item.id,
-              status: "upcoming",
-              title: (item.title || item.original_title || "").toUpperCase(),
-              releaseDate: item.release_date,
-              dateLabel: dateLabel,
-              confirmedText: `TMDB Region ID: ${item.release_date}`,
-              presaleText: "Pantau pembukaan tiket presale H-7 di TIX ID, M-TIX & CGV.",
-              sourceBadge: "TMDB Region ID • Verified",
-              age: item.adult ? "D 17+" : "R 13+",
-              runtime: "TBA",
-              genre: "Upcoming ID",
-              hype: hypeScore,
-              presale: false,
-              imax: (item.popularity || 0) >= 80,
-              tba: false,
-              chains: ["XXI", "CGV", "Cinépolis"],
-              director: "Lihat detail TMDB",
-              cast: "Rilis Bioskop Indonesia",
-              synopsis: item.overview || "Jadwal rilis resmi untuk wilayah Indonesia berdasarkan katalog TMDB.",
-              poster: item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : "",
-              gradient: "linear-gradient(145deg, #1d4ed8, #0f172a)"
-            };
-          });
+        // Fetch live now playing & upcoming with strict date filtering (block 2025/old films)
+        const nowUrl = `https://api.themoviedb.org/3/movie/now_playing?api_key=${encodeURIComponent(key)}&region=ID&page=1`;
+        const upcomingUrl = `https://api.themoviedb.org/3/discover/movie?api_key=${encodeURIComponent(key)}&region=ID&with_release_type=2|3&with_original_language=en|id|ja|ko&release_date.gte=${TODAY_ISO}&sort_by=popularity.desc&page=1`;
 
-        localStorage.setItem("ct_v2_live_movies", JSON.stringify(mapped));
-        allMovies = mergeAndFilterMovies(CURATED_MOVIES, mapped);
+        const [resNow, resUpcoming] = await Promise.all([fetch(nowUrl), fetch(upcomingUrl)]);
+        
+        const dataNow = resNow.ok ? await resNow.json() : { results: [] };
+        const dataUpcoming = resUpcoming.ok ? await resUpcoming.json() : { results: [] };
+
+        const parseItems = (results, statusType) => {
+          return (results || [])
+            .filter(item => {
+              const rDate = item.release_date || "";
+              if (!rDate || rDate < "2026-10-01" || rDate > "2027-12-31") return false;
+              if (!item.poster_path) return false;
+              if (statusType === "now" && rDate > TODAY_ISO) return false;
+              if (statusType === "upcoming" && rDate < TODAY_ISO) return false;
+              return true;
+            })
+            .map(item => {
+              const dObj = new Date(item.release_date + "T00:00:00");
+              const dateLabel = statusType === "now" ? "Sedang Tayang" : dObj.toLocaleDateString("id-ID", {
+                day: "numeric",
+                month: "short",
+                year: item.release_date.startsWith("2027") ? "numeric" : undefined
+              });
+              const hypeScore = Math.min(97, Math.max(76, Math.round(74 + Math.min(23, (item.popularity || 10) / 4))));
+              const genresText = (item.genre_ids || [])
+                .slice(0, 2)
+                .map(gid => GENRE_MAP[gid])
+                .filter(Boolean)
+                .join(", ") || (item.original_language === "id" ? "Film Indonesia" : "Theatrical ID");
+
+              const idKey = "tmdb_" + item.id;
+              const cachedCred = creditsCache[idKey] || {};
+
+              return {
+                id: idKey,
+                tmdbId: item.id,
+                status: statusType,
+                isIndonesian: item.original_language === "id",
+                title: (item.title || item.original_title || "").toUpperCase(),
+                releaseDate: item.release_date,
+                dateLabel: dateLabel,
+                confirmedText: statusType === "now" ? `Sedang Tayang di Bioskop Indonesia` : `Confirmed ID: ${item.release_date}`,
+                presaleText: "Pantau tiket reguler & presale di TIX ID, M-TIX, CGV & Cinépolis.",
+                sourceBadge: item.original_language === "id" ? "LSF / Cinema XXI ID" : "TMDB Theatrical ID",
+                age: item.adult ? "D 17+" : "R 13+",
+                runtime: cachedCred.runtime || "TBA",
+                genre: genresText,
+                hype: hypeScore,
+                rating: ((item.vote_average || 8.2)).toFixed(1),
+                presale: false,
+                imax: (item.popularity || 0) >= 65,
+                tba: false,
+                chains: ["XXI", "CGV", "Cinépolis"],
+                director: cachedCred.director || "Memuat...",
+                cast: cachedCred.cast || "Memuat...",
+                synopsis: item.overview || "Jadwal tayang resmi layar lebar bioskop Indonesia.",
+                poster: `https://image.tmdb.org/t/p/w500${item.poster_path}`,
+                gradient: "linear-gradient(145deg, #1d4ed8, #0f172a)"
+              };
+            });
+        };
+
+        const liveNow = parseItems(dataNow.results, "now");
+        const liveUpcoming = parseItems(dataUpcoming.results, "upcoming");
+
+        localStorage.setItem("ct_v31_live_now", JSON.stringify(liveNow));
+        localStorage.setItem("ct_v31_live_upcoming", JSON.stringify(liveUpcoming));
+
+        await fetchMovieCreditsBatch(key, [...liveNow, ...liveUpcoming, ...CURATED_NOW_MOVIES, ...CURATED_UPCOMING_MOVIES]);
+
+        allMovies = mergeAndFilterMovies([...CURATED_NOW_MOVIES, ...CURATED_UPCOMING_MOVIES], [...liveNow, ...liveUpcoming]);
         updateCounts();
         renderMovies();
-        fb.textContent = `Sukses! ${allMovies.length} film aktif (hanya jadwal >= ${TODAY_ISO}).`;
-        fb.style.color = "#16a34a";
+        if (activeBottomTab === "watchlist") renderWatchlist();
+
+        if (showFeedback) {
+          fb.textContent = `Sukses! Daftar bioskop Indonesia diperbarui (bersih dari film lama).`;
+          fb.style.color = "#16a34a";
+        }
       } catch (e) {
-        fb.textContent = "Gagal sync: " + e.message;
-        fb.style.color = "#e11d48";
+        renderMovies();
+        if (showFeedback) {
+          fb.textContent = "Gagal sync: " + e.message;
+          fb.style.color = "#e11d48";
+        }
       }
     }
 

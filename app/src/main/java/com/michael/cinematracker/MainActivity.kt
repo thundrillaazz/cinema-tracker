@@ -51,6 +51,7 @@ class MainActivity : AppCompatActivity() {
             setBackgroundColor(Color.parseColor("#F8FAFC"))
             settings.javaScriptEnabled = true
             settings.domStorageEnabled = true
+            settings.loadsImagesAutomatically = true
             settings.cacheMode = WebSettings.LOAD_DEFAULT
             settings.allowFileAccess = true
             webViewClient = WebViewClient()
@@ -176,6 +177,14 @@ class MainActivity : AppCompatActivity() {
 
             val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             manager.notify(notifId, notification)
+        }
+
+        @JavascriptInterface
+        fun openExternalUrl(url: String) {
+            try {
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                context.startActivity(intent)
+            } catch (_: Exception) {}
         }
 
         @JavascriptInterface

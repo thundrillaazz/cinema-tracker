@@ -27,7 +27,9 @@ class CinemaCheckWorker(
 
         return try {
             val todayStr = LocalDate.now().toString()
-            val endpoint = "https://api.themoviedb.org/3/discover/movie?api_key=$apiKey&region=ID&primary_release_date.gte=$todayStr&sort_by=popularity.desc&page=1"
+            val endpoint = "https://api.themoviedb.org/3/discover/movie?api_key=$apiKey" +
+                "&region=ID&with_release_type=2|3&with_original_language=en|id|ja|ko" +
+                "&release_date.gte=$todayStr&sort_by=popularity.desc&page=1"
             val url = URL(endpoint)
             val connection = (url.openConnection() as HttpURLConnection).apply {
                 requestMethod = "GET"
@@ -60,7 +62,7 @@ class CinemaCheckWorker(
                 val popularity = item.optDouble("popularity", 0.0)
                 val voteAverage = item.optDouble("vote_average", 0.0)
 
-                val isHighHype = popularity >= 35.0 || voteAverage >= 7.2
+                val isHighHype = popularity >= 25.0 || voteAverage >= 7.0
                 if (isHighHype && !notifiedIds.contains(id)) {
                     sendMovieNotification(id.hashCode(), title, releaseDate)
                     notifiedIds.add(id)
