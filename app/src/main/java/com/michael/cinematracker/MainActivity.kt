@@ -9,6 +9,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.webkit.JavascriptInterface
@@ -47,7 +48,7 @@ class MainActivity : AppCompatActivity() {
         scheduleBackgroundWorker()
 
         webView = WebView(this).apply {
-            setBackgroundColor(Color.parseColor("#09090B"))
+            setBackgroundColor(Color.parseColor("#F8FAFC"))
             settings.javaScriptEnabled = true
             settings.domStorageEnabled = true
             settings.cacheMode = WebSettings.LOAD_DEFAULT
@@ -62,10 +63,14 @@ class MainActivity : AppCompatActivity() {
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                if (webView.canGoBack()) {
-                    webView.goBack()
-                } else {
-                    finish()
+                webView.evaluateJavascript("window.handleAndroidBack && window.handleAndroidBack()") { result ->
+                    if (result != "true") {
+                        if (webView.canGoBack()) {
+                            webView.goBack()
+                        } else {
+                            finish()
+                        }
+                    }
                 }
             }
         })
@@ -90,9 +95,9 @@ class MainActivity : AppCompatActivity() {
                 "Jadwal & Presale Bioskop Indo",
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
-                description = "Notifikasi rilis film hype dan pembukaan tiket presale bioskop Indonesia"
+                description = "Notifikasi rilis film hype dan pembukaan tiket presale XXI, CGV, Cinépolis"
                 enableLights(true)
-                lightColor = Color.RED
+                lightColor = Color.BLUE
                 enableVibration(true)
             }
             val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -147,28 +152,51 @@ class MainActivity : AppCompatActivity() {
         }
 
         @JavascriptInterface
-        fun sendTestNotification() {
+        fun sendCustomNotification(title: String, body: String) {
             val intent = Intent(context, MainActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
             }
+            val notifId = (title.hashCode() and 0x7fffffff)
             val pendingIntent = PendingIntent.getActivity(
                 context,
-                1001,
+                notifId,
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
 
             val notification = NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_notification)
-                .setContentTitle("🎬 Cinema Tracker Aktif di S24 FE!")
-                .setContentText("Background scanner siap pantau jadwal rilis & presale bioskop Indonesia setiap 6 jam.")
+                .setContentTitle(title)
+                .setContentText(body)
+                .setStyle(NotificationCompat.BigTextStyle().bigText(body))
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setAutoCancel(true)
                 .setContentIntent(pendingIntent)
                 .build()
 
             val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            manager.notify(1001, notification)
+            manager.notify(notifId, notification)
+        }
+
+        @JavascriptInterface
+        fun addCalendarEvent(title: String, description: String, location: String, startMillis: Long) {
+            try {
+                val intent = Intent(Intent.ACTION_EDIT).apply {
+                    type = "vnd.android.cursor.item/event"
+                    putExtra("beginTime", startMillis)
+                    putExtra("endTime", startMillis + 7200000L)
+                    putExtra("allDay", true)
+                    putExtra("title", title)
+                    putExtra("description", description)
+                    putExtra("eventLocation", location)
+                }
+                context.startActivity(intent)
+            } catch (e: Exception) {
+                val url = "https://calendar.google.com/calendar/render?action=TEMPLATE&text=" +
+                    Uri.encode(title) + "&details=" + Uri.encode(description) +
+                    "&location=" + Uri.encode(location)
+                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+            }
         }
     }
 

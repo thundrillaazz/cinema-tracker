@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.CinemaTracker" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="android:windowBackground">#09090B</item>
-        <item name="android:statusBarColor">#09090B</item>
-        <item name="android:navigationBarColor">#09090B</item>
+    <style name="Theme.CinemaTracker" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="android:windowBackground">#F8FAFC</item>
+        <item name="android:statusBarColor">#FFFFFF</item>
+        <item name="android:navigationBarColor">#FFFFFF</item>
+        <item name="android:windowLightStatusBar">true</item>
     </style>
 </resources>

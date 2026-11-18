@@ -10,6 +10,7 @@ import androidx.work.WorkerParameters
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
+import java.time.LocalDate
 
 class CinemaCheckWorker(
     private val appContext: Context,
@@ -25,7 +26,8 @@ class CinemaCheckWorker(
         }
 
         return try {
-            val endpoint = "https://api.themoviedb.org/3/movie/upcoming?api_key=$apiKey&region=ID&page=1"
+            val todayStr = LocalDate.now().toString()
+            val endpoint = "https://api.themoviedb.org/3/discover/movie?api_key=$apiKey&region=ID&primary_release_date.gte=$todayStr&sort_by=popularity.desc&page=1"
             val url = URL(endpoint)
             val connection = (url.openConnection() as HttpURLConnection).apply {
                 requestMethod = "GET"
@@ -51,11 +53,14 @@ class CinemaCheckWorker(
                 val item = results.getJSONObject(i)
                 val id = item.optInt("id").toString()
                 val title = item.optString("title", "Film Baru")
-                val releaseDate = item.optString("release_date", "Segera Tayang")
+                val releaseDate = item.optString("release_date", "")
+
+                if (releaseDate.isEmpty() || releaseDate < todayStr) continue
+
                 val popularity = item.optDouble("popularity", 0.0)
                 val voteAverage = item.optDouble("vote_average", 0.0)
 
-                val isHighHype = popularity >= 40.0 || voteAverage >= 7.2
+                val isHighHype = popularity >= 35.0 || voteAverage >= 7.2
                 if (isHighHype && !notifiedIds.contains(id)) {
                     sendMovieNotification(id.hashCode(), title, releaseDate)
                     notifiedIds.add(id)
@@ -84,7 +89,7 @@ class CinemaCheckWorker(
         val notification = NotificationCompat.Builder(appContext, MainActivity.CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle("🎟️ Jadwal Bioskop Indo: $title")
-            .setContentText("Rilis ID: $releaseDate • Cek ketersediaan tiket presale XXI / CGV / Cinépolis!")
+            .setContentText("Rilis ID: $releaseDate • Cek presale tiket di TIX ID / M-TIX / CGV!")
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)

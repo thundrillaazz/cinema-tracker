@@ -10,7 +10,7 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
-        android:label="Cinema Tracker"
+        android:label="Cinema Tracker ID"
         android:supportsRtl="true"
         android:theme="@style/Theme.CinemaTracker"
         android:usesCleartextTraffic="false">
