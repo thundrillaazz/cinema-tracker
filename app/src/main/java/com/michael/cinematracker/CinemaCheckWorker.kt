@@ -4,9 +4,12 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import androidx.core.app.NotificationCompat
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import org.json.JSONArray
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
@@ -25,8 +28,72 @@ class CinemaCheckWorker(
             return Result.success()
         }
 
+        val minHype = prefs.getInt("min_hype_threshold", 85)
+        val tbaWatchJson = prefs.getString("tba_watch_list_json", "[]") ?: "[]"
+
         return try {
             val todayStr = LocalDate.now().toString()
+            val notifiedIds = prefs.getStringSet("notified_movie_ids", emptySet())?.toMutableSet()
+                ?: mutableSetOf()
+
+            var sentCount = 0
+
+            // 1. Check user's TBA Watchlist movies to see if they now have an Indonesian theatrical release
+            val tbaArray = JSONArray(tbaWatchJson)
+            for (i in 0 until tbaArray.length()) {
+                val tmdbId = tbaArray.optInt(i, -1)
+                if (tmdbId <= 0) continue
+
+                val relUrl = URL("https://api.themoviedb.org/3/movie/$tmdbId/release_dates?api_key=$apiKey")
+                val conn = (relUrl.openConnection() as HttpURLConnection).apply {
+                    requestMethod = "GET"
+                    connectTimeout = 8000
+                    readTimeout = 8000
+                }
+                if (conn.responseCode == 200) {
+                    val body = conn.inputStream.bufferedReader().use { it.readText() }
+                    val json = JSONObject(body)
+                    val results = json.optJSONArray("results") ?: continue
+                    var idReleaseDate = ""
+                    for (j in 0 until results.length()) {
+                        val countryObj = results.getJSONObject(j)
+                        if (countryObj.optString("iso_3166_1") == "ID") {
+                            val rDates = countryObj.optJSONArray("release_dates") ?: continue
+                            for (k in 0 until rDates.length()) {
+                                val rd = rDates.getJSONObject(k)
+                                val type = rd.optInt("type", 0)
+                                val dateStr = rd.optString("release_date", "").take(10)
+                                if ((type == 2 || type == 3) && dateStr.isNotEmpty()) {
+                                    idReleaseDate = dateStr
+                                    break
+                                }
+                            }
+                        }
+                    }
+
+                    val notifyKey = "tba_confirmed_$tmdbId"
+                    if (idReleaseDate.isNotEmpty() && !notifiedIds.contains(notifyKey)) {
+                        val detUrl = URL("https://api.themoviedb.org/3/movie/$tmdbId?api_key=$apiKey")
+                        val dConn = detUrl.openConnection() as HttpURLConnection
+                        if (dConn.responseCode == 200) {
+                            val dJson = JSONObject(dConn.inputStream.bufferedReader().use { it.readText() })
+                            val title = dJson.optString("title", "Film Watchlist")
+                            val posterPath = dJson.optString("poster_path", "")
+                            val posterUrl = if (posterPath.isNotEmpty()) "https://image.tmdb.org/t/p/w500$posterPath" else ""
+                            sendMovieNotification(
+                                notifyKey.hashCode(),
+                                "Watchlist Confirmed ID: $title",
+                                "Resmi tayang di Indonesia mulai $idReleaseDate",
+                                posterUrl
+                            )
+                            notifiedIds.add(notifyKey)
+                            sentCount++
+                        }
+                    }
+                }
+            }
+
+            // 2. Scan High-Hype new Indonesian theatrical releases
             val endpoint = "https://api.themoviedb.org/3/discover/movie?api_key=$apiKey" +
                 "&region=ID&with_release_type=2|3&with_original_language=en|id|ja|ko" +
                 "&release_date.gte=$todayStr&sort_by=popularity.desc&page=1"
@@ -37,36 +104,37 @@ class CinemaCheckWorker(
                 readTimeout = 10000
             }
 
-            if (connection.responseCode != 200) {
-                return Result.retry()
-            }
+            if (connection.responseCode == 200) {
+                val body = connection.inputStream.bufferedReader().use { it.readText() }
+                val json = JSONObject(body)
+                val results = json.optJSONArray("results")
 
-            val body = connection.inputStream.bufferedReader().use { it.readText() }
-            val json = JSONObject(body)
-            val results = json.optJSONArray("results") ?: return Result.success()
+                if (results != null) {
+                    for (i in 0 until results.length()) {
+                        if (sentCount >= 4) break
+                        val item = results.getJSONObject(i)
+                        val id = item.optInt("id").toString()
+                        val title = item.optString("title", "Film Baru")
+                        val releaseDate = item.optString("release_date", "")
+                        val posterPath = item.optString("poster_path", "")
 
-            val notifiedIds = prefs.getStringSet("notified_movie_ids", emptySet())?.toMutableSet()
-                ?: mutableSetOf()
+                        if (releaseDate.isEmpty() || releaseDate < todayStr) continue
 
-            var sentCount = 0
+                        val popularity = item.optDouble("popularity", 0.0)
+                        val hypeScore = Math.min(98, Math.max(75, Math.round(74 + Math.min(24.0, popularity / 4.0)).toInt()))
 
-            for (i in 0 until results.length()) {
-                if (sentCount >= 3) break
-                val item = results.getJSONObject(i)
-                val id = item.optInt("id").toString()
-                val title = item.optString("title", "Film Baru")
-                val releaseDate = item.optString("release_date", "")
-
-                if (releaseDate.isEmpty() || releaseDate < todayStr) continue
-
-                val popularity = item.optDouble("popularity", 0.0)
-                val voteAverage = item.optDouble("vote_average", 0.0)
-
-                val isHighHype = popularity >= 25.0 || voteAverage >= 7.0
-                if (isHighHype && !notifiedIds.contains(id)) {
-                    sendMovieNotification(id.hashCode(), title, releaseDate)
-                    notifiedIds.add(id)
-                    sentCount++
+                        if (hypeScore >= minHype && !notifiedIds.contains(id)) {
+                            val posterUrl = if (posterPath.isNotEmpty()) "https://image.tmdb.org/t/p/w500$posterPath" else ""
+                            sendMovieNotification(
+                                id.hashCode(),
+                                "Rilis Bioskop ID: $title",
+                                "Tayang $releaseDate • Hype $hypeScore% • Cek presale TIX ID / XXI / CGV",
+                                posterUrl
+                            )
+                            notifiedIds.add(id)
+                            sentCount++
+                        }
+                    }
                 }
             }
 
@@ -77,7 +145,18 @@ class CinemaCheckWorker(
         }
     }
 
-    private fun sendMovieNotification(notificationId: Int, title: String, releaseDate: String) {
+    private fun sendMovieNotification(notificationId: Int, title: String, bodyText: String, posterUrl: String) {
+        var bitmap: Bitmap? = null
+        try {
+            if (posterUrl.isNotEmpty()) {
+                val url = URL(posterUrl)
+                val connection = url.openConnection() as HttpURLConnection
+                connection.doInput = true
+                connection.connect()
+                bitmap = BitmapFactory.decodeStream(connection.inputStream)
+            }
+        } catch (_: Exception) {}
+
         val intent = Intent(appContext, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
@@ -88,16 +167,24 @@ class CinemaCheckWorker(
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val notification = NotificationCompat.Builder(appContext, MainActivity.CHANNEL_ID)
+        val builder = NotificationCompat.Builder(appContext, MainActivity.CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle("Rilis Bioskop: $title")
-            .setContentText("Tayang $releaseDate • Cek presale di TIX ID / M-TIX / CGV")
+            .setContentTitle(title)
+            .setContentText(bodyText)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
-            .build()
+
+        if (bitmap != null) {
+            builder.setLargeIcon(bitmap)
+            builder.setStyle(
+                NotificationCompat.BigPictureStyle()
+                    .bigPicture(bitmap)
+                    .bigLargeIcon(null as Bitmap?)
+            )
+        }
 
         val manager = appContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        manager.notify(notificationId, notification)
+        manager.notify(notificationId, builder.build())
     }
 }

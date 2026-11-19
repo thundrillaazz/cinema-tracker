@@ -5,9 +5,12 @@ import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.net.Uri
 import android.os.Build
@@ -29,11 +32,15 @@ import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import java.net.HttpURLConnection
+import java.net.URL
+import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var webView: WebView
+    private val executor = Executors.newSingleThreadExecutor()
 
     private val notificationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -107,17 +114,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun scheduleBackgroundWorker() {
+        val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val intervalHours = prefs.getLong("sync_interval_hours", 6L)
+
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
-        val periodicWork = PeriodicWorkRequestBuilder<CinemaCheckWorker>(6, TimeUnit.HOURS)
+        val periodicWork = PeriodicWorkRequestBuilder<CinemaCheckWorker>(intervalHours, TimeUnit.HOURS)
             .setConstraints(constraints)
             .build()
 
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(
             "CinemaIndonesiaHypeScanner",
-            ExistingPeriodicWorkPolicy.KEEP,
+            ExistingPeriodicWorkPolicy.UPDATE,
             periodicWork
         )
     }
@@ -125,10 +135,17 @@ class MainActivity : AppCompatActivity() {
     inner class AndroidBridge(private val context: Context) {
 
         @JavascriptInterface
-        fun saveTmdbApiKey(apiKey: String) {
+        fun saveSettings(apiKey: String, minHype: Int, intervalHours: Int, tbaWatchIdsJson: String) {
             val cleanKey = apiKey.trim()
             val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            prefs.edit().putString("tmdb_api_key", cleanKey).apply()
+            prefs.edit()
+                .putString("tmdb_api_key", cleanKey)
+                .putInt("min_hype_threshold", minHype)
+                .putLong("sync_interval_hours", intervalHours.toLong())
+                .putString("tba_watch_list_json", tbaWatchIdsJson)
+                .apply()
+
+            scheduleBackgroundWorker()
 
             if (cleanKey.isNotEmpty()) {
                 val immediateWork = OneTimeWorkRequestBuilder<CinemaCheckWorker>()
@@ -153,30 +170,76 @@ class MainActivity : AppCompatActivity() {
         }
 
         @JavascriptInterface
-        fun sendCustomNotification(title: String, body: String) {
-            val intent = Intent(context, MainActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-            }
-            val notifId = (title.hashCode() and 0x7fffffff)
-            val pendingIntent = PendingIntent.getActivity(
-                context,
-                notifId,
-                intent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        fun changeLauncherIcon(aliasName: String) {
+            val aliases = listOf(
+                "com.michael.cinematracker.LauncherDefault",
+                "com.michael.cinematracker.LauncherSciFi",
+                "com.michael.cinematracker.LauncherAction",
+                "com.michael.cinematracker.LauncherImax"
             )
+            val targetAlias = "com.michael.cinematracker.$aliasName"
+            val pm = context.packageManager
 
-            val notification = NotificationCompat.Builder(context, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_notification)
-                .setContentTitle(title)
-                .setContentText(body)
-                .setStyle(NotificationCompat.BigTextStyle().bigText(body))
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setAutoCancel(true)
-                .setContentIntent(pendingIntent)
-                .build()
+            for (alias in aliases) {
+                val state = if (alias == targetAlias) {
+                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED
+                } else {
+                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED
+                }
+                pm.setComponentEnabledSetting(
+                    ComponentName(context, alias),
+                    state,
+                    PackageManager.DONT_KILL_APP
+                )
+            }
+        }
 
-            val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            manager.notify(notifId, notification)
+        @JavascriptInterface
+        fun sendCustomNotification(title: String, body: String, posterUrl: String) {
+            executor.execute {
+                var bitmap: Bitmap? = null
+                try {
+                    if (posterUrl.isNotEmpty()) {
+                        val url = URL(posterUrl)
+                        val connection = url.openConnection() as HttpURLConnection
+                        connection.doInput = true
+                        connection.connect()
+                        bitmap = BitmapFactory.decodeStream(connection.inputStream)
+                    }
+                } catch (_: Exception) {}
+
+                val intent = Intent(context, MainActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                }
+                val notifId = (title.hashCode() and 0x7fffffff)
+                val pendingIntent = PendingIntent.getActivity(
+                    context,
+                    notifId,
+                    intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
+
+                val builder = NotificationCompat.Builder(context, CHANNEL_ID)
+                    .setSmallIcon(R.drawable.ic_notification)
+                    .setContentTitle(title)
+                    .setContentText(body)
+                    .setStyle(NotificationCompat.BigTextStyle().bigText(body))
+                    .setPriority(NotificationCompat.PRIORITY_HIGH)
+                    .setAutoCancel(true)
+                    .setContentIntent(pendingIntent)
+
+                if (bitmap != null) {
+                    builder.setLargeIcon(bitmap)
+                    builder.setStyle(
+                        NotificationCompat.BigPictureStyle()
+                            .bigPicture(bitmap)
+                            .bigLargeIcon(null as Bitmap?)
+                    )
+                }
+
+                val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                manager.notify(notifId, builder.build())
+            }
         }
 
         @JavascriptInterface
