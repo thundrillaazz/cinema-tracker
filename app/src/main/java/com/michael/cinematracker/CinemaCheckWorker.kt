@@ -163,8 +163,7 @@ class CinemaCheckWorker(
             val isCinemaReleaseMidweek = (today.dayOfWeek == DayOfWeek.WEDNESDAY || today.dayOfWeek == DayOfWeek.THURSDAY)
             if (thisWeekTitles.isNotEmpty() && (isCinemaReleaseMidweek || (isManual && sentCount == 0)) && !notifiedIds.contains(digestKey)) {
                 val summaryLine = "${thisWeekTitles.size} film Watchlist tayang pekan ini"
-                val detailBody = thisWeekTitles.take(5).joinToString("
-")
+                val detailBody = thisWeekTitles.take(5).joinToString("\n")
                 sendDigestNotification(digestKey.hashCode(), "Ringkasan Bioskop Pekan Ini", summaryLine, detailBody)
                 notifiedIds.add(digestKey)
                 sentCount++
