@@ -55,7 +55,7 @@ class CinemaCheckWorker(
 
                 val dayAlert = entry.optBoolean("dayAlert", true)
                 val presaleAlert = entry.optBoolean("presaleAlert", true)
-                val movieData = entry.optJSONObject("movieData") ?: continue
+                val movieData = entry.optJSONObject("movie") ?: entry.optJSONObject("movieData") ?: continue
                 val title = movieData.optString("title", "")
                 if (title.isEmpty()) continue
                 val releaseDateStr = movieData.optString("releaseDate", "")
@@ -339,5 +339,8 @@ class CinemaCheckWorker(
 
         val manager = appContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         manager.notify(notificationId, builder.build())
+
+        bannerBitmap?.recycle()
+        rawBitmap?.recycle()
     }
 }

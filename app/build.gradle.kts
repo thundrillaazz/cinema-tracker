@@ -11,8 +11,8 @@ android {
         applicationId = "com.michael.cinematracker"
         minSdk = 26
         targetSdk = 34
-        versionCode = 18
-        versionName = "4.2.0"
+        versionCode = 23
+        versionName = "4.5.0"
     }
 
     buildTypes {

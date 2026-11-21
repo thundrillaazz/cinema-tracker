@@ -40,6 +40,20 @@
         </activity-alias>
 
         <activity-alias
+            android:name=".LauncherKinoTrio"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_kinotrio"
+            android:roundIcon="@mipmap/ic_launcher_kinotrio"
+            android:label="Cinema Tracker"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <activity-alias
             android:name=".LauncherSciFi"
             android:enabled="false"
             android:exported="true"

@@ -45,8 +45,8 @@
       --amber: #fbbf24;
       --amber-soft: rgba(245, 158, 11, 0.16);
       --rose: #fb7185;
-      --rose-soft: rgba(225, 29, 72, 0.18);
-      --rose-border: rgba(251, 113, 133, 0.35);
+      --rose-soft: rgba(225, 29, 72, 0.22);
+      --rose-border: rgba(251, 113, 133, 0.40);
     }
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -86,13 +86,14 @@
       width: 34px;
       height: 34px;
       border-radius: 9px;
-      background: var(--accent);
-      color: var(--accent-text);
+      background: #0f172a;
+      color: #ffffff;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
     }
+    html[data-theme="dark"] .brand-icon { background: #1e293b; color: #f8fafc; }
     .brand-icon svg { width: 18px; height: 18px; }
     .brand-title { font-size: 15px; font-weight: 700; color: var(--text); letter-spacing: -0.01em; }
     .brand-sub { font-size: 11px; color: var(--muted); }
@@ -120,7 +121,7 @@
       min-width: 16px;
       height: 16px;
       border-radius: 999px;
-      background: var(--rose);
+      background: var(--blue);
       color: #fff;
       font-size: 10px;
       font-weight: 700;
@@ -184,7 +185,7 @@
       border: none;
       background: transparent;
       color: var(--muted);
-      font-size: 14px;
+      font-size: 15px;
       cursor: pointer;
       padding: 2px 6px;
       display: none;
@@ -217,7 +218,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 8px;
-      margin: 6px 0 10px 0;
+      margin: 6px 0 8px 0;
       font-size: 11.5px;
       color: var(--muted);
     }
@@ -237,22 +238,10 @@
       align-items: center;
       justify-content: space-between;
       gap: 8px;
-      padding: 8px 11px;
-      border-radius: 9px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      margin-bottom: 12px;
+      padding: 4px 2px 10px 2px;
       font-size: 11.5px;
       color: var(--muted);
     }
-    .status-pill-inline {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      font-weight: 600;
-      color: var(--text);
-    }
-    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--emerald); }
 
     .grid {
       display: grid;
@@ -262,7 +251,7 @@
     .movie-card {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 11px;
+      border-radius: 12px;
       overflow: hidden;
       display: flex;
       flex-direction: column;
@@ -283,66 +272,78 @@
     }
     .poster-badge-imax {
       position: absolute;
-      top: 7px;
-      left: 7px;
-      background: rgba(9, 9, 11, 0.85);
+      top: 8px;
+      left: 8px;
+      background: rgba(9, 9, 11, 0.86);
       color: #fbbf24;
       font-size: 9.5px;
-      font-weight: 700;
+      font-weight: 800;
       padding: 2px 6px;
       border-radius: 5px;
       letter-spacing: 0.04em;
     }
     .poster-badge-rerelease {
       position: absolute;
-      bottom: 7px;
-      left: 7px;
-      background: rgba(37, 99, 235, 0.9);
+      bottom: 8px;
+      left: 8px;
+      background: rgba(37, 99, 235, 0.92);
       color: #ffffff;
       font-size: 9.5px;
       font-weight: 700;
       padding: 2px 6px;
       border-radius: 5px;
     }
+
+    @keyframes popBookmark {
+      0% { transform: scale(1); }
+      45% { transform: scale(1.24); }
+      100% { transform: scale(1); }
+    }
     .save-btn {
       position: absolute;
-      top: 7px;
-      right: 7px;
-      width: 34px;
-      height: 34px;
+      top: 8px;
+      right: 8px;
+      width: 35px;
+      height: 35px;
       border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      background: rgba(9, 9, 11, 0.72);
+      border: 1.5px solid rgba(255, 255, 255, 0.35);
+      background: rgba(15, 23, 42, 0.72);
       color: #ffffff;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
+      z-index: 5;
+      transition: background-color 0.12s ease, border-color 0.12s ease;
     }
+    .save-btn.pop { animation: popBookmark 0.24s ease; }
     .save-btn.saved {
-      background: var(--rose);
-      border-color: var(--rose);
-      color: #ffffff;
+      background: #e11d48 !important;
+      border-color: #fda4af !important;
+      color: #ffffff !important;
+      box-shadow: 0 3px 10px rgba(225, 29, 72, 0.55);
     }
-    .save-btn svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2.2; }
-    .save-btn.saved svg { fill: currentColor; }
+    .save-btn svg { width: 15px; height: 15px; stroke: #ffffff; fill: none; stroke-width: 2.2; pointer-events: none; }
+    .save-btn.saved svg { fill: #ffffff !important; stroke: #ffffff !important; }
 
-    .card-body { padding: 9px 10px 10px 10px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
-    .card-title { font-size: 12.5px; font-weight: 700; color: var(--text); line-height: 1.28; }
-    .card-meta { font-size: 11px; color: var(--muted); }
-    .card-date-line {
+    .card-body { padding: 9px 10px 10px 10px; display: flex; flex-direction: column; gap: 3px; flex: 1; }
+    .card-genre { font-size: 10.5px; color: var(--muted); }
+    .card-title { font-size: 12.5px; font-weight: 700; color: var(--text); line-height: 1.28; text-transform: uppercase; }
+    .card-chains { font-size: 10.5px; color: var(--muted); }
+    .card-footer-line {
       margin-top: auto;
-      padding-top: 5px;
+      padding-top: 6px;
       font-size: 11px;
       font-weight: 700;
-      color: var(--blue);
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 4px;
     }
+    .card-hype { color: var(--blue); }
+    .card-rel { color: var(--text); font-weight: 700; }
 
-    /* Watchlist: clean schedule & countdown focus */
+    /* Ultra-clean Watchlist focused strictly on Release Date & Countdown */
     .wl-tabs {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -350,8 +351,8 @@
       margin-bottom: 10px;
     }
     .wl-tab {
-      padding: 8px 10px;
-      border-radius: 9px;
+      padding: 9px 10px;
+      border-radius: 10px;
       border: 1px solid var(--border);
       background: var(--surface);
       color: var(--muted);
@@ -371,27 +372,110 @@
       align-items: center;
       justify-content: space-between;
       gap: 8px;
-      padding: 9px 12px;
-      border-radius: 9px;
+      padding: 10px 12px;
+      border-radius: 10px;
       background: var(--surface);
       border: 1px solid var(--border);
       margin-bottom: 10px;
       font-size: 12px;
     }
+    .wl-next-label { color: var(--muted); font-weight: 600; }
     .wl-next-title { font-weight: 700; color: var(--text); }
-    .wl-next-cd { font-weight: 700; color: var(--blue); white-space: nowrap; }
+    .wl-next-cd { font-weight: 800; color: var(--blue); white-space: nowrap; }
 
     .wl-list { display: flex; flex-direction: column; gap: 9px; }
     .wl-card {
       display: flex;
-      gap: 11px;
-      padding: 10px;
-      border-radius: 10px;
+      gap: 12px;
+      padding: 10px 11px;
+      border-radius: 12px;
       background: var(--surface);
       border: 1px solid var(--border);
       align-items: center;
     }
     .wl-poster {
+      width: 52px;
+      height: 78px;
+      border-radius: 8px;
+      object-fit: cover;
+      background: var(--surface-2);
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+    .wl-info { flex: 1; min-width: 0; cursor: pointer; }
+    .wl-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 5px; line-height: 1.25; }
+    .wl-schedule-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 4px;
+    }
+    .wl-cd-pill {
+      padding: 3px 9px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 800;
+      background: var(--blue-soft);
+      color: var(--blue);
+      letter-spacing: 0.01em;
+    }
+    .wl-cd-pill.urgent { background: var(--rose-soft); color: var(--rose); }
+    .wl-cd-pill.tba { background: var(--amber-soft); color: var(--amber); }
+    .wl-date-text { font-size: 12.5px; font-weight: 700; color: var(--text); }
+    .wl-chains { font-size: 11px; color: var(--muted); }
+
+    .wl-remove-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+    .wl-remove-btn:active { color: var(--rose); border-color: var(--rose-border); }
+
+    /* Search */
+    .search-header-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+    .search-header-title { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+    .search-header-sub { font-size: 11.5px; color: var(--muted); margin-bottom: 10px; }
+    .search-box-wrap { position: relative; }
+    .search-input {
+      width: 100%;
+      padding: 10px 34px 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 13px;
+      outline: none;
+    }
+    .search-input:focus { border-color: var(--blue); }
+
+    .search-item {
+      display: flex;
+      gap: 11px;
+      align-items: center;
+      padding: 10px;
+      border-radius: 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      margin-bottom: 9px;
+    }
+    .search-item img {
       width: 52px;
       height: 78px;
       border-radius: 7px;
@@ -400,104 +484,46 @@
       flex-shrink: 0;
       cursor: pointer;
     }
-    .wl-info { flex: 1; min-width: 0; cursor: pointer; }
-    .wl-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
-    .wl-schedule { font-size: 11.5px; font-weight: 700; color: var(--blue); }
-    .wl-chains { font-size: 11px; color: var(--muted); margin-top: 2px; }
-    .wl-actions-col { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
-    .wl-cd-pill {
-      padding: 3px 8px;
-      border-radius: 999px;
-      font-size: 11px;
-      font-weight: 700;
-      background: var(--blue-soft);
-      color: var(--blue);
-    }
-    .wl-cd-pill.urgent { background: var(--rose-soft); color: var(--rose); }
-    .wl-cd-pill.tba { background: var(--amber-soft); color: var(--amber); }
-    .wl-rem-mini { display: flex; gap: 4px; }
-    .rem-mini-btn {
-      padding: 4px 7px;
-      border-radius: 7px;
-      border: 1px solid var(--border);
-      background: var(--surface-2);
-      color: var(--muted);
-      font-size: 10.5px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-    .rem-mini-btn.on {
-      background: var(--blue-soft);
-      border-color: var(--blue-border);
-      color: var(--blue);
-    }
-    .wl-remove-btn {
-      border: none;
-      background: transparent;
-      color: var(--muted);
-      font-size: 15px;
-      line-height: 1;
-      padding: 2px 4px;
-      cursor: pointer;
-    }
-    .wl-remove-btn:hover { color: var(--rose); }
-
-    /* Search */
-    .search-box-wrap { position: relative; margin-bottom: 10px; }
-    .search-input {
-      width: 100%;
-      padding: 10px 34px 10px 12px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: var(--surface);
-      color: var(--text);
-      font-size: 13px;
-      outline: none;
-    }
-    .search-input:focus { border-color: var(--blue); }
-    .search-item {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      padding: 9px 10px;
-      border-radius: 10px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      margin-bottom: 8px;
-    }
-    .search-item img { width: 46px; height: 69px; border-radius: 6px; object-fit: cover; background: var(--surface-2); flex-shrink: 0; }
     .search-item-info { flex: 1; min-width: 0; cursor: pointer; }
-    .search-item-title { font-size: 12.5px; font-weight: 700; color: var(--text); }
-    .search-item-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .search-item-title { font-size: 13px; font-weight: 700; color: var(--text); text-transform: uppercase; }
+    .search-item-global { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .search-item-id { font-size: 11.5px; font-weight: 700; margin-top: 2px; }
+    .search-item-id.confirmed { color: var(--emerald); }
+    .search-item-id.tba { color: var(--amber); }
+
     .search-save-btn {
-      padding: 7px 10px;
+      margin-top: 7px;
+      padding: 6px 12px;
       border-radius: 8px;
       border: 1px solid var(--border);
       background: var(--surface-2);
       color: var(--text);
-      font-size: 11px;
+      font-size: 11.5px;
       font-weight: 700;
       cursor: pointer;
-      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: background-color 0.12s ease, color 0.12s ease, border-color 0.12s ease;
     }
     .search-save-btn.saved {
-      background: var(--rose-soft);
-      border-color: var(--rose-border);
-      color: var(--rose);
+      background: #e11d48 !important;
+      border-color: #e11d48 !important;
+      color: #ffffff !important;
     }
 
     /* Settings */
     .section-card {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 11px;
+      border-radius: 12px;
       padding: 12px;
       margin-bottom: 11px;
     }
     .section-title { font-size: 12.5px; font-weight: 700; margin-bottom: 8px; color: var(--text); }
     .btn-primary {
       width: 100%;
-      padding: 9px 12px;
+      padding: 10px 12px;
       border-radius: 9px;
       border: none;
       background: var(--accent);
@@ -527,8 +553,8 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      padding: 8px;
-      border-radius: 8px;
+      padding: 9px;
+      border-radius: 9px;
       border: 1px solid var(--border);
       background: var(--surface-2);
       font-size: 11.5px;
@@ -536,13 +562,13 @@
       cursor: pointer;
     }
     .launcher-option.active { border-color: var(--blue); background: var(--blue-soft); color: var(--blue); }
-    .launcher-swatch { width: 20px; height: 20px; border-radius: 5px; flex-shrink: 0; }
+    .launcher-swatch { width: 22px; height: 22px; border-radius: 6px; flex-shrink: 0; }
 
-    /* Detail Sheet */
+    /* Modern Detail Sheet */
     .sheet-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.55);
+      background: rgba(0, 0, 0, 0.62);
       z-index: 60;
       display: none;
       align-items: flex-end;
@@ -550,37 +576,96 @@
     .sheet-backdrop.open { display: flex; }
     .sheet-panel {
       width: 100%;
-      max-height: 88vh;
+      max-height: 90vh;
       overflow-y: auto;
       background: var(--surface);
-      border-top-left-radius: 16px;
-      border-top-right-radius: 16px;
-      padding: 14px 16px 24px 16px;
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
+      position: relative;
+      padding-bottom: 24px;
+    }
+    .sheet-hero {
+      position: relative;
+      padding: 12px 16px 14px 16px;
+      overflow: hidden;
+    }
+    .sheet-hero-bg {
+      position: absolute;
+      inset: -16px;
+      background-size: cover;
+      background-position: center;
+      filter: blur(22px) saturate(1.2);
+      opacity: 0.22;
+      pointer-events: none;
     }
     .sheet-handle {
-      width: 36px;
+      position: relative;
+      width: 38px;
       height: 4px;
       border-radius: 999px;
       background: var(--border);
-      margin: 0 auto 12px auto;
+      margin: 0 auto 14px auto;
     }
-    .sheet-top { display: flex; gap: 12px; margin-bottom: 12px; }
-    .sheet-poster { width: 84px; height: 126px; border-radius: 9px; object-fit: cover; background: var(--surface-2); flex-shrink: 0; }
-    .sheet-title { font-size: 16px; font-weight: 700; margin: 0 0 4px 0; }
-    .sheet-sub { font-size: 12px; color: var(--blue); font-weight: 700; margin-bottom: 4px; }
-    .sheet-meta { font-size: 11.5px; color: var(--muted); }
+    .sheet-top {
+      position: relative;
+      display: flex;
+      gap: 13px;
+      align-items: flex-start;
+    }
+    .sheet-poster {
+      width: 88px;
+      height: 132px;
+      border-radius: 10px;
+      object-fit: cover;
+      background: var(--surface-2);
+      flex-shrink: 0;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
+    }
+    .sheet-title {
+      font-size: 16.5px;
+      font-weight: 800;
+      margin: 0 0 6px 0;
+      line-height: 1.24;
+      letter-spacing: -0.01em;
+    }
+    .sheet-sched-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 9px;
+      border-radius: 7px;
+      background: var(--blue-soft);
+      color: var(--blue);
+      font-size: 11.5px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+    .sheet-sched-badge.tba {
+      background: var(--amber-soft);
+      color: var(--amber);
+    }
+    .sheet-meta-line {
+      font-size: 11.5px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+    .sheet-body { padding: 0 16px; }
 
     .sheet-watch-btn {
       width: 100%;
-      padding: 10px 12px;
-      border-radius: 9px;
-      border: 1px solid var(--border);
-      background: var(--surface-2);
-      color: var(--text);
-      font-size: 12.5px;
+      padding: 11px 14px;
+      border-radius: 11px;
+      border: 1px solid transparent;
+      background: var(--accent);
+      color: var(--accent-text);
+      font-size: 13px;
       font-weight: 700;
       cursor: pointer;
       margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
     }
     .sheet-watch-btn.saved {
       background: var(--rose-soft);
@@ -588,36 +673,99 @@
       color: var(--rose);
     }
 
-    .sheet-box {
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 10px 12px;
+    .quick-pills-row {
+      display: flex;
+      gap: 7px;
+      overflow-x: auto;
+      padding-bottom: 4px;
       margin-bottom: 10px;
-      background: var(--bg);
+      scrollbar-width: none;
     }
-    .sheet-box-title { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; margin-bottom: 6px; }
-    .links-row { display: flex; flex-wrap: wrap; gap: 6px; }
-    .link-chip {
-      padding: 6px 10px;
-      border-radius: 8px;
+    .quick-pills-row::-webkit-scrollbar { display: none; }
+    .q-pill {
+      flex: 0 0 auto;
+      padding: 7px 11px;
+      border-radius: 9px;
       border: 1px solid var(--border);
-      background: var(--surface);
+      background: var(--bg);
       color: var(--text);
       font-size: 11.5px;
       font-weight: 700;
       text-decoration: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
     }
-    .alert-toggle-row {
+    .q-pill:active { background: var(--surface-2); }
+
+    .sheet-card {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 11px 12px;
+      margin-bottom: 10px;
+      background: var(--bg);
+    }
+    .sheet-card-label {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 8px;
+    }
+
+    .switch-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 6px 0;
-      font-size: 12px;
+      padding: 5px 0;
+      font-size: 12.5px;
       font-weight: 600;
+      cursor: pointer;
     }
-    .alert-toggle-row input { width: 17px; height: 17px; accent-color: var(--blue); }
+    .switch-wrap {
+      position: relative;
+      width: 40px;
+      height: 22px;
+      flex-shrink: 0;
+    }
+    .switch-wrap input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute;
+    }
+    .switch-slider {
+      position: absolute;
+      inset: 0;
+      border-radius: 999px;
+      background: var(--border);
+      transition: background-color 0.16s ease;
+    }
+    .switch-slider::before {
+      content: "";
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      left: 3px;
+      top: 3px;
+      border-radius: 50%;
+      background: #ffffff;
+      transition: transform 0.16s ease;
+    }
+    .switch-wrap input:checked + .switch-slider { background: var(--blue); }
+    .switch-wrap input:checked + .switch-slider::before { transform: translateX(18px); }
 
-    .sheet-footer-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+    .credits-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 9px;
+    }
+    .credit-k { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; margin-bottom: 2px; }
+    .credit-v { font-size: 12px; font-weight: 600; color: var(--text); }
+    .synopsis-text { font-size: 12px; color: var(--text); line-height: 1.5; }
 
     /* Calendar modal */
     .cal-backdrop {
@@ -647,7 +795,6 @@
       border-radius: 7px;
       font-size: 11.5px;
       cursor: pointer;
-      position: relative;
     }
     .cal-day.has-rel { font-weight: 700; background: var(--blue-soft); color: var(--blue); }
     .cal-day.selected { background: var(--accent); color: var(--accent-text); }
@@ -688,7 +835,7 @@
       min-width: 15px;
       height: 15px;
       border-radius: 999px;
-      background: var(--rose);
+      background: var(--blue);
       color: #fff;
       font-size: 9.5px;
       font-weight: 700;
@@ -730,7 +877,7 @@
         </div>
         <div>
           <div class="brand-title">Cinema Tracker</div>
-          <div class="brand-sub">Jadwal &amp; rilis bioskop ID</div>
+          <div class="brand-sub">XXI · CGV · Cinépolis · IMAX</div>
         </div>
       </div>
       <div class="header-actions">
@@ -757,13 +904,14 @@
     <div class="container">
       <div class="filter-search-wrap">
         <svg class="filter-search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input id="catalogFilterInput" class="filter-search-input" type="text" placeholder="Filter judul, sutradara, atau genre..." oninput="onCatalogFilterInput()" />
+        <input id="catalogFilterInput" class="filter-search-input" type="text" placeholder="Filter judul, genre, atau jaringan..." oninput="onCatalogFilterInput()" />
         <button id="catalogClearBtn" class="filter-clear-btn" onclick="clearCatalogFilter()">&times;</button>
       </div>
 
       <div class="chips-row" id="chipRow">
         <button class="chip active" data-chip="all" onclick="setChip('all')">Semua</button>
         <button class="chip" data-chip="local" onclick="setChip('local')">Lokal ID</button>
+        <button class="chip" data-chip="presale" onclick="setChip('presale')">Pre-Sale</button>
         <button class="chip" data-chip="rerelease" onclick="setChip('rerelease')">Re-Release</button>
         <button class="chip" data-chip="hype" onclick="setChip('hype')">High Hype</button>
         <button class="chip" data-chip="imax" onclick="setChip('imax')">IMAX</button>
@@ -782,7 +930,7 @@
       </div>
 
       <div class="status-strip">
-        <span class="status-pill-inline"><span class="status-dot"></span>Jadwal Bioskop ID</span>
+        <span id="catalogCountLabel">Sedang Tayang · 0 film</span>
         <span id="lastSyncText">Belum sync</span>
       </div>
 
@@ -793,9 +941,13 @@
   <!-- SEARCH VIEW -->
   <div id="viewSearch" class="page-view">
     <div class="container">
-      <div class="search-box-wrap">
-        <input id="searchInput" class="search-input" type="text" placeholder="Cari judul film..." oninput="onSearchInput()" />
-        <button id="searchClearBtn" class="filter-clear-btn visible" onclick="clearSearchInput()">&times;</button>
+      <div class="search-header-card">
+        <div class="search-header-title">Cari Film</div>
+        <div class="search-header-sub">Cari jadwal tayang ID dari katalog lokal maupun database TMDB.</div>
+        <div class="search-box-wrap">
+          <input id="searchInput" class="search-input" type="text" placeholder="Judul, sutradara, atau pemeran..." oninput="onSearchInput()" />
+          <button id="searchClearBtn" class="filter-clear-btn" onclick="clearSearchInput()">&times;</button>
+        </div>
       </div>
       <div id="searchResults">
         <div class="empty-state">Ketik judul film untuk cek jadwal rilis Indonesia.</div>
@@ -812,7 +964,10 @@
       </div>
 
       <div id="wlNextBar" class="wl-next-bar" style="display:none;">
-        <span class="wl-next-title" id="wlNextTitle">-</span>
+        <div style="min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+          <span class="wl-next-label">Terdekat: </span>
+          <span class="wl-next-title" id="wlNextTitle">-</span>
+        </div>
         <span class="wl-next-cd" id="wlNextCd">-</span>
       </div>
 
@@ -824,22 +979,25 @@
   <div id="viewSettings" class="page-view">
     <div class="container">
       <div class="section-card">
-        <div class="section-title">Tema</div>
+        <div class="section-title">Tampilan</div>
         <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:6px;">
-          <button class="btn-secondary" id="themeBtnLight" onclick="setTheme('light')">Light</button>
-          <button class="btn-secondary" id="themeBtnDark" onclick="setTheme('dark')">Dark</button>
+          <button class="btn-secondary" id="themeBtnLight" onclick="setTheme('light')">Light Mode</button>
+          <button class="btn-secondary" id="themeBtnDark" onclick="setTheme('dark')">Dark Mode</button>
           <button class="btn-secondary" id="themeBtnSystem" onclick="setTheme('system')">System</button>
         </div>
       </div>
 
       <div class="section-card">
         <div class="section-title">API Key TMDB</div>
-        <input id="apiKeyInput" class="search-input" type="password" placeholder="Masukkan TMDB API Key" style="margin-bottom:8px;" />
-        <button class="btn-primary" onclick="saveApiAndSync()">Simpan &amp; Sync</button>
+        <div style="position:relative; margin-bottom:8px;">
+          <input id="apiKeyInput" class="search-input" type="password" placeholder="Masukkan TMDB API Key" style="padding-right:58px;" />
+          <button type="button" id="toggleApiVisBtn" onclick="toggleApiKeyVisibility()" style="position:absolute; right:8px; top:50%; transform:translateY(-50%); border:none; background:transparent; color:var(--blue); font-size:11px; font-weight:700; cursor:pointer;">Tampil</button>
+        </div>
+        <button class="btn-primary" onclick="saveApiAndSync()">Simpan &amp; Perbarui Jadwal</button>
       </div>
 
       <div class="section-card">
-        <div class="section-title">Pengingat Latar Belakang</div>
+        <div class="section-title">Pengingat &amp; Latar Belakang</div>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px;">
           <select id="minHypeSelect" class="sort-select" onchange="saveWorkerPrefs()">
             <option value="75">Hype &ge; 75%</option>
@@ -852,7 +1010,7 @@
             <option value="12">Tiap 12 Jam</option>
           </select>
         </div>
-        <button class="btn-secondary" onclick="triggerWorkerNow()">Cek Notifikasi Sekarang</button>
+        <button class="btn-secondary" onclick="triggerWorkerNow()">Cek Pengingat Sekarang</button>
       </div>
 
       <div class="section-card">
@@ -860,6 +1018,9 @@
         <div class="launcher-grid">
           <div class="launcher-option active" id="iconOptLauncherDefault" onclick="setLauncherIcon('LauncherDefault')">
             <span class="launcher-swatch" style="background:#2563eb;"></span><span>Cinema Blue</span>
+          </div>
+          <div class="launcher-option" id="iconOptLauncherKinoTrio" onclick="setLauncherIcon('LauncherKinoTrio')">
+            <span class="launcher-swatch" style="background:linear-gradient(135deg,#ff8000,#00e054,#40bcf4);"></span><span>Kino Trio</span>
           </div>
           <div class="launcher-option" id="iconOptLauncherSciFi" onclick="setLauncherIcon('LauncherSciFi')">
             <span class="launcher-swatch" style="background:#ea580c;"></span><span>Dune Amber</span>
@@ -883,53 +1044,65 @@
       </div>
 
       <div style="text-align:center; font-size:11px; color:var(--muted); padding:6px 0 10px;">
-        Cinema Tracker v4.2.0
+        Cinema Tracker v4.5.0
       </div>
     </div>
   </div>
 
-  <!-- DETAIL SHEET -->
+  <!-- MODERN DETAIL SHEET -->
   <div id="detailSheet" class="sheet-backdrop" onclick="onSheetBackdropClick(event)">
     <div class="sheet-panel" id="detailPanel">
-      <div class="sheet-handle"></div>
-      <div class="sheet-top">
-        <img id="sheetPoster" class="sheet-poster" src="" alt="" />
-        <div style="flex:1; min-width:0;">
-          <h3 id="sheetTitle" class="sheet-title">Judul</h3>
-          <div id="sheetScheduleLine" class="sheet-sub">-</div>
-          <div id="sheetMeta" class="sheet-meta">-</div>
+      <div class="sheet-hero">
+        <div id="sheetHeroBg" class="sheet-hero-bg"></div>
+        <div class="sheet-handle"></div>
+        <div class="sheet-top">
+          <img id="sheetPoster" class="sheet-poster" src="" alt="" />
+          <div style="flex:1; min-width:0;">
+            <h3 id="sheetTitle" class="sheet-title">Judul</h3>
+            <div id="sheetScheduleBadge" class="sheet-sched-badge">-</div>
+            <div id="sheetMeta" class="sheet-meta-line">-</div>
+            <div id="sheetChainsLine" class="sheet-meta-line" style="margin-top:3px; font-weight:600;">-</div>
+          </div>
         </div>
       </div>
 
-      <button id="sheetWatchBtn" class="sheet-watch-btn" onclick="toggleWatchFromDetail()">Simpan ke Watchlist</button>
+      <div class="sheet-body">
+        <button type="button" id="sheetWatchBtn" class="sheet-watch-btn" onclick="toggleWatchFromDetail()">+ Simpan ke Watchlist</button>
 
-      <div class="sheet-box">
-        <div class="sheet-box-title">Pengingat</div>
-        <label class="alert-toggle-row">
-          <span>Notif Pre-Sale</span>
-          <input type="checkbox" id="sheetPresaleCheck" onchange="updateDetailAlerts()" />
-        </label>
-        <label class="alert-toggle-row">
-          <span>Notif H-1 &amp; Hari-H</span>
-          <input type="checkbox" id="sheetDayCheck" onchange="updateDetailAlerts()" />
-        </label>
-      </div>
+        <div class="quick-pills-row" id="sheetQuickPills"></div>
 
-      <div class="sheet-box">
-        <div class="sheet-box-title">Jaringan &amp; Tautan</div>
-        <div id="sheetChainsText" style="font-size:11.5px; color:var(--muted); margin-bottom:8px;">-</div>
-        <div class="links-row" id="sheetLinksRow"></div>
-      </div>
+        <div class="sheet-card">
+          <div class="sheet-card-label">Pengingat Otomatis</div>
+          <label class="switch-row">
+            <span>Notifikasi Pre-Sale Tiket</span>
+            <span class="switch-wrap">
+              <input type="checkbox" id="sheetPresaleCheck" onchange="updateDetailAlerts()" />
+              <span class="switch-slider"></span>
+            </span>
+          </label>
+          <label class="switch-row">
+            <span>Pengingat H-1 &amp; Hari Tayang</span>
+            <span class="switch-wrap">
+              <input type="checkbox" id="sheetDayCheck" onchange="updateDetailAlerts()" />
+              <span class="switch-slider"></span>
+            </span>
+          </label>
+        </div>
 
-      <div class="sheet-box">
-        <div class="sheet-box-title">Info Film</div>
-        <div id="sheetCreditsText" style="font-size:11.5px; color:var(--muted); margin-bottom:6px;">-</div>
-        <div id="sheetOverviewText" style="font-size:12px; color:var(--text);">-</div>
-      </div>
-
-      <div class="sheet-footer-btns">
-        <button class="btn-primary" onclick="addCurrentDetailToCalendar()">Simpan Kalender</button>
-        <button class="btn-secondary" onclick="shareCurrentDetail()">Bagikan</button>
+        <div class="sheet-card">
+          <div class="credits-grid">
+            <div>
+              <div class="credit-k">Sutradara</div>
+              <div class="credit-v" id="sheetDirectorVal">-</div>
+            </div>
+            <div>
+              <div class="credit-k">Pemeran Utama</div>
+              <div class="credit-v" id="sheetCastVal">-</div>
+            </div>
+          </div>
+          <div class="credit-k">Sinopsis</div>
+          <div class="synopsis-text" id="sheetOverviewText">-</div>
+        </div>
       </div>
     </div>
   </div>
@@ -970,10 +1143,11 @@
   <div id="toast" class="toast"></div>
 
   <script>
-    const STORAGE_KEY_MOVIES = "ct_v42_movies_cache";
-    const STORAGE_KEY_WATCHLIST = "ct_v42_watchlist";
-    const STORAGE_KEY_META = "ct_v42_meta";
+    const STORAGE_KEY_MOVIES = "ct_v45_movies_cache";
+    const STORAGE_KEY_WATCHLIST = "ct_v45_watchlist";
+    const STORAGE_KEY_META = "ct_v45_meta";
 
+    const MONTHS_ID = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
     const GENRE_MAP = {
       28: "Action", 12: "Adventure", 16: "Animation", 35: "Comedy", 80: "Crime",
       99: "Documentary", 18: "Drama", 10751: "Family", 14: "Fantasy", 36: "History",
@@ -988,10 +1162,19 @@
     let currentWlSubTab = "scheduled";
     let activeDetailMovie = null;
     let searchTimer = null;
+    let searchAbort = null;
     let lastSearchItems = [];
     let calCurrentDate = new Date();
     let calSelectedIso = "";
     let lastSyncMs = 0;
+
+    function normId(val) {
+      return String(val ?? "").replace(/^(tmdb_|search_)/, "").trim();
+    }
+
+    function thumbPoster(url) {
+      return String(url || "").replace("/w500/", "/w342/");
+    }
 
     function getLocalTodayIso() {
       const now = new Date();
@@ -1001,11 +1184,22 @@
       return `${y}-${m}-${d}`;
     }
 
-    function formatDateDmy(iso) {
+    function formatDateShortId(iso) {
       if (!iso || iso === "TBA" || iso.length < 10) return "TBA";
       const parts = iso.slice(0, 10).split("-");
       if (parts.length !== 3) return iso;
-      return `${parts[2]}/${parts[1]}/${parts[0]}`;
+      const day = Number(parts[2]);
+      const mon = MONTHS_ID[Number(parts[1]) - 1] || parts[1];
+      return `${day} ${mon}`;
+    }
+
+    function formatDateFullId(iso) {
+      if (!iso || iso === "TBA" || iso.length < 10) return "TBA";
+      const parts = iso.slice(0, 10).split("-");
+      if (parts.length !== 3) return iso;
+      const day = Number(parts[2]);
+      const mon = MONTHS_ID[Number(parts[1]) - 1] || parts[1];
+      return `${day} ${mon} ${parts[0]}`;
     }
 
     function getDaysUntil(iso) {
@@ -1019,7 +1213,7 @@
 
     function formatCountdownBadge(days) {
       if (days === null || days === undefined) return "TBA";
-      if (days < 0) return "Sedang Tayang";
+      if (days < 0) return "Tayang";
       if (days === 0) return "Hari Ini";
       if (days === 1) return "Besok";
       return `H-${days}`;
@@ -1030,7 +1224,7 @@
       el.textContent = msg;
       el.classList.add("show");
       clearTimeout(window._toastTimer);
-      window._toastTimer = setTimeout(() => el.classList.remove("show"), 1800);
+      window._toastTimer = setTimeout(() => el.classList.remove("show"), 1600);
     }
 
     function setTheme(mode) {
@@ -1070,6 +1264,38 @@
       if (activeEl) activeEl.classList.add("active");
     }
 
+    function toggleApiKeyVisibility() {
+      const inp = document.getElementById("apiKeyInput");
+      const btn = document.getElementById("toggleApiVisBtn");
+      if (inp.type === "password") {
+        inp.type = "text";
+        btn.textContent = "Sembunyi";
+      } else {
+        inp.type = "password";
+        btn.textContent = "Tampil";
+      }
+    }
+
+    function migrateWatchlistObject(rawObj) {
+      const cleaned = {};
+      if (!rawObj || typeof rawObj !== "object") return cleaned;
+      Object.entries(rawObj).forEach(([k, val]) => {
+        if (!val || typeof val !== "object") return;
+        const m = val.movie || val.movieData;
+        if (!m || !m.title) return;
+        const id = normId(m.id || m.tmdbId || k);
+        if (!id) return;
+        m.id = id;
+        cleaned[id] = {
+          movie: m,
+          isTba: !m.releaseDate || m.releaseDate === "TBA",
+          presaleAlert: val.presaleAlert !== false,
+          dayAlert: val.dayAlert !== false
+        };
+      });
+      return cleaned;
+    }
+
     function loadState() {
       const savedTheme = localStorage.getItem("ct_app_theme") || "light";
       applyTheme(savedTheme);
@@ -1077,29 +1303,43 @@
       const savedIcon = localStorage.getItem("ct_launcher_icon") || "LauncherDefault";
       highlightLauncherOption(savedIcon);
 
+      let parsedWl = {};
       try {
-        const rawWl = localStorage.getItem(STORAGE_KEY_WATCHLIST);
-        watchlist = rawWl ? JSON.parse(rawWl) : {};
-      } catch (_) {
-        watchlist = {};
-      }
+        const rawWl =
+          localStorage.getItem(STORAGE_KEY_WATCHLIST) ||
+          localStorage.getItem("ct_v44_watchlist") ||
+          localStorage.getItem("ct_v43_watchlist") ||
+          localStorage.getItem("ct_v42_watchlist") ||
+          localStorage.getItem("ct_watchlist_v4");
+        if (rawWl) parsedWl = JSON.parse(rawWl);
+      } catch (_) {}
 
-      if (Object.keys(watchlist).length === 0 && window.AndroidBridge && typeof window.AndroidBridge.getWatchlistFullJson === "function") {
+      if (Object.keys(parsedWl).length === 0 && window.AndroidBridge && typeof window.AndroidBridge.getWatchlistFullJson === "function") {
         try {
-          const nativeWl = JSON.parse(window.AndroidBridge.getWatchlistFullJson() || "{}");
-          if (nativeWl && typeof nativeWl === "object") watchlist = nativeWl;
+          parsedWl = JSON.parse(window.AndroidBridge.getWatchlistFullJson() || "{}");
         } catch (_) {}
       }
+      watchlist = migrateWatchlistObject(parsedWl);
+      persistWatchlist();
 
       try {
-        const rawMov = localStorage.getItem(STORAGE_KEY_MOVIES);
-        movies = rawMov ? JSON.parse(rawMov) : [];
+        const rawMov =
+          localStorage.getItem(STORAGE_KEY_MOVIES) ||
+          localStorage.getItem("ct_v44_movies_cache") ||
+          localStorage.getItem("ct_v43_movies_cache") ||
+          localStorage.getItem("ct_v42_movies_cache");
+        const arr = rawMov ? JSON.parse(rawMov) : [];
+        movies = Array.isArray(arr) ? arr.map(m => ({ ...m, id: normId(m.id || m.tmdbId) })) : [];
       } catch (_) {
         movies = [];
       }
 
       try {
-        const rawMeta = localStorage.getItem(STORAGE_KEY_META);
+        const rawMeta =
+          localStorage.getItem(STORAGE_KEY_META) ||
+          localStorage.getItem("ct_v44_meta") ||
+          localStorage.getItem("ct_v43_meta") ||
+          localStorage.getItem("ct_v42_meta");
         if (rawMeta) {
           const meta = JSON.parse(rawMeta);
           lastSyncMs = meta.lastSyncMs || 0;
@@ -1126,7 +1366,7 @@
       const tbaIds = [];
       Object.values(watchlist).forEach(entry => {
         if (entry && entry.isTba && entry.movie && entry.movie.tmdbId) {
-          tbaIds.push(entry.movie.tmdbId);
+          tbaIds.push(Number(entry.movie.tmdbId));
         }
       });
       if (window.AndroidBridge && typeof window.AndroidBridge.syncWatchlistReminders === "function") {
@@ -1152,14 +1392,42 @@
     }
 
     function isWatchlisted(id) {
-      return Boolean(watchlist[String(id)]);
+      const key = normId(id);
+      return Boolean(key && watchlist[key]);
     }
 
-    function toggleWatchlistMovie(movie) {
-      if (!movie || !movie.id) return;
-      const key = String(movie.id);
+    function onPosterSaveClick(e, id, btnEl) {
+      if (e) {
+        e.stopPropagation();
+        e.preventDefault();
+      }
+      const key = normId(id);
+      const m = findMovieById(key);
+      if (!m) return;
+      toggleWatchlistMovie(m, btnEl);
+    }
+
+    function onSearchSaveClick(e, id, btnEl) {
+      if (e) {
+        e.stopPropagation();
+        e.preventDefault();
+      }
+      const key = normId(id);
+      const m = findMovieById(key);
+      if (!m) return;
+      toggleWatchlistMovie(m, btnEl);
+    }
+
+    function toggleWatchlistMovie(movie, triggerBtn) {
+      if (!movie) return;
+      const key = normId(movie.id || movie.tmdbId);
+      if (!key) return;
+      movie.id = key;
+
+      let nowSaved = false;
       if (watchlist[key]) {
         delete watchlist[key];
+        nowSaved = false;
         persistWatchlist();
         showToast("Dihapus dari Watchlist");
       } else {
@@ -1170,26 +1438,43 @@
           presaleAlert: true,
           dayAlert: true
         };
+        nowSaved = true;
         persistWatchlist();
         showToast("Masuk Watchlist");
       }
+
+      if (triggerBtn) {
+        applyButtonSavedState(triggerBtn, nowSaved, true);
+      }
       refreshAllWatchIndicators();
+
       if (document.getElementById("viewWatchlist").classList.contains("active")) {
         renderWatchlist();
       }
-      if (activeDetailMovie && String(activeDetailMovie.id) === key) {
+      if (activeDetailMovie && normId(activeDetailMovie.id) === key) {
         syncDetailWatchButton();
+      }
+    }
+
+    function applyButtonSavedState(btn, saved, animate) {
+      if (!btn) return;
+      btn.classList.toggle("saved", saved);
+      btn.setAttribute("aria-pressed", saved ? "true" : "false");
+      if (animate && btn.classList.contains("save-btn")) {
+        btn.classList.remove("pop");
+        void btn.offsetWidth;
+        btn.classList.add("pop");
+      }
+      if (btn.classList.contains("search-save-btn")) {
+        btn.textContent = saved ? "✓ Di Watchlist" : "+ Watchlist";
       }
     }
 
     function refreshAllWatchIndicators() {
       document.querySelectorAll("[data-watch-id]").forEach(btn => {
-        const wid = btn.getAttribute("data-watch-id");
+        const wid = normId(btn.getAttribute("data-watch-id"));
         const saved = isWatchlisted(wid);
-        btn.classList.toggle("saved", saved);
-        if (btn.classList.contains("search-save-btn")) {
-          btn.textContent = saved ? "Tersimpan" : "+ Watchlist";
-        }
+        applyButtonSavedState(btn, saved, false);
       });
     }
 
@@ -1199,6 +1484,7 @@
         document.getElementById("view" + cap).classList.toggle("active", t === tab);
         document.getElementById("nav" + cap).classList.toggle("active", t === tab);
       });
+      if (tab === "catalog") refreshAllWatchIndicators();
       if (tab === "watchlist") renderWatchlist();
       if (tab === "search") refreshAllWatchIndicators();
     }
@@ -1248,6 +1534,11 @@
       }
       if (currentChip === "local") {
         base = base.filter(m => m.originalLanguage === "id");
+      } else if (currentChip === "presale") {
+        base = base.filter(m => {
+          const d = getDaysUntil(m.releaseDate);
+          return d !== null && d >= 1 && d <= 7;
+        });
       } else if (currentChip === "rerelease") {
         base = base.filter(m => Boolean(m.isReRelease));
       } else if (currentChip === "hype") {
@@ -1259,7 +1550,8 @@
         base = base.filter(m =>
           (m.title || "").toLowerCase().includes(q) ||
           (m.director || "").toLowerCase().includes(q) ||
-          (m.genresText || "").toLowerCase().includes(q)
+          (m.genresText || "").toLowerCase().includes(q) ||
+          ((m.chains || []).join(" ").toLowerCase().includes(q))
         );
       }
 
@@ -1271,34 +1563,43 @@
         return currentSubTab === "now" ? db.localeCompare(da) : da.localeCompare(db);
       });
 
+      const subTitle = currentSubTab === "now" ? "Sedang Tayang" : "Akan Datang";
+      document.getElementById("catalogCountLabel").textContent = `${subTitle} · ${sorted.length} film`;
+
       const grid = document.getElementById("movieGrid");
       if (sorted.length === 0) {
-        grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;">Belum ada jadwal film. Tap Sync atau cek tab Cari.</div>';
+        grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;">Belum ada jadwal film. Ketuk Sync atau cek tab Cari.</div>';
         return;
       }
 
       grid.innerHTML = sorted.map(m => {
-        const saved = isWatchlisted(m.id);
+        const mid = normId(m.id);
+        const saved = isWatchlisted(mid);
         const days = getDaysUntil(m.releaseDate);
-        const dateLabel = m.releaseDate && m.releaseDate !== "TBA"
-          ? `${formatDateDmy(m.releaseDate)} • ${formatCountdownBadge(days)}`
+        const relRight = m.releaseDate && m.releaseDate !== "TBA"
+          ? `${formatDateShortId(m.releaseDate)} · ${formatCountdownBadge(days)}`
           : "TBA";
         const chains = (m.chains && m.chains.length) ? m.chains.join(" · ") : "XXI · CGV · Cinépolis";
+        const genreLine = m.genresText || "Bioskop ID";
 
         return `
-          <div class="movie-card" onclick='openMovieDetailById("${String(m.id)}")'>
+          <div class="movie-card" onclick="openMovieDetailById('${mid}')">
             <div class="poster-wrap">
-              <img src="${m.poster || ""}" alt="${escapeHtml(m.title)}" loading="lazy" />
+              <img src="${thumbPoster(m.poster)}" alt="${escapeHtml(m.title)}" loading="lazy" decoding="async" />
               ${m.isImax ? '<span class="poster-badge-imax">IMAX</span>' : ""}
               ${m.isReRelease ? '<span class="poster-badge-rerelease">Re-Release</span>' : ""}
-              <button class="save-btn ${saved ? "saved" : ""}" data-watch-id="${m.id}" onclick='event.stopPropagation(); toggleWatchlistById("${String(m.id)}")' title="Watchlist">
+              <button type="button" class="save-btn ${saved ? "saved" : ""}" data-watch-id="${mid}" aria-pressed="${saved}" onclick="onPosterSaveClick(event, '${mid}', this)" title="Watchlist">
                 <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
               </button>
             </div>
             <div class="card-body">
+              <div class="card-genre">${escapeHtml(genreLine)}</div>
               <div class="card-title">${escapeHtml(m.title)}</div>
-              <div class="card-meta">${escapeHtml(chains)}</div>
-              <div class="card-date-line"><span>${escapeHtml(dateLabel)}</span></div>
+              <div class="card-chains">${escapeHtml(chains)}</div>
+              <div class="card-footer-line">
+                <span class="card-hype">Hype ${m.hype || 80}%</span>
+                <span class="card-rel">${escapeHtml(relRight)}</span>
+              </div>
             </div>
           </div>
         `;
@@ -1306,10 +1607,11 @@
     }
 
     function findMovieById(id) {
-      const target = String(id);
-      const fromCatalog = movies.find(m => String(m.id) === target);
+      const target = normId(id);
+      if (!target) return null;
+      const fromCatalog = movies.find(m => normId(m.id) === target);
       if (fromCatalog) return fromCatalog;
-      const fromSearch = lastSearchItems.find(m => String(m.id) === target);
+      const fromSearch = lastSearchItems.find(m => normId(m.id) === target);
       if (fromSearch) return fromSearch;
       if (watchlist[target] && watchlist[target].movie) return watchlist[target].movie;
       return null;
@@ -1317,57 +1619,110 @@
 
     function toggleWatchlistById(id) {
       const m = findMovieById(id);
-      if (m) toggleWatchlistMovie(m);
+      if (m) toggleWatchlistMovie(m, null);
     }
 
     function openMovieDetailById(id) {
       const m = findMovieById(id);
       if (!m) return;
       activeDetailMovie = m;
+      renderDetailSheetContent(m);
+      document.getElementById("detailSheet").classList.add("open");
 
-      document.getElementById("sheetPoster").src = m.poster || "";
+      if ((!m.director && (!m.cast || m.cast.length === 0)) && m.tmdbId) {
+        enrichMovieCreditsLazy(m);
+      }
+    }
+
+    function renderDetailSheetContent(m) {
+      const posterUrl = thumbPoster(m.poster);
+      document.getElementById("sheetPoster").src = posterUrl;
+      document.getElementById("sheetHeroBg").style.backgroundImage = posterUrl ? `url("${posterUrl}")` : "none";
       document.getElementById("sheetTitle").textContent = m.title || "";
 
       const days = getDaysUntil(m.releaseDate);
-      const schedText = m.releaseDate && m.releaseDate !== "TBA"
-        ? `Rilis ${formatDateDmy(m.releaseDate)} (${formatCountdownBadge(days)})`
-        : "Jadwal Indonesia TBA";
-      document.getElementById("sheetScheduleLine").textContent = schedText;
+      const isTba = !m.releaseDate || m.releaseDate === "TBA";
+      const pill = document.getElementById("sheetScheduleBadge");
+      pill.classList.toggle("tba", isTba);
+      if (isTba) {
+        pill.textContent = "Jadwal Bioskop ID Belum Diumumkan";
+      } else if (days !== null && days < 0) {
+        pill.textContent = `Sedang Tayang · Sejak ${formatDateFullId(m.releaseDate)}`;
+      } else {
+        pill.textContent = `${formatCountdownBadge(days)} · Tayang ${formatDateFullId(m.releaseDate)}`;
+      }
 
       const metaBits = [];
       if (m.genresText) metaBits.push(m.genresText);
       if (m.runtime) metaBits.push(`${m.runtime} mnt`);
       if (m.hype) metaBits.push(`Hype ${m.hype}%`);
-      document.getElementById("sheetMeta").textContent = metaBits.join(" • ") || "Bioskop Indonesia";
+      document.getElementById("sheetMeta").textContent = metaBits.join(" · ") || "Rilis Bioskop Indonesia";
 
-      const chains = (m.chains && m.chains.length) ? m.chains.join(" • ") : "XXI • CGV • Cinépolis";
-      document.getElementById("sheetChainsText").textContent = chains;
+      const chains = (m.chains && m.chains.length) ? m.chains.join(" · ") : "XXI · CGV · Cinépolis";
+      document.getElementById("sheetChainsLine").textContent = chains;
 
       const enc = encodeURIComponent(m.title || "");
-      document.getElementById("sheetLinksRow").innerHTML = `
-        <a class="link-chip" href="https://www.youtube.com/results?search_query=${enc}+trailer" target="_blank">YouTube</a>
-        <a class="link-chip" href="https://letterboxd.com/search/${enc}/" target="_blank">Letterboxd</a>
-        <a class="link-chip" href="https://tixid.id/" target="_blank">TIX ID</a>
-        <a class="link-chip" href="https://21cineplex.com/" target="_blank">XXI</a>
-        <a class="link-chip" href="https://www.cgv.id/" target="_blank">CGV</a>
+      document.getElementById("sheetQuickPills").innerHTML = `
+        <a class="q-pill" href="https://www.youtube.com/results?search_query=${enc}+trailer" target="_blank">▶ Trailer</a>
+        <a class="q-pill" href="https://tixid.id/" target="_blank">TIX ID</a>
+        <a class="q-pill" href="https://21cineplex.com/" target="_blank">XXI</a>
+        <a class="q-pill" href="https://www.cgv.id/" target="_blank">CGV</a>
+        <button type="button" class="q-pill" onclick="addCurrentDetailToCalendar()">+ Kalender</button>
+        <button type="button" class="q-pill" onclick="shareCurrentDetail()">Bagikan</button>
       `;
 
-      const dir = m.director || "-";
-      const cast = (m.cast && m.cast.length) ? m.cast.slice(0, 4).join(", ") : "-";
-      document.getElementById("sheetCreditsText").textContent = `Sutradara: ${dir} • Pemeran: ${cast}`;
-      document.getElementById("sheetOverviewText").textContent = m.overview || "Sinopsis belum tersedia.";
+      document.getElementById("sheetDirectorVal").textContent = m.director || "Memuat...";
+      document.getElementById("sheetCastVal").textContent = (m.cast && m.cast.length) ? m.cast.slice(0, 3).join(", ") : "Memuat...";
+      document.getElementById("sheetOverviewText").textContent = m.overview || "Sinopsis belum tersedia di database.";
 
       syncDetailWatchButton();
-      document.getElementById("detailSheet").classList.add("open");
+    }
+
+    async function enrichMovieCreditsLazy(movie) {
+      const apiKey = getApiKey();
+      if (!apiKey || !movie.tmdbId) {
+        movie.director = movie.director || "-";
+        movie.cast = movie.cast && movie.cast.length ? movie.cast : ["-"];
+        if (activeDetailMovie && normId(activeDetailMovie.id) === normId(movie.id)) {
+          document.getElementById("sheetDirectorVal").textContent = movie.director;
+          document.getElementById("sheetCastVal").textContent = movie.cast.join(", ");
+        }
+        return;
+      }
+      try {
+        const res = await fetch(`https://api.themoviedb.org/3/movie/${movie.tmdbId}?api_key=${encodeURIComponent(apiKey)}&append_to_response=credits`);
+        const d = await res.json();
+        const crew = (d.credits && Array.isArray(d.credits.crew)) ? d.credits.crew : [];
+        const dirObj = crew.find(c => c.job === "Director");
+        movie.director = dirObj ? dirObj.name : "-";
+        const castArr = (d.credits && Array.isArray(d.credits.cast)) ? d.credits.cast.slice(0, 3).map(c => c.name) : [];
+        movie.cast = castArr.length ? castArr : ["-"];
+        if (d.runtime) movie.runtime = d.runtime;
+        if (d.overview && !movie.overview) movie.overview = d.overview;
+
+        try { localStorage.setItem(STORAGE_KEY_MOVIES, JSON.stringify(movies)); } catch (_) {}
+        if (watchlist[normId(movie.id)]) {
+          watchlist[normId(movie.id)].movie = movie;
+          persistWatchlist();
+        }
+        if (activeDetailMovie && normId(activeDetailMovie.id) === normId(movie.id)) {
+          renderDetailSheetContent(movie);
+        }
+      } catch (_) {
+        if (activeDetailMovie && normId(activeDetailMovie.id) === normId(movie.id)) {
+          document.getElementById("sheetDirectorVal").textContent = "-";
+          document.getElementById("sheetCastVal").textContent = "-";
+        }
+      }
     }
 
     function syncDetailWatchButton() {
       if (!activeDetailMovie) return;
-      const key = String(activeDetailMovie.id);
+      const key = normId(activeDetailMovie.id);
       const saved = isWatchlisted(key);
       const btn = document.getElementById("sheetWatchBtn");
       btn.classList.toggle("saved", saved);
-      btn.textContent = saved ? "Tersimpan di Watchlist (Tap untuk Hapus)" : "Simpan ke Watchlist";
+      btn.textContent = saved ? "✓ Tersimpan di Watchlist" : "+ Simpan ke Watchlist";
 
       const entry = watchlist[key] || { presaleAlert: true, dayAlert: true };
       document.getElementById("sheetPresaleCheck").checked = Boolean(entry.presaleAlert);
@@ -1376,14 +1731,14 @@
 
     function toggleWatchFromDetail() {
       if (!activeDetailMovie) return;
-      toggleWatchlistMovie(activeDetailMovie);
+      toggleWatchlistMovie(activeDetailMovie, null);
     }
 
     function updateDetailAlerts() {
       if (!activeDetailMovie) return;
-      const key = String(activeDetailMovie.id);
+      const key = normId(activeDetailMovie.id);
       if (!watchlist[key]) {
-        toggleWatchlistMovie(activeDetailMovie);
+        toggleWatchlistMovie(activeDetailMovie, null);
       }
       if (watchlist[key]) {
         watchlist[key].presaleAlert = document.getElementById("sheetPresaleCheck").checked;
@@ -1420,9 +1775,9 @@
     function shareCurrentDetail() {
       if (!activeDetailMovie) return;
       const dateStr = activeDetailMovie.releaseDate && activeDetailMovie.releaseDate !== "TBA"
-        ? formatDateDmy(activeDetailMovie.releaseDate)
+        ? formatDateFullId(activeDetailMovie.releaseDate)
         : "TBA";
-      const text = `${activeDetailMovie.title} — Rilis ID: ${dateStr}`;
+      const text = `${activeDetailMovie.title} — Rilis Bioskop ID: ${dateStr}`;
       if (window.AndroidBridge && typeof window.AndroidBridge.shareText === "function") {
         window.AndroidBridge.shareText(text);
       } else if (navigator.clipboard) {
@@ -1431,7 +1786,7 @@
       }
     }
 
-    /* Watchlist rendering: focused strictly on release date & countdown */
+    /* Clean Watchlist: strictly focused on release date & countdown */
     function switchWatchlistSubTab(sub) {
       currentWlSubTab = sub;
       document.getElementById("wlTabScheduled").classList.toggle("active", sub === "scheduled");
@@ -1464,7 +1819,7 @@
         const top = upcomingSched[0];
         nextBar.style.display = "flex";
         document.getElementById("wlNextTitle").textContent = top.e.movie.title;
-        document.getElementById("wlNextCd").textContent = `${formatCountdownBadge(top.d)} • ${formatDateDmy(top.e.movie.releaseDate)}`;
+        document.getElementById("wlNextCd").textContent = `${formatCountdownBadge(top.d)} · ${formatDateShortId(top.e.movie.releaseDate)}`;
       } else {
         nextBar.style.display = "none";
       }
@@ -1477,50 +1832,38 @@
 
       container.innerHTML = list.map(entry => {
         const m = entry.movie;
-        const id = String(m.id);
+        const id = normId(m.id);
         const days = getDaysUntil(m.releaseDate);
         const isTba = !m.releaseDate || m.releaseDate === "TBA";
         const cdText = isTba ? "TBA" : formatCountdownBadge(days);
         const cdClass = isTba ? "tba" : ((days !== null && days <= 3) ? "urgent" : "");
-        const dateLine = isTba ? "Menunggu jadwal rilis ID" : `Rilis ${formatDateDmy(m.releaseDate)}`;
+        const dateText = isTba ? "Menunggu jadwal ID" : formatDateFullId(m.releaseDate);
         const chains = (m.chains && m.chains.length) ? m.chains.join(" · ") : "XXI · CGV · Cinépolis";
 
         return `
           <div class="wl-card">
-            <img class="wl-poster" src="${m.poster || ""}" alt="${escapeHtml(m.title)}" onclick='openMovieDetailById("${id}")' />
-            <div class="wl-info" onclick='openMovieDetailById("${id}")'>
+            <img class="wl-poster" src="${thumbPoster(m.poster)}" alt="${escapeHtml(m.title)}" loading="lazy" decoding="async" onclick="openMovieDetailById('${id}')" />
+            <div class="wl-info" onclick="openMovieDetailById('${id}')">
               <div class="wl-title">${escapeHtml(m.title)}</div>
-              <div class="wl-schedule">${escapeHtml(dateLine)}</div>
+              <div class="wl-schedule-row">
+                <span class="wl-cd-pill ${cdClass}">${escapeHtml(cdText)}</span>
+                <span class="wl-date-text">${escapeHtml(dateText)}</span>
+              </div>
               <div class="wl-chains">${escapeHtml(chains)}</div>
             </div>
-            <div class="wl-actions-col">
-              <div style="display:flex; align-items:center; gap:6px;">
-                <span class="wl-cd-pill ${cdClass}">${escapeHtml(cdText)}</span>
-                <button class="wl-remove-btn" onclick='toggleWatchlistById("${id}")' title="Hapus">&times;</button>
-              </div>
-              <div class="wl-rem-mini">
-                <button class="rem-mini-btn ${entry.presaleAlert ? "on" : ""}" onclick='toggleEntryAlert("${id}", "presaleAlert")'>Pre-Sale</button>
-                <button class="rem-mini-btn ${entry.dayAlert ? "on" : ""}" onclick='toggleEntryAlert("${id}", "dayAlert")'>Hari-H</button>
-              </div>
-            </div>
+            <button type="button" class="wl-remove-btn" onclick="toggleWatchlistById('${id}')" title="Hapus">&times;</button>
           </div>
         `;
       }).join("");
     }
 
-    function toggleEntryAlert(id, field) {
-      const entry = watchlist[String(id)];
-      if (!entry) return;
-      entry[field] = !entry[field];
-      persistWatchlist();
-      renderWatchlist();
-    }
-
-    /* Search */
+    /* Search with AbortController so stale queries don't pile up */
     function onSearchInput() {
       clearTimeout(searchTimer);
       const q = (document.getElementById("searchInput").value || "").trim();
+      document.getElementById("searchClearBtn").classList.toggle("visible", q.length > 0);
       if (!q) {
+        if (searchAbort) searchAbort.abort();
         document.getElementById("searchResults").innerHTML = '<div class="empty-state">Ketik judul film untuk cek jadwal rilis Indonesia.</div>';
         return;
       }
@@ -1528,7 +1871,9 @@
     }
 
     function clearSearchInput() {
+      if (searchAbort) searchAbort.abort();
       document.getElementById("searchInput").value = "";
+      document.getElementById("searchClearBtn").classList.remove("visible");
       document.getElementById("searchResults").innerHTML = '<div class="empty-state">Ketik judul film untuk cek jadwal rilis Indonesia.</div>';
     }
 
@@ -1548,16 +1893,20 @@
         box.innerHTML = '<div class="empty-state">Isi TMDB API Key di menu Settings terlebih dahulu.</div>';
         return;
       }
-      box.innerHTML = '<div class="empty-state">Mencari...</div>';
+      if (searchAbort) searchAbort.abort();
+      searchAbort = new AbortController();
+      const signal = searchAbort.signal;
+
+      box.innerHTML = '<div class="empty-state">Mencari di TMDB...</div>';
       try {
-        const res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${encodeURIComponent(apiKey)}&query=${encodeURIComponent(query)}&language=en-US&page=1`);
+        const res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${encodeURIComponent(apiKey)}&query=${encodeURIComponent(query)}&language=en-US&page=1`, { signal });
         const data = await res.json();
-        const raw = Array.isArray(data.results) ? data.results.slice(0, 12) : [];
+        const raw = Array.isArray(data.results) ? data.results.slice(0, 10) : [];
 
         const enriched = await Promise.all(raw.map(async item => {
           let idDate = "";
           try {
-            const relRes = await fetch(`https://api.themoviedb.org/3/movie/${item.id}/release_dates?api_key=${encodeURIComponent(apiKey)}`);
+            const relRes = await fetch(`https://api.themoviedb.org/3/movie/${item.id}/release_dates?api_key=${encodeURIComponent(apiKey)}`, { signal });
             const relJson = await relRes.json();
             const cList = Array.isArray(relJson.results) ? relJson.results : [];
             const idEntry = cList.find(c => c.iso_3166_1 === "ID");
@@ -1567,9 +1916,12 @@
             }
           } catch (_) {}
 
-          return normalizeMovie(item, idDate || "TBA");
+          const norm = normalizeMovie(item, idDate || "TBA");
+          norm.globalReleaseDate = item.release_date || "TBA";
+          return norm;
         }));
 
+        if (signal.aborted) return;
         lastSearchItems = enriched;
         if (enriched.length === 0) {
           box.innerHTML = '<div class="empty-state">Film tidak ditemukan.</div>';
@@ -1577,24 +1929,29 @@
         }
 
         box.innerHTML = enriched.map(m => {
-          const saved = isWatchlisted(m.id);
-          const schedLabel = m.releaseDate && m.releaseDate !== "TBA"
-            ? `Rilis ID: ${formatDateDmy(m.releaseDate)}`
-            : "Jadwal ID: TBA";
+          const mid = normId(m.id);
+          const saved = isWatchlisted(mid);
+          const hasId = m.releaseDate && m.releaseDate !== "TBA";
+          const idStatusHtml = hasId
+            ? `<div class="search-item-id confirmed">Confirmed ID · ${formatDateFullId(m.releaseDate)}</div>`
+            : `<div class="search-item-id tba">Menunggu jadwal ID (TBA)</div>`;
+
           return `
             <div class="search-item">
-              <img src="${m.poster || ""}" alt="${escapeHtml(m.title)}" onclick='openMovieDetailById("${m.id}")' />
-              <div class="search-item-info" onclick='openMovieDetailById("${m.id}")'>
+              <img src="${thumbPoster(m.poster)}" alt="${escapeHtml(m.title)}" loading="lazy" decoding="async" onclick="openMovieDetailById('${mid}')" />
+              <div class="search-item-info" onclick="openMovieDetailById('${mid}')">
                 <div class="search-item-title">${escapeHtml(m.title)}</div>
-                <div class="search-item-sub">${escapeHtml(schedLabel)}</div>
+                <div class="search-item-global">Rilis Global: ${escapeHtml(m.globalReleaseDate || "TBA")}</div>
+                ${idStatusHtml}
+                <button type="button" class="search-save-btn ${saved ? "saved" : ""}" data-watch-id="${mid}" aria-pressed="${saved}" onclick="onSearchSaveClick(event, '${mid}', this)">
+                  ${saved ? "✓ Di Watchlist" : "+ Watchlist"}
+                </button>
               </div>
-              <button class="search-save-btn ${saved ? "saved" : ""}" data-watch-id="${m.id}" onclick='toggleWatchlistById("${m.id}")'>
-                ${saved ? "Tersimpan" : "+ Watchlist"}
-              </button>
             </div>
           `;
         }).join("");
-      } catch (_) {
+      } catch (err) {
+        if (err && err.name === "AbortError") return;
         box.innerHTML = '<div class="empty-state">Gagal memuat pencarian. Periksa koneksi.</div>';
       }
     }
@@ -1616,17 +1973,18 @@
       const isImax = hype >= 88 || genres.includes("Sci-Fi") || genres.includes("Action");
 
       return {
-        id: String(item.id),
+        id: normId(item.id),
         tmdbId: item.id,
         title: item.title || item.original_title || "Untitled",
         releaseDate: relDate,
+        globalReleaseDate: item.release_date || "TBA",
         originalLanguage: item.original_language || "en",
         genresText: genres.slice(0, 2).join(", "),
         hype: hype,
         isImax: isImax,
         isReRelease: isReRelease,
         chains: isImax ? ["XXI", "CGV", "Cinépolis", "IMAX"] : ["XXI", "CGV", "Cinépolis"],
-        poster: item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : "",
+        poster: item.poster_path ? `https://image.tmdb.org/t/p/w342${item.poster_path}` : "",
         overview: item.overview || "",
         director: "",
         cast: [],
@@ -1641,25 +1999,31 @@
         return;
       }
       const now = Date.now();
-      if (!force && lastSyncMs && (now - lastSyncMs) < 20 * 60 * 1000) {
+      if (!force && lastSyncMs && (now - lastSyncMs) < 30 * 60 * 1000) {
         renderCatalog();
         return;
       }
 
       document.getElementById("lastSyncText").textContent = "Menyinkronkan...";
       try {
-        const today = getLocalTodayIso();
         const urlId = `https://api.themoviedb.org/3/discover/movie?api_key=${encodeURIComponent(apiKey)}&region=ID&with_release_type=2|3&release_date.gte=2026-10-01&sort_by=popularity.desc&page=1`;
         const urlLocal = `https://api.themoviedb.org/3/discover/movie?api_key=${encodeURIComponent(apiKey)}&region=ID&with_original_language=id&with_release_type=2|3&release_date.gte=2026-10-01&sort_by=popularity.desc&page=1`;
 
         const [res1, res2] = await Promise.all([fetch(urlId), fetch(urlLocal)]);
         const [j1, j2] = await Promise.all([res1.json(), res2.json()]);
 
+        const prevById = new Map(movies.map(x => [normId(x.id), x]));
         const map = new Map();
         [...(j1.results || []), ...(j2.results || [])].forEach(item => {
           if (!item || !item.id || !item.poster_path) return;
           const m = normalizeMovie(item, item.release_date || "TBA");
-          map.set(String(m.id), m);
+          const old = prevById.get(normId(m.id));
+          if (old) {
+            if (old.director) m.director = old.director;
+            if (old.cast && old.cast.length) m.cast = old.cast;
+            if (old.runtime) m.runtime = old.runtime;
+          }
+          map.set(normId(m.id), m);
         });
 
         movies = Array.from(map.values());
@@ -1700,7 +2064,7 @@
       const tbaIds = [];
       Object.values(watchlist).forEach(entry => {
         if (entry && entry.isTba && entry.movie && entry.movie.tmdbId) {
-          tbaIds.push(entry.movie.tmdbId);
+          tbaIds.push(Number(entry.movie.tmdbId));
         }
       });
       if (window.AndroidBridge && typeof window.AndroidBridge.saveWorkerSettings === "function") {
@@ -1711,7 +2075,7 @@
     function triggerWorkerNow() {
       if (window.AndroidBridge && typeof window.AndroidBridge.runWorkerNow === "function") {
         window.AndroidBridge.runWorkerNow();
-        showToast("Pemeriksaan notifikasi dijalankan");
+        showToast("Pemeriksaan pengingat dijalankan");
       } else {
         showToast("Hanya berjalan di Android");
       }
@@ -1738,7 +2102,7 @@
       const m = calCurrentDate.getMonth();
       const firstDay = new Date(y, m, 1).getDay();
       const daysInMonth = new Date(y, m + 1, 0).getDate();
-      document.getElementById("calMonthLabel").textContent = `${m + 1}/${y}`;
+      document.getElementById("calMonthLabel").textContent = `${MONTHS_ID[m]} ${y}`;
 
       const relDatesSet = new Set(movies.map(x => (x.releaseDate || "").slice(0, 10)));
       let html = "";
@@ -1747,7 +2111,7 @@
         const iso = `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
         const hasRel = relDatesSet.has(iso);
         const sel = iso === calSelectedIso;
-        html += `<div class="cal-day ${hasRel ? "has-rel" : ""} ${sel ? "selected" : ""}" onclick='selectCalDate("${iso}")'>${d}</div>`;
+        html += `<div class="cal-day ${hasRel ? "has-rel" : ""} ${sel ? "selected" : ""}" onclick="selectCalDate('${iso}')">${d}</div>`;
       }
       document.getElementById("calGrid").innerHTML = html;
       renderCalMoviesForDate(calSelectedIso);
@@ -1762,13 +2126,13 @@
       const matches = movies.filter(x => (x.releaseDate || "").slice(0, 10) === iso);
       const box = document.getElementById("calDateMovies");
       if (matches.length === 0) {
-        box.innerHTML = `<div class="empty-state" style="padding:10px;">Tidak ada rilis pada ${formatDateDmy(iso)}.</div>`;
+        box.innerHTML = `<div class="empty-state" style="padding:10px;">Tidak ada rilis pada ${formatDateFullId(iso)}.</div>`;
         return;
       }
       box.innerHTML = matches.map(x => `
-        <div style="padding:7px 8px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick='closeCalendarModal(); openMovieDetailById("${x.id}")'>
+        <div style="padding:8px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="closeCalendarModal(); openMovieDetailById('${normId(x.id)}')">
           <strong>${escapeHtml(x.title)}</strong>
-          <span style="font-size:11px; color:var(--blue);">${formatDateDmy(x.releaseDate)}</span>
+          <span style="font-size:11px; color:var(--blue);">${formatDateShortId(x.releaseDate)}</span>
         </div>
       `).join("");
     }
@@ -1798,7 +2162,7 @@
     window.onNativeResume = function() {
       const mode = localStorage.getItem("ct_app_theme") || "light";
       applyTheme(mode);
-      renderCatalog();
+      refreshAllWatchIndicators();
       updateBadges();
     };
 

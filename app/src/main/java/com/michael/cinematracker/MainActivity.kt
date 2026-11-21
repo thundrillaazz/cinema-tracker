@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.ComponentName
 import android.content.ContentValues
 import android.content.Context
@@ -96,6 +97,13 @@ class MainActivity : AppCompatActivity() {
         settings.setSupportZoom(false)
         settings.builtInZoomControls = false
         settings.displayZoomControls = false
+
+        val currentVerCode = 23
+        val lastVerCode = prefs.getInt("installed_ver_code", 0)
+        if (lastVerCode != currentVerCode) {
+            webView.clearCache(true)
+            prefs.edit().putInt("installed_ver_code", currentVerCode).apply()
+        }
 
         webView.addJavascriptInterface(AndroidBridge(this), "AndroidBridge")
 
@@ -313,6 +321,7 @@ class MainActivity : AppCompatActivity() {
         fun changeLauncherIcon(aliasName: String) {
             val aliases = listOf(
                 "com.michael.cinematracker.LauncherDefault",
+                "com.michael.cinematracker.LauncherKinoTrio",
                 "com.michael.cinematracker.LauncherSciFi",
                 "com.michael.cinematracker.LauncherAction",
                 "com.michael.cinematracker.LauncherImax",
@@ -321,6 +330,7 @@ class MainActivity : AppCompatActivity() {
                 "com.michael.cinematracker.LauncherReel35"
             )
             val targetClass = when (aliasName) {
+                "LauncherKinoTrio" -> "com.michael.cinematracker.LauncherKinoTrio"
                 "LauncherSciFi" -> "com.michael.cinematracker.LauncherSciFi"
                 "LauncherAction" -> "com.michael.cinematracker.LauncherAction"
                 "LauncherImax" -> "com.michael.cinematracker.LauncherImax"
@@ -449,6 +459,7 @@ class MainActivity : AppCompatActivity() {
                             Toast.makeText(context, "Poster tersimpan ke Galeri", Toast.LENGTH_SHORT).show()
                         }
                     }
+                    bmp.recycle()
                 } catch (_: Exception) {
                 } finally {
                     conn?.disconnect()
@@ -548,6 +559,9 @@ class MainActivity : AppCompatActivity() {
 
                 val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
                 manager.notify(notifId, builder.build())
+
+                bannerBitmap?.recycle()
+                rawBitmap?.recycle()
             }
         }
     }
