@@ -12,6 +12,7 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.RectF
 import android.graphics.Shader
+import android.net.Uri
 import androidx.core.app.NotificationCompat
 import androidx.work.Worker
 import androidx.work.WorkerParameters
@@ -19,9 +20,13 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
+import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
+import java.time.temporal.WeekFields
+import java.util.Locale
 
 class CinemaCheckWorker(
     private val appContext: Context,
@@ -29,80 +34,122 @@ class CinemaCheckWorker(
 ) : Worker(appContext, workerParams) {
 
     override fun doWork(): Result {
+        val isManual = inputData.getBoolean("is_manual", false)
+        val nowTime = LocalTime.now()
+        // Respect quiet hours (22:00 - 07:30) for automatic background checks
+        if (!isManual && (nowTime.isAfter(LocalTime.of(22, 0)) || nowTime.isBefore(LocalTime.of(7, 30)))) {
+            return Result.success()
+        }
+
         val prefs = appContext.getSharedPreferences(MainActivity.PREFS_NAME, Context.MODE_PRIVATE)
         val apiKey = prefs.getString("tmdb_api_key", "")?.trim() ?: ""
         val minHype = prefs.getInt("min_hype_threshold", 85)
         val tbaWatchJson = prefs.getString("tba_watch_list_json", "[]") ?: "[]"
         val watchlistFullJson = prefs.getString("watchlist_full_json", "{}") ?: "{}"
         val customPostersJson = prefs.getString("custom_posters_json", "{}") ?: "{}"
+        val knownDatesJson = prefs.getString("known_release_dates_json", "{}") ?: "{}"
 
         return try {
             val today = LocalDate.now()
             val todayStr = today.toString()
             val fullDateFmt = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+            val shortDateFmt = DateTimeFormatter.ofPattern("dd MMM", Locale("id", "ID"))
             val notifiedIds = prefs.getStringSet("notified_movie_ids", emptySet())?.toMutableSet()
                 ?: mutableSetOf()
             val customPosters = try { JSONObject(customPostersJson) } catch (_: Exception) { JSONObject() }
+            val knownDates = try { JSONObject(knownDatesJson) } catch (_: Exception) { JSONObject() }
 
             var sentCount = 0
+            val thisWeekTitles = mutableListOf<String>()
 
-            // 1. Watchlist Reminders (Day-0, H-1, Pre-Sale Window)
+            // 1. Smart Watchlist Reminders (H-0, H-1, Pre-Sale Window, Date Shift, & Weekly Digest Collector)
             val watchlistObj = try { JSONObject(watchlistFullJson) } catch (_: Exception) { JSONObject() }
             val keysIter = watchlistObj.keys()
             while (keysIter.hasNext()) {
                 val wId = keysIter.next()
                 val entry = watchlistObj.optJSONObject(wId) ?: continue
                 if (entry.optBoolean("isTba", false)) continue
+                if (entry.optString("watchStatus", "diincar") == "watched") continue
 
                 val dayAlert = entry.optBoolean("dayAlert", true)
                 val presaleAlert = entry.optBoolean("presaleAlert", true)
+                val userNote = entry.optString("userNote", "").trim()
                 val movieData = entry.optJSONObject("movieData") ?: continue
                 val title = movieData.optString("title", "")
                 if (title.isEmpty()) continue
                 val releaseDateStr = movieData.optString("releaseDate", "")
                 if (releaseDateStr.length < 10 || releaseDateStr == "TBA") continue
 
-                val relDate = try { LocalDate.parse(releaseDateStr.take(10)) } catch (_: Exception) { null } ?: continue
+                val cleanRel = releaseDateStr.take(10)
+                val relDate = try { LocalDate.parse(cleanRel) } catch (_: Exception) { null } ?: continue
                 val daysUntil = ChronoUnit.DAYS.between(today, relDate)
                 val defaultPoster = movieData.optString("poster", "")
                 val chosenPoster = customPosters.optString(wId, defaultPoster)
                 val prettyDate = relDate.format(fullDateFmt)
+                val noteSuffix = if (userNote.isNotEmpty()) " • $userNote" else ""
+
+                // Detect Release Date Shift on tracked Watchlist items
+                val prevKnown = knownDates.optString(wId, "")
+                if (prevKnown.isNotEmpty() && prevKnown != cleanRel && daysUntil >= 0L) {
+                    val shiftKey = "wl_shift_${wId}_${prevKnown}_$cleanRel"
+                    if (!notifiedIds.contains(shiftKey)) {
+                        sendMovieNotification(
+                            shiftKey.hashCode(),
+                            "Perubahan Jadwal Rilis",
+                            title,
+                            "Jadwal bergeser ke $prettyDate$noteSuffix",
+                            chosenPoster,
+                            wId
+                        )
+                        notifiedIds.add(shiftKey)
+                        sentCount++
+                    }
+                }
+                knownDates.put(wId, cleanRel)
+
+                // Collect upcoming 7-day titles for Weekly Cinema Digest
+                if (daysUntil in 0L..6L) {
+                    thisWeekTitles.add("• $title (${relDate.format(shortDateFmt)})")
+                }
 
                 if (dayAlert && daysUntil == 0L) {
-                    val key = "wl_day0_${wId}_$releaseDateStr"
+                    val key = "wl_day0_${wId}_$cleanRel"
                     if (!notifiedIds.contains(key)) {
                         sendMovieNotification(
                             key.hashCode(),
                             "Tayang Hari Ini",
                             title,
-                            "Resmi tayang di bioskop Indonesia hari ini ($prettyDate).",
-                            chosenPoster
+                            "Mulai tayang hari ini ($prettyDate)$noteSuffix",
+                            chosenPoster,
+                            wId
                         )
                         notifiedIds.add(key)
                         sentCount++
                     }
                 } else if (dayAlert && daysUntil == 1L) {
-                    val key = "wl_day1_${wId}_$releaseDateStr"
+                    val key = "wl_day1_${wId}_$cleanRel"
                     if (!notifiedIds.contains(key)) {
                         sendMovieNotification(
                             key.hashCode(),
                             "Tayang Besok • H-1",
                             title,
-                            "Mulai tayang di bioskop besok ($prettyDate).",
-                            chosenPoster
+                            "Tayang besok ($prettyDate)$noteSuffix",
+                            chosenPoster,
+                            wId
                         )
                         notifiedIds.add(key)
                         sentCount++
                     }
                 } else if (presaleAlert && daysUntil in 2L..4L) {
-                    val key = "wl_presale_${wId}_$releaseDateStr"
+                    val key = "wl_presale_${wId}_$cleanRel"
                     if (!notifiedIds.contains(key)) {
                         sendMovieNotification(
                             key.hashCode(),
-                            "Tiket Pre-Sale Dibuka",
+                            "Cek Tiket Pre-Sale",
                             title,
-                            "Rilis $prettyDate (H-$daysUntil). Tiket mulai tersedia.",
-                            chosenPoster
+                            "Rilis $prettyDate (H-$daysUntil)$noteSuffix",
+                            chosenPoster,
+                            wId
                         )
                         notifiedIds.add(key)
                         sentCount++
@@ -110,12 +157,28 @@ class CinemaCheckWorker(
                 }
             }
 
+            // 2. Weekly Cinema Digest on Wednesday / Thursday (or manual scan if >= 2 films this week)
+            val weekNum = today.get(WeekFields.ISO.weekOfWeekBasedYear())
+            val digestKey = "weekly_digest_${today.year}_w$weekNum"
+            val isCinemaReleaseMidweek = (today.dayOfWeek == DayOfWeek.WEDNESDAY || today.dayOfWeek == DayOfWeek.THURSDAY)
+            if (thisWeekTitles.isNotEmpty() && (isCinemaReleaseMidweek || (isManual && sentCount == 0)) && !notifiedIds.contains(digestKey)) {
+                val summaryLine = "${thisWeekTitles.size} film Watchlist tayang pekan ini"
+                val detailBody = thisWeekTitles.take(5).joinToString("
+")
+                sendDigestNotification(digestKey.hashCode(), "Ringkasan Bioskop Pekan Ini", summaryLine, detailBody)
+                notifiedIds.add(digestKey)
+                sentCount++
+            }
+
             if (apiKey.isEmpty()) {
-                prefs.edit().putStringSet("notified_movie_ids", notifiedIds).apply()
+                prefs.edit()
+                    .putStringSet("notified_movie_ids", notifiedIds)
+                    .putString("known_release_dates_json", knownDates.toString())
+                    .apply()
                 return Result.success()
             }
 
-            // 2. Check TBA Watchlist movies for Indonesian theatrical release confirmation
+            // 3. Check TBA Watchlist movies for Indonesian theatrical release confirmation
             val tbaArray = JSONArray(tbaWatchJson)
             for (i in 0 until tbaArray.length()) {
                 val tmdbId = tbaArray.optInt(i, -1)
@@ -140,7 +203,7 @@ class CinemaCheckWorker(
                     }
                 }
 
-                val notifyKey = "tba_confirmed_$tmdbId"
+                val notifyKey = "tba_confirmed_${tmdbId}_$idReleaseDate"
                 if (idReleaseDate.isNotEmpty() && !notifiedIds.contains(notifyKey)) {
                     val dJson = fetchJson("https://api.themoviedb.org/3/movie/$tmdbId?api_key=$apiKey") ?: continue
                     val title = dJson.optString("title", "Film Watchlist")
@@ -151,17 +214,18 @@ class CinemaCheckWorker(
                     val parsedDate = try { LocalDate.parse(idReleaseDate).format(fullDateFmt) } catch (_: Exception) { idReleaseDate }
                     sendMovieNotification(
                         notifyKey.hashCode(),
-                        "Resmi Masuk Indonesia",
+                        "Rilis ID Terkonfirmasi",
                         title,
-                        "Jadwal tayang bioskop: $parsedDate.",
-                        chosenPoster
+                        "Jadwal bioskop ID: $parsedDate",
+                        chosenPoster,
+                        "search_$tmdbId"
                     )
                     notifiedIds.add(notifyKey)
                     sentCount++
                 }
             }
 
-            // 3. Scan High-Hype Theatrical Indonesian Releases (strict theatrical filter)
+            // 4. Scan High-Hype Theatrical Indonesian Releases
             val endpoint = "https://api.themoviedb.org/3/discover/movie?api_key=$apiKey" +
                 "&region=ID&with_release_type=2|3" +
                 "&release_date.gte=$todayStr&sort_by=popularity.desc&page=1"
@@ -201,8 +265,9 @@ class CinemaCheckWorker(
                             id.hashCode(),
                             "Jadwal Bioskop ID • Hype $hypeScore%",
                             title,
-                            "Mulai tayang $parsedDate di bioskop Indonesia.",
-                            chosenPoster
+                            "Mulai $parsedDate di bioskop ID",
+                            chosenPoster,
+                            "tmdb_$id"
                         )
                         notifiedIds.add(id)
                         sentCount++
@@ -210,7 +275,10 @@ class CinemaCheckWorker(
                 }
             }
 
-            prefs.edit().putStringSet("notified_movie_ids", notifiedIds).apply()
+            prefs.edit()
+                .putStringSet("notified_movie_ids", notifiedIds)
+                .putString("known_release_dates_json", knownDates.toString())
+                .apply()
             Result.success()
         } catch (_: Exception) {
             Result.retry()
@@ -277,12 +345,49 @@ class CinemaCheckWorker(
         return out
     }
 
+    private fun sendDigestNotification(
+        notificationId: Int,
+        title: String,
+        summaryLine: String,
+        expandedLines: String
+    ) {
+        val intent = Intent(appContext, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        }
+        val pendingIntent = PendingIntent.getActivity(
+            appContext,
+            notificationId,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val builder = NotificationCompat.Builder(appContext, MainActivity.CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setColor(0xFF18181B.toInt())
+            .setSubText("Cinema Tracker ID")
+            .setContentTitle(title)
+            .setContentText(summaryLine)
+            .setStyle(
+                NotificationCompat.BigTextStyle()
+                    .bigText(expandedLines)
+                    .setBigContentTitle(title)
+                    .setSummaryText(summaryLine)
+            )
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setAutoCancel(true)
+            .setContentIntent(pendingIntent)
+
+        val manager = appContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        manager.notify(notificationId, builder.build())
+    }
+
     private fun sendMovieNotification(
         notificationId: Int,
         subLabel: String,
         movieTitle: String,
         bodyText: String,
-        posterUrl: String
+        posterUrl: String,
+        movieId: String
     ) {
         var rawBitmap: Bitmap? = null
         var bannerBitmap: Bitmap? = null
@@ -307,12 +412,21 @@ class CinemaCheckWorker(
         }
 
         val intent = Intent(appContext, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            if (movieId.isNotEmpty()) putExtra(MainActivity.EXTRA_MOVIE_ID, movieId)
         }
         val pendingIntent = PendingIntent.getActivity(
             appContext,
             notificationId,
             intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val tixIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.tix.id/search?q=" + Uri.encode(movieTitle)))
+        val tixPendingIntent = PendingIntent.getActivity(
+            appContext,
+            notificationId + 77,
+            tixIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
@@ -325,6 +439,7 @@ class CinemaCheckWorker(
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
+            .addAction(0, "Cek TIX ID", tixPendingIntent)
 
         if (rawBitmap != null && bannerBitmap != null) {
             builder.setLargeIcon(rawBitmap)

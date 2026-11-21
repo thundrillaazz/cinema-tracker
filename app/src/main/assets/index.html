@@ -1245,6 +1245,18 @@
       border-color: var(--blue);
       background: var(--blue-soft);
     }
+        .launcher-swatch {
+      width: 26px;
+      height: 26px;
+      border-radius: 7px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      flex-shrink: 0;
+      border: 1px solid rgba(148,163,184,0.22);
+    }
     .launcher-dot {
       width: 24px;
       height: 24px;
@@ -1442,6 +1454,178 @@
     }
 
 
+  
+    /* v4.0 UPGRADES: AESTHETIC ICONS, WATCHLIST STATUSES, NOTES & CHAIN CLARITY */
+    .brand-icon svg {
+      width: 22px;
+      height: 22px;
+      display: block;
+    }
+    .launcher-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+    .launcher-option {
+      padding: 9px 10px;
+      border-radius: 10px;
+      justify-content: flex-start;
+    }
+    .launcher-swatch {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      overflow: hidden;
+      padding: 0;
+      border: 1px solid rgba(148,163,184,0.28);
+    }
+    .launcher-swatch svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .launcher-label-wrap {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      line-height: 1.2;
+    }
+    .launcher-name {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .launcher-sub {
+      font-size: 9.5px;
+      font-weight: 500;
+      color: var(--muted);
+    }
+
+    /* Watchlist Status & Note Styles */
+    .wl-status-row {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+      margin-bottom: 6px;
+    }
+    .status-chip-btn {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 99px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--muted);
+      cursor: pointer;
+    }
+    .status-chip-btn.active-diincar {
+      background: var(--blue-soft);
+      border-color: var(--blue-border);
+      color: var(--blue);
+    }
+    .status-chip-btn.active-prioritas {
+      background: var(--amber-soft);
+      border-color: rgba(217, 119, 6, 0.35);
+      color: var(--amber);
+    }
+    .status-chip-btn.active-watched {
+      background: var(--emerald-soft);
+      border-color: rgba(22, 163, 74, 0.35);
+      color: var(--emerald);
+    }
+    .wl-note-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10.5px;
+      color: var(--text);
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 3px 8px;
+      margin-bottom: 6px;
+      max-width: 100%;
+      cursor: pointer;
+    }
+    .wl-note-text {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .clash-pill {
+      font-size: 9.5px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: var(--amber-soft);
+      color: var(--amber);
+    }
+    .priority-badge {
+      font-size: 9px;
+      font-weight: 700;
+      padding: 2px 5px;
+      border-radius: 4px;
+      background: var(--amber-soft);
+      color: var(--amber);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .chain-status-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-bottom: 9px;
+    }
+    .chain-pill {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 5px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+    .chain-pill.verified {
+      border-color: rgba(22, 163, 74, 0.32);
+      color: var(--emerald);
+    }
+    .chain-pill.check {
+      color: var(--muted);
+    }
+    .detail-note-box {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+    }
+    .detail-note-input {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 7px 10px;
+      font-size: 12px;
+      color: var(--text);
+      outline: none;
+      margin-top: 6px;
+    }
+    .detail-note-input:focus {
+      border-color: var(--blue);
+    }
+    .reset-empty-btn {
+      margin-top: 10px;
+      padding: 7px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -1449,10 +1633,10 @@
   <header>
     <div class="header-top">
       <div class="brand" onclick="switchBottomTab('catalog')">
-        <div class="brand-icon">CT</div>
+        <div id="headerBrandMark" class="brand-icon" aria-hidden="true"></div>
         <div>
           <div class="brand-title">Cinema Tracker</div>
-          <div class="brand-sub">Film yang tayang di bioskop</div>
+          <div class="brand-sub">Jadwal & rilis bioskop ID</div>
         </div>
       </div>
       <div class="header-actions">
@@ -1479,10 +1663,10 @@
     <div class="filter-section">
       <div class="catalog-quick-search">
         <svg class="catalog-search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input id="catalogQuickInput" class="catalog-quick-input" type="text" placeholder="Filter judul atau genre di jadwal..." oninput="onCatalogQuickFilter()" />
+        <input id="catalogQuickInput" class="catalog-quick-input" type="text" placeholder="Filter judul, sutradara, atau genre..." oninput="onCatalogQuickFilter()" />
         <button id="catalogClearBtn" class="catalog-clear-btn" onclick="clearCatalogQuickFilter()">✕</button>
       </div>
-      <div class="chips-row">
+      <div class="chips-row" id="catalogChipsRow">
         <button class="chip active" data-chip="all" onclick="setChip('all', this)">Semua</button>
         <button class="chip" data-chip="id" onclick="setChip('id', this)">Lokal ID</button>
         <button class="chip" data-chip="rerelease" onclick="setChip('rerelease', this)">Re-Release</button>
@@ -1564,13 +1748,15 @@
   <div id="viewWatchlist" class="view-container">
     <div class="watchlist-tabs">
       <button id="wTabConfirmed" class="w-tab active" onclick="setWatchlistTab('confirmed')">Terjadwal (<span id="wCountConfirmed">0</span>)</button>
-      <button id="wTabTba" class="w-tab" onclick="setWatchlistTab('tba')">Menunggu Jadwal (<span id="wCountTba">0</span>)</button>
+      <button id="wTabTba" class="w-tab" onclick="setWatchlistTab('tba')">TBA (<span id="wCountTba">0</span>)</button>
+      <button id="wTabWatched" class="w-tab" onclick="setWatchlistTab('watched')">Riwayat (<span id="wCountWatched">0</span>)</button>
     </div>
 
     <div id="wlToolbar" class="wl-toolbar">
       <div class="wl-chips">
         <button class="chip active" data-wfilter="all" onclick="setWatchlistFilter('all', this)">Semua</button>
-        <button class="chip" data-wfilter="soon" onclick="setWatchlistFilter('soon', this)">Segera (≤14 Hari)</button>
+        <button class="chip" data-wfilter="priority" onclick="setWatchlistFilter('priority', this)">Prioritas</button>
+        <button class="chip" data-wfilter="soon" onclick="setWatchlistFilter('soon', this)">≤ 14 Hari</button>
         <button class="chip" data-wfilter="imax" onclick="setWatchlistFilter('imax', this)">IMAX</button>
         <button class="chip" data-wfilter="reminded" onclick="setWatchlistFilter('reminded', this)">Notif Aktif</button>
       </div>
@@ -1578,7 +1764,8 @@
         <span id="wlSummaryText">0 film tersimpan</span>
         <select id="wlSortSelect" class="sort-select" onchange="renderWatchlist()">
           <option value="date_asc">Urut: Rilis Terdekat</option>
-          <option value="hype">Urut: Hype Tertinggi</option>
+          <option value="priority">Urut: Prioritas</option>
+          <option value="hype">Urut: Hype</option>
           <option value="title">Urut: Judul A-Z</option>
         </select>
       </div>
@@ -1618,6 +1805,7 @@
 
     <div class="info-card">
       <h3>Sistem Pengingat & Notifikasi</h3>
+      <p>Mendukung alert Pre-Sale, H-1, Hari-H, perubahan jadwal rilis, dan ringkasan pekanan (bebas ganggu jam 22:00–07:30).</p>
       <div class="setting-row">
         <span>Minimal Hype Score Notif Otomatis</span>
         <select id="minHypeSelect" class="sort-select" onchange="saveAppSettings()">
@@ -1638,32 +1826,16 @@
     </div>
 
     <div class="info-card">
-      <h3>Ikon Aplikasi (Launcher Icon)</h3>
-      <p>Ganti tampilan ikon aplikasi di layar utama Android Anda.</p>
-      <div class="launcher-grid">
-        <div id="iconOptDefault" class="launcher-option active" onclick="selectLauncherIcon('LauncherDefault')">
-          <div class="launcher-dot" style="background:#0f172a;">CT</div>
-          <span>Cinema Blue</span>
-        </div>
-        <div id="iconOptSciFi" class="launcher-option" onclick="selectLauncherIcon('LauncherSciFi')">
-          <div class="launcher-dot" style="background:#c2410c;">SF</div>
-          <span>Dune Desert</span>
-        </div>
-        <div id="iconOptAction" class="launcher-option" onclick="selectLauncherIcon('LauncherAction')">
-          <div class="launcher-dot" style="background:#047857;">AC</div>
-          <span>Emerald Cut</span>
-        </div>
-        <div id="iconOptImax" class="launcher-option" onclick="selectLauncherIcon('LauncherImax')">
-          <div class="launcher-dot" style="background:#eab308; color:#09090b;">IMX</div>
-          <span>IMAX Gold</span>
-        </div>
-      </div>
+      <h3>Ikon Aplikasi & Tema Header</h3>
+      <p>Pilih gaya ikon launcher sekaligus emblem header di dalam aplikasi.</p>
+      <div id="launcherOptionsGrid" class="launcher-grid"></div>
     </div>
 
     <div style="text-align:center; font-size:11px; color:var(--muted); padding:4px 0 12px;">
-      Cinema Tracker v3.9.2 • Editorial Sheet, Clean Dates & Framed Alerts
+      Cinema Tracker v4.0 • Smart Alerts, Watchlist Notes & Cinema Icons
     </div>
   </div>
+
   <!-- BOTTOM NAVIGATION -->
   <nav class="bottom-nav">
     <button id="navCatalog" class="nav-item active" onclick="switchBottomTab('catalog')">
@@ -1701,15 +1873,14 @@
       <button class="pm-btn-secondary" onclick="resetMoviePoster()">Reset Default</button>
     </div>
     <div class="pm-alt-section">
-      <div class="pm-alt-title" id="pmAltLabel">Pilih Poster Alternatif (Database TMDB)</div>
+      <div class="pm-alt-title" id="pmAltLabel">Memuat variasi poster...</div>
       <div class="pm-alt-grid" id="pmAltGrid"></div>
     </div>
   </div>
 
-  <!-- TOAST -->
   <div id="toastBanner" class="toast-banner">
-    <span id="toastText"></span>
-    <button id="toastUndoBtn" class="toast-undo-btn" style="display:none;" onclick="undoLastWatchlistRemove()">Urungkan</button>
+    <span id="toastText">Tersimpan</span>
+    <button id="toastUndoBtn" class="toast-undo-btn" style="display:none;" onclick="undoLastWatchlistRemove()">Batal</button>
   </div>
 
   <script>
@@ -1726,138 +1897,201 @@
       9648: "Mystery", 10749: "Romance", 878: "Sci-Fi", 53: "Thriller"
     };
 
+    const LAUNCHER_PRESETS = [
+      {
+        alias: "LauncherDefault",
+        name: "Cinema Blue",
+        sub: "35mm Gate",
+        svg: `<svg viewBox="0 0 36 36"><rect width="36" height="36" fill="#0F172A"/><rect x="7" y="9" width="22" height="18" rx="3" fill="#2563EB"/><rect x="9" y="12" width="2" height="2.2" fill="#93C5FD"/><rect x="9" y="16.9" width="2" height="2.2" fill="#93C5FD"/><rect x="9" y="21.8" width="2" height="2.2" fill="#93C5FD"/><rect x="25" y="12" width="2" height="2.2" fill="#93C5FD"/><rect x="25" y="16.9" width="2" height="2.2" fill="#93C5FD"/><rect x="25" y="21.8" width="2" height="2.2" fill="#93C5FD"/><polygon points="15.5,14 22.5,18 15.5,22" fill="#FFFFFF"/></svg>`
+      },
+      {
+        alias: "LauncherSciFi",
+        name: "Arrakis Dune",
+        sub: "Twin Suns",
+        svg: `<svg viewBox="0 0 36 36"><rect width="36" height="36" fill="#431407"/><circle cx="18" cy="16" r="8" fill="#FDE68A"/><circle cx="24" cy="11" r="3" fill="#F59E0B"/><path d="M0,24 Q18,17 36,24 L36,36 L0,36 Z" fill="#9A3412"/></svg>`
+      },
+      {
+        alias: "LauncherNoir",
+        name: "Gotham Noir",
+        sub: "Crimson Frame",
+        svg: `<svg viewBox="0 0 36 36"><rect width="36" height="36" fill="#09090B"/><circle cx="18" cy="18" r="13" fill="#7F1D1D" opacity="0.75"/><rect x="8" y="10" width="20" height="16" fill="#09090B" stroke="#F4F4F5" stroke-width="1.8"/><polygon points="15,14 23,18 15,22" fill="#DC2626"/></svg>`
+      },
+      {
+        alias: "LauncherSolaris",
+        name: "In The Mood",
+        sub: "WKW Neon",
+        svg: `<svg viewBox="0 0 36 36"><rect x="0" y="0" width="18" height="36" fill="#065F46"/><rect x="18" y="0" width="18" height="36" fill="#881337"/><rect x="9" y="9" width="18" height="18" fill="#18181B" stroke="#FDE68A" stroke-width="1.5"/><circle cx="18" cy="18" r="5" fill="#FB7185"/></svg>`
+      },
+      {
+        alias: "LauncherPastLives",
+        name: "Past Lives",
+        sub: "Twilight Dusk",
+        svg: `<svg viewBox="0 0 36 36"><rect width="36" height="36" fill="#1E3A8A"/><rect y="18" width="36" height="18" fill="#2563EB"/><circle cx="14.5" cy="17.5" r="4.5" fill="#FDE68A"/><circle cx="21.5" cy="17.5" r="4.5" fill="#DBEAFE"/><rect x="7" y="22" width="22" height="1.6" fill="#FFFFFF"/></svg>`
+      },
+      {
+        alias: "LauncherImax",
+        name: "IMAX 70mm",
+        sub: "1.43:1 Gold",
+        svg: `<svg viewBox="0 0 36 36"><rect width="36" height="36" fill="#09090B"/><rect x="7" y="10" width="22" height="16" fill="#18181B" stroke="#EAB308" stroke-width="2"/><polygon points="15.5,14 22,18 15.5,22" fill="#EAB308"/></svg>`
+      },
+      {
+        alias: "LauncherReel35",
+        name: "Kodak 35mm",
+        sub: "Analog Strip",
+        svg: `<svg viewBox="0 0 36 36"><rect width="36" height="36" fill="#18181B"/><rect x="8" y="6" width="20" height="24" fill="#27272A"/><rect x="10" y="9" width="2.2" height="2" fill="#F59E0B"/><rect x="10" y="14" width="2.2" height="2" fill="#F59E0B"/><rect x="10" y="19" width="2.2" height="2" fill="#F59E0B"/><rect x="10" y="24" width="2.2" height="2" fill="#F59E0B"/><rect x="23.8" y="9" width="2.2" height="2" fill="#F59E0B"/><rect x="23.8" y="14" width="2.2" height="2" fill="#F59E0B"/><rect x="23.8" y="19" width="2.2" height="2" fill="#F59E0B"/><rect x="23.8" y="24" width="2.2" height="2" fill="#F59E0B"/><rect x="14" y="10" width="8" height="16" fill="#FAFAFA"/><polygon points="16.8,15.5 20.5,18 16.8,20.5" fill="#18181B"/></svg>`
+      },
+      {
+        alias: "LauncherAction",
+        name: "Emerald Cut",
+        sub: "Prism",
+        svg: `<svg viewBox="0 0 36 36"><rect width="36" height="36" fill="#064E3B"/><polygon points="18,8 28,26 8,26" fill="#10B981"/><polygon points="18,14 23.5,24 12.5,24" fill="#ECFDF5"/></svg>`
+      },
+      {
+        alias: "LauncherAftersun",
+        name: "Aftersun VHS",
+        sub: "Sun Horizon",
+        svg: `<svg viewBox="0 0 36 36"><rect width="36" height="36" fill="#115E59"/><rect y="19" width="36" height="17" fill="#0D9488"/><circle cx="18" cy="17" r="7" fill="#FDE047"/><rect x="8" y="19" width="20" height="2.2" fill="#FB7185"/><rect x="11" y="23" width="14" height="1.5" fill="#CCFBF1"/></svg>`
+      },
+      {
+        alias: "LauncherA24",
+        name: "A24 Gallery",
+        sub: "Minimalist",
+        svg: `<svg viewBox="0 0 36 36"><rect width="36" height="36" fill="#FAFAFA"/><rect x="9" y="9" width="18" height="18" fill="none" stroke="#09090B" stroke-width="2.2"/><polygon points="15.5,14 22,18 15.5,22" fill="#09090B"/></svg>`
+      }
+    ];
+
     const BASE_CURATED_MOVIES = [
       {
         id: "now_1", isIndonesian: true, title: "HAMKA: AWAL MULA (VOL. 3)", searchQuery: "Buya Hamka Vol 3",
         releaseDate: "2026-11-12", confirmedText: "Tayang di XXI, CGV & Cinépolis",
         presaleText: "Tiket tersedia di TIX ID, M-TIX & CGV.", sourceBadge: "LSF SU • XXI Schedule", age: "SU", runtime: "128m",
-        genre: "Biopic, Drama", hype: 88, rating: "8.8", presale: false, imax: false, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        genre: "Biopic, Drama", hype: 88, rating: "8.8", presale: false, imax: false, tba: false, chains: ["XXI", "CGV", "Cinépolis"], chainVerified: true,
         director: "Fajar Bustomi", cast: "Vino G. Bastian, Laudya Cynthia Bella", synopsis: "Babak penutup perjalanan hidup Buya Hamka.", poster: ""
       },
       {
         id: "now_2", isIndonesian: false, title: "THE HUNGER GAMES: SUNRISE ON THE REAPING", searchQuery: "Sunrise on the Reaping",
         releaseDate: "2026-11-18", confirmedText: "Tayang di IMAX XXI & CGV",
         presaleText: "Tersedia format IMAX & Regular.", sourceBadge: "TMDB Region ID • IMAX", age: "R 13+", runtime: "144m",
-        genre: "Action, Fantasy", hype: 96, rating: "9.4", presale: false, imax: true, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        genre: "Action, Fantasy", hype: 96, rating: "9.4", presale: false, imax: true, tba: false, chains: ["XXI", "CGV", "Cinépolis"], chainVerified: true,
         director: "Francis Lawrence", cast: "Joseph Zada, Whitney Peak", synopsis: "Kisah Quarter Quell ke-50 Haymitch Abernathy.", poster: ""
       },
       {
         id: "now_3", isIndonesian: false, title: "LOOK BACK (LIVE-ACTION)", searchQuery: "Look Back",
         releaseDate: "2026-11-11", confirmedText: "Tayang di CGV & Cinépolis",
         presaleText: "Tersedia di jaringan CGV.", sourceBadge: "CGV ID • TMDB Region ID", age: "R 13+", runtime: "110m",
-        genre: "Drama", hype: 95, rating: "9.3", presale: false, imax: false, tba: false, chains: ["CGV", "Cinépolis"],
+        genre: "Drama", hype: 95, rating: "9.3", presale: false, imax: false, tba: false, chains: ["CGV", "Cinépolis"], chainVerified: true,
         director: "Hirokazu Kore-eda", cast: "Mana Ashida, Mizuki Yoshida", synopsis: "Adaptasi live-action manga Tatsuki Fujimoto.", poster: ""
       },
       {
         id: "now_4", isIndonesian: true, title: "SEPORSI MIE AYAM SEBELUM MATI", searchQuery: "Seporsi Mie Ayam Sebelum Mati",
         releaseDate: "2026-11-12", confirmedText: "Tayang di XXI, CGV & Cinépolis",
         presaleText: "Tiket tersedia di bioskop.", sourceBadge: "LSF R13+ • XXI Schedule", age: "R 13+", runtime: "105m",
-        genre: "Drama", hype: 90, rating: "8.9", presale: false, imax: false, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        genre: "Drama", hype: 90, rating: "8.9", presale: false, imax: false, tba: false, chains: ["XXI", "CGV", "Cinépolis"], chainVerified: true,
         director: "Yandy Laurens", cast: "Baskara Mahendra, Rachel Amanda", synopsis: "Adaptasi novel Brian Khrisna.", poster: ""
       },
       {
         id: "now_5", isIndonesian: false, title: "NOW YOU SEE ME: NOW YOU DON'T", searchQuery: "Now You See Me Now You Don't",
         releaseDate: "2026-11-11", confirmedText: "Tayang di XXI, CGV & Cinépolis",
         presaleText: "Tiket tersedia di bioskop.", sourceBadge: "TMDB Region ID • Verified", age: "R 13+", runtime: "122m",
-        genre: "Action, Mystery", hype: 87, rating: "8.4", presale: false, imax: false, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        genre: "Action, Mystery", hype: 87, rating: "8.4", presale: false, imax: false, tba: false, chains: ["XXI", "CGV", "Cinépolis"], chainVerified: true,
         director: "Ruben Fleischer", cast: "Jesse Eisenberg, Woody Harrelson", synopsis: "Aksi pencurian baru Four Horsemen.", poster: ""
       },
       {
         id: "up_rerelease_yourname", isIndonesian: false, isReRelease: true, tmdbId: 372058, title: "YOUR NAME (4K RE-RELEASE)", searchQuery: "Your Name",
         releaseDate: "2026-12-02", confirmedText: "Tayang kembali mulai 02/12/2026",
         presaleText: "Tersedia di TIX ID, CGV & Cinépolis.", sourceBadge: "TIX ID • Re-Release ID", age: "R 13+", runtime: "106m",
-        genre: "Animation, Romance", hype: 95, rating: "8.9", presale: true, imax: false, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        genre: "Animation, Romance", hype: 95, rating: "8.9", presale: true, imax: false, tba: false, chains: ["XXI", "CGV", "Cinépolis"], chainVerified: true,
         director: "Makoto Shinkai", cast: "Ryunosuke Kamiki, Mone Kamishiraishi", synopsis: "Dua remaja yang terhubung lewat pertukaran tubuh misterius melintasi ruang dan waktu.", poster: ""
       },
       {
         id: "up_1", isIndonesian: false, title: "BLUE LOCK: EPISODE NAGI - STAGE 2", searchQuery: "Blue Lock Episode Nagi",
         releaseDate: "2026-11-20", confirmedText: "20/11/2026",
         presaleText: "Tersedia di TIX ID, XXI & CGV.", sourceBadge: "CGV & XXI • Verified", age: "R 13+", runtime: "108m",
-        genre: "Anime, Sports", hype: 92, rating: "9.0", presale: false, imax: false, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        genre: "Anime, Sports", hype: 92, rating: "9.0", presale: false, imax: false, tba: false, chains: ["XXI", "CGV", "Cinépolis"], chainVerified: true,
         director: "Shunsuke Ishikawa", cast: "Nobunaga Shimazaki, Yuma Uchida", synopsis: "Neo Egoist League.", poster: ""
       },
       {
         id: "up_2", isIndonesian: false, title: "HOW TO ROB A BANK", searchQuery: "How to Rob a Bank",
         releaseDate: "2026-11-20", confirmedText: "20/11/2026",
         presaleText: "Tersedia di XXI & CGV.", sourceBadge: "TMDB Region ID • Verified", age: "D 17+", runtime: "118m",
-        genre: "Action, Crime", hype: 88, rating: "8.6", presale: false, imax: false, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        genre: "Action, Crime", hype: 88, rating: "8.6", presale: false, imax: false, tba: false, chains: ["XXI", "CGV", "Cinépolis"], chainVerified: false,
         director: "David Leitch", cast: "Nicholas Hoult, Zoë Kravitz", synopsis: "Perampokan berisiko tinggi.", poster: ""
       },
       {
         id: "up_3", isIndonesian: false, title: "THE FURTHER MIS-ADVENTURES OF CLIFF BOOTH", searchQuery: "The Adventures of Cliff Booth",
         releaseDate: "2026-11-25", confirmedText: "25/11/2026",
         presaleText: "Presale dibuka di TIX ID & XXI.", sourceBadge: "TMDB Region ID • LSF", age: "D 17+", runtime: "136m",
-        genre: "Drama, Crime", hype: 95, rating: "9.1", presale: true, imax: true, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        genre: "Drama, Crime", hype: 95, rating: "9.1", presale: true, imax: true, tba: false, chains: ["XXI", "CGV", "Cinépolis"], chainVerified: true,
         director: "David Fincher", cast: "Brad Pitt, Elizabeth Debicki", synopsis: "Hollywood era 1970-an.", poster: ""
       },
       {
         id: "up_4", isIndonesian: false, title: "FOCKER-IN-LAW", searchQuery: "Focker-in-Law",
         releaseDate: "2026-11-27", confirmedText: "27/11/2026",
         presaleText: "Estimasi presale 24/11/2026 di M-TIX.", sourceBadge: "TMDB Region ID • Verified", age: "R 13+", runtime: "110m",
-        genre: "Comedy", hype: 81, rating: "8.0", presale: false, imax: false, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        genre: "Comedy", hype: 81, rating: "8.0", presale: false, imax: false, tba: false, chains: ["XXI", "CGV", "Cinépolis"], chainVerified: false,
         director: "John Hamburg", cast: "Robert De Niro, Ben Stiller", synopsis: "Keluarga Byrnes kembali.", poster: ""
       },
       {
         id: "up_5", isIndonesian: false, title: "HEXED", searchQuery: "Hexed",
         releaseDate: "2026-11-27", confirmedText: "27/11/2026",
         presaleText: "Estimasi presale IMAX 23/11/2026.", sourceBadge: "IMAX XXI • TMDB Region ID", age: "SU", runtime: "104m",
-        genre: "Animation, Fantasy", hype: 91, rating: "8.7", presale: false, imax: true, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        genre: "Animation, Fantasy", hype: 91, rating: "8.7", presale: false, imax: true, tba: false, chains: ["XXI", "CGV", "Cinépolis"], chainVerified: true,
         director: "Josie Trinidad", cast: "Disney Animation", synopsis: "Petualangan sihir remaja.", poster: ""
       },
       {
         id: "up_6", isIndonesian: false, title: "VIOLENT NIGHT 2", searchQuery: "Violent Night 2",
         releaseDate: "2026-12-02", confirmedText: "02/12/2026",
         presaleText: "Estimasi presale 28/11/2026 di TIX ID.", sourceBadge: "TMDB Region ID • Verified", age: "D 17+", runtime: "115m",
-        genre: "Action, Thriller", hype: 90, rating: "8.5", presale: false, imax: false, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        genre: "Action, Thriller", hype: 90, rating: "8.5", presale: false, imax: false, tba: false, chains: ["XXI", "CGV", "Cinépolis"], chainVerified: false,
         director: "Tommy Wirkola", cast: "David Harbour, Kristen Bell", synopsis: "Santa Claus kembali beraksi.", poster: ""
       },
       {
         id: "up_7", isIndonesian: true, title: "3726 MDPL", searchQuery: "3726 MDPL",
         releaseDate: "2026-12-03", confirmedText: "03/12/2026",
         presaleText: "Estimasi presale 30/11/2026 di M-TIX.", sourceBadge: "LSF • XXI Schedule", age: "R 13+", runtime: "116m",
-        genre: "Adventure, Romance", hype: 86, rating: "8.4", presale: false, imax: false, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        genre: "Adventure, Romance", hype: 86, rating: "8.4", presale: false, imax: false, tba: false, chains: ["XXI", "CGV", "Cinépolis"], chainVerified: true,
         director: "Rako Prijanto", cast: "Angga Yunanda, Syifa Hadju", synopsis: "Pendakian Gunung Rinjani.", poster: ""
       },
       {
         id: "up_8", isIndonesian: false, isReRelease: true, title: "DUNE: PART TWO (IMAX RE-RELEASE)", searchQuery: "Dune Part Two",
         releaseDate: "2026-12-09", confirmedText: "09/12/2026",
         presaleText: "Presale IMAX buka 04/12/2026.", sourceBadge: "IMAX Indonesia • Verified", age: "R 13+", runtime: "166m",
-        genre: "Sci-Fi, Adventure", hype: 94, rating: "9.2", presale: false, imax: true, tba: false, chains: ["XXI", "CGV"],
+        genre: "Sci-Fi, Adventure", hype: 94, rating: "9.2", presale: false, imax: true, tba: false, chains: ["XXI", "CGV"], chainVerified: true,
         director: "Denis Villeneuve", cast: "Timothée Chalamet, Zendaya", synopsis: "Penayangan ulang spesial IMAX.", poster: ""
       },
       {
         id: "up_10", isIndonesian: false, title: "DUNE: PART THREE", searchQuery: "Dune Part Three",
         releaseDate: "2026-12-16", confirmedText: "16/12/2026",
         presaleText: "Estimasi presale IMAX 09/12/2026.", sourceBadge: "TMDB Region ID • IMAX XXI", age: "R 13+", runtime: "162m",
-        genre: "Sci-Fi, Action", hype: 98, rating: "9.5", presale: false, imax: true, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        genre: "Sci-Fi, Action", hype: 98, rating: "9.5", presale: false, imax: true, tba: false, chains: ["XXI", "CGV", "Cinépolis"], chainVerified: true,
         director: "Denis Villeneuve", cast: "Timothée Chalamet, Zendaya", synopsis: "Babak puncak Dune Messiah.", poster: ""
       },
       {
         id: "up_11", isIndonesian: false, title: "AVENGERS: DOOMSDAY", searchQuery: "Avengers Doomsday",
         releaseDate: "2026-12-16", confirmedText: "16/12/2026",
         presaleText: "Estimasi presale IMAX 08/12/2026.", sourceBadge: "TMDB Region ID • IMAX XXI", age: "R 13+", runtime: "158m",
-        genre: "Action, Superhero", hype: 99, rating: "9.6", presale: false, imax: true, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        genre: "Action, Superhero", hype: 99, rating: "9.6", presale: false, imax: true, tba: false, chains: ["XXI", "CGV", "Cinépolis"], chainVerified: true,
         director: "Anthony & Joe Russo", cast: "Robert Downey Jr., Pedro Pascal", synopsis: "Menghadapi Victor Von Doom.", poster: ""
       },
       {
         id: "up_12", isIndonesian: true, title: "5 CM: REVOLUSI HATI", searchQuery: "5 cm",
         releaseDate: "2026-12-24", confirmedText: "24/12/2026",
         presaleText: "Estimasi presale 19/12/2026.", sourceBadge: "LSF • XXI Schedule", age: "R 13+", runtime: "124m",
-        genre: "Drama, Adventure", hype: 87, rating: "8.5", presale: false, imax: false, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        genre: "Drama, Adventure", hype: 87, rating: "8.5", presale: false, imax: false, tba: false, chains: ["XXI", "CGV", "Cinépolis"], chainVerified: true,
         director: "Rizal Mantovani", cast: "Herjunot Ali, Fedi Nuril", synopsis: "Reuni sahabat Mahameru.", poster: ""
       },
       {
         id: "up_15", isIndonesian: false, title: "THE BEEKEEPER 2", searchQuery: "The Beekeeper 2",
         releaseDate: "2027-01-13", confirmedText: "13/01/2027",
         presaleText: "Estimasi presale 09/01/2027.", sourceBadge: "TMDB Region ID • Verified", age: "D 17+", runtime: "112m",
-        genre: "Action, Thriller", hype: 95, rating: "8.9", presale: false, imax: true, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        genre: "Action, Thriller", hype: 95, rating: "8.9", presale: false, imax: true, tba: false, chains: ["XXI", "CGV", "Cinépolis"], chainVerified: false,
         director: "Timo Tjahjanto", cast: "Jason Statham, Pom Klementieff", synopsis: "Disutradarai Timo Tjahjanto.", poster: ""
       },
       {
         id: "up_17", isIndonesian: false, title: "THE MANDALORIAN AND GROGU", searchQuery: "The Mandalorian and Grogu",
         releaseDate: "2027-01-20", confirmedText: "20/01/2027",
         presaleText: "Estimasi presale IMAX 15/01/2027.", sourceBadge: "TMDB Region ID • IMAX XXI", age: "R 13+", runtime: "130m",
-        genre: "Sci-Fi, Adventure", hype: 94, rating: "9.0", presale: false, imax: true, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        genre: "Sci-Fi, Adventure", hype: 94, rating: "9.0", presale: false, imax: true, tba: false, chains: ["XXI", "CGV", "Cinépolis"], chainVerified: true,
         director: "Jon Favreau", cast: "Pedro Pascal, Sigourney Weaver", synopsis: "Misi baru New Republic.", poster: ""
       }
     ];
@@ -1866,7 +2100,7 @@
 
     let activeBottomTab = "catalog";
     let activeMode = "now";
-    let activeChip = "all";
+    let activeChip = localStorage.getItem("ct_v40_last_chip") || "all";
     let activeWatchlistTab = "confirmed";
     let activeWatchlistFilter = "all";
     let allMovies = [];
@@ -1881,11 +2115,18 @@
     let toastTimer = null;
     let lastRemovedWatchItem = null;
 
-    // Calendar state
     let calYear = 2026;
-    let calMonth = 10; // 0-indexed (10 = November)
+    let calMonth = 10;
     let calSelectedDate = "";
-    let calScope = "all"; // "all" | "watchlist"
+    let calScope = "all";
+
+    function escapeHtml(str) {
+      return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
 
     function showToast(msg, withUndo = false) {
       const el = document.getElementById("toastBanner");
@@ -1930,7 +2171,7 @@
 
     function normalizeIsoDatesInText(txt) {
       if (!txt) return txt;
-      return String(txt).replace(/\b(20\d{2})-(\d{2})-(\d{2})\b/g, "$3/$2/$1");
+      return String(txt).replace(/(20\d{2})-(\d{2})-(\d{2})/g, "$3/$2/$1");
     }
 
     function getDaysUntil(isoDate) {
@@ -1972,6 +2213,45 @@
       applyTheme(mode);
     }
 
+    function renderLauncherPresetGrid() {
+      const grid = document.getElementById("launcherOptionsGrid");
+      if (!grid) return;
+      grid.innerHTML = LAUNCHER_PRESETS.map(p => `
+        <div id="iconOpt_${p.alias}" class="launcher-option" onclick="selectLauncherIcon('${p.alias}')">
+          <span class="launcher-swatch">${p.svg}</span>
+          <div class="launcher-label-wrap">
+            <span class="launcher-name">${p.name}</span>
+            <span class="launcher-sub">${p.sub}</span>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function applyHeaderBrandMark(aliasName) {
+      const mark = document.getElementById("headerBrandMark");
+      if (!mark) return;
+      const preset = LAUNCHER_PRESETS.find(p => p.alias === aliasName) || LAUNCHER_PRESETS[0];
+      mark.style.background = "transparent";
+      mark.style.padding = "0";
+      mark.style.overflow = "hidden";
+      mark.innerHTML = preset.svg;
+    }
+
+    function highlightLauncherOption(aliasName) {
+      document.querySelectorAll(".launcher-option").forEach(el => el.classList.remove("active"));
+      const target = document.getElementById("iconOpt_" + aliasName) || document.getElementById("iconOpt_LauncherDefault");
+      if (target) target.classList.add("active");
+      applyHeaderBrandMark(aliasName);
+    }
+
+    function selectLauncherIcon(aliasName) {
+      localStorage.setItem("ct_launcher_icon", aliasName);
+      highlightLauncherOption(aliasName);
+      if (window.AndroidBridge && typeof window.AndroidBridge.changeLauncherIcon === "function") {
+        window.AndroidBridge.changeLauncherIcon(aliasName);
+      }
+    }
+
     function loadPersistentState() {
       let localCustom = JSON.parse((localStorage.getItem("ct_v38_custom_posters") || localStorage.getItem("ct_v37_custom_posters")) || localStorage.getItem("ct_v36_custom_posters") || "{}");
       if (Object.keys(localCustom).length === 0 && window.AndroidBridge && typeof window.AndroidBridge.getCustomPostersJson === "function") {
@@ -1998,12 +2278,20 @@
               presaleAlert: true,
               dayAlert: true,
               isTba: false,
+              watchStatus: id === "up_10" || id === "up_11" ? "priority" : "diincar",
+              userNote: "",
               tmdbId: 0,
               movieData: { ...found }
             };
           }
         });
       }
+
+      // Ensure backward-compatible defaults on every entry
+      Object.keys(localWatch).forEach(k => {
+        if (!localWatch[k].watchStatus) localWatch[k].watchStatus = "diincar";
+        if (typeof localWatch[k].userNote !== "string") localWatch[k].userNote = "";
+      });
 
       watchlistMap = localWatch;
       localStorage.setItem("ct_v37_initialized", "1");
@@ -2035,6 +2323,8 @@
     }
 
     function init() {
+      renderLauncherPresetGrid();
+
       const todayIso = getLocalTodayIso();
       const parts = todayIso.split("-");
       calYear = parseInt(parts[0], 10) || 2026;
@@ -2061,6 +2351,11 @@
       document.getElementById("minHypeSelect").value = savedHype;
       document.getElementById("syncIntervalSelect").value = savedInterval;
       highlightLauncherOption(savedIcon);
+
+      // Restore last selected catalog chip
+      document.querySelectorAll("#catalogChipsRow .chip").forEach(c => {
+        c.classList.toggle("active", c.getAttribute("data-chip") === activeChip);
+      });
 
       if (savedKey) {
         document.getElementById("tmdbKeyInput").value = savedKey;
@@ -2107,10 +2402,25 @@
       if (key) autoSyncIfStale(key);
     };
 
+    window.openMovieFromNotification = function(movieId) {
+      if (!movieId) return;
+      rebuildMovieCatalog();
+      let target = allMovies.find(m => m.id === movieId);
+      if (!target) {
+        const cleanNum = movieId.replace(/^(tmdb_|search_)/, "");
+        target = allMovies.find(m => String(m.tmdbId) === cleanNum || m.id.endsWith("_" + cleanNum));
+      }
+      if (target) {
+        openDetail(target.id);
+      } else {
+        switchBottomTab("watchlist");
+      }
+    };
+
     function updateLastSyncLabel(ts) {
       const el = document.getElementById("bannerLastSync");
       if (!ts) {
-        el.textContent = "Siap sinkronisasi";
+        el.textContent = "Belum sinkron";
         return;
       }
       const d = new Date(ts);
@@ -2198,33 +2508,16 @@
       allMovies = Array.from(map.values());
     }
 
-    function highlightLauncherOption(aliasName) {
-      document.querySelectorAll(".launcher-option").forEach(el => el.classList.remove("active"));
-      if (aliasName === "LauncherSciFi") document.getElementById("iconOptSciFi").classList.add("active");
-      else if (aliasName === "LauncherAction") document.getElementById("iconOptAction").classList.add("active");
-      else if (aliasName === "LauncherImax") document.getElementById("iconOptImax").classList.add("active");
-      else document.getElementById("iconOptDefault").classList.add("active");
-    }
-
-    function selectLauncherIcon(aliasName) {
-      localStorage.setItem("ct_launcher_icon", aliasName);
-      highlightLauncherOption(aliasName);
-      if (window.AndroidBridge && typeof window.AndroidBridge.changeLauncherIcon === "function") {
-        window.AndroidBridge.changeLauncherIcon(aliasName);
-      }
-    }
-
     function getTbaTmdbIdsJson() {
       const ids = [];
       Object.keys(watchlistMap).forEach(k => {
         const item = watchlistMap[k];
-        if (item && item.isTba && item.tmdbId) {
+        if (item && item.isTba && item.tmdbId && item.watchStatus !== "watched") {
           ids.push(item.tmdbId);
         }
       });
       return JSON.stringify(ids);
     }
-
 
     function toggleApiKeyVisibility() {
       const inp = document.getElementById("tmdbKeyInput");
@@ -2293,22 +2586,27 @@
 
       let confirmedCount = 0;
       let tbaCount = 0;
+      let watchedCount = 0;
       Object.keys(watchlistMap).forEach(id => {
-        if (watchlistMap[id].isTba) tbaCount++;
+        const entry = watchlistMap[id];
+        if (!entry) return;
+        if (entry.watchStatus === "watched") watchedCount++;
+        else if (entry.isTba) tbaCount++;
         else confirmedCount++;
       });
 
       document.getElementById("wCountConfirmed").textContent = confirmedCount;
       document.getElementById("wCountTba").textContent = tbaCount;
+      document.getElementById("wCountWatched").textContent = watchedCount;
 
-      const totalWatch = confirmedCount + tbaCount;
+      const activeWatch = confirmedCount + tbaCount;
       const bell = document.getElementById("headerBellBadge");
       const navBadge = document.getElementById("navWatchBadge");
-      if (totalWatch > 0) {
+      if (activeWatch > 0) {
         bell.style.display = "flex";
-        bell.textContent = totalWatch;
+        bell.textContent = activeWatch;
         navBadge.style.display = "flex";
-        navBadge.textContent = totalWatch;
+        navBadge.textContent = activeWatch;
       } else {
         bell.style.display = "none";
         navBadge.style.display = "none";
@@ -2324,8 +2622,20 @@
 
     function setChip(chip, el) {
       activeChip = chip;
-      document.querySelectorAll("#viewCatalog .chip").forEach(c => c.classList.remove("active"));
-      el.classList.add("active");
+      localStorage.setItem("ct_v40_last_chip", chip);
+      document.querySelectorAll("#catalogChipsRow .chip").forEach(c => c.classList.remove("active"));
+      if (el) el.classList.add("active");
+      renderMovies();
+    }
+
+    function resetCatalogFilters() {
+      activeChip = "all";
+      localStorage.setItem("ct_v40_last_chip", "all");
+      document.querySelectorAll("#catalogChipsRow .chip").forEach(c => {
+        c.classList.toggle("active", c.getAttribute("data-chip") === "all");
+      });
+      document.getElementById("hideTbaCheck").checked = false;
+      clearCatalogQuickFilter();
       renderMovies();
     }
 
@@ -2333,6 +2643,7 @@
       activeWatchlistTab = tab;
       document.getElementById("wTabConfirmed").classList.toggle("active", tab === "confirmed");
       document.getElementById("wTabTba").classList.toggle("active", tab === "tba");
+      document.getElementById("wTabWatched").classList.toggle("active", tab === "watched");
       document.getElementById("wlToolbar").style.display = tab === "confirmed" ? "block" : "none";
       renderWatchlist();
     }
@@ -2436,7 +2747,10 @@
         : `Jadwal Rilis (${list.length} Film)`;
 
       if (list.length === 0) {
-        grid.innerHTML = `<div class="empty-msg">Tidak ada film ditemukan.</div>`;
+        grid.innerHTML = `<div class="empty-msg">
+          <div>Tidak ada film yang cocok dengan filter ini.</div>
+          <button type="button" class="reset-empty-btn" onclick="resetCatalogFilters()">Reset Filter</button>
+        </div>`;
         return;
       }
 
@@ -2450,8 +2764,8 @@
         else if (m.isIndonesian) badgeText = "LOKAL";
 
         const posterHtml = effectivePoster
-          ? `<img src="${effectivePoster}" alt="${m.title}" loading="lazy" decoding="async" />`
-          : `<div class="poster-art"><div class="poster-art-title">${m.title}</div></div>`;
+          ? `<img src="${effectivePoster}" alt="${escapeHtml(m.title)}" loading="lazy" decoding="async" />`
+          : `<div class="poster-art"><div class="poster-art-title">${escapeHtml(m.title)}</div></div>`;
 
         let rightPill = "";
         if (activeMode === "upcoming") {
@@ -2476,9 +2790,9 @@
               <div>
                 <div class="meta-top">
                   <span class="age-pill">${m.age || 'R 13+'}</span>
-                  <span>${m.genre}</span>
+                  <span>${escapeHtml(m.genre)}</span>
                 </div>
-                <div class="card-title">${m.title}</div>
+                <div class="card-title">${escapeHtml(m.title)}</div>
               </div>
               <div class="card-footer">
                 <span>${footerLeft}</span>
@@ -2530,17 +2844,16 @@
       document.getElementById("calMonthTitle").textContent = `${ID_MONTHS[calMonth]} ${calYear}`;
       const todayIso = getLocalTodayIso();
 
-      // Map movies by releaseDate
       const moviesByDate = {};
       allMovies.forEach(m => {
         if (!m.releaseDate || m.releaseDate === "TBA" || m.tba) return;
-        const isWl = Boolean(watchlistMap[m.id]);
+        const isWl = Boolean(watchlistMap[m.id] && watchlistMap[m.id].watchStatus !== "watched");
         if (calScope === "watchlist" && !isWl) return;
         if (!moviesByDate[m.releaseDate]) moviesByDate[m.releaseDate] = [];
         moviesByDate[m.releaseDate].push({ ...m, isWatchlisted: isWl });
       });
 
-      const firstDayOfWeek = new Date(calYear, calMonth, 1).getDay(); // 0 = Sun
+      const firstDayOfWeek = new Date(calYear, calMonth, 1).getDay();
       const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
       const mmStr = String(calMonth + 1).padStart(2, "0");
 
@@ -2578,14 +2891,12 @@
 
       document.getElementById("calDaysGrid").innerHTML = cellsHtml;
 
-      // Render Agenda for selected date
       const agendaList = document.getElementById("calAgendaList");
       const selectedMovies = moviesByDate[calSelectedDate] || [];
       document.getElementById("calAgendaLabel").textContent = `Rilis: ${formatShortDate(calSelectedDate)}`;
       document.getElementById("calAgendaCount").textContent = `${selectedMovies.length} Film`;
 
       if (selectedMovies.length === 0) {
-        // Find next upcoming movie in current month to help user navigate seamlessly
         const monthPrefix = `${calYear}-${mmStr}-`;
         const nextDates = Object.keys(moviesByDate).filter(d => d.startsWith(monthPrefix)).sort();
         const hintHtml = nextDates.length > 0
@@ -2606,21 +2917,21 @@
         const isWatched = Boolean(watchlistMap[m.id]);
         const countdownHtml = buildCountdownBadge(m.releaseDate, m.tba);
         const thumb = effPoster
-          ? `<img src="${effPoster}" alt="${m.title}" />`
-          : `<div style="width:100%;height:100%;background:#0f172a;color:#fff;font-size:9px;display:flex;align-items:center;justify-content:center;text-align:center;padding:2px;">${m.title}</div>`;
+          ? `<img src="${effPoster}" alt="${escapeHtml(m.title)}" />`
+          : `<div style="width:100%;height:100%;background:#0f172a;color:#fff;font-size:9px;display:flex;align-items:center;justify-content:center;text-align:center;padding:2px;">${escapeHtml(m.title)}</div>`;
 
         return `
           <div class="watch-item">
             <div class="watch-thumb" onclick="openDetail('${m.id}')">${thumb}</div>
             <div class="watch-body" style="padding-right:0;">
-              <div class="watch-title" onclick="openDetail('${m.id}')">${m.title}</div>
+              <div class="watch-title" onclick="openDetail('${m.id}')">${escapeHtml(m.title)}</div>
               <div class="watch-date-row" onclick="openDetail('${m.id}')">
                 ${countdownHtml}
                 <span class="watch-date">${(m.chains || ["XXI", "CGV"]).join(" • ")}</span>
               </div>
               <div class="watch-toggles">
                 <button type="button" class="cal-action-btn ${isWatched ? 'saved' : ''}" onclick="event.stopPropagation(); toggleWatch('${m.id}')">
-                  ${isWatched ? '✓ Tersimpan di Watchlist' : '+ Tambah ke Watchlist'}
+                  ${isWatched ? '✓ Tersimpan di Watchlist' : '+ Simpan ke Watchlist'}
                 </button>
               </div>
             </div>
@@ -2643,6 +2954,8 @@
           presaleAlert: true,
           dayAlert: true,
           isTba: m.tba || false,
+          watchStatus: "diincar",
+          userNote: "",
           tmdbId: m.tmdbId || 0,
           movieData: { ...m, poster: effPoster }
         };
@@ -2654,6 +2967,34 @@
       renderMovies();
       if (activeBottomTab === "watchlist") renderWatchlist();
       if (activeBottomTab === "calendar") renderCalendar();
+    }
+
+    function setWatchlistItemStatus(id, newStatus) {
+      if (!watchlistMap[id]) return;
+      watchlistMap[id].watchStatus = newStatus;
+      persistWatchlist();
+      syncWatchlistToNative();
+      updateCounts();
+      renderWatchlist();
+      const labelMap = { diincar: "Status: Diincar", priority: "Status: Prioritas", watched: "Dipindah ke Riwayat" };
+      showToast(labelMap[newStatus] || "Status diperbarui");
+    }
+
+    function updateWatchlistNote(id, noteVal) {
+      if (!watchlistMap[id]) return;
+      watchlistMap[id].userNote = String(noteVal || "").trim();
+      persistWatchlist();
+      if (activeBottomTab === "watchlist") renderWatchlist();
+    }
+
+    function promptEditWatchlistNote(id) {
+      if (!watchlistMap[id]) return;
+      const currentNote = watchlistMap[id].userNote || "";
+      const nextNote = window.prompt("Catatan nonton (misal: IMAX bareng Sassa):", currentNote);
+      if (nextNote !== null) {
+        updateWatchlistNote(id, nextNote);
+        showToast(nextNote.trim() ? "Catatan disimpan" : "Catatan dihapus");
+      }
     }
 
     function undoLastWatchlistRemove() {
@@ -2717,7 +3058,10 @@
         const topResults = (data.results || []).slice(0, 8);
 
         if (topResults.length === 0) {
-          resContainer.innerHTML = `<div class="empty-msg">Film tidak ditemukan di database TMDB.</div>`;
+          resContainer.innerHTML = `<div class="empty-msg">
+            <div>Film tidak ditemukan di TMDB.</div>
+            <button type="button" class="reset-empty-btn" onclick="clearGlobalSearch()">Hapus Pencarian</button>
+          </div>`;
           return;
         }
 
@@ -2739,11 +3083,7 @@
             }
           } catch (_) {}
 
-          return {
-            ...item,
-            idReleaseDate,
-            sourceDetail
-          };
+          return { ...item, idReleaseDate, sourceDetail };
         }));
 
         resContainer.innerHTML = enriched.map(item => {
@@ -2752,7 +3092,7 @@
           const displayPoster = customPostersMap[idKey] || defaultPoster;
           const hasIdDate = Boolean(item.idReleaseDate);
           const displayDate = hasIdDate ? item.idReleaseDate : (item.release_date || "TBA");
-          const statusText = hasIdDate ? `Confirmed ID (${item.idReleaseDate})` : "Belum Terjadwal di Indonesia (TBA)";
+          const statusText = hasIdDate ? `Confirmed ID (${formatFullDate(item.idReleaseDate)})` : "Belum Terjadwal di Indonesia (TBA)";
           const badgeColor = hasIdDate ? "var(--emerald)" : "var(--amber)";
           const isWatched = Boolean(watchlistMap[idKey]);
 
@@ -2769,11 +3109,11 @@
           return `
             <div class="watch-item">
               <div class="watch-thumb" onclick="openSearchMovieDetail('${safeObj}')">
-                ${displayPoster ? `<img src="${displayPoster}" alt="${item.title}" />` : `<div style="width:100%;height:100%;background:#0f172a;color:#fff;font-size:9px;display:flex;align-items:center;justify-content:center;text-align:center;padding:2px;">${item.title}</div>`}
+                ${displayPoster ? `<img src="${displayPoster}" alt="${escapeHtml(item.title)}" />` : `<div style="width:100%;height:100%;background:#0f172a;color:#fff;font-size:9px;display:flex;align-items:center;justify-content:center;text-align:center;padding:2px;">${escapeHtml(item.title)}</div>`}
               </div>
               <div class="watch-body" style="padding-right:0;">
-                <div class="watch-title" onclick="openSearchMovieDetail('${safeObj}')">${(item.title || item.original_title || "").toUpperCase()}</div>
-                <div class="watch-date">Rilis Global: ${item.release_date || 'TBA'}</div>
+                <div class="watch-title" onclick="openSearchMovieDetail('${safeObj}')">${escapeHtml((item.title || item.original_title || "").toUpperCase())}</div>
+                <div class="watch-date">Rilis Global: ${formatFullDate(item.release_date) || 'TBA'}</div>
                 <div style="font-size:11px; font-weight:600; color:${badgeColor}; margin-bottom:6px;">${statusText}</div>
                 <button class="toggle-pill ${isWatched ? 'active' : ''}" onclick="toggleSearchWatch('${safeObj}')">
                   ${isWatched ? "Tersimpan di Watchlist" : "+ Simpan ke Watchlist"}
@@ -2783,7 +3123,7 @@
           `;
         }).join("");
       } catch (_) {
-        resContainer.innerHTML = `<div class="empty-msg">Gagal melakukan pencarian.</div>`;
+        resContainer.innerHTML = `<div class="empty-msg">Koneksi tidak stabil. Coba lagi sebentar.</div>`;
       }
     }
 
@@ -2798,8 +3138,8 @@
         title: data.title.toUpperCase(),
         releaseDate: data.releaseDate,
         dateLabel: data.isTba ? "TBA ID" : formatShortDate(data.releaseDate),
-        confirmedText: data.isTba ? "Menunggu Konfirmasi Jadwal Bioskop Indonesia" : `Confirmed Rilis ID: ${formatShortDate(data.releaseDate)}`,
-        presaleText: data.isTba ? "Sistem akan mengirim notifikasi saat film ini terkonfirmasi masuk Indonesia." : "Cek presale di TIX ID, M-TIX, atau CGV.",
+        confirmedText: data.isTba ? "Menunggu Konfirmasi Jadwal Bioskop Indonesia" : `Confirmed Rilis ID: ${formatFullDate(data.releaseDate)}`,
+        presaleText: data.isTba ? "Pengingat otomatis aktif saat jadwal ID keluar." : "Cek ketersediaan di TIX ID, XXI, CGV & Cinépolis.",
         sourceBadge: data.sourceBadge,
         age: "R 13+",
         runtime: "TBA",
@@ -2810,6 +3150,7 @@
         imax: false,
         tba: data.isTba,
         chains: ["XXI", "CGV", "Cinépolis"],
+        chainVerified: false,
         director: "Memuat...",
         cast: "Memuat...",
         synopsis: data.overview || "Sinopsis tidak tersedia.",
@@ -2840,6 +3181,8 @@
           presaleAlert: true,
           dayAlert: true,
           isTba: data.isTba,
+          watchStatus: "diincar",
+          userNote: "",
           tmdbId: data.tmdbId,
           movieData: { ...movieObj }
         };
@@ -2854,7 +3197,6 @@
       executeGlobalSearch();
       if (activeBottomTab === "watchlist") renderWatchlist();
     }
-
 
     let trailerCache = JSON.parse(localStorage.getItem("ct_v39_trailer_cache") || "{}");
 
@@ -2931,7 +3273,6 @@
       else if (platform === "XXI") url = `https://21cineplex.com/`;
       else if (platform === "CGV") url = `https://www.cgv.id/en/movies/now_playing`;
       else if (platform === "Cinépolis") url = `https://cinepolis.co.id/`;
-      else if (platform === "Trailer") url = `https://www.youtube.com/results?search_query=${encodeURIComponent(movieTitle + " official trailer")}`;
 
       if (window.AndroidBridge && typeof window.AndroidBridge.openExternalUrl === "function") {
         window.AndroidBridge.openExternalUrl(url);
@@ -2943,14 +3284,25 @@
     function shareMovieInfo(id) {
       const m = allMovies.find(item => item.id === id) || (watchlistMap[id] && watchlistMap[id].movieData);
       if (!m) return;
-      const text = `${m.title}\n${m.confirmedText}\n${m.presaleText}\n— Cinema Tracker ID`;
+      const watchCfg = watchlistMap[id];
+      const datePart = m.tba ? "TBA Bioskop Indonesia" : `${formatFullDate(m.releaseDate)} (${m.confirmedText || "Bioskop ID"})`;
+      const chainsPart = (m.chains && m.chains.length) ? `Jaringan: ${m.chains.join(", ")}${m.imax ? " • IMAX" : ""}` : "";
+      const notePart = (watchCfg && watchCfg.userNote) ? `Catatan: ${watchCfg.userNote}` : "";
+      const lines = [
+        `🎬 ${m.title}`,
+        `Jadwal ID: ${datePart}`,
+        chainsPart,
+        notePart,
+        `— Cinema Tracker`
+      ].filter(Boolean);
+      const text = lines.join("
+");
       if (window.AndroidBridge && typeof window.AndroidBridge.shareMovieText === "function") {
         window.AndroidBridge.shareMovieText(text);
       } else {
-        showToast("Info siap dibagikan");
+        showToast("Info disalin");
       }
     }
-
 
     function toggleDetailWatch(id) {
       toggleWatch(id);
@@ -2959,16 +3311,36 @@
     }
 
     function renderDetailHtml(m) {
-      const watchCfg = watchlistMap[m.id] || { presaleAlert: false, dayAlert: false };
+      const isSaved = Boolean(watchlistMap[m.id]);
+      const watchCfg = watchlistMap[m.id] || { presaleAlert: false, dayAlert: false, watchStatus: "diincar", userNote: "" };
       const effectivePoster = getEffectivePoster(m);
       const posterHtml = effectivePoster
-        ? `<img src="${effectivePoster}" alt="${m.title}" />`
-        : `<div class="poster-art" style="padding:10px;"><div class="poster-art-title" style="font-size:11px;">${m.title}</div></div>`;
+        ? `<img src="${effectivePoster}" alt="${escapeHtml(m.title)}" />`
+        : `<div class="poster-art" style="padding:10px;"><div class="poster-art-title" style="font-size:11px;">${escapeHtml(m.title)}</div></div>`;
 
-      const safeTitle = m.title.replace(/'/g, "\\'");
+      const safeTitle = m.title.replace(/'/g, "\'");
       const genreTags = (m.genre || "Bioskop").split(",").map(g => g.trim()).filter(Boolean)
-        .map(g => `<span class="genre-tag">${g}</span>`).join("");
+        .map(g => `<span class="genre-tag">${escapeHtml(g)}</span>`).join("");
       const releaseDisplay = m.confirmedText || (`Rilis: ${formatFullDate(m.releaseDate)}`);
+
+      const chainVerified = Boolean(m.chainVerified);
+      const chainsHtml = (m.chains || ["XXI", "CGV", "Cinépolis"]).map(c =>
+        `<span class="chain-pill ${chainVerified ? 'verified' : 'check'}">${chainVerified ? '✓ ' + c : 'Cek ' + c}</span>`
+      ).join("") + (m.imax ? `<span class="chain-pill verified">✓ IMAX</span>` : "");
+
+      const noteSectionHtml = isSaved ? `
+        <div class="detail-note-box">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:6px; margin-bottom:6px;">
+            <span class="credit-label" style="margin:0;">Status & Catatan Watchlist</span>
+            <div style="display:flex; gap:4px;">
+              <button type="button" class="status-chip-btn ${watchCfg.watchStatus === 'diincar' ? 'active-diincar' : ''}" onclick="setWatchlistItemStatus('${m.id}', 'diincar'); renderDetailHtml(allMovies.find(x => x.id === '${m.id}'))">Diincar</button>
+              <button type="button" class="status-chip-btn ${watchCfg.watchStatus === 'priority' ? 'active-prioritas' : ''}" onclick="setWatchlistItemStatus('${m.id}', 'priority'); renderDetailHtml(allMovies.find(x => x.id === '${m.id}'))">Prioritas</button>
+              <button type="button" class="status-chip-btn ${watchCfg.watchStatus === 'watched' ? 'active-watched' : ''}" onclick="setWatchlistItemStatus('${m.id}', 'watched'); renderDetailHtml(allMovies.find(x => x.id === '${m.id}'))">Sudah Nonton</button>
+            </div>
+          </div>
+          <input type="text" class="detail-note-input" placeholder="Tambah catatan (misal: Nonton bareng Sassa • IMAX)..." value="${escapeHtml(watchCfg.userNote || '')}" onchange="updateWatchlistNote('${m.id}', this.value); showToast('Catatan disimpan')" />
+        </div>
+      ` : "";
 
       document.getElementById("detailContent").innerHTML = `
         <div class="sheet-drag-handle"></div>
@@ -2993,7 +3365,7 @@
               ${m.imax ? '<span class="meta-chip">IMAX</span>' : ''}
               ${m.tba ? '<span class="meta-chip status-tba">TBA ID</span>' : '<span class="meta-chip status-confirmed">Confirmed ID</span>'}
             </div>
-            <div class="detail-title">${m.title}</div>
+            <div class="detail-title">${escapeHtml(m.title)}</div>
             <div class="detail-genre-row">${genreTags}</div>
             <div class="hype-meter-row">
               <div class="hype-bar-track"><div class="hype-bar-fill" style="width:${Math.min(100, Math.max(10, m.hype || 80))}%;"></div></div>
@@ -3009,7 +3381,7 @@
             </span>
             <div style="min-width:0;">
               <div class="media-btn-title">Official Trailer</div>
-              <div id="trailerSubLabel_${m.id}" class="media-btn-sub">${m.trailerKey ? 'Putar langsung' : 'Tonton di YouTube'}</div>
+              <div id="trailerSubLabel_${m.id}" class="media-btn-sub">Putar di YouTube</div>
             </div>
           </button>
           <button type="button" class="media-pill-btn" onclick="openLetterboxd('${m.id}')">
@@ -3028,9 +3400,10 @@
         <div class="verify-box">
           <div class="verify-source-header">
             <span style="font-size:10px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.04em;">Jadwal & Tiket Bioskop</span>
-            <span class="verify-source-tag">${m.sourceBadge || 'Bioskop ID'}</span>
+            <span class="verify-source-tag">${chainVerified ? 'Terkonfirmasi' : 'Cek Manual Jaringan'}</span>
           </div>
-          <div class="verify-date">${releaseDisplay}</div>
+          <div class="verify-date">${escapeHtml(releaseDisplay)}</div>
+          <div class="chain-status-row">${chainsHtml}</div>
           <div class="quick-verify-bar">
             <button class="verify-link-btn" onclick="openTicketSearch('TIX ID', '${safeTitle}')">TIX ID</button>
             <button class="verify-link-btn" onclick="openTicketSearch('XXI', '${safeTitle}')">XXI</button>
@@ -3039,20 +3412,22 @@
           </div>
         </div>
 
-        <button type="button" class="btn-watch-detail ${watchlistMap[m.id] ? 'saved' : ''}" onclick="toggleDetailWatch('${m.id}')">
-          ${watchlistMap[m.id] ? '✓ Tersimpan di Watchlist' : '+ Simpan ke Watchlist'}
+        <button type="button" class="btn-watch-detail ${isSaved ? 'saved' : ''}" onclick="toggleDetailWatch('${m.id}')">
+          ${isSaved ? '✓ Tersimpan di Watchlist' : '+ Simpan ke Watchlist'}
         </button>
+
+        ${noteSectionHtml}
 
         <div class="reminder-box">
           <label class="rem-option">
-            <span class="rem-title">Notifikasi Pre-Sale Tiket</span>
+            <span class="rem-title">Notifikasi Pre-Sale (H-4 s.d. H-2)</span>
             <span class="switch-wrap">
               <input type="checkbox" ${watchCfg.presaleAlert ? 'checked' : ''} onchange="updateReminder('${m.id}', 'presaleAlert', this.checked)" />
               <span class="switch-slider"></span>
             </span>
           </label>
           <label class="rem-option">
-            <span class="rem-title">Notifikasi Hari-H Rilis</span>
+            <span class="rem-title">Notifikasi H-1 & Hari-H Rilis</span>
             <span class="switch-wrap">
               <input type="checkbox" ${watchCfg.dayAlert ? 'checked' : ''} onchange="updateReminder('${m.id}', 'dayAlert', this.checked)" />
               <span class="switch-slider"></span>
@@ -3064,15 +3439,15 @@
           <div class="credits-grid">
             <div>
               <div class="credit-label">Sutradara</div>
-              <div class="credit-val">${m.director || 'Memuat...'}</div>
+              <div class="credit-val">${escapeHtml(m.director || 'Memuat...')}</div>
             </div>
             <div>
               <div class="credit-label">Pemeran</div>
-              <div class="credit-val">${m.cast || 'Memuat...'}</div>
+              <div class="credit-val">${escapeHtml(m.cast || 'Memuat...')}</div>
             </div>
           </div>
           <div class="credit-label">Sinopsis</div>
-          <div class="synopsis-text">${m.synopsis}</div>
+          <div class="synopsis-text">${escapeHtml(m.synopsis)}</div>
         </div>
 
         <div class="detail-actions">
@@ -3120,7 +3495,7 @@
       if (key) {
         resolveMovieTrailerKey(m, key).then(ytKey => {
           const subEl = document.getElementById(`trailerSubLabel_${m.id}`);
-          if (subEl && ytKey) subEl.textContent = "Official Trailer siap diputar";
+          if (subEl && ytKey) subEl.textContent = "Putar di YouTube";
         });
         const resolvedId = await resolveMovieTmdbId(m, key);
         if (resolvedId && (!m.director || m.director === "Memuat..." || !m.cast || m.cast === "Memuat...")) {
@@ -3164,8 +3539,8 @@
       const effPoster = getEffectivePoster(m);
       document.getElementById("pmMovieTitle").textContent = m.title;
       document.getElementById("pmPreviewBox").innerHTML = effPoster
-        ? `<img src="${effPoster}" alt="${m.title}" />`
-        : `<div class="poster-art"><div class="poster-art-title">${m.title}</div></div>`;
+        ? `<img src="${effPoster}" alt="${escapeHtml(m.title)}" />`
+        : `<div class="poster-art"><div class="poster-art-title">${escapeHtml(m.title)}</div></div>`;
 
       const altGrid = document.getElementById("pmAltGrid");
       const altLabel = document.getElementById("pmAltLabel");
@@ -3174,7 +3549,7 @@
 
       const key = localStorage.getItem("ct_tmdb_key") || "";
       if (!key) {
-        altLabel.textContent = "Masukkan TMDB API Key di Settings untuk melihat poster alternatif";
+        altLabel.textContent = "Masukkan TMDB API Key di Settings untuk poster alternatif";
         return;
       }
 
@@ -3196,7 +3571,7 @@
           return;
         }
 
-        altLabel.textContent = `Pilih Poster Alternatif (${posters.length} Tersedia)`;
+        altLabel.textContent = `Poster Alternatif (${posters.length})`;
         altGrid.innerHTML = posters.map(p => {
           const url = `https://image.tmdb.org/t/p/w500${p.file_path}`;
           const isCurrent = effPoster === url;
@@ -3233,7 +3608,7 @@
       renderMovies();
       if (activeBottomTab === "watchlist") renderWatchlist();
       if (m) renderDetailHtml(m);
-      showToast("Poster kustom diterapkan");
+      showToast("Poster diterapkan");
     }
 
     function resetMoviePoster() {
@@ -3253,7 +3628,7 @@
       renderMovies();
       if (activeBottomTab === "watchlist") renderWatchlist();
       if (m) renderDetailHtml(m);
-      showToast("Poster dikembalikan ke default");
+      showToast("Poster dikembalikan");
     }
 
     function downloadCurrentPoster() {
@@ -3265,7 +3640,7 @@
       if (window.AndroidBridge && typeof window.AndroidBridge.downloadPosterImage === "function") {
         window.AndroidBridge.downloadPosterImage(url, m.title);
       } else {
-        showToast("Fitur unduh poster aktif di aplikasi Android");
+        showToast("Unduh poster aktif di Android");
       }
     }
 
@@ -3298,6 +3673,8 @@
         presaleAlert: false,
         dayAlert: false,
         isTba: isTbaVal,
+        watchStatus: "diincar",
+        userNote: "",
         tmdbId: tmdbIdVal,
         movieData: m ? { ...m, poster: getEffectivePoster(m) } : null
       };
@@ -3326,6 +3703,14 @@
       showToast("Dihapus dari Watchlist", true);
     }
 
+    function ChronoDiffDays(dateA, dateB) {
+      if (!dateA || !dateB || dateA === "TBA" || dateB === "TBA") return 999;
+      const a = new Date(dateA.slice(0, 10) + "T00:00:00");
+      const b = new Date(dateB.slice(0, 10) + "T00:00:00");
+      if (isNaN(a.getTime()) || isNaN(b.getTime())) return 999;
+      return Math.round((a.getTime() - b.getTime()) / 86400000);
+    }
+
     function renderWatchlist() {
       const container = document.getElementById("watchlistContainer");
       const sortBy = document.getElementById("wlSortSelect").value;
@@ -3342,13 +3727,18 @@
         })
         .filter(Boolean)
         .filter(item => {
+          const status = item.cfg.watchStatus || "diincar";
+          if (activeWatchlistTab === "watched") return status === "watched";
+          if (status === "watched") return false;
           if (activeWatchlistTab === "tba") return item.cfg.isTba;
           return !item.cfg.isTba;
         });
 
-      // Apply filter chips on Confirmed ID tab
       if (activeWatchlistTab === "confirmed") {
         entries = entries.filter(item => {
+          if (activeWatchlistFilter === "priority") {
+            return (item.cfg.watchStatus || "diincar") === "priority";
+          }
           if (activeWatchlistFilter === "soon") {
             const d = getDaysUntil(item.m.releaseDate);
             return d !== null && d >= 0 && d <= 14;
@@ -3362,12 +3752,18 @@
           return true;
         });
 
-        // Sort Watchlist entries cleanly
         if (sortBy === "date_asc") {
           entries.sort((a, b) => {
             const da = (a.m.releaseDate && a.m.releaseDate !== "TBA") ? a.m.releaseDate : "9999-12-31";
             const db = (b.m.releaseDate && b.m.releaseDate !== "TBA") ? b.m.releaseDate : "9999-12-31";
             return da.localeCompare(db);
+          });
+        } else if (sortBy === "priority") {
+          entries.sort((a, b) => {
+            const pa = (a.cfg.watchStatus === "priority") ? 0 : 1;
+            const pb = (b.cfg.watchStatus === "priority") ? 0 : 1;
+            if (pa !== pb) return pa - pb;
+            return (a.m.releaseDate || "9999").localeCompare(b.m.releaseDate || "9999");
           });
         } else if (sortBy === "hype") {
           entries.sort((a, b) => (b.m.hype || 0) - (a.m.hype || 0));
@@ -3391,8 +3787,13 @@
           const nextItem = upcomingSorted[0];
           const dLeft = getDaysUntil(nextItem.m.releaseDate);
           const whenLabel = dLeft === 0 ? "Tayang hari ini" : dLeft === 1 ? "Tayang besok" : `H-${dLeft} (${formatShortDate(nextItem.m.releaseDate)})`;
+          const sameWeekCount = upcomingSorted.filter(e => {
+            const diffDays = Math.abs(ChronoDiffDays(nextItem.m.releaseDate, e.m.releaseDate));
+            return diffDays <= 6;
+          }).length - 1;
+          const weekNote = sameWeekCount > 0 ? ` <span style="font-size:10.5px;color:var(--muted);">(+${sameWeekCount} sepekan)</span>` : "";
           hlCard.style.display = "flex";
-          hlCard.innerHTML = `<span style="color:var(--muted);">Rilis terdekat: <strong style="color:var(--text);">${nextItem.m.title}</strong></span><span class="countdown-pill ${dLeft <= 1 ? 'now-pill' : ''}">${whenLabel}</span>`;
+          hlCard.innerHTML = `<span style="color:var(--muted);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Terdekat: <strong style="color:var(--text);">${escapeHtml(nextItem.m.title)}</strong>${weekNote}</span><span class="countdown-pill ${dLeft <= 1 ? 'now-pill' : ''}">${whenLabel}</span>`;
         } else {
           hlCard.style.display = "none";
         }
@@ -3401,19 +3802,57 @@
       }
 
       if (entries.length === 0) {
+        const emptyLabel = activeWatchlistTab === "watched"
+          ? "Belum ada film yang ditandai Sudah Ditonton."
+          : activeWatchlistTab === "tba"
+            ? "Belum ada film TBA di Watchlist."
+            : "Belum ada film di daftar ini.";
         container.innerHTML = `<div class="info-card" style="text-align:center; padding:24px 16px;">
-          <p style="margin:0;">Tidak ada film di daftar ${activeWatchlistTab === 'confirmed' ? 'Confirmed ID' : 'Menunggu Rilis ID / TBA'} untuk filter ini.</p>
+          <p style="margin:0;">${emptyLabel}</p>
         </div>`;
         return;
       }
 
+      // Compute same-week clashes across active confirmed watchlist
+      const confirmedDates = entries.map(e => ({ id: e.id, date: e.m.releaseDate }));
+
       container.innerHTML = entries.map(({ id, cfg, m }) => {
         const effPoster = getEffectivePoster(m);
         const countdownHtml = buildCountdownBadge(m.releaseDate, cfg.isTba);
+        const status = cfg.watchStatus || "diincar";
+        const isPriority = status === "priority";
+        const isWatchedHistory = status === "watched";
+
+        const clashPeers = (!cfg.isTba && !isWatchedHistory && m.releaseDate && m.releaseDate !== "TBA")
+          ? confirmedDates.filter(p => p.id !== id && Math.abs(ChronoDiffDays(m.releaseDate, p.date)) <= 6).length
+          : 0;
 
         const thumb = effPoster
-          ? `<img src="${effPoster}" alt="${m.title}" />`
-          : `<div style="width:100%;height:100%;background:#0f172a;color:#fff;font-size:9px;display:flex;align-items:center;justify-content:center;text-align:center;padding:2px;">${m.title}</div>`;
+          ? `<img src="${effPoster}" alt="${escapeHtml(m.title)}" />`
+          : `<div style="width:100%;height:100%;background:#0f172a;color:#fff;font-size:9px;display:flex;align-items:center;justify-content:center;text-align:center;padding:2px;">${escapeHtml(m.title)}</div>`;
+
+        const noteHtml = cfg.userNote
+          ? `<div class="wl-note-pill" onclick="promptEditWatchlistNote('${m.id}')"><span class="wl-note-text">✎ ${escapeHtml(cfg.userNote)}</span></div>`
+          : `<div class="wl-note-pill" style="color:var(--muted);" onclick="promptEditWatchlistNote('${m.id}')"><span>+ Catatan</span></div>`;
+
+        const controlsHtml = isWatchedHistory
+          ? `<div class="watch-toggles">
+              <button class="toggle-pill" onclick="setWatchlistItemStatus('${m.id}', 'diincar')">Kembalikan ke Watchlist</button>
+              ${noteHtml}
+            </div>`
+          : `<div class="watch-toggles">
+              <button class="toggle-pill ${cfg.presaleAlert ? 'active' : ''}" onclick="updateReminder('${m.id}', 'presaleAlert', ${!cfg.presaleAlert})">
+                <svg viewBox="0 0 24 24" style="width:11px;height:11px;stroke:currentColor;stroke-width:2.2;fill:${cfg.presaleAlert ? 'currentColor' : 'none'};vertical-align:-1px;margin-right:3px;"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Pre-Sale
+              </button>
+              <button class="toggle-pill ${cfg.dayAlert ? 'active' : ''}" onclick="updateReminder('${m.id}', 'dayAlert', ${!cfg.dayAlert})">
+                <svg viewBox="0 0 24 24" style="width:11px;height:11px;stroke:currentColor;stroke-width:2.2;fill:${cfg.dayAlert ? 'currentColor' : 'none'};vertical-align:-1px;margin-right:3px;"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Hari-H
+              </button>
+              <button class="toggle-pill ${isPriority ? 'active' : ''}" onclick="setWatchlistItemStatus('${m.id}', '${isPriority ? 'diincar' : 'priority'}')">
+                ${isPriority ? '★ Prioritas' : '☆ Prioritas'}
+              </button>
+              <button class="toggle-pill" onclick="setWatchlistItemStatus('${m.id}', 'watched')">✓ Selesai</button>
+              ${noteHtml}
+            </div>`;
 
         return `
           <div class="watch-item">
@@ -3423,20 +3862,15 @@
             <div class="watch-thumb" onclick="openDetail('${m.id}')">${thumb}</div>
             <div class="watch-body">
               <div class="watch-title-row">
-                <div class="watch-title" onclick="openDetail('${m.id}')">${m.title}</div>
+                <div class="watch-title" onclick="openDetail('${m.id}')">${escapeHtml(m.title)}</div>
               </div>
               <div class="watch-date-row">
+                ${isPriority && !isWatchedHistory ? '<span class="priority-badge">Prioritas</span>' : ''}
                 ${countdownHtml}
                 <span class="watch-date">${cfg.isTba ? 'TBA Indonesia' : formatShortDate(m.releaseDate)}</span>
+                ${clashPeers > 0 ? `<span class="clash-pill">Rilis sepekan</span>` : ''}
               </div>
-              <div class="watch-toggles">
-                <button class="toggle-pill ${cfg.presaleAlert ? 'active' : ''}" onclick="updateReminder('${m.id}', 'presaleAlert', ${!cfg.presaleAlert})">
-                  <svg viewBox="0 0 24 24" style="width:11px;height:11px;stroke:currentColor;stroke-width:2.2;fill:${cfg.presaleAlert ? 'currentColor' : 'none'};vertical-align:-1px;margin-right:3px;"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Pre-Sale
-                </button>
-                <button class="toggle-pill ${cfg.dayAlert ? 'active' : ''}" onclick="updateReminder('${m.id}', 'dayAlert', ${!cfg.dayAlert})">
-                  <svg viewBox="0 0 24 24" style="width:11px;height:11px;stroke:currentColor;stroke-width:2.2;fill:${cfg.dayAlert ? 'currentColor' : 'none'};vertical-align:-1px;margin-right:3px;"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Hari-H
-                </button>
-              </div>
+              ${controlsHtml}
             </div>
           </div>
         `;
@@ -3448,26 +3882,32 @@
       if (!m) return;
       const startMillis = new Date(m.releaseDate + "T10:00:00+07:00").getTime();
       const title = `Nonton Bioskop: ${m.title}`;
-      const desc = `${m.confirmedText}\n${m.presaleText}`;
+      const desc = `${m.confirmedText}
+${m.presaleText}`;
       const loc = "Bioskop Indonesia";
 
       if (window.AndroidBridge && typeof window.AndroidBridge.addCalendarEvent === "function") {
         window.AndroidBridge.addCalendarEvent(title, desc, loc, startMillis);
       } else {
-        showToast(`Jadwal ${m.title} siap disimpan`);
+        showToast(`Buka kalender ${m.title}`);
       }
     }
 
     function testMoviePush(id) {
       let m = allMovies.find(item => item.id === id) || (watchlistMap[id] && watchlistMap[id].movieData);
       if (!m) return;
+      const watchCfg = watchlistMap[id];
       const title = m.title;
-      const body = m.confirmedText || (`Rilis ${formatFullDate(m.releaseDate)}`);
+      const noteSuffix = (watchCfg && watchCfg.userNote) ? ` • ${watchCfg.userNote}` : "";
+      const body = (m.confirmedText || (`Rilis ${formatFullDate(m.releaseDate)}`)) + noteSuffix;
       const posterUrl = getEffectivePoster(m);
 
-      if (window.AndroidBridge && typeof window.AndroidBridge.sendCustomNotification === "function") {
+      if (window.AndroidBridge && typeof window.AndroidBridge.sendCustomNotificationWithMovie === "function") {
+        window.AndroidBridge.sendCustomNotificationWithMovie(title, body, posterUrl, m.id);
+        showToast("Notifikasi dikirim");
+      } else if (window.AndroidBridge && typeof window.AndroidBridge.sendCustomNotification === "function") {
         window.AndroidBridge.sendCustomNotification(title, body, posterUrl);
-        showToast("Notifikasi poster dikirim");
+        showToast("Notifikasi dikirim");
       } else {
         showToast(title);
       }
@@ -3561,16 +4001,17 @@
                     wEntry.movieData.releaseDate = newDate;
                     wEntry.movieData.dateLabel = newDate <= todayIso ? "Sedang Tayang" : formatShortDate(newDate);
                     wEntry.movieData.status = newDate <= todayIso ? "now" : "upcoming";
-                    wEntry.movieData.confirmedText = `Confirmed Rilis ID: ${formatShortDate(newDate)}`;
+                    wEntry.movieData.confirmedText = `Confirmed Rilis ID: ${formatFullDate(newDate)}`;
                     wEntry.movieData.sourceBadge = "TMDB Region ID • Confirmed";
                   }
-                  if (window.AndroidBridge && typeof window.AndroidBridge.sendCustomNotification === "function") {
+                  if (window.AndroidBridge && typeof window.AndroidBridge.sendCustomNotificationWithMovie === "function") {
                     const mTitle = wEntry.movieData ? wEntry.movieData.title : "Film Watchlist";
                     const mPoster = wEntry.movieData ? getEffectivePoster(wEntry.movieData) : "";
-                    window.AndroidBridge.sendCustomNotification(
-                      `Watchlist Confirmed ID: ${mTitle}`,
-                      `Resmi tayang di bioskop Indonesia mulai ${newDate}`,
-                      mPoster
+                    window.AndroidBridge.sendCustomNotificationWithMovie(
+                      `Rilis ID Terkonfirmasi: ${mTitle}`,
+                      `Resmi tayang di bioskop ID mulai ${formatFullDate(newDate)}`,
+                      mPoster,
+                      wKey
                     );
                   }
                 }
@@ -3630,10 +4071,10 @@
                 id: idKey, tmdbId: item.id, status: resolvedStatus, isIndonesian: item.original_language === "id", isReRelease: Boolean(item.release_date && item.release_date >= "2026-10-01" && (item.title || "").toLowerCase().includes("re-release")),
                 title: (item.title || item.original_title || "").toUpperCase(), releaseDate: item.release_date,
                 dateLabel: dateLabel, confirmedText: isReleased ? "Sedang tayang di bioskop Indonesia" : `Confirmed Rilis: ${formatFullDate(item.release_date)}`,
-                presaleText: "Cek presale di TIX ID, XXI, CGV & Cinépolis.", sourceBadge: "TMDB Region ID (Type 3)",
+                presaleText: "Cek ketersediaan di TIX ID, XXI, CGV & Cinépolis.", sourceBadge: "TMDB Region ID (Type 3)",
                 age: item.adult ? "D 17+" : "R 13+", runtime: cachedCred.runtime || "TBA", genre: genresText,
                 hype: hypeScore, rating: ((item.vote_average || 8.2)).toFixed(1), presale: false,
-                imax: (item.popularity || 0) >= 65, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+                imax: (item.popularity || 0) >= 65, tba: false, chains: ["XXI", "CGV", "Cinépolis"], chainVerified: false,
                 director: cachedCred.director || "Memuat...", cast: cachedCred.cast || "Memuat...",
                 synopsis: item.overview || "Jadwal tayang layar lebar Indonesia.",
                 poster: `https://image.tmdb.org/t/p/w500${item.poster_path}`
@@ -3659,12 +4100,11 @@
         updateApiStatusPill(true, true);
 
         if (showFeedback) {
-          fb.textContent = "Tersimpan & jadwal bioskop Indonesia berhasil diperbarui.";
+          fb.textContent = "Tersimpan & jadwal bioskop Indonesia diperbarui.";
           fb.style.color = "var(--emerald)";
           showToast("Jadwal diperbarui");
         }
 
-        // Fetch credits asynchronously in background without blocking UI or failing sync
         fetchMovieCreditsBatch(key, [...liveNow, ...liveUpcoming].slice(0, 12)).catch(() => {});
       } catch (e) {
         rebuildMovieCatalog();

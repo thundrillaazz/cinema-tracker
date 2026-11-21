@@ -19,6 +19,7 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
+            android:launchMode="singleTop"
             android:configChanges="orientation|screenSize|keyboardHidden" />
 
         <activity-alias
@@ -34,7 +35,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity-alias>
-
         <activity-alias
             android:name=".LauncherSciFi"
             android:enabled="false"
@@ -48,7 +48,71 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity-alias>
-
+        <activity-alias
+            android:name=".LauncherNoir"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_noir"
+            android:roundIcon="@mipmap/ic_launcher_noir"
+            android:label="Cinema Tracker"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".LauncherSolaris"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_solaris"
+            android:roundIcon="@mipmap/ic_launcher_solaris"
+            android:label="Cinema Tracker"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".LauncherPastLives"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_pastlives"
+            android:roundIcon="@mipmap/ic_launcher_pastlives"
+            android:label="Cinema Tracker"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".LauncherImax"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_imax"
+            android:roundIcon="@mipmap/ic_launcher_imax"
+            android:label="Cinema Tracker"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".LauncherReel35"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_reel35"
+            android:roundIcon="@mipmap/ic_launcher_reel35"
+            android:label="Cinema Tracker"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
         <activity-alias
             android:name=".LauncherAction"
             android:enabled="false"
@@ -62,13 +126,25 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity-alias>
-
         <activity-alias
-            android:name=".LauncherImax"
+            android:name=".LauncherAftersun"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_imax"
-            android:roundIcon="@mipmap/ic_launcher_imax"
+            android:icon="@mipmap/ic_launcher_aftersun"
+            android:roundIcon="@mipmap/ic_launcher_aftersun"
+            android:label="Cinema Tracker"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".LauncherA24"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_a24"
+            android:roundIcon="@mipmap/ic_launcher_a24"
             android:label="Cinema Tracker"
             android:targetActivity=".MainActivity">
             <intent-filter>

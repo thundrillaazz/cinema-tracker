@@ -12,7 +12,13 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.LinearGradient
+import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.RectF
+import android.graphics.Shader
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -36,6 +42,7 @@ import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import androidx.work.workDataOf
 import java.io.File
 import java.io.FileOutputStream
 import java.net.HttpURLConnection
@@ -47,6 +54,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var webView: WebView
     private val executor = Executors.newSingleThreadExecutor()
+    private var pendingDeepLinkMovieId: String? = null
 
     private val notificationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -55,6 +63,8 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        pendingDeepLinkMovieId = intent?.getStringExtra(EXTRA_MOVIE_ID)
 
         createNotificationChannel()
         requestNotificationPermissionIfNeeded()
@@ -67,7 +77,12 @@ class MainActivity : AppCompatActivity() {
             settings.loadsImagesAutomatically = true
             settings.cacheMode = WebSettings.LOAD_DEFAULT
             settings.allowFileAccess = true
-            webViewClient = WebViewClient()
+            webViewClient = object : WebViewClient() {
+                override fun onPageFinished(view: WebView?, url: String?) {
+                    super.onPageFinished(view, url)
+                    dispatchPendingDeepLink()
+                }
+            }
             webChromeClient = WebChromeClient()
             addJavascriptInterface(AndroidBridge(this@MainActivity), "AndroidBridge")
             loadUrl("file:///android_asset/index.html")
@@ -88,6 +103,26 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         })
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        val movieId = intent.getStringExtra(EXTRA_MOVIE_ID)
+        if (!movieId.isNullOrEmpty()) {
+            pendingDeepLinkMovieId = movieId
+            dispatchPendingDeepLink()
+        }
+    }
+
+    private fun dispatchPendingDeepLink() {
+        val targetId = pendingDeepLinkMovieId ?: return
+        if (!::webView.isInitialized) return
+        val escaped = targetId.replace("'", "\'")
+        pendingDeepLinkMovieId = null
+        webView.postDelayed({
+            webView.evaluateJavascript("window.openMovieFromNotification && window.openMovieFromNotification('$escaped')", null)
+        }, 250L)
     }
 
     override fun onResume() {
@@ -116,7 +151,7 @@ class MainActivity : AppCompatActivity() {
                 "Jadwal Bioskop Indonesia",
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
-                description = "Notifikasi rilis film teater, watchlist, dan presale XXI, CGV, Cinépolis"
+                description = "Notifikasi rilis film teater, watchlist, presale & ringkasan pekan ini"
                 enableLights(true)
                 lightColor = Color.BLUE
                 enableVibration(true)
@@ -159,8 +194,8 @@ class MainActivity : AppCompatActivity() {
         @JavascriptInterface
         fun setSystemBarTheme(isDark: Boolean) {
             runOnUiThread {
-                val bgColor = if (isDark) Color.parseColor("#0B0F19") else Color.parseColor("#FFFFFF")
-                val pageBg = if (isDark) Color.parseColor("#0B0F19") else Color.parseColor("#F8FAFC")
+                val bgColor = if (isDark) Color.parseColor("#09090B") else Color.parseColor("#FFFFFF")
+                val pageBg = if (isDark) Color.parseColor("#09090B") else Color.parseColor("#F8FAFC")
                 window.statusBarColor = bgColor
                 window.navigationBarColor = bgColor
                 if (::webView.isInitialized) {
@@ -215,6 +250,7 @@ class MainActivity : AppCompatActivity() {
                         .setRequiredNetworkType(NetworkType.CONNECTED)
                         .build()
                 )
+                .setInputData(workDataOf("is_manual" to false))
                 .build()
             WorkManager.getInstance(context).enqueueUniqueWork(
                 "CinemaImmediateCheck",
@@ -225,7 +261,9 @@ class MainActivity : AppCompatActivity() {
 
         @JavascriptInterface
         fun runWatchlistReminderCheckNow() {
-            val immediateWork = OneTimeWorkRequestBuilder<CinemaCheckWorker>().build()
+            val immediateWork = OneTimeWorkRequestBuilder<CinemaCheckWorker>()
+                .setInputData(workDataOf("is_manual" to true))
+                .build()
             WorkManager.getInstance(context).enqueueUniqueWork(
                 "CinemaManualReminderCheck",
                 ExistingWorkPolicy.REPLACE,
@@ -245,8 +283,14 @@ class MainActivity : AppCompatActivity() {
             val aliases = listOf(
                 "com.michael.cinematracker.LauncherDefault",
                 "com.michael.cinematracker.LauncherSciFi",
+                "com.michael.cinematracker.LauncherNoir",
+                "com.michael.cinematracker.LauncherSolaris",
+                "com.michael.cinematracker.LauncherPastLives",
+                "com.michael.cinematracker.LauncherImax",
+                "com.michael.cinematracker.LauncherReel35",
                 "com.michael.cinematracker.LauncherAction",
-                "com.michael.cinematracker.LauncherImax"
+                "com.michael.cinematracker.LauncherAftersun",
+                "com.michael.cinematracker.LauncherA24"
             )
             val targetAlias = "com.michael.cinematracker.$aliasName"
             val pm = context.packageManager
@@ -317,7 +361,7 @@ class MainActivity : AppCompatActivity() {
                         context.sendBroadcast(scanIntent)
                         showJsToast("Poster tersimpan di Galeri")
                     }
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                     showJsToast("Gagal mengunduh poster")
                 }
             }
@@ -337,6 +381,11 @@ class MainActivity : AppCompatActivity() {
 
         @JavascriptInterface
         fun sendCustomNotification(title: String, body: String, posterUrl: String) {
+            sendCustomNotificationWithMovie(title, body, posterUrl, "")
+        }
+
+        @JavascriptInterface
+        fun sendCustomNotificationWithMovie(title: String, body: String, posterUrl: String, movieId: String) {
             executor.execute {
                 var rawBitmap: Bitmap? = null
                 var bannerBitmap: Bitmap? = null
@@ -355,12 +404,12 @@ class MainActivity : AppCompatActivity() {
                             val w = 640
                             val h = 320
                             val out = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
-                            val canvas = android.graphics.Canvas(out)
-                            val bgPaint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
-                                shader = android.graphics.LinearGradient(
+                            val canvas = Canvas(out)
+                            val bgPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                                shader = LinearGradient(
                                     0f, 0f, w.toFloat(), h.toFloat(),
                                     0xFF09090B.toInt(), 0xFF1F2430.toInt(),
-                                    android.graphics.Shader.TileMode.CLAMP
+                                    Shader.TileMode.CLAMP
                                 )
                             }
                             canvas.drawRect(0f, 0f, w.toFloat(), h.toFloat(), bgPaint)
@@ -368,17 +417,17 @@ class MainActivity : AppCompatActivity() {
                             val pW = pH * (2f / 3f)
                             val left = (w - pW) / 2f
                             val top = (h - pH) / 2f
-                            val rect = android.graphics.RectF(left, top, left + pW, top + pH)
-                            val clipPath = android.graphics.Path().apply {
-                                addRoundRect(rect, 16f, 16f, android.graphics.Path.Direction.CW)
+                            val rect = RectF(left, top, left + pW, top + pH)
+                            val clipPath = Path().apply {
+                                addRoundRect(rect, 16f, 16f, Path.Direction.CW)
                             }
                             canvas.save()
                             canvas.clipPath(clipPath)
-                            canvas.drawBitmap(rawBitmap, null, rect, android.graphics.Paint(android.graphics.Paint.FILTER_BITMAP_FLAG))
+                            canvas.drawBitmap(rawBitmap, null, rect, Paint(Paint.FILTER_BITMAP_FLAG))
                             canvas.restore()
-                            val borderPaint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
+                            val borderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
                                 color = 0x33FFFFFF
-                                style = android.graphics.Paint.Style.STROKE
+                                style = Paint.Style.STROKE
                                 strokeWidth = 2f
                             }
                             canvas.drawRoundRect(rect, 16f, 16f, borderPaint)
@@ -391,13 +440,22 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 val intent = Intent(context, MainActivity::class.java).apply {
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                    if (movieId.isNotEmpty()) putExtra(EXTRA_MOVIE_ID, movieId)
                 }
                 val notifId = (title.hashCode() and 0x7fffffff)
                 val pendingIntent = PendingIntent.getActivity(
                     context,
                     notifId,
                     intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
+
+                val tixIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.tix.id/search?q=" + Uri.encode(title)))
+                val tixPendingIntent = PendingIntent.getActivity(
+                    context,
+                    notifId + 99,
+                    tixIntent,
                     PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                 )
 
@@ -410,6 +468,7 @@ class MainActivity : AppCompatActivity() {
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
                     .setAutoCancel(true)
                     .setContentIntent(pendingIntent)
+                    .addAction(0, "Cek TIX ID", tixPendingIntent)
 
                 if (rawBitmap != null && bannerBitmap != null) {
                     builder.setLargeIcon(rawBitmap)
@@ -450,7 +509,7 @@ class MainActivity : AppCompatActivity() {
                     putExtra("eventLocation", location)
                 }
                 context.startActivity(intent)
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 val url = "https://calendar.google.com/calendar/render?action=TEMPLATE&text=" +
                     Uri.encode(title) + "&details=" + Uri.encode(description) +
                     "&location=" + Uri.encode(location)
@@ -462,5 +521,6 @@ class MainActivity : AppCompatActivity() {
     companion object {
         const val CHANNEL_ID = "cinema_hype_alerts"
         const val PREFS_NAME = "cinema_tracker_prefs"
+        const val EXTRA_MOVIE_ID = "open_movie_id"
     }
 }
