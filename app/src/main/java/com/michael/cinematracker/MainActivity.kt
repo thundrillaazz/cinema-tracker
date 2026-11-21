@@ -38,7 +38,6 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import java.io.File
 import java.io.FileOutputStream
-import java.io.OutputStream
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.concurrent.Executors
@@ -117,7 +116,7 @@ class MainActivity : AppCompatActivity() {
                 "Jadwal Bioskop Indonesia",
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
-                description = "Notifikasi rilis film teater dan presale XXI, CGV, Cinépolis"
+                description = "Notifikasi rilis film teater, watchlist, dan presale XXI, CGV, Cinépolis"
                 enableLights(true)
                 lightColor = Color.BLUE
                 enableVibration(true)
@@ -210,20 +209,29 @@ class MainActivity : AppCompatActivity() {
 
             scheduleBackgroundWorker()
 
-            if (cleanKey.isNotEmpty()) {
-                val immediateWork = OneTimeWorkRequestBuilder<CinemaCheckWorker>()
-                    .setConstraints(
-                        Constraints.Builder()
-                            .setRequiredNetworkType(NetworkType.CONNECTED)
-                            .build()
-                    )
-                    .build()
-                WorkManager.getInstance(context).enqueueUniqueWork(
-                    "CinemaImmediateCheck",
-                    ExistingWorkPolicy.REPLACE,
-                    immediateWork
+            val immediateWork = OneTimeWorkRequestBuilder<CinemaCheckWorker>()
+                .setConstraints(
+                    Constraints.Builder()
+                        .setRequiredNetworkType(NetworkType.CONNECTED)
+                        .build()
                 )
-            }
+                .build()
+            WorkManager.getInstance(context).enqueueUniqueWork(
+                "CinemaImmediateCheck",
+                ExistingWorkPolicy.REPLACE,
+                immediateWork
+            )
+        }
+
+        @JavascriptInterface
+        fun runWatchlistReminderCheckNow() {
+            val immediateWork = OneTimeWorkRequestBuilder<CinemaCheckWorker>().build()
+            WorkManager.getInstance(context).enqueueUniqueWork(
+                "CinemaManualReminderCheck",
+                ExistingWorkPolicy.REPLACE,
+                immediateWork
+            )
+            showJsToast("Memeriksa pengingat Watchlist...")
         }
 
         @JavascriptInterface

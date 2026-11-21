@@ -19,9 +19,9 @@
       --blue-soft: #eff6ff;
       --blue-border: #bfdbfe;
       --emerald: #16a34a;
+      --emerald-soft: #dcfce7;
       --amber: #d97706;
-      --danger-bg: #fff1f2;
-      --danger-border: #fecdd3;
+      --amber-soft: #fef3c7;
       --danger-text: #e11d48;
     }
 
@@ -39,9 +39,9 @@
       --blue-soft: rgba(59, 130, 246, 0.16);
       --blue-border: rgba(59, 130, 246, 0.35);
       --emerald: #22c55e;
+      --emerald-soft: rgba(34, 197, 94, 0.16);
       --amber: #f59e0b;
-      --danger-bg: rgba(225, 29, 72, 0.14);
-      --danger-border: rgba(225, 29, 72, 0.35);
+      --amber-soft: rgba(245, 158, 11, 0.16);
       --danger-text: #fb7185;
     }
 
@@ -50,7 +50,7 @@
       background: var(--bg);
       color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      padding-bottom: 74px;
+      padding-bottom: 76px;
       line-height: 1.45;
       transition: background-color 0.2s ease, color 0.2s ease;
     }
@@ -68,7 +68,7 @@
       align-items: center;
       justify-content: space-between;
       padding: 12px 16px 10px;
-      gap: 12px;
+      gap: 10px;
     }
     .brand {
       display: flex;
@@ -118,6 +118,12 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .icon-btn.active-header {
+      background: var(--accent);
+      color: var(--accent-text);
+      border-color: var(--accent);
     }
     .icon-btn:active { opacity: 0.8; }
     .icon-btn svg { width: 16px; height: 16px; stroke: currentColor; stroke-width: 2; fill: none; }
@@ -186,11 +192,13 @@
       color: var(--muted);
       white-space: nowrap;
       cursor: pointer;
+      transition: all 0.15s ease;
     }
     .chip.active {
       background: var(--accent);
       border-color: var(--accent);
       color: var(--accent-text);
+      font-weight: 600;
     }
     .controls-row {
       display: flex;
@@ -357,11 +365,20 @@
     }
     .countdown-pill {
       font-size: 9.5px;
-      font-weight: 600;
-      padding: 1px 5px;
+      font-weight: 700;
+      padding: 2px 6px;
       border-radius: 4px;
       background: var(--blue-soft);
       color: var(--blue);
+      letter-spacing: 0.01em;
+    }
+    .countdown-pill.now-pill {
+      background: var(--emerald-soft);
+      color: var(--emerald);
+    }
+    .countdown-pill.muted-pill {
+      background: var(--surface-2);
+      color: var(--muted);
     }
 
     .view-container { display: none; padding: 16px; }
@@ -370,7 +387,7 @@
     .watchlist-tabs {
       display: flex;
       gap: 6px;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
     .w-tab {
       flex: 1;
@@ -390,55 +407,231 @@
       border-color: var(--accent);
     }
 
-    .watch-item {
+    .wl-toolbar {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 10px;
-      padding: 10px;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+    }
+    .wl-chips {
       display: flex;
-      gap: 10px;
-      margin-bottom: 8px;
+      gap: 6px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding-bottom: 8px;
+    }
+    .wl-chips::-webkit-scrollbar { display: none; }
+    .wl-meta-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding-top: 6px;
+      border-top: 1px solid var(--border);
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .watch-item {
+      position: relative;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 12px;
+      display: flex;
+      gap: 11px;
+      margin-bottom: 9px;
       align-items: center;
     }
     .watch-thumb {
-      width: 50px;
-      height: 72px;
-      border-radius: 6px;
+      width: 52px;
+      height: 76px;
+      border-radius: 7px;
       overflow: hidden;
       flex-shrink: 0;
       background: #0f172a;
       cursor: pointer;
     }
     .watch-thumb img { width: 100%; height: 100%; object-fit: cover; }
-    .watch-body { flex: 1; min-width: 0; }
-    .watch-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 2px; cursor: pointer; }
-    .watch-date { font-size: 11px; color: var(--muted); margin-bottom: 6px; }
+    .watch-body { flex: 1; min-width: 0; padding-right: 26px; }
+    .watch-title-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      margin-bottom: 3px;
+    }
+    .watch-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.25;
+      cursor: pointer;
+    }
+    .watch-date-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 7px;
+    }
+    .watch-date { font-size: 11px; color: var(--muted); }
     .watch-toggles { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
     .toggle-pill {
       font-size: 10.5px;
-      font-weight: 500;
-      padding: 4px 8px;
+      font-weight: 600;
+      padding: 4px 9px;
       border-radius: 6px;
       border: 1px solid var(--border);
       background: var(--surface-2);
       color: var(--muted);
       cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
     }
     .toggle-pill.active {
       background: var(--blue-soft);
       border-color: var(--blue-border);
       color: var(--blue);
     }
-    .remove-btn {
-      font-size: 10.5px;
-      font-weight: 500;
-      padding: 4px 8px;
+    .ghost-remove-btn {
+      position: absolute;
+      top: 9px;
+      right: 9px;
+      width: 26px;
+      height: 26px;
       border-radius: 6px;
-      border: 1px solid var(--danger-border);
-      background: var(--danger-bg);
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0.7;
+    }
+    .ghost-remove-btn:active {
+      background: var(--surface-2);
       color: var(--danger-text);
+      opacity: 1;
+    }
+    .ghost-remove-btn svg { width: 14px; height: 14px; stroke: currentColor; stroke-width: 2; fill: none; }
+
+    /* CALENDAR VIEW STYLES */
+    .cal-header-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 12px;
+    }
+    .cal-nav-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .cal-month-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .cal-nav-btns {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .cal-mini-btn {
+      padding: 5px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--text);
+      font-size: 11px;
+      font-weight: 600;
       cursor: pointer;
     }
+    .cal-scope-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .cal-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      text-align: center;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .cal-days-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+    }
+    .cal-day {
+      aspect-ratio: 1 / 1.05;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      background: transparent;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      cursor: pointer;
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .cal-day.empty { cursor: default; }
+    .cal-day.today {
+      border-color: var(--blue-border);
+      background: var(--blue-soft);
+      color: var(--blue);
+      font-weight: 700;
+    }
+    .cal-day.selected {
+      background: var(--accent);
+      color: var(--accent-text);
+      border-color: var(--accent);
+      font-weight: 700;
+    }
+    .cal-dots {
+      display: flex;
+      gap: 2px;
+      height: 5px;
+      align-items: center;
+    }
+    .cal-dot-wl {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--blue);
+    }
+    .cal-day.selected .cal-dot-wl { background: var(--accent-text); }
+    .cal-dot-all {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--muted);
+    }
+    .cal-day.selected .cal-dot-all { background: var(--accent-text); opacity: 0.75; }
+    .cal-legend {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border);
+      font-size: 10.5px;
+      color: var(--muted);
+    }
+    .legend-item { display: flex; align-items: center; gap: 5px; }
 
     .info-card {
       background: var(--surface);
@@ -487,6 +680,18 @@
       border-radius: 8px;
       padding: 10px;
       font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+    .btn-secondary-full {
+      width: 100%;
+      background: var(--surface-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 9px;
+      font-size: 12px;
       font-weight: 600;
       cursor: pointer;
       margin-top: 8px;
@@ -634,17 +839,17 @@
     .verify-date { font-weight: 700; color: var(--blue); margin-bottom: 2px; }
 
     .quick-verify-bar {
-      display: flex;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
       gap: 6px;
       margin-bottom: 12px;
     }
     .verify-link-btn {
-      flex: 1;
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 6px;
       padding: 7px 4px;
-      font-size: 11px;
+      font-size: 10.5px;
       font-weight: 600;
       color: var(--text);
       text-align: center;
@@ -866,13 +1071,26 @@
       pointer-events: none;
       transition: opacity 0.25s ease;
       box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+      display: flex;
+      align-items: center;
+      gap: 10px;
       white-space: nowrap;
     }
     html[data-theme="dark"] .toast-banner {
       background: #f8fafc;
       color: #0f172a;
     }
-    .toast-banner.show { opacity: 1; }
+    .toast-banner.show { opacity: 1; pointer-events: auto; }
+    .toast-undo-btn {
+      background: var(--blue);
+      color: #fff;
+      border: none;
+      border-radius: 99px;
+      padding: 3px 9px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -887,8 +1105,8 @@
         </div>
       </div>
       <div class="header-actions">
-        <button class="icon-btn" onclick="switchBottomTab('search')" title="Cari Film">
-          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <button id="headerCalBtn" class="icon-btn" onclick="switchBottomTab('calendar')" title="Kalender Rilis">
+          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
         </button>
         <button class="icon-btn" onclick="switchBottomTab('watchlist')" title="Watchlist">
           <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
@@ -937,6 +1155,41 @@
     <main id="movieGrid" class="movie-grid"></main>
   </div>
 
+  <!-- CALENDAR VIEW -->
+  <div id="viewCalendar" class="view-container">
+    <div class="cal-header-card">
+      <div class="cal-nav-row">
+        <div class="cal-month-title" id="calMonthTitle">November 2026</div>
+        <div class="cal-nav-btns">
+          <button class="cal-mini-btn" onclick="jumpCalendarToday()">Hari Ini</button>
+          <button class="cal-mini-btn" onclick="shiftCalendarMonth(-1)">‹</button>
+          <button class="cal-mini-btn" onclick="shiftCalendarMonth(1)">›</button>
+        </div>
+      </div>
+
+      <div class="cal-scope-row">
+        <button id="calScopeAll" class="w-tab active" onclick="setCalendarScope('all')">Semua Rilis ID</button>
+        <button id="calScopeWatchlist" class="w-tab" onclick="setCalendarScope('watchlist')">Watchlist Saya</button>
+      </div>
+
+      <div class="cal-weekdays">
+        <div>Min</div><div>Sen</div><div>Sel</div><div>Rab</div><div>Kam</div><div>Jum</div><div>Sab</div>
+      </div>
+      <div class="cal-days-grid" id="calDaysGrid"></div>
+
+      <div class="cal-legend">
+        <span class="legend-item"><span class="cal-dot-wl"></span> Watchlist</span>
+        <span class="legend-item"><span class="cal-dot-all"></span> Rilis Teater</span>
+      </div>
+    </div>
+
+    <div class="status-banner" style="margin:0 0 10px;">
+      <span id="calAgendaLabel">Agenda Rilis</span>
+      <span id="calAgendaCount">0 Film</span>
+    </div>
+    <div id="calAgendaList"></div>
+  </div>
+
   <!-- SEARCH VIEW -->
   <div id="viewSearch" class="view-container">
     <div class="info-card">
@@ -956,6 +1209,24 @@
       <button id="wTabConfirmed" class="w-tab active" onclick="setWatchlistTab('confirmed')">Confirmed ID (<span id="wCountConfirmed">0</span>)</button>
       <button id="wTabTba" class="w-tab" onclick="setWatchlistTab('tba')">Menunggu Rilis ID / TBA (<span id="wCountTba">0</span>)</button>
     </div>
+
+    <div id="wlToolbar" class="wl-toolbar">
+      <div class="wl-chips">
+        <button class="chip active" data-wfilter="all" onclick="setWatchlistFilter('all', this)">Semua</button>
+        <button class="chip" data-wfilter="soon" onclick="setWatchlistFilter('soon', this)">Segera (≤14 Hari)</button>
+        <button class="chip" data-wfilter="imax" onclick="setWatchlistFilter('imax', this)">IMAX</button>
+        <button class="chip" data-wfilter="reminded" onclick="setWatchlistFilter('reminded', this)">Notif Aktif</button>
+      </div>
+      <div class="wl-meta-row">
+        <span id="wlSummaryText">0 film tersimpan</span>
+        <select id="wlSortSelect" class="sort-select" onchange="renderWatchlist()">
+          <option value="date_asc">Urut: Rilis Terdekat</option>
+          <option value="hype">Urut: Hype Tertinggi</option>
+          <option value="title">Urut: Judul A-Z</option>
+        </select>
+      </div>
+    </div>
+
     <div id="watchlistContainer"></div>
   </div>
 
@@ -982,7 +1253,7 @@
     </div>
 
     <div class="info-card">
-      <h3>Preferensi Notifikasi Otomatis</h3>
+      <h3>Sistem Pengingat & Notifikasi</h3>
       <div class="setting-row">
         <span>Minimal Hype Score Notif Otomatis</span>
         <select id="minHypeSelect" class="sort-select" onchange="saveAppSettings()">
@@ -999,6 +1270,7 @@
           <option value="12">Tiap 12 Jam</option>
         </select>
       </div>
+      <button class="btn-secondary-full" onclick="triggerManualReminderScan()">Cek Pengingat Watchlist Sekarang</button>
     </div>
 
     <div class="info-card">
@@ -1023,8 +1295,15 @@
         </div>
       </div>
     </div>
+
+    <div style="text-align:center; font-size:11px; color:var(--muted); padding:4px 0 12px;">
+      Cinema Tracker v3.7.0 • Watchlist Countdown & Release Calendar
+    </div>
   </div>
 
+    <div style="text-align:center; font-size:11px; color:var(--muted); padding:4px 0 12px;">
+      Cinema Tracker v3.7.0 • Watchlist Countdown & Release Calendar
+    </div>
   <!-- BOTTOM NAVIGATION -->
   <nav class="bottom-nav">
     <button id="navCatalog" class="nav-item active" onclick="switchBottomTab('catalog')">
@@ -1068,7 +1347,10 @@
   </div>
 
   <!-- TOAST -->
-  <div id="toastBanner" class="toast-banner"></div>
+  <div id="toastBanner" class="toast-banner">
+    <span id="toastText"></span>
+    <button id="toastUndoBtn" class="toast-undo-btn" style="display:none;" onclick="undoLastWatchlistRemove()">Urungkan</button>
+  </div>
 
   <script>
     function getLocalTodayIso() {
@@ -1213,29 +1495,45 @@
       }
     ];
 
+    const ID_MONTHS = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+
     let activeBottomTab = "catalog";
     let activeMode = "now";
     let activeChip = "all";
     let activeWatchlistTab = "confirmed";
+    let activeWatchlistFilter = "all";
     let allMovies = [];
-    let posterCache = JSON.parse(localStorage.getItem("ct_v36_poster_cache") || "{}");
-    let tmdbIdCache = JSON.parse(localStorage.getItem("ct_v36_tmdbid_cache") || "{}");
-    let creditsCache = JSON.parse(localStorage.getItem("ct_v36_credits_cache") || "{}");
+    let posterCache = JSON.parse(localStorage.getItem("ct_v37_poster_cache") || "{}");
+    let tmdbIdCache = JSON.parse(localStorage.getItem("ct_v37_tmdbid_cache") || "{}");
+    let creditsCache = JSON.parse(localStorage.getItem("ct_v37_credits_cache") || "{}");
     let customPostersMap = {};
     let watchlistMap = {};
     let searchTimeout = null;
     let isSyncing = false;
     let activePosterModalMovieId = null;
     let toastTimer = null;
+    let lastRemovedWatchItem = null;
 
-    function showToast(msg) {
+    // Calendar state
+    let calYear = 2026;
+    let calMonth = 10; // 0-indexed (10 = November)
+    let calSelectedDate = "";
+    let calScope = "all"; // "all" | "watchlist"
+
+    function showToast(msg, withUndo = false) {
       const el = document.getElementById("toastBanner");
-      el.textContent = msg;
+      const textEl = document.getElementById("toastText");
+      const undoBtn = document.getElementById("toastUndoBtn");
+      textEl.textContent = msg;
+      undoBtn.style.display = withUndo ? "inline-block" : "none";
       el.classList.add("show");
       clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => el.classList.remove("show"), 2500);
+      toastTimer = setTimeout(() => {
+        el.classList.remove("show");
+        if (!withUndo) lastRemovedWatchItem = null;
+      }, withUndo ? 3600 : 2400);
     }
-    window.showToast = showToast;
+    window.showToast = (msg) => showToast(msg, false);
 
     function normalizeKey(str) {
       return (str || "").toLowerCase().replace(/[^a-z0-9]/g, "");
@@ -1260,6 +1558,19 @@
       return Math.round((target - today) / 86400000);
     }
 
+    function buildCountdownBadge(isoDate, isTba = false) {
+      if (isTba || !isoDate || isoDate === "TBA") {
+        return `<span class="countdown-pill muted-pill">TBA ID</span>`;
+      }
+      const daysLeft = getDaysUntil(isoDate);
+      if (daysLeft === null) return "";
+      if (daysLeft < 0) return `<span class="countdown-pill now-pill">SEDANG TAYANG</span>`;
+      if (daysLeft === 0) return `<span class="countdown-pill now-pill">HARI INI</span>`;
+      if (daysLeft === 1) return `<span class="countdown-pill">BESOK</span>`;
+      if (daysLeft <= 14) return `<span class="countdown-pill">H-${daysLeft}</span>`;
+      return `<span class="countdown-pill muted-pill">H-${daysLeft}</span>`;
+    }
+
     function applyTheme(mode) {
       let resolvedDark = false;
       if (mode === "dark") {
@@ -1279,8 +1590,7 @@
     }
 
     function loadPersistentState() {
-      // Load Custom Posters from localStorage + Native SharedPreferences backup
-      let localCustom = JSON.parse(localStorage.getItem("ct_v36_custom_posters") || "{}");
+      let localCustom = JSON.parse(localStorage.getItem("ct_v37_custom_posters") || localStorage.getItem("ct_v36_custom_posters") || "{}");
       if (Object.keys(localCustom).length === 0 && window.AndroidBridge && typeof window.AndroidBridge.getCustomPostersJson === "function") {
         const nativeCp = window.AndroidBridge.getCustomPostersJson();
         if (nativeCp) {
@@ -1289,8 +1599,7 @@
       }
       customPostersMap = localCustom;
 
-      // Load Watchlist from localStorage + Native SharedPreferences backup so it NEVER disappears!
-      let localWatch = JSON.parse(localStorage.getItem("ct_v36_watchlist") || "{}");
+      let localWatch = JSON.parse(localStorage.getItem("ct_v37_watchlist") || localStorage.getItem("ct_v36_watchlist") || "{}");
       if (Object.keys(localWatch).length === 0 && window.AndroidBridge && typeof window.AndroidBridge.getWatchlistJson === "function") {
         const nativeWl = window.AndroidBridge.getWatchlistJson();
         if (nativeWl) {
@@ -1298,35 +1607,30 @@
         }
       }
 
-      if (Object.keys(localWatch).length === 0 && !localStorage.getItem("ct_v36_initialized")) {
-        const oldWatch = JSON.parse(localStorage.getItem("ct_v35_watchlist") || "{}");
-        if (Object.keys(oldWatch).length > 0) {
-          localWatch = oldWatch;
-        } else {
-          ["up_1", "up_10", "up_11"].forEach(id => {
-            const found = BASE_CURATED_MOVIES.find(m => m.id === id);
-            if (found) {
-              localWatch[id] = {
-                presaleAlert: true,
-                dayAlert: true,
-                isTba: false,
-                tmdbId: 0,
-                movieData: { ...found }
-              };
-            }
-          });
-        }
+      if (Object.keys(localWatch).length === 0 && !localStorage.getItem("ct_v37_initialized")) {
+        ["up_1", "up_10", "up_11"].forEach(id => {
+          const found = BASE_CURATED_MOVIES.find(m => m.id === id);
+          if (found) {
+            localWatch[id] = {
+              presaleAlert: true,
+              dayAlert: true,
+              isTba: false,
+              tmdbId: 0,
+              movieData: { ...found }
+            };
+          }
+        });
       }
 
       watchlistMap = localWatch;
-      localStorage.setItem("ct_v36_initialized", "1");
+      localStorage.setItem("ct_v37_initialized", "1");
       persistWatchlist();
       persistCustomPosters();
     }
 
     function persistWatchlist() {
       const jsonStr = JSON.stringify(watchlistMap);
-      localStorage.setItem("ct_v36_watchlist", jsonStr);
+      localStorage.setItem("ct_v37_watchlist", jsonStr);
       if (window.AndroidBridge && typeof window.AndroidBridge.saveWatchlistJson === "function") {
         window.AndroidBridge.saveWatchlistJson(jsonStr);
       }
@@ -1334,7 +1638,7 @@
 
     function persistCustomPosters() {
       const jsonStr = JSON.stringify(customPostersMap);
-      localStorage.setItem("ct_v36_custom_posters", jsonStr);
+      localStorage.setItem("ct_v37_custom_posters", jsonStr);
       if (window.AndroidBridge && typeof window.AndroidBridge.saveCustomPostersJson === "function") {
         window.AndroidBridge.saveCustomPostersJson(jsonStr);
       }
@@ -1348,6 +1652,12 @@
     }
 
     function init() {
+      const todayIso = getLocalTodayIso();
+      const parts = todayIso.split("-");
+      calYear = parseInt(parts[0], 10) || 2026;
+      calMonth = (parseInt(parts[1], 10) || 11) - 1;
+      calSelectedDate = todayIso;
+
       const savedTheme = localStorage.getItem("ct_app_theme") || "light";
       document.getElementById("themeSelect").value = savedTheme;
       applyTheme(savedTheme);
@@ -1377,8 +1687,8 @@
       updateCounts();
       renderMovies();
       renderWatchlist();
+      renderCalendar();
 
-      // Lightweight 60-second check in case device clock crosses midnight while app is open
       setInterval(() => {
         const prevDate = localStorage.getItem("ct_rendered_date") || "";
         const currDate = getLocalTodayIso();
@@ -1387,6 +1697,7 @@
           updateCounts();
           renderMovies();
           if (activeBottomTab === "watchlist") renderWatchlist();
+          if (activeBottomTab === "calendar") renderCalendar();
         }
       }, 60000);
     }
@@ -1405,6 +1716,7 @@
       updateCounts();
       renderMovies();
       if (activeBottomTab === "watchlist") renderWatchlist();
+      if (activeBottomTab === "calendar") renderCalendar();
       const key = localStorage.getItem("ct_tmdb_key") || "";
       if (key) autoSyncIfStale(key);
     };
@@ -1425,8 +1737,8 @@
       const todayIso = getLocalTodayIso();
       localStorage.setItem("ct_rendered_date", todayIso);
 
-      const liveNow = JSON.parse(localStorage.getItem("ct_v36_live_now") || "[]");
-      const liveUpcoming = JSON.parse(localStorage.getItem("ct_v36_live_upcoming") || "[]");
+      const liveNow = JSON.parse(localStorage.getItem("ct_v37_live_now") || localStorage.getItem("ct_v36_live_now") || "[]");
+      const liveUpcoming = JSON.parse(localStorage.getItem("ct_v37_live_upcoming") || localStorage.getItem("ct_v36_live_upcoming") || "[]");
 
       const map = new Map();
       const seenNormalized = new Map();
@@ -1493,8 +1805,8 @@
         }
       });
 
-      localStorage.setItem("ct_v36_poster_cache", JSON.stringify(posterCache));
-      localStorage.setItem("ct_v36_tmdbid_cache", JSON.stringify(tmdbIdCache));
+      localStorage.setItem("ct_v37_poster_cache", JSON.stringify(posterCache));
+      localStorage.setItem("ct_v37_tmdbid_cache", JSON.stringify(tmdbIdCache));
       allMovies = Array.from(map.values());
     }
 
@@ -1548,6 +1860,15 @@
       }
     }
 
+    function triggerManualReminderScan() {
+      persistWatchlist();
+      if (window.AndroidBridge && typeof window.AndroidBridge.runWatchlistReminderCheckNow === "function") {
+        window.AndroidBridge.runWatchlistReminderCheckNow();
+      } else {
+        showToast("Pemeriksaan pengingat berjalan di Android");
+      }
+    }
+
     function updateCounts() {
       const nowList = allMovies.filter(m => !(m.id.startsWith("search_") && m.tba) && m.status === "now");
       const upList = allMovies.filter(m => !(m.id.startsWith("search_") && m.tba) && m.status === "upcoming");
@@ -1587,7 +1908,7 @@
 
     function setChip(chip, el) {
       activeChip = chip;
-      document.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
+      document.querySelectorAll("#viewCatalog .chip").forEach(c => c.classList.remove("active"));
       el.classList.add("active");
       renderMovies();
     }
@@ -1596,17 +1917,27 @@
       activeWatchlistTab = tab;
       document.getElementById("wTabConfirmed").classList.toggle("active", tab === "confirmed");
       document.getElementById("wTabTba").classList.toggle("active", tab === "tba");
+      document.getElementById("wlToolbar").style.display = tab === "confirmed" ? "block" : "none";
+      renderWatchlist();
+    }
+
+    function setWatchlistFilter(filterVal, el) {
+      activeWatchlistFilter = filterVal;
+      document.querySelectorAll("#wlToolbar .chip").forEach(c => c.classList.remove("active"));
+      el.classList.add("active");
       renderWatchlist();
     }
 
     function switchBottomTab(tab) {
       activeBottomTab = tab;
       document.getElementById("viewCatalog").classList.toggle("active", tab === "catalog");
+      document.getElementById("viewCalendar").classList.toggle("active", tab === "calendar");
       document.getElementById("viewSearch").classList.toggle("active", tab === "search");
       document.getElementById("viewWatchlist").classList.toggle("active", tab === "watchlist");
       document.getElementById("viewSettings").classList.toggle("active", tab === "settings");
 
       document.getElementById("modeTabsBar").style.display = tab === "catalog" ? "grid" : "none";
+      document.getElementById("headerCalBtn").classList.toggle("active-header", tab === "calendar");
 
       document.getElementById("navCatalog").classList.toggle("active", tab === "catalog");
       document.getElementById("navSearch").classList.toggle("active", tab === "search");
@@ -1615,6 +1946,8 @@
 
       if (tab === "watchlist") {
         renderWatchlist();
+      } else if (tab === "calendar") {
+        renderCalendar();
       } else if (tab === "search") {
         clearGlobalSearch();
       }
@@ -1683,7 +2016,8 @@
         let rightPill = "";
         if (activeMode === "upcoming") {
           const daysLeft = getDaysUntil(m.releaseDate);
-          if (daysLeft === 1) rightPill = `<span class="countdown-pill">Besok</span>`;
+          if (daysLeft === 0) rightPill = `<span class="countdown-pill now-pill">Hari Ini</span>`;
+          else if (daysLeft === 1) rightPill = `<span class="countdown-pill">Besok</span>`;
           else if (daysLeft !== null && daysLeft > 1 && daysLeft <= 14) rightPill = `<span class="countdown-pill">H-${daysLeft}</span>`;
         }
 
@@ -1716,13 +2050,153 @@
       }).join("");
     }
 
+    // CALENDAR LOGIC
+    function shiftCalendarMonth(delta) {
+      calMonth += delta;
+      if (calMonth < 0) {
+        calMonth = 11;
+        calYear -= 1;
+      } else if (calMonth > 11) {
+        calMonth = 0;
+        calYear += 1;
+      }
+      const mm = String(calMonth + 1).padStart(2, "0");
+      calSelectedDate = `${calYear}-${mm}-01`;
+      renderCalendar();
+    }
+
+    function jumpCalendarToday() {
+      const todayIso = getLocalTodayIso();
+      const parts = todayIso.split("-");
+      calYear = parseInt(parts[0], 10);
+      calMonth = parseInt(parts[1], 10) - 1;
+      calSelectedDate = todayIso;
+      renderCalendar();
+    }
+
+    function setCalendarScope(scope) {
+      calScope = scope;
+      document.getElementById("calScopeAll").classList.toggle("active", scope === "all");
+      document.getElementById("calScopeWatchlist").classList.toggle("active", scope === "watchlist");
+      renderCalendar();
+    }
+
+    function selectCalendarDate(isoDate) {
+      calSelectedDate = isoDate;
+      renderCalendar();
+    }
+
+    function renderCalendar() {
+      document.getElementById("calMonthTitle").textContent = `${ID_MONTHS[calMonth]} ${calYear}`;
+      const todayIso = getLocalTodayIso();
+
+      // Map movies by releaseDate
+      const moviesByDate = {};
+      allMovies.forEach(m => {
+        if (!m.releaseDate || m.releaseDate === "TBA" || m.tba) return;
+        const isWl = Boolean(watchlistMap[m.id]);
+        if (calScope === "watchlist" && !isWl) return;
+        if (!moviesByDate[m.releaseDate]) moviesByDate[m.releaseDate] = [];
+        moviesByDate[m.releaseDate].push({ ...m, isWatchlisted: isWl });
+      });
+
+      const firstDayOfWeek = new Date(calYear, calMonth, 1).getDay(); // 0 = Sun
+      const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+      const mmStr = String(calMonth + 1).padStart(2, "0");
+
+      let cellsHtml = "";
+      for (let i = 0; i < firstDayOfWeek; i++) {
+        cellsHtml += `<div class="cal-day empty"></div>`;
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const ddStr = String(day).padStart(2, "0");
+        const dateIso = `${calYear}-${mmStr}-${ddStr}`;
+        const items = moviesByDate[dateIso] || [];
+        const hasWl = items.some(x => x.isWatchlisted);
+        const hasAny = items.length > 0;
+
+        const isToday = dateIso === todayIso;
+        const isSelected = dateIso === calSelectedDate;
+
+        let dotsHtml = "";
+        if (hasWl && items.length > 1) {
+          dotsHtml = `<span class="cal-dot-wl"></span><span class="cal-dot-all"></span>`;
+        } else if (hasWl) {
+          dotsHtml = `<span class="cal-dot-wl"></span>`;
+        } else if (hasAny) {
+          dotsHtml = `<span class="cal-dot-all"></span>`;
+        }
+
+        cellsHtml += `
+          <button class="cal-day ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''}" onclick="selectCalendarDate('${dateIso}')">
+            <span>${day}</span>
+            <span class="cal-dots">${dotsHtml}</span>
+          </button>
+        `;
+      }
+
+      document.getElementById("calDaysGrid").innerHTML = cellsHtml;
+
+      // Render Agenda for selected date
+      const agendaList = document.getElementById("calAgendaList");
+      const selectedMovies = moviesByDate[calSelectedDate] || [];
+      document.getElementById("calAgendaLabel").textContent = `Rilis: ${formatShortDate(calSelectedDate)}`;
+      document.getElementById("calAgendaCount").textContent = `${selectedMovies.length} Film`;
+
+      if (selectedMovies.length === 0) {
+        // Find next upcoming movie in current month to help user navigate seamlessly
+        const monthPrefix = `${calYear}-${mmStr}-`;
+        const nextDates = Object.keys(moviesByDate).filter(d => d.startsWith(monthPrefix)).sort();
+        const hintHtml = nextDates.length > 0
+          ? `<div style="margin-top:8px; display:flex; gap:6px; justify-content:center; flex-wrap:wrap;">
+              ${nextDates.slice(0, 4).map(d => `<button class="cal-mini-btn" onclick="selectCalendarDate('${d}')">${formatShortDate(d)} (${moviesByDate[d].length})</button>`).join("")}
+             </div>`
+          : "";
+
+        agendaList.innerHTML = `<div class="info-card" style="text-align:center; padding:20px 14px;">
+          <p style="margin:0;">Tidak ada jadwal rilis pada tanggal ini.</p>
+          ${hintHtml}
+        </div>`;
+        return;
+      }
+
+      agendaList.innerHTML = selectedMovies.map(m => {
+        const effPoster = getEffectivePoster(m);
+        const isWatched = Boolean(watchlistMap[m.id]);
+        const countdownHtml = buildCountdownBadge(m.releaseDate, m.tba);
+        const thumb = effPoster
+          ? `<img src="${effPoster}" alt="${m.title}" />`
+          : `<div style="width:100%;height:100%;background:#0f172a;color:#fff;font-size:9px;display:flex;align-items:center;justify-content:center;text-align:center;padding:2px;">${m.title}</div>`;
+
+        return `
+          <div class="watch-item" onclick="openDetail('${m.id}')" style="cursor:pointer;">
+            <div class="watch-thumb">${thumb}</div>
+            <div class="watch-body" style="padding-right:0;">
+              <div class="watch-title">${m.title}</div>
+              <div class="watch-date-row">
+                ${countdownHtml}
+                <span class="watch-date">${(m.chains || ["XXI", "CGV"]).join(" • ")}</span>
+              </div>
+              <div class="watch-toggles">
+                <button class="toggle-pill ${isWatched ? 'active' : ''}" onclick="event.stopPropagation(); toggleWatch('${m.id}'); renderCalendar();">
+                  ${isWatched ? 'Tersimpan di Watchlist' : '+ Tambah Watchlist'}
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
     function toggleWatch(id) {
       const m = allMovies.find(item => item.id === id);
       if (!m) return;
 
       if (watchlistMap[id]) {
+        lastRemovedWatchItem = { id, entry: { ...watchlistMap[id] } };
         delete watchlistMap[id];
-        showToast("Dihapus dari Watchlist");
+        showToast("Dihapus dari Watchlist", true);
       } else {
         const effPoster = getEffectivePoster(m);
         watchlistMap[id] = {
@@ -1739,6 +2213,19 @@
       updateCounts();
       renderMovies();
       if (activeBottomTab === "watchlist") renderWatchlist();
+    }
+
+    function undoLastWatchlistRemove() {
+      if (!lastRemovedWatchItem) return;
+      watchlistMap[lastRemovedWatchItem.id] = lastRemovedWatchItem.entry;
+      lastRemovedWatchItem = null;
+      document.getElementById("toastBanner").classList.remove("show");
+      persistWatchlist();
+      syncWatchlistToNative();
+      updateCounts();
+      renderMovies();
+      if (activeBottomTab === "watchlist") renderWatchlist();
+      if (activeBottomTab === "calendar") renderCalendar();
     }
 
     function syncWatchlistToNative() {
@@ -1843,7 +2330,7 @@
               <div class="watch-thumb" onclick="openSearchMovieDetail('${safeObj}')">
                 ${displayPoster ? `<img src="${displayPoster}" alt="${item.title}" />` : `<div style="width:100%;height:100%;background:#0f172a;color:#fff;font-size:9px;display:flex;align-items:center;justify-content:center;text-align:center;padding:2px;">${item.title}</div>`}
               </div>
-              <div class="watch-body">
+              <div class="watch-body" style="padding-right:0;">
                 <div class="watch-title" onclick="openSearchMovieDetail('${safeObj}')">${(item.title || item.original_title || "").toUpperCase()}</div>
                 <div class="watch-date">Rilis Global: ${item.release_date || 'TBA'}</div>
                 <div style="font-size:11px; font-weight:600; color:${badgeColor}; margin-bottom:6px;">${statusText}</div>
@@ -1904,8 +2391,9 @@
       const idKey = movieObj.id;
 
       if (watchlistMap[idKey]) {
+        lastRemovedWatchItem = { id: idKey, entry: { ...watchlistMap[idKey] } };
         delete watchlistMap[idKey];
-        showToast("Dihapus dari Watchlist");
+        showToast("Dihapus dari Watchlist", true);
       } else {
         watchlistMap[idKey] = {
           presaleAlert: true,
@@ -1932,6 +2420,7 @@
       if (platform === "TIX ID") url = `https://www.tix.id/search?q=${q}`;
       else if (platform === "XXI") url = `https://21cineplex.com/`;
       else if (platform === "CGV") url = `https://www.cgv.id/en/movies/now_playing`;
+      else if (platform === "Trailer") url = `https://www.youtube.com/results?search_query=${encodeURIComponent(movieTitle + " official trailer")}`;
 
       if (window.AndroidBridge && typeof window.AndroidBridge.openExternalUrl === "function") {
         window.AndroidBridge.openExternalUrl(url);
@@ -1996,8 +2485,9 @@
 
         <div class="quick-verify-bar">
           <button class="verify-link-btn" onclick="openTicketSearch('TIX ID', '${safeTitle}')">TIX ID</button>
-          <button class="verify-link-btn" onclick="openTicketSearch('XXI', '${safeTitle}')">Cinema XXI</button>
-          <button class="verify-link-btn" onclick="openTicketSearch('CGV', '${safeTitle}')">CGV ID</button>
+          <button class="verify-link-btn" onclick="openTicketSearch('XXI', '${safeTitle}')">XXI</button>
+          <button class="verify-link-btn" onclick="openTicketSearch('CGV', '${safeTitle}')">CGV</button>
+          <button class="verify-link-btn" onclick="openTicketSearch('Trailer', '${safeTitle}')">Trailer</button>
         </div>
 
         <div class="credits-block">
@@ -2039,7 +2529,7 @@
           if (hit && hit.id) {
             m.tmdbId = hit.id;
             tmdbIdCache[m.id] = hit.id;
-            localStorage.setItem("ct_v36_tmdbid_cache", JSON.stringify(tmdbIdCache));
+            localStorage.setItem("ct_v37_tmdbid_cache", JSON.stringify(tmdbIdCache));
             return hit.id;
           }
         }
@@ -2074,7 +2564,7 @@
               if (d.runtime && d.runtime > 0) m.runtime = `${d.runtime}m`;
 
               creditsCache[m.id] = { director: m.director, cast: m.cast, runtime: m.runtime };
-              localStorage.setItem("ct_v36_credits_cache", JSON.stringify(creditsCache));
+              localStorage.setItem("ct_v37_credits_cache", JSON.stringify(creditsCache));
               if (watchlistMap[m.id]) {
                 watchlistMap[m.id].movieData = { ...m };
                 persistWatchlist();
@@ -2094,7 +2584,6 @@
       if (e.target.id === "detailOverlay") closeDetail();
     }
 
-    // FULL POSTER VIEWER & LETTERBOXD PATRON-STYLE CUSTOMIZER
     async function openPosterCustomizer(id) {
       const m = allMovies.find(item => item.id === id) || (watchlistMap[id] && watchlistMap[id].movieData);
       if (!m) return;
@@ -2245,11 +2734,7 @@
       current.tmdbId = tmdbIdVal;
       if (m) current.movieData = { ...m, poster: getEffectivePoster(m) };
 
-      if (!current.presaleAlert && !current.dayAlert) {
-        delete watchlistMap[id];
-      } else {
-        watchlistMap[id] = current;
-      }
+      watchlistMap[id] = current;
       persistWatchlist();
       syncWatchlistToNative();
       updateCounts();
@@ -2258,38 +2743,80 @@
     }
 
     function removeFromWatchlist(id) {
+      if (!watchlistMap[id]) return;
+      lastRemovedWatchItem = { id, entry: { ...watchlistMap[id] } };
       delete watchlistMap[id];
       persistWatchlist();
       syncWatchlistToNative();
       updateCounts();
       renderMovies();
       renderWatchlist();
-      showToast("Dihapus dari Watchlist");
+      showToast("Dihapus dari Watchlist", true);
     }
 
     function renderWatchlist() {
       const container = document.getElementById("watchlistContainer");
+      const sortBy = document.getElementById("wlSortSelect").value;
       const ids = Object.keys(watchlistMap);
 
-      const filteredIds = ids.filter(id => {
-        const item = watchlistMap[id];
-        if (!item) return false;
-        if (activeWatchlistTab === "tba") return item.isTba;
-        return !item.isTba;
-      });
+      let entries = ids
+        .map(id => {
+          const cfg = watchlistMap[id];
+          if (!cfg) return null;
+          const liveM = allMovies.find(item => item.id === id) || {};
+          const mergedM = { ...(cfg.movieData || {}), ...liveM, id };
+          if (!mergedM.title) return null;
+          return { id, cfg, m: mergedM };
+        })
+        .filter(Boolean)
+        .filter(item => {
+          if (activeWatchlistTab === "tba") return item.cfg.isTba;
+          return !item.cfg.isTba;
+        });
 
-      if (filteredIds.length === 0) {
+      // Apply filter chips on Confirmed ID tab
+      if (activeWatchlistTab === "confirmed") {
+        entries = entries.filter(item => {
+          if (activeWatchlistFilter === "soon") {
+            const d = getDaysUntil(item.m.releaseDate);
+            return d !== null && d >= 0 && d <= 14;
+          }
+          if (activeWatchlistFilter === "imax") {
+            return Boolean(item.m.imax);
+          }
+          if (activeWatchlistFilter === "reminded") {
+            return Boolean(item.cfg.presaleAlert || item.cfg.dayAlert);
+          }
+          return true;
+        });
+
+        // Sort Watchlist entries cleanly
+        if (sortBy === "date_asc") {
+          entries.sort((a, b) => {
+            const da = (a.m.releaseDate && a.m.releaseDate !== "TBA") ? a.m.releaseDate : "9999-12-31";
+            const db = (b.m.releaseDate && b.m.releaseDate !== "TBA") ? b.m.releaseDate : "9999-12-31";
+            return da.localeCompare(db);
+          });
+        } else if (sortBy === "hype") {
+          entries.sort((a, b) => (b.m.hype || 0) - (a.m.hype || 0));
+        } else if (sortBy === "title") {
+          entries.sort((a, b) => a.m.title.localeCompare(b.m.title));
+        }
+      }
+
+      const activeRemCount = entries.filter(e => e.cfg.presaleAlert || e.cfg.dayAlert).length;
+      document.getElementById("wlSummaryText").textContent = `${entries.length} film • ${activeRemCount} pengingat aktif`;
+
+      if (entries.length === 0) {
         container.innerHTML = `<div class="info-card" style="text-align:center; padding:24px 16px;">
-          <p style="margin:0;">Tidak ada film di daftar ${activeWatchlistTab === 'confirmed' ? 'Confirmed ID' : 'Menunggu Rilis ID / TBA'}.</p>
+          <p style="margin:0;">Tidak ada film di daftar ${activeWatchlistTab === 'confirmed' ? 'Confirmed ID' : 'Menunggu Rilis ID / TBA'} untuk filter ini.</p>
         </div>`;
         return;
       }
 
-      container.innerHTML = filteredIds.map(id => {
-        const cfg = watchlistMap[id];
-        let m = allMovies.find(item => item.id === id) || cfg.movieData;
-        if (!m) return "";
+      container.innerHTML = entries.map(({ id, cfg, m }) => {
         const effPoster = getEffectivePoster(m);
+        const countdownHtml = buildCountdownBadge(m.releaseDate, cfg.isTba);
 
         const thumb = effPoster
           ? `<img src="${effPoster}" alt="${m.title}" />`
@@ -2297,10 +2824,18 @@
 
         return `
           <div class="watch-item">
+            <button class="ghost-remove-btn" onclick="removeFromWatchlist('${m.id}')" title="Hapus dari Watchlist" aria-label="Hapus">
+              <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+            </button>
             <div class="watch-thumb" onclick="openDetail('${m.id}')">${thumb}</div>
             <div class="watch-body">
-              <div class="watch-title" onclick="openDetail('${m.id}')">${m.title}</div>
-              <div class="watch-date">${cfg.isTba ? 'Status: Menunggu jadwal Indonesia' : `Rilis: ${m.dateLabel} (${m.releaseDate})`}</div>
+              <div class="watch-title-row">
+                <div class="watch-title" onclick="openDetail('${m.id}')">${m.title}</div>
+              </div>
+              <div class="watch-date-row">
+                ${countdownHtml}
+                <span class="watch-date">${cfg.isTba ? 'Menunggu jadwal ID' : formatShortDate(m.releaseDate)}</span>
+              </div>
               <div class="watch-toggles">
                 <button class="toggle-pill ${cfg.presaleAlert ? 'active' : ''}" onclick="updateReminder('${m.id}', 'presaleAlert', ${!cfg.presaleAlert})">
                   Presale ${cfg.presaleAlert ? 'ON' : 'OFF'}
@@ -2308,7 +2843,6 @@
                 <button class="toggle-pill ${cfg.dayAlert ? 'active' : ''}" onclick="updateReminder('${m.id}', 'dayAlert', ${!cfg.dayAlert})">
                   Hari-H ${cfg.dayAlert ? 'ON' : 'OFF'}
                 </button>
-                <button class="remove-btn" onclick="removeFromWatchlist('${m.id}')">Hapus</button>
               </div>
             </div>
           </div>
@@ -2364,8 +2898,8 @@
         } catch (_) {}
       }));
 
-      localStorage.setItem("ct_v36_poster_cache", JSON.stringify(posterCache));
-      localStorage.setItem("ct_v36_tmdbid_cache", JSON.stringify(tmdbIdCache));
+      localStorage.setItem("ct_v37_poster_cache", JSON.stringify(posterCache));
+      localStorage.setItem("ct_v37_tmdbid_cache", JSON.stringify(tmdbIdCache));
     }
 
     async function fetchMovieCreditsBatch(apiKey, movieItems) {
@@ -2388,7 +2922,7 @@
         } catch (_) {}
       }));
 
-      localStorage.setItem("ct_v36_credits_cache", JSON.stringify(creditsCache));
+      localStorage.setItem("ct_v37_credits_cache", JSON.stringify(creditsCache));
     }
 
     async function syncTmdbLive(showFeedback = true) {
@@ -2496,8 +3030,8 @@
         const liveNow = parseItems(dataNow.results);
         const liveUpcoming = parseItems(dataUpcoming.results);
 
-        localStorage.setItem("ct_v36_live_now", JSON.stringify(liveNow));
-        localStorage.setItem("ct_v36_live_upcoming", JSON.stringify(liveUpcoming));
+        localStorage.setItem("ct_v37_live_now", JSON.stringify(liveNow));
+        localStorage.setItem("ct_v37_live_upcoming", JSON.stringify(liveUpcoming));
 
         await fetchMovieCreditsBatch(key, [...liveNow, ...liveUpcoming]);
 
@@ -2505,6 +3039,7 @@
         updateCounts();
         renderMovies();
         if (activeBottomTab === "watchlist") renderWatchlist();
+        if (activeBottomTab === "calendar") renderCalendar();
 
         const nowTs = Date.now();
         localStorage.setItem("ct_last_sync_ts", nowTs.toString());

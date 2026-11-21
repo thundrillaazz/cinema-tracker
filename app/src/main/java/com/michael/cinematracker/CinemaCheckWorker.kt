@@ -14,6 +14,7 @@ import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 
 class CinemaCheckWorker(
     private val appContext: Context,
@@ -23,24 +24,86 @@ class CinemaCheckWorker(
     override fun doWork(): Result {
         val prefs = appContext.getSharedPreferences(MainActivity.PREFS_NAME, Context.MODE_PRIVATE)
         val apiKey = prefs.getString("tmdb_api_key", "")?.trim() ?: ""
-
-        if (apiKey.isEmpty()) {
-            return Result.success()
-        }
-
         val minHype = prefs.getInt("min_hype_threshold", 85)
         val tbaWatchJson = prefs.getString("tba_watch_list_json", "[]") ?: "[]"
+        val watchlistFullJson = prefs.getString("watchlist_full_json", "{}") ?: "{}"
         val customPostersJson = prefs.getString("custom_posters_json", "{}") ?: "{}"
 
         return try {
-            val todayStr = LocalDate.now().toString()
+            val today = LocalDate.now()
+            val todayStr = today.toString()
             val notifiedIds = prefs.getStringSet("notified_movie_ids", emptySet())?.toMutableSet()
                 ?: mutableSetOf()
             val customPosters = try { JSONObject(customPostersJson) } catch (_: Exception) { JSONObject() }
 
             var sentCount = 0
 
-            // 1. Check user's TBA Watchlist movies for Indonesian theatrical release confirmation
+            // 1. Priority #1: Watchlist Release Day & Presale Window Reminders (Works Offline & Online!)
+            val watchlistObj = try { JSONObject(watchlistFullJson) } catch (_: Exception) { JSONObject() }
+            val keysIter = watchlistObj.keys()
+            while (keysIter.hasNext()) {
+                val wId = keysIter.next()
+                val entry = watchlistObj.optJSONObject(wId) ?: continue
+                val isTba = entry.optBoolean("isTba", false)
+                if (isTba) continue
+
+                val dayAlert = entry.optBoolean("dayAlert", true)
+                val presaleAlert = entry.optBoolean("presaleAlert", true)
+                val movieData = entry.optJSONObject("movieData") ?: continue
+                val title = movieData.optString("title", "").ifEmpty { continue }
+                val releaseDateStr = movieData.optString("releaseDate", "")
+                if (releaseDateStr.length < 10 || releaseDateStr == "TBA") continue
+
+                val relDate = try { LocalDate.parse(releaseDateStr.take(10)) } catch (_: Exception) { null } ?: continue
+                val daysUntil = ChronoUnit.DAYS.between(today, relDate)
+                val defaultPoster = movieData.optString("poster", "")
+                val chosenPoster = customPosters.optString(wId, defaultPoster)
+
+                if (dayAlert && daysUntil == 0L) {
+                    val key = "wl_day0_${wId}_$releaseDateStr"
+                    if (!notifiedIds.contains(key)) {
+                        sendMovieNotification(
+                            key.hashCode(),
+                            "Tayang Hari Ini: $title",
+                            "Film Watchlist Anda sudah resmi tayang di XXI, CGV & Cinépolis hari ini.",
+                            chosenPoster
+                        )
+                        notifiedIds.add(key)
+                        sentCount++
+                    }
+                } else if (dayAlert && daysUntil == 1L) {
+                    val key = "wl_day1_${wId}_$releaseDateStr"
+                    if (!notifiedIds.contains(key)) {
+                        sendMovieNotification(
+                            key.hashCode(),
+                            "Besok Tayang: $title",
+                            "Siapkan jadwal nonton! Tayang di bioskop Indonesia besok ($releaseDateStr).",
+                            chosenPoster
+                        )
+                        notifiedIds.add(key)
+                        sentCount++
+                    }
+                } else if (presaleAlert && daysUntil in 2L..4L) {
+                    val key = "wl_presale_${wId}_$releaseDateStr"
+                    if (!notifiedIds.contains(key)) {
+                        sendMovieNotification(
+                            key.hashCode(),
+                            "Cek Presale Tiket: $title",
+                            "Rilis H-$daysUntil ($releaseDateStr). Cek ketersediaan kursi di TIX ID, M-TIX & CGV.",
+                            chosenPoster
+                        )
+                        notifiedIds.add(key)
+                        sentCount++
+                    }
+                }
+            }
+
+            if (apiKey.isEmpty()) {
+                prefs.edit().putStringSet("notified_movie_ids", notifiedIds).apply()
+                return Result.success()
+            }
+
+            // 2. Check user's TBA Watchlist movies for Indonesian theatrical release confirmation
             val tbaArray = JSONArray(tbaWatchJson)
             for (i in 0 until tbaArray.length()) {
                 val tmdbId = tbaArray.optInt(i, -1)
@@ -97,7 +160,7 @@ class CinemaCheckWorker(
                 }
             }
 
-            // 2. Scan High-Hype new Indonesian theatrical releases
+            // 3. Scan High-Hype new Indonesian theatrical releases
             val endpoint = "https://api.themoviedb.org/3/discover/movie?api_key=$apiKey" +
                 "&region=ID&with_release_type=2|3&with_original_language=en|id|ja|ko" +
                 "&release_date.gte=$todayStr&sort_by=popularity.desc&page=1"
@@ -115,7 +178,7 @@ class CinemaCheckWorker(
 
                 if (results != null) {
                     for (i in 0 until results.length()) {
-                        if (sentCount >= 4) break
+                        if (sentCount >= 5) break
                         val item = results.getJSONObject(i)
                         val id = item.optInt("id").toString()
                         val title = item.optString("title", "Film Baru")
