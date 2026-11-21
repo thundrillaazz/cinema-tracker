@@ -6,6 +6,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.ComponentName
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -15,6 +16,8 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.provider.MediaStore
 import android.webkit.JavascriptInterface
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
@@ -25,6 +28,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy
@@ -32,6 +36,9 @@ import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import java.io.File
+import java.io.FileOutputStream
+import java.io.OutputStream
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.concurrent.Executors
@@ -84,6 +91,13 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (::webView.isInitialized) {
+            webView.evaluateJavascript("window.onAppResume && window.onAppResume()", null)
+        }
+    }
+
     private fun requestNotificationPermissionIfNeeded() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(
@@ -132,7 +146,56 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
+    private fun showJsToast(message: String) {
+        val escaped = message.replace("'", "\'")
+        runOnUiThread {
+            if (::webView.isInitialized) {
+                webView.evaluateJavascript("window.showToast && window.showToast('$escaped')", null)
+            }
+        }
+    }
+
     inner class AndroidBridge(private val context: Context) {
+
+        @JavascriptInterface
+        fun setSystemBarTheme(isDark: Boolean) {
+            runOnUiThread {
+                val bgColor = if (isDark) Color.parseColor("#0B0F19") else Color.parseColor("#FFFFFF")
+                val pageBg = if (isDark) Color.parseColor("#0B0F19") else Color.parseColor("#F8FAFC")
+                window.statusBarColor = bgColor
+                window.navigationBarColor = bgColor
+                if (::webView.isInitialized) {
+                    webView.setBackgroundColor(pageBg)
+                }
+                val controller = WindowInsetsControllerCompat(window, window.decorView)
+                controller.isAppearanceLightStatusBars = !isDark
+                controller.isAppearanceLightNavigationBars = !isDark
+            }
+        }
+
+        @JavascriptInterface
+        fun saveWatchlistJson(jsonStr: String) {
+            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            prefs.edit().putString("watchlist_full_json", jsonStr).apply()
+        }
+
+        @JavascriptInterface
+        fun getWatchlistJson(): String {
+            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            return prefs.getString("watchlist_full_json", "") ?: ""
+        }
+
+        @JavascriptInterface
+        fun saveCustomPostersJson(jsonStr: String) {
+            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            prefs.edit().putString("custom_posters_json", jsonStr).apply()
+        }
+
+        @JavascriptInterface
+        fun getCustomPostersJson(): String {
+            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            return prefs.getString("custom_posters_json", "") ?: ""
+        }
 
         @JavascriptInterface
         fun saveSettings(apiKey: String, minHype: Int, intervalHours: Int, tbaWatchIdsJson: String) {
@@ -192,6 +255,76 @@ class MainActivity : AppCompatActivity() {
                     PackageManager.DONT_KILL_APP
                 )
             }
+            showJsToast("Ikon aplikasi diperbarui")
+        }
+
+        @JavascriptInterface
+        fun downloadPosterImage(posterUrl: String, movieTitle: String) {
+            if (posterUrl.isEmpty()) {
+                showJsToast("Poster belum tersedia")
+                return
+            }
+            showJsToast("Mengunduh poster HD...")
+            executor.execute {
+                try {
+                    val hdUrl = posterUrl.replace("/w500/", "/original/")
+                    val url = URL(hdUrl)
+                    val connection = url.openConnection() as HttpURLConnection
+                    connection.doInput = true
+                    connection.connectTimeout = 8000
+                    connection.readTimeout = 8000
+                    connection.connect()
+                    val bytes = connection.inputStream.readBytes()
+
+                    val safeName = movieTitle.replace(Regex("[^a-zA-Z0-9_-]"), "_").take(35)
+                    val fileName = "CinemaTracker_${safeName}_${System.currentTimeMillis()}.jpg"
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        val values = ContentValues().apply {
+                            put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
+                            put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+                            put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/CinemaTracker")
+                            put(MediaStore.Images.Media.IS_PENDING, 1)
+                        }
+                        val resolver = context.contentResolver
+                        val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+                        if (uri != null) {
+                            resolver.openOutputStream(uri)?.use { out -> out.write(bytes) }
+                            values.clear()
+                            values.put(MediaStore.Images.Media.IS_PENDING, 0)
+                            resolver.update(uri, values, null, null)
+                            showJsToast("Poster tersimpan di Galeri")
+                        } else {
+                            showJsToast("Gagal menyimpan poster")
+                        }
+                    } else {
+                        val dir = File(
+                            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
+                            "CinemaTracker"
+                        )
+                        if (!dir.exists()) dir.mkdirs()
+                        val file = File(dir, fileName)
+                        FileOutputStream(file).use { out -> out.write(bytes) }
+                        val scanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file))
+                        context.sendBroadcast(scanIntent)
+                        showJsToast("Poster tersimpan di Galeri")
+                    }
+                } catch (e: Exception) {
+                    showJsToast("Gagal mengunduh poster")
+                }
+            }
+        }
+
+        @JavascriptInterface
+        fun shareMovieText(text: String) {
+            try {
+                val sendIntent = Intent(Intent.ACTION_SEND).apply {
+                    type = "text/plain"
+                    putExtra(Intent.EXTRA_TEXT, text)
+                }
+                val shareIntent = Intent.createChooser(sendIntent, "Bagikan Info Film")
+                context.startActivity(shareIntent)
+            } catch (_: Exception) {}
         }
 
         @JavascriptInterface
@@ -203,6 +336,8 @@ class MainActivity : AppCompatActivity() {
                         val url = URL(posterUrl)
                         val connection = url.openConnection() as HttpURLConnection
                         connection.doInput = true
+                        connection.connectTimeout = 5000
+                        connection.readTimeout = 5000
                         connection.connect()
                         bitmap = BitmapFactory.decodeStream(connection.inputStream)
                     }

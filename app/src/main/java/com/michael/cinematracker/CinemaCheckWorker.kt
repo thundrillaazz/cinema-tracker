@@ -30,15 +30,17 @@ class CinemaCheckWorker(
 
         val minHype = prefs.getInt("min_hype_threshold", 85)
         val tbaWatchJson = prefs.getString("tba_watch_list_json", "[]") ?: "[]"
+        val customPostersJson = prefs.getString("custom_posters_json", "{}") ?: "{}"
 
         return try {
             val todayStr = LocalDate.now().toString()
             val notifiedIds = prefs.getStringSet("notified_movie_ids", emptySet())?.toMutableSet()
                 ?: mutableSetOf()
+            val customPosters = try { JSONObject(customPostersJson) } catch (_: Exception) { JSONObject() }
 
             var sentCount = 0
 
-            // 1. Check user's TBA Watchlist movies to see if they now have an Indonesian theatrical release
+            // 1. Check user's TBA Watchlist movies for Indonesian theatrical release confirmation
             val tbaArray = JSONArray(tbaWatchJson)
             for (i in 0 until tbaArray.length()) {
                 val tmdbId = tbaArray.optInt(i, -1)
@@ -79,12 +81,14 @@ class CinemaCheckWorker(
                             val dJson = JSONObject(dConn.inputStream.bufferedReader().use { it.readText() })
                             val title = dJson.optString("title", "Film Watchlist")
                             val posterPath = dJson.optString("poster_path", "")
-                            val posterUrl = if (posterPath.isNotEmpty()) "https://image.tmdb.org/t/p/w500$posterPath" else ""
+                            val defaultPoster = if (posterPath.isNotEmpty()) "https://image.tmdb.org/t/p/w500$posterPath" else ""
+                            val chosenPoster = customPosters.optString("search_$tmdbId", "")
+                                .ifEmpty { customPosters.optString("tmdb_$tmdbId", defaultPoster) }
                             sendMovieNotification(
                                 notifyKey.hashCode(),
                                 "Watchlist Confirmed ID: $title",
-                                "Resmi tayang di Indonesia mulai $idReleaseDate",
-                                posterUrl
+                                "Resmi tayang di bioskop Indonesia mulai $idReleaseDate",
+                                chosenPoster
                             )
                             notifiedIds.add(notifyKey)
                             sentCount++
@@ -124,12 +128,13 @@ class CinemaCheckWorker(
                         val hypeScore = Math.min(98, Math.max(75, Math.round(74 + Math.min(24.0, popularity / 4.0)).toInt()))
 
                         if (hypeScore >= minHype && !notifiedIds.contains(id)) {
-                            val posterUrl = if (posterPath.isNotEmpty()) "https://image.tmdb.org/t/p/w500$posterPath" else ""
+                            val defaultPoster = if (posterPath.isNotEmpty()) "https://image.tmdb.org/t/p/w500$posterPath" else ""
+                            val chosenPoster = customPosters.optString("tmdb_$id", defaultPoster)
                             sendMovieNotification(
                                 id.hashCode(),
                                 "Rilis Bioskop ID: $title",
                                 "Tayang $releaseDate • Hype $hypeScore% • Cek presale TIX ID / XXI / CGV",
-                                posterUrl
+                                chosenPoster
                             )
                             notifiedIds.add(id)
                             sentCount++
@@ -152,6 +157,8 @@ class CinemaCheckWorker(
                 val url = URL(posterUrl)
                 val connection = url.openConnection() as HttpURLConnection
                 connection.doInput = true
+                connection.connectTimeout = 5000
+                connection.readTimeout = 5000
                 connection.connect()
                 bitmap = BitmapFactory.decodeStream(connection.inputStream)
             }
