@@ -1,0 +1,518 @@
+package com.michael.cinematracker
+
+import android.Manifest
+import android.annotation.SuppressLint
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.ComponentName
+import android.content.ContentValues
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.LinearGradient
+import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.RectF
+import android.graphics.Shader
+import android.net.Uri
+import android.os.Build
+import android.os.Bundle
+import android.os.Environment
+import android.provider.MediaStore
+import android.webkit.JavascriptInterface
+import android.webkit.WebChromeClient
+import android.webkit.WebSettings
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
+import androidx.core.view.WindowInsetsControllerCompat
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.workDataOf
+import java.io.File
+import java.io.FileOutputStream
+import java.net.HttpURLConnection
+import java.net.URL
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
+
+class MainActivity : AppCompatActivity() {
+
+    private lateinit var webView: WebView
+    private val executor = Executors.newSingleThreadExecutor()
+    private var pendingDeepLinkMovieId: String? = null
+
+    private val notificationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { _ -> }
+
+    @SuppressLint("SetJavaScriptEnabled")
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        pendingDeepLinkMovieId = intent?.getStringExtra(EXTRA_MOVIE_ID)
+
+        createNotificationChannel()
+        requestNotificationPermissionIfNeeded()
+        scheduleBackgroundWorker()
+
+        webView = WebView(this).apply {
+            setBackgroundColor(Color.parseColor("#F8FAFC"))
+            settings.javaScriptEnabled = true
+            settings.domStorageEnabled = true
+            settings.loadsImagesAutomatically = true
+            settings.cacheMode = WebSettings.LOAD_DEFAULT
+            settings.allowFileAccess = true
+            webViewClient = object : WebViewClient() {
+                override fun onPageFinished(view: WebView?, url: String?) {
+                    super.onPageFinished(view, url)
+                    dispatchPendingDeepLink()
+                }
+            }
+            webChromeClient = WebChromeClient()
+            addJavascriptInterface(AndroidBridge(this@MainActivity), "AndroidBridge")
+            loadUrl("file:///android_asset/index.html")
+        }
+
+        setContentView(webView)
+
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                webView.evaluateJavascript("window.handleAndroidBack && window.handleAndroidBack()") { result ->
+                    if (result != "true") {
+                        if (webView.canGoBack()) {
+                            webView.goBack()
+                        } else {
+                            finish()
+                        }
+                    }
+                }
+            }
+        })
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        val movieId = intent.getStringExtra(EXTRA_MOVIE_ID)
+        if (!movieId.isNullOrEmpty()) {
+            pendingDeepLinkMovieId = movieId
+            dispatchPendingDeepLink()
+        }
+    }
+
+    private fun dispatchPendingDeepLink() {
+        val targetId = pendingDeepLinkMovieId ?: return
+        if (!::webView.isInitialized) return
+        val escaped = targetId.replace("'", "\'")
+        pendingDeepLinkMovieId = null
+        webView.postDelayed({
+            webView.evaluateJavascript("window.openMovieFromNotification && window.openMovieFromNotification('$escaped')", null)
+        }, 250L)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (::webView.isInitialized) {
+            webView.evaluateJavascript("window.onAppResume && window.onAppResume()", null)
+        }
+    }
+
+    private fun requestNotificationPermissionIfNeeded() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+    }
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                CHANNEL_ID,
+                "Jadwal Bioskop Indonesia",
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = "Notifikasi rilis film teater, watchlist, presale & ringkasan pekan ini"
+                enableLights(true)
+                lightColor = Color.BLUE
+                enableVibration(true)
+            }
+            val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            manager.createNotificationChannel(channel)
+        }
+    }
+
+    private fun scheduleBackgroundWorker() {
+        val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val intervalHours = prefs.getLong("sync_interval_hours", 6L)
+
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .setRequiresBatteryNotLow(true)
+            .build()
+
+        val periodicWork = PeriodicWorkRequestBuilder<CinemaCheckWorker>(intervalHours, TimeUnit.HOURS)
+            .setConstraints(constraints)
+            .build()
+
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+            "CinemaIndonesiaHypeScanner",
+            ExistingPeriodicWorkPolicy.UPDATE,
+            periodicWork
+        )
+    }
+
+    private fun showJsToast(message: String) {
+        val escaped = message.replace("'", "\'")
+        runOnUiThread {
+            if (::webView.isInitialized) {
+                webView.evaluateJavascript("window.showToast && window.showToast('$escaped')", null)
+            }
+        }
+    }
+
+    inner class AndroidBridge(private val context: Context) {
+
+        @JavascriptInterface
+        fun setSystemBarTheme(isDark: Boolean) {
+            runOnUiThread {
+                val bgColor = if (isDark) Color.parseColor("#09090B") else Color.parseColor("#FFFFFF")
+                val pageBg = if (isDark) Color.parseColor("#09090B") else Color.parseColor("#F8FAFC")
+                window.statusBarColor = bgColor
+                window.navigationBarColor = bgColor
+                if (::webView.isInitialized) {
+                    webView.setBackgroundColor(pageBg)
+                }
+                val controller = WindowInsetsControllerCompat(window, window.decorView)
+                controller.isAppearanceLightStatusBars = !isDark
+                controller.isAppearanceLightNavigationBars = !isDark
+            }
+        }
+
+        @JavascriptInterface
+        fun saveWatchlistJson(jsonStr: String) {
+            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            prefs.edit().putString("watchlist_full_json", jsonStr).apply()
+        }
+
+        @JavascriptInterface
+        fun getWatchlistJson(): String {
+            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            return prefs.getString("watchlist_full_json", "") ?: ""
+        }
+
+        @JavascriptInterface
+        fun saveCustomPostersJson(jsonStr: String) {
+            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            prefs.edit().putString("custom_posters_json", jsonStr).apply()
+        }
+
+        @JavascriptInterface
+        fun getCustomPostersJson(): String {
+            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            return prefs.getString("custom_posters_json", "") ?: ""
+        }
+
+        @JavascriptInterface
+        fun saveSettings(apiKey: String, minHype: Int, intervalHours: Int, tbaWatchIdsJson: String) {
+            val cleanKey = apiKey.trim()
+            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            val prevKey = prefs.getString("tmdb_api_key", "") ?: ""
+            val prevInterval = prefs.getLong("sync_interval_hours", 6L)
+
+            prefs.edit()
+                .putString("tmdb_api_key", cleanKey)
+                .putInt("min_hype_threshold", minHype)
+                .putLong("sync_interval_hours", intervalHours.toLong())
+                .putString("tba_watch_list_json", tbaWatchIdsJson)
+                .apply()
+
+            if (prevInterval != intervalHours.toLong() || (cleanKey.isNotEmpty() && cleanKey != prevKey)) {
+                scheduleBackgroundWorker()
+            }
+        }
+
+        @JavascriptInterface
+        fun runWatchlistReminderCheckNow() {
+            val immediateWork = OneTimeWorkRequestBuilder<CinemaCheckWorker>()
+                .setInputData(workDataOf("is_manual" to true))
+                .build()
+            WorkManager.getInstance(context).enqueueUniqueWork(
+                "CinemaManualReminderCheck",
+                ExistingWorkPolicy.REPLACE,
+                immediateWork
+            )
+            showJsToast("Memeriksa pengingat Watchlist...")
+        }
+
+        @JavascriptInterface
+        fun getTmdbApiKey(): String {
+            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            return prefs.getString("tmdb_api_key", "") ?: ""
+        }
+
+        @JavascriptInterface
+        fun changeLauncherIcon(aliasName: String) {
+            val aliases = listOf(
+                "com.michael.cinematracker.LauncherDefault",
+                "com.michael.cinematracker.LauncherTrio",
+                "com.michael.cinematracker.LauncherSciFi",
+                "com.michael.cinematracker.LauncherNoir",
+                "com.michael.cinematracker.LauncherBudapest",
+                "com.michael.cinematracker.LauncherCyber",
+                "com.michael.cinematracker.LauncherImax",
+                "com.michael.cinematracker.LauncherReel35",
+                "com.michael.cinematracker.LauncherTrinity",
+                "com.michael.cinematracker.LauncherAction"
+            )
+            val targetAlias = "com.michael.cinematracker.$aliasName"
+            val pm = context.packageManager
+
+            for (alias in aliases) {
+                val state = if (alias == targetAlias) {
+                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED
+                } else {
+                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED
+                }
+                pm.setComponentEnabledSetting(
+                    ComponentName(context, alias),
+                    state,
+                    PackageManager.DONT_KILL_APP
+                )
+            }
+            showJsToast("Ikon aplikasi diperbarui")
+        }
+
+        @JavascriptInterface
+        fun downloadPosterImage(posterUrl: String, movieTitle: String) {
+            if (posterUrl.isEmpty()) {
+                showJsToast("Poster belum tersedia")
+                return
+            }
+            showJsToast("Mengunduh poster HD...")
+            executor.execute {
+                try {
+                    val hdUrl = posterUrl.replace("/w500/", "/original/")
+                    val url = URL(hdUrl)
+                    val connection = url.openConnection() as HttpURLConnection
+                    connection.doInput = true
+                    connection.connectTimeout = 8000
+                    connection.readTimeout = 8000
+                    connection.connect()
+                    val bytes = connection.inputStream.readBytes()
+
+                    val safeName = movieTitle.replace(Regex("[^a-zA-Z0-9_-]"), "_").take(35)
+                    val fileName = "CinemaTracker_${safeName}_${System.currentTimeMillis()}.jpg"
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        val values = ContentValues().apply {
+                            put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
+                            put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+                            put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/CinemaTracker")
+                            put(MediaStore.Images.Media.IS_PENDING, 1)
+                        }
+                        val resolver = context.contentResolver
+                        val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+                        if (uri != null) {
+                            resolver.openOutputStream(uri)?.use { out -> out.write(bytes) }
+                            values.clear()
+                            values.put(MediaStore.Images.Media.IS_PENDING, 0)
+                            resolver.update(uri, values, null, null)
+                            showJsToast("Poster tersimpan di Galeri")
+                        } else {
+                            showJsToast("Gagal menyimpan poster")
+                        }
+                    } else {
+                        val dir = File(
+                            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
+                            "CinemaTracker"
+                        )
+                        if (!dir.exists()) dir.mkdirs()
+                        val file = File(dir, fileName)
+                        FileOutputStream(file).use { out -> out.write(bytes) }
+                        val scanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file))
+                        context.sendBroadcast(scanIntent)
+                        showJsToast("Poster tersimpan di Galeri")
+                    }
+                } catch (_: Exception) {
+                    showJsToast("Gagal mengunduh poster")
+                }
+            }
+        }
+
+        @JavascriptInterface
+        fun shareMovieText(text: String) {
+            try {
+                val sendIntent = Intent(Intent.ACTION_SEND).apply {
+                    type = "text/plain"
+                    putExtra(Intent.EXTRA_TEXT, text)
+                }
+                val shareIntent = Intent.createChooser(sendIntent, "Bagikan Info Film")
+                context.startActivity(shareIntent)
+            } catch (_: Exception) {}
+        }
+
+        @JavascriptInterface
+        fun sendCustomNotification(title: String, body: String, posterUrl: String) {
+            sendCustomNotificationWithMovie(title, body, posterUrl, "")
+        }
+
+        @JavascriptInterface
+        fun sendCustomNotificationWithMovie(title: String, body: String, posterUrl: String, movieId: String) {
+            executor.execute {
+                var rawBitmap: Bitmap? = null
+                var bannerBitmap: Bitmap? = null
+                var connection: HttpURLConnection? = null
+                try {
+                    if (posterUrl.isNotEmpty()) {
+                        val url = URL(posterUrl.replace("/w500/", "/w342/"))
+                        connection = (url.openConnection() as HttpURLConnection).apply {
+                            doInput = true
+                            connectTimeout = 5000
+                            readTimeout = 5000
+                        }
+                        connection.connect()
+                        rawBitmap = BitmapFactory.decodeStream(connection.inputStream)
+                        if (rawBitmap != null) {
+                            val w = 640
+                            val h = 320
+                            val out = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+                            val canvas = Canvas(out)
+                            val bgPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                                shader = LinearGradient(
+                                    0f, 0f, w.toFloat(), h.toFloat(),
+                                    0xFF09090B.toInt(), 0xFF1F2430.toInt(),
+                                    Shader.TileMode.CLAMP
+                                )
+                            }
+                            canvas.drawRect(0f, 0f, w.toFloat(), h.toFloat(), bgPaint)
+                            val pH = 280f
+                            val pW = pH * (2f / 3f)
+                            val left = (w - pW) / 2f
+                            val top = (h - pH) / 2f
+                            val rect = RectF(left, top, left + pW, top + pH)
+                            val clipPath = Path().apply {
+                                addRoundRect(rect, 16f, 16f, Path.Direction.CW)
+                            }
+                            canvas.save()
+                            canvas.clipPath(clipPath)
+                            canvas.drawBitmap(rawBitmap, null, rect, Paint(Paint.FILTER_BITMAP_FLAG))
+                            canvas.restore()
+                            val borderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                                color = 0x33FFFFFF
+                                style = Paint.Style.STROKE
+                                strokeWidth = 2f
+                            }
+                            canvas.drawRoundRect(rect, 16f, 16f, borderPaint)
+                            bannerBitmap = out
+                        }
+                    }
+                } catch (_: Exception) {
+                } finally {
+                    connection?.disconnect()
+                }
+
+                val intent = Intent(context, MainActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                    if (movieId.isNotEmpty()) putExtra(EXTRA_MOVIE_ID, movieId)
+                }
+                val notifId = (title.hashCode() and 0x7fffffff)
+                val pendingIntent = PendingIntent.getActivity(
+                    context,
+                    notifId,
+                    intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
+
+                val tixIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.tix.id/search?q=" + Uri.encode(title)))
+                val tixPendingIntent = PendingIntent.getActivity(
+                    context,
+                    notifId + 99,
+                    tixIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
+
+                val builder = NotificationCompat.Builder(context, CHANNEL_ID)
+                    .setSmallIcon(R.drawable.ic_notification)
+                    .setColor(0xFF18181B.toInt())
+                    .setSubText("Jadwal Bioskop ID")
+                    .setContentTitle(title)
+                    .setContentText(body)
+                    .setPriority(NotificationCompat.PRIORITY_HIGH)
+                    .setAutoCancel(true)
+                    .setContentIntent(pendingIntent)
+                    .addAction(0, "Cek TIX ID", tixPendingIntent)
+
+                if (rawBitmap != null && bannerBitmap != null) {
+                    builder.setLargeIcon(rawBitmap)
+                    builder.setStyle(
+                        NotificationCompat.BigPictureStyle()
+                            .bigPicture(bannerBitmap)
+                            .bigLargeIcon(null as Bitmap?)
+                            .setBigContentTitle(title)
+                            .setSummaryText(body)
+                    )
+                } else {
+                    builder.setStyle(NotificationCompat.BigTextStyle().bigText(body).setBigContentTitle(title))
+                }
+
+                val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                manager.notify(notifId, builder.build())
+            }
+        }
+
+        @JavascriptInterface
+        fun openExternalUrl(url: String) {
+            try {
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                context.startActivity(intent)
+            } catch (_: Exception) {}
+        }
+
+        @JavascriptInterface
+        fun addCalendarEvent(title: String, description: String, location: String, startMillis: Long) {
+            try {
+                val intent = Intent(Intent.ACTION_EDIT).apply {
+                    type = "vnd.android.cursor.item/event"
+                    putExtra("beginTime", startMillis)
+                    putExtra("endTime", startMillis + 7200000L)
+                    putExtra("allDay", true)
+                    putExtra("title", title)
+                    putExtra("description", description)
+                    putExtra("eventLocation", location)
+                }
+                context.startActivity(intent)
+            } catch (_: Exception) {
+                val url = "https://calendar.google.com/calendar/render?action=TEMPLATE&text=" +
+                    Uri.encode(title) + "&details=" + Uri.encode(description) +
+                    "&location=" + Uri.encode(location)
+                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+            }
+        }
+    }
+
+    companion object {
+        const val CHANNEL_ID = "cinema_hype_alerts"
+        const val PREFS_NAME = "cinema_tracker_prefs"
+        const val EXTRA_MOVIE_ID = "open_movie_id"
+    }
+}
