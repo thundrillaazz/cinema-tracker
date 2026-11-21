@@ -1464,56 +1464,57 @@
     }
   </style>
 
-<style id="ct-qol-v46">
+<style id="ct-qol-v47">
   * { -webkit-tap-highlight-color: transparent; }
-  img { content-visibility: auto; }
 
-  /* 1. Indikator visual jelas saat tersimpan / diklik */
-  .ct-wl-active,
-  button.ct-wl-active,
-  [data-ct-saved="1"] {
-    background: #e11d48 !important;
-    color: #ffffff !important;
-    border-color: #e11d48 !important;
+  /* Warna emas instan saat save / bookmark / watchlist aktif atau diklik */
+  .ct-gold-active,
+  button.ct-gold-active,
+  [role="button"].ct-gold-active,
+  [data-ct-gold="1"] {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+    color: #111827 !important;
+    border-color: #f59e0b !important;
+    box-shadow: 0 2px 10px rgba(245, 158, 11, 0.35) !important;
   }
-  .ct-wl-active svg,
-  [data-ct-saved="1"] svg {
-    fill: #ffffff !important;
-    stroke: #ffffff !important;
-  }
-
-  /* 2. Sembunyikan elemen yang dilingkari putih (star, selesai, status & catatan nonton) */
-  #tab-watchlist [class*="star"],
-  #tab-watchlist [class*="priority"],
-  #tab-watchlist [class*="selesai"],
-  #tab-watchlist .wl-actions,
-  #tab-watchlist .notif-row,
-  .ct-hide-clutter {
-    display: none !important;
+  .ct-gold-active svg,
+  [data-ct-gold="1"] svg {
+    fill: #111827 !important;
+    stroke: #111827 !important;
   }
 
-  /* 3 & 4. Rapikan bagian atas & kartu Watchlist */
-  #tab-watchlist .ct-wl-top-bar {
+  /* Bagian atas Watchlist simetris & filter tidak terpotong */
+  #tab-watchlist .ct-wl-sym-tabs {
     display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
-    gap: 8px !important;
-    align-items: stretch !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+    width: 100% !important;
     margin-bottom: 10px !important;
   }
-  #tab-watchlist .ct-wl-top-bar > * {
+  #tab-watchlist .ct-wl-sym-tabs > button {
     width: 100% !important;
     justify-content: center !important;
     text-align: center !important;
     margin: 0 !important;
   }
-  #tab-watchlist .ct-wl-card {
+  #tab-watchlist .ct-wl-sym-filters {
     display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    gap: 12px !important;
-    padding: 10px 12px !important;
-    border-radius: 14px !important;
-    margin-bottom: 8px !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  #tab-watchlist .ct-wl-sym-filters > button {
+    flex: 0 0 auto !important;
+    max-width: 100% !important;
+  }
+
+  /* Rapikan kartu Watchlist agar fokus ke countdown & tanggal rilis */
+  #tab-watchlist .ct-wl-card-clean .ct-wl-extra-btns,
+  #tab-watchlist [class*="star"],
+  #tab-watchlist [class*="priority"],
+  #tab-watchlist [class*="selesai"] {
+    display: none !important;
   }
 </style>
 </head>
@@ -4461,114 +4462,53 @@
     init();
   </script>
 
-<script id="ct-qol-v46-js">
+<script id="ct-qol-v47-js">
 (function() {
-  function getSavedKeys() {
-    const keys = new Set();
+  function markGold(el, active) {
+    if (!el) return;
+    el.classList.toggle('ct-gold-active', !!active);
+    if (active) {
+      el.setAttribute('data-ct-gold', '1');
+    } else {
+      el.removeAttribute('data-ct-gold');
+    }
+  }
+
+  function getSavedSet() {
+    const set = new Set();
     for (let i = 0; i < localStorage.length; i++) {
       const k = localStorage.key(i) || '';
       if (!/watch/i.test(k)) continue;
       try {
-        const data = JSON.parse(localStorage.getItem(k) || 'null');
-        if (!Array.isArray(data)) continue;
-        data.forEach(item => {
+        const raw = JSON.parse(localStorage.getItem(k) || 'null');
+        if (!Array.isArray(raw)) continue;
+        raw.forEach(item => {
           if (item == null) return;
           if (typeof item === 'object') {
-            [item.id, item.movieId, item.tmdbId, item.slug, item.title].forEach(v => {
-              if (v != null && String(v).trim()) keys.add(String(v).trim().toLowerCase());
+            [item.id, item.movieId, item.tmdbId, item.slug, item.title, item.name].forEach(v => {
+              if (v != null && String(v).trim()) set.add(String(v).trim().toLowerCase());
             });
           } else {
-            keys.add(String(item).trim().toLowerCase());
+            set.add(String(item).trim().toLowerCase());
           }
         });
       } catch (_) {}
     }
-    return keys;
+    return set;
   }
 
-  function applyClutterCleanup() {
-    // Sembunyikan blok status nonton & catatan singkat di modal detail
-    document.querySelectorAll('button, input, textarea, div, section, label').forEach(el => {
-      if (el.children.length > 5) return;
-      const t = (el.textContent || '').trim();
-      const ph = (el.getAttribute && (el.getAttribute('placeholder') || '')).trim();
-      if (
-        t === 'Diincar' ||
-        t === 'Sudah Nonton' ||
-        t === '✓ Selesai' ||
-        t === 'Prioritas' ||
-        /^Ditonton\s*\(\d+\)$/i.test(t) ||
-        /catatan singkat/i.test(t) ||
-        /catatan singkat/i.test(ph)
-      ) {
-        const target = (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') ? el.parentElement : el;
-        if (target && target.children.length <= 3) {
-          target.classList.add('ct-hide-clutter');
-        }
-      }
-    });
-
-    // Sembunyikan tombol aksi ekstra di dalam kartu Watchlist (bintang / selesai / pre-sale / h-1 / hari-h)
-    const wlRoot = document.getElementById('tab-watchlist') || document.querySelector('[data-tab="watchlist"]');
-    if (!wlRoot) return;
-
-    wlRoot.querySelectorAll('button').forEach(btn => {
-      if (btn.children.length > 2) return;
-      const t = (btn.textContent || '').trim();
-      if (
-        t === '★' ||
-        t === '☆' ||
-        t === '✓ Selesai' ||
-        t === 'Selesai' ||
-        t === 'Pre-Sale' ||
-        t === 'H-1' ||
-        t === 'Hari-H'
-      ) {
-        btn.classList.add('ct-hide-clutter');
-      }
-    });
-  }
-
-  function applyWatchlistLayoutAndCopy() {
-    const wlRoot = document.getElementById('tab-watchlist') || document.querySelector('[data-tab="watchlist"]');
-    if (!wlRoot) return;
-
-    // Copywriting lebih modern & ringkas
-    wlRoot.querySelectorAll('button, span, div, h1, h2, h3').forEach(el => {
-      if (el.children.length > 0) return;
-      const raw = (el.textContent || '').trim();
-      const m1 = raw.match(/^Terjadwal\s*\((\d+)\)$/i);
-      if (m1) el.textContent = `Rilis (${m1[1]})`;
-      const m2 = raw.match(/^Menunggu(?:\s+ID)?\s*\((\d+)\)$/i);
-      if (m2) el.textContent = `TBA (${m2[1]})`;
-    });
-
-    // Bar atas dua tab dibuat simetris 2 kolom
-    const firstBtn = wlRoot.querySelector('button');
-    if (firstBtn && firstBtn.parentElement && firstBtn.parentElement.children.length === 2) {
-      firstBtn.parentElement.classList.add('ct-wl-top-bar');
-    }
-
-    // Rapikan kartu film di Watchlist
-    wlRoot.querySelectorAll('img').forEach(img => {
-      const card = img.closest('[class*="card"], [class*="item"], [class*="movie"], li, article') || img.parentElement;
-      if (card && card !== wlRoot) {
-        card.classList.add('ct-wl-card');
-      }
-    });
-  }
-
-  function syncSavedIndicators() {
-    const saved = getSavedKeys();
+  function syncGoldButtons() {
+    const saved = getSavedSet();
+    const modal = document.querySelector('.modal.open, .modal.active, [class*="modal"][style*="display: block"], [class*="modal"][style*="display: flex"], [role="dialog"]');
+    const modalTitle = modal ? modal.querySelector('h1, h2, h3, h4, [class*="title"]') : null;
 
     document.querySelectorAll('button, [role="button"]').forEach(btn => {
-      const t = (btn.textContent || '').trim();
-      const card = btn.closest('[data-id], [data-movie-id], [data-tmdb-id], [class*="card"], [class*="movie"], [class*="search"], li, article') || btn.parentElement;
+      const txt = (btn.textContent || '').trim();
+      const card = btn.closest('[data-id], [data-movie-id], [data-tmdb-id], [class*="card"], [class*="movie"], [class*="search"], [class*="item"], li, article') || btn.parentElement;
       const titleEl = card ? card.querySelector('h1, h2, h3, h4, .title, [class*="title"]') : null;
-      const modalTitle = document.querySelector('.modal h1, .modal h2, .modal h3, [class*="modal"] h1, [class*="modal"] h2, [class*="modal"] h3');
-      const isInsideModal = !!(btn.closest('.modal, [class*="modal"], [role="dialog"]'));
+      const inModal = !!(modal && modal.contains(btn));
 
-      const candidates = [
+      const cands = [
         btn.getAttribute('data-id'),
         btn.getAttribute('data-movie-id'),
         btn.getAttribute('data-tmdb-id'),
@@ -4576,56 +4516,80 @@
         card && card.getAttribute('data-movie-id'),
         card && card.getAttribute('data-tmdb-id'),
         titleEl && titleEl.textContent,
-        isInsideModal && modalTitle && modalTitle.textContent
+        inModal && modalTitle && modalTitle.textContent
       ].filter(Boolean).map(s => String(s).trim().toLowerCase());
 
-      const isSaved = candidates.some(c => saved.has(c));
+      const isSaved = cands.some(c => saved.has(c));
 
-      if (/^\+?\s*watchlist$/i.test(t) || /^✓?\s*(di\s*)?watchlist$/i.test(t) || /tersimpan di watchlist/i.test(t)) {
-        btn.classList.toggle('ct-wl-active', isSaved);
-        if (isSaved) {
-          btn.setAttribute('data-ct-saved', '1');
-          if (/^\+?\s*watchlist$/i.test(t) || /^✓?\s*(di\s*)?watchlist$/i.test(t)) {
-            btn.textContent = '✓ Tersimpan';
-          }
-        } else {
-          btn.removeAttribute('data-ct-saved');
-          if (/^✓?\s*(di\s*)?watchlist$/i.test(t) || /^✓\s*tersimpan$/i.test(t)) {
-            btn.textContent = '+ Watchlist';
-          }
+      if (/^\+?\s*watchlist$/i.test(txt) || /^✓?\s*(di\s*)?watchlist$/i.test(txt) || /tersimpan di watchlist/i.test(txt) || /watchlist/i.test(txt) && txt.length <= 28) {
+        markGold(btn, isSaved);
+        if (/^\+?\s*watchlist$/i.test(txt) || /^✓?\s*(di\s*)?watchlist$/i.test(txt)) {
+          btn.textContent = isSaved ? '★ Di Watchlist' : '+ Watchlist';
         }
-      } else if (t === '' && btn.querySelector('svg') && card) {
-        btn.classList.toggle('ct-wl-active', isSaved);
-        if (isSaved) btn.setAttribute('data-ct-saved', '1');
-        else btn.removeAttribute('data-ct-saved');
+      } else if (txt === '' && btn.querySelector('svg')) {
+        if (isSaved || btn.getAttribute('data-ct-gold') === '1') {
+          markGold(btn, isSaved);
+        }
       }
     });
   }
 
-  function runAll() {
-    syncSavedIndicators();
-    applyClutterCleanup();
-    applyWatchlistLayoutAndCopy();
+  function syncWatchlistUI() {
+    const wlRoot = document.getElementById('tab-watchlist') || document.querySelector('[data-tab="watchlist"]');
+    if (!wlRoot) return;
+
+    const btns = Array.from(wlRoot.querySelectorAll('button'));
+    const schedBtn = btns.find(b => /^Terjadwal\s*\(/i.test((b.textContent || '').trim()) || /^Rilis\s*\(/i.test((b.textContent || '').trim()));
+    const waitBtn = btns.find(b => /^Menunggu\s*\(/i.test((b.textContent || '').trim()) || /^TBA\s*\(/i.test((b.textContent || '').trim()));
+
+    if (schedBtn && waitBtn && schedBtn.parentElement === waitBtn.parentElement) {
+      schedBtn.parentElement.classList.add('ct-wl-sym-tabs');
+    }
+
+    const semuaBtn = btns.find(b => (b.textContent || '').trim() === 'Semua');
+    if (semuaBtn && semuaBtn.parentElement) {
+      semuaBtn.parentElement.classList.add('ct-wl-sym-filters');
+    }
+
+    wlRoot.querySelectorAll('button').forEach(b => {
+      const t = (b.textContent || '').trim();
+      if (t === '★' || t === '☆' || t === '✓ Selesai' || t === 'Selesai' || t === 'Pre-Sale' || t === 'H-1' || t === 'Hari-H') {
+        b.classList.add('ct-wl-extra-btns');
+      }
+    });
   }
 
+  // Tangkap klik secara langsung supaya warna emas langsung muncul saat diklik
   document.addEventListener('click', function(e) {
-    const btn = e.target.closest('button, [role="button"]');
-    if (!btn) return;
-    const t = (btn.textContent || '').trim();
-    if (/watchlist/i.test(t) || /tersimpan/i.test(t) || (t === '' && btn.querySelector('svg'))) {
-      const currentlySaved = btn.classList.contains('ct-wl-active') || btn.getAttribute('data-ct-saved') === '1';
-      if (!currentlySaved && (/^\+?\s*watchlist$/i.test(t) || /tersimpan di watchlist/i.test(t) || t === '')) {
-        btn.classList.add('ct-wl-active');
-        btn.setAttribute('data-ct-saved', '1');
-        if (/^\+?\s*watchlist$/i.test(t)) btn.textContent = '✓ Tersimpan';
-      }
-      setTimeout(runAll, 60);
-    }
-  }, false);
+    const target = e.target.closest('button, [role="button"]');
+    if (!target) return;
+    const txt = (target.textContent || '').trim();
+    const isWatchlistBtn = /watchlist/i.test(txt) || /tersimpan/i.test(txt);
+    const isIconSaveBtn = txt === '' && !!target.querySelector('svg');
 
-  window.addEventListener('load', function() {
-    runAll();
-    setInterval(runAll, 1500);
+    if (isWatchlistBtn || isIconSaveBtn) {
+      const wasGold = target.getAttribute('data-ct-gold') === '1' || target.classList.contains('ct-gold-active');
+      if (isWatchlistBtn) {
+        const nextGold = !wasGold;
+        markGold(target, nextGold);
+        if (/^\+?\s*watchlist$/i.test(txt) || /^★?\s*(di\s*)?watchlist$/i.test(txt)) {
+          target.textContent = nextGold ? '★ Di Watchlist' : '+ Watchlist';
+        }
+      } else if (isIconSaveBtn) {
+        markGold(target, !wasGold);
+      }
+      setTimeout(syncGoldButtons, 80);
+      setTimeout(syncGoldButtons, 260);
+    }
+  }, true);
+
+  window.addEventListener('DOMContentLoaded', function() {
+    syncGoldButtons();
+    syncWatchlistUI();
+    setInterval(function() {
+      syncGoldButtons();
+      syncWatchlistUI();
+    }, 1200);
   });
 })();
 </script>
