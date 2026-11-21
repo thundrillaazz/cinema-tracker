@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Cinema Tracker</title>
+<style>
+  :root {
+    --bg: #09090B;
+    --surface: #121216;
+    --surface-2: #1A1A20;
+    --border: rgba(255, 255, 255, 0.08);
+    --text: #F4F4F5;
+    --muted: #A1A1AA;
+    --dim: #71717A;
+    --accent: #E11D48;
+    --accent-soft: rgba(225, 29, 72, 0.16);
+    --green: #10B981;
+    --green-soft: rgba(16, 185, 129, 0.14);
+    --amber: #F59E0B;
+    --amber-soft: rgba(245, 158, 11, 0.15);
+    --lb-green: #00E054;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+    min-height: 100vh;
+    padding-bottom: 84px;
+    overflow-x: hidden;
+  }
+
+  /* Header */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    background: rgba(9, 9, 11, 0.88);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 16px 12px;
+  }
+
+  .top-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .brand {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .brand h1 {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .brand span {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+  }
+
+  .icon-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  .search-wrap {
+    margin-top: 10px;
+    position: relative;
+  }
+
+  .search-input {
+    width: 100%;
+    height: 38px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    padding: 0 36px 0 36px;
+    font-size: 13px;
+    outline: none;
+  }
+
+  .search-input:focus {
+    border-color: rgba(255, 255, 255, 0.22);
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 11px;
+    top: 10px;
+    color: var(--dim);
+    pointer-events: none;
+  }
+
+  .clear-search {
+    position: absolute;
+    right: 8px;
+    top: 7px;
+    width: 24px;
+    height: 24px;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-size: 16px;
+    display: none;
+    cursor: pointer;
+  }
+
+  /* Filter Pills */
+  .sub-filters {
+    display: flex;
+    gap: 8px;
+    padding: 12px 16px 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .sub-filters::-webkit-scrollbar { display: none; }
+
+  .pill {
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 500;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    white-space: nowrap;
+    cursor: pointer;
+    transition: 0.15s ease;
+  }
+
+  .pill.active {
+    background: var(--text);
+    color: var(--bg);
+    border-color: var(--text);
+    font-weight: 600;
+  }
+
+  /* Grid */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    padding: 12px 16px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.14s ease;
+  }
+
+  .card:active {
+    transform: scale(0.98);
+  }
+
+  .poster-box {
+    position: relative;
+    aspect-ratio: 2 / 3;
+    background: #18181D;
+    overflow: hidden;
+  }
+
+  .poster-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .badge-top {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    right: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 4px;
+    pointer-events: none;
+  }
+
+  .release-badge {
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    backdrop-filter: blur(10px);
+    background: rgba(9, 9, 11, 0.78);
+    color: var(--text);
+    border: 1px solid rgba(255,255,255,0.12);
+  }
+
+  .release-badge.live {
+    background: rgba(16, 185, 129, 0.9);
+    color: #04130D;
+    border: none;
+  }
+
+  .release-badge.soon {
+    background: rgba(245, 158, 11, 0.92);
+    color: #1A1102;
+    border: none;
+  }
+
+  .score-badge {
+    padding: 3px 6px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    background: rgba(9, 9, 11, 0.78);
+    color: #E4E4E7;
+    border: 1px solid rgba(255,255,255,0.12);
+  }
+
+  .remind-dot {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.16);
+    background: rgba(9, 9, 11, 0.82);
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 2;
+  }
+
+  .remind-dot.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #FFF;
+  }
+
+  .card-info {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .card-title {
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .card-meta {
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  /* Bottom Navigation */
+  nav.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 35;
+    background: rgba(12, 12, 15, 0.94);
+    backdrop-filter: blur(18px);
+    border-top: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    height: 64px;
+  }
+
+  .nav-item {
+    border: none;
+    background: transparent;
+    color: var(--dim);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .nav-item.active {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  .nav-count {
+    position: absolute;
+    top: 8px;
+    right: calc(50% - 22px);
+    background: var(--accent);
+    color: #FFF;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 999px;
+    display: none;
+  }
+
+  /* Detail Bottom Sheet */
+  .sheet-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.72);
+    backdrop-filter: blur(6px);
+    z-index: 50;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+  }
+
+  .sheet-backdrop.open {
+    display: flex;
+  }
+
+  .sheet {
+    width: 100%;
+    max-width: 540px;
+    max-height: 90vh;
+    background: #111115;
+    border-top-left-radius: 22px;
+    border-top-right-radius: 22px;
+    border-top: 1px solid rgba(255,255,255,0.12);
+    overflow-y: auto;
+    position: relative;
+    animation: slideUp 0.2s ease-out;
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(24px); opacity: 0.6; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  .sheet-hero {
+    position: relative;
+    height: 190px;
+    overflow: hidden;
+  }
+
+  .sheet-hero-bg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: blur(18px) brightness(0.45);
+    transform: scale(1.15);
+  }
+
+  .sheet-hero-gradient {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(17,17,21,0.15), #111115);
+  }
+
+  .sheet-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.16);
+    background: rgba(9,9,11,0.7);
+    color: var(--text);
+    font-size: 18px;
+    cursor: pointer;
+    z-index: 5;
+  }
+
+  .sheet-body {
+    padding: 0 18px 26px;
+    margin-top: -92px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .sheet-header {
+    display: flex;
+    gap: 14px;
+    align-items: flex-end;
+  }
+
+  .sheet-poster {
+    width: 104px;
+    aspect-ratio: 2 / 3;
+    border-radius: 12px;
+    object-fit: cover;
+    border: 1px solid rgba(255,255,255,0.16);
+    box-shadow: 0 10px 28px rgba(0,0,0,0.6);
+    background: #1C1C22;
+    flex-shrink: 0;
+  }
+
+  .sheet-title-block h2 {
+    font-size: 19px;
+    font-weight: 700;
+    line-height: 1.25;
+    margin-bottom: 6px;
+  }
+
+  .sheet-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 4px;
+  }
+
+  .tag {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+
+  .tag.id-date {
+    background: var(--accent-soft);
+    border-color: rgba(225, 29, 72, 0.35);
+    color: #FDA4AF;
+    font-weight: 600;
+  }
+
+  /* Action Bar: Reminder + Direct Trailer + Direct Letterboxd Profile */
+  .action-row {
+    display: grid;
+    grid-template-columns: 1.25fr 1fr 1fr;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .act-btn {
+    height: 42px;
+    border-radius: 11px;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    padding: 0 10px;
+  }
+
+  .act-btn.primary {
+    background: var(--text);
+    color: var(--bg);
+    border-color: var(--text);
+  }
+
+  .act-btn.reminded {
+    background: var(--accent);
+    color: #FFF;
+    border-color: var(--accent);
+  }
+
+  .act-btn.lb-btn {
+    border-color: rgba(0, 224, 84, 0.28);
+    color: #D1FAE5;
+  }
+
+  .lb-dots {
+    display: inline-flex;
+    gap: 2px;
+  }
+  .lb-dots span {
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+  }
+
+  .section-label {
+    margin-top: 18px;
+    margin-bottom: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--dim);
+  }
+
+  .overview-text {
+    font-size: 13px;
+    line-height: 1.58;
+    color: #D4D4D8;
+  }
+
+  .cast-list {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+  .cast-list::-webkit-scrollbar { display: none; }
+
+  .cast-chip {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 11px;
+    white-space: nowrap;
+    color: var(--muted);
+  }
+
+  /* Settings Modal */
+  .modal-box {
+    width: 100%;
+    max-width: 460px;
+    background: #121216;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    border-top: 1px solid rgba(255,255,255,0.12);
+    padding: 20px 18px 28px;
+  }
+
+  .modal-box h3 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 14px;
+  }
+
+  .field-group {
+    margin-bottom: 14px;
+  }
+
+  .field-group label {
+    display: block;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .field-input {
+    width: 100%;
+    height: 40px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    padding: 0 12px;
+    font-size: 13px;
+  }
+
+  .icon-choices {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .icon-choice {
+    padding: 10px 8px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 500;
+    text-align: center;
+    cursor: pointer;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="top-row">
+    <div class="brand">
+      <h1>Cinema Tracker</h1>
+      <span id="headerSubtitle">Radar Tayang Bioskop Indonesia</span>
+    </div>
+    <button class="icon-btn" id="openSettingsBtn" aria-label="Pengaturan">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="3"></circle>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.6.85 1 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+      </svg>
+    </button>
+  </div>
+
+  <div class="search-wrap">
+    <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="11" cy="11" r="8"></circle>
+      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+    <input id="searchInput" class="search-input" type="search" placeholder="Cari film yang akan tayang..." />
+    <button id="clearSearchBtn" class="clear-search">&times;</button>
+  </div>
+</header>
+
+<div id="subFilters" class="sub-filters"></div>
+<main id="contentArea"></main>
+
+<nav class="bottom-nav">
+  <button class="nav-item active" data-tab="id">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <rect x="2" y="3" width="20" height="14" rx="2"></rect>
+      <line x1="8" y1="21" x2="16" y2="21"></line>
+      <line x1="12" y1="17" x2="12" y2="21"></line>
+    </svg>
+    <span>Bioskop ID</span>
+  </button>
+  <button class="nav-item" data-tab="hype">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+    </svg>
+    <span>Radar Hype</span>
+  </button>
+  <button class="nav-item" data-tab="reminders">
+    <span id="reminderBadge" class="nav-count">0</span>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+      <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+    </svg>
+    <span>Reminder</span>
+  </button>
+</nav>
+
+<!-- Movie Detail Bottom Sheet -->
+<div id="detailBackdrop" class="sheet-backdrop">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="sheet-hero">
+      <img id="sheetBackdropImg" class="sheet-hero-bg" alt="" />
+      <div class="sheet-hero-gradient"></div>
+      <button id="closeDetailBtn" class="sheet-close">&times;</button>
+    </div>
+    <div class="sheet-body">
+      <div class="sheet-header">
+        <img id="sheetPosterImg" class="sheet-poster" alt="" />
+        <div class="sheet-title-block">
+          <h2 id="sheetTitle"></h2>
+          <div id="sheetTags" class="sheet-tags"></div>
+        </div>
+      </div>
+
+      <!-- Focused Actions ONLY: Reminder Tayang, Direct Trailer, Direct Letterboxd Film Profile -->
+      <div class="action-row">
+        <button id="sheetRemindBtn" class="act-btn primary"></button>
+        <button id="sheetTrailerBtn" class="act-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+          <span>Trailer</span>
+        </button>
+        <button id="sheetLetterboxdBtn" class="act-btn lb-btn">
+          <span class="lb-dots">
+            <span style="background:#FF8000"></span>
+            <span style="background:#00E054"></span>
+            <span style="background:#40BCF4"></span>
+          </span>
+          <span>Letterboxd</span>
+        </button>
+      </div>
+
+      <div class="section-label">Sinopsis</div>
+      <p id="sheetOverview" class="overview-text"></p>
+
+      <div id="castSection" style="display:none;">
+        <div class="section-label">Pemeran Utama</div>
+        <div id="sheetCast" class="cast-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Settings Bottom Sheet -->
+<div id="settingsBackdrop" class="sheet-backdrop">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <h3>Pengaturan Radar</h3>
+    <div class="field-group">
+      <label for="apiKeyInput">TMDB API Key (v3 auth)</label>
+      <input id="apiKeyInput" class="field-input" type="text" placeholder="Masukkan TMDB API Key..." />
+    </div>
+
+    <div class="field-group">
+      <label>Ikon Peluncur Aplikasi</label>
+      <div class="icon-choices">
+        <button class="icon-choice" onclick="changeAppIcon('default')">Default</button>
+        <button class="icon-choice" onclick="changeAppIcon('obsidian')">Obsidian</button>
+        <button class="icon-choice" onclick="changeAppIcon('crimson')">Crimson</button>
+      </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:16px;">
+      <button class="act-btn" onclick="triggerTestNotif()">Tes Notifikasi</button>
+      <button class="act-btn" onclick="triggerClearCache()">Bersihkan Cache</button>
+    </div>
+
+    <button class="act-btn primary" style="width:100%; margin-top:10px;" onclick="saveSettings()">Simpan</button>
+  </div>
+</div>
+
+<script>
+  const IMG_W500 = "https://image.tmdb.org/t/p/w500";
+  const IMG_W780 = "https://image.tmdb.org/t/p/w780";
+
+  const state = {
+    apiKey: localStorage.getItem("tmdb_api_key") || "",
+    tab: "id",
+    idSubFilter: "upcoming", // upcoming | now_playing
+    hypeSubFilter: "anticipated", // anticipated | top_rated_upcoming
+    searchQuery: "",
+    movies: [],
+    reminders: JSON.parse(localStorage.getItem("cinema_reminders") || "[]"),
+    selectedMovie: null,
+    selectedTrailerKey: ""
+  };
+
+  const contentArea = document.getElementById("contentArea");
+  const subFiltersEl = document.getElementById("subFilters");
+  const searchInput = document.getElementById("searchInput");
+  const clearSearchBtn = document.getElementById("clearSearchBtn");
+  const reminderBadge = document.getElementById("reminderBadge");
+
+  function syncNativeState() {
+    localStorage.setItem("cinema_reminders", JSON.stringify(state.reminders));
+    updateReminderBadge();
+    if (window.AndroidBridge && window.AndroidBridge.syncState) {
+      window.AndroidBridge.syncState(JSON.stringify(state.reminders), state.apiKey);
+    }
+  }
+
+  function updateReminderBadge() {
+    if (state.reminders.length > 0) {
+      reminderBadge.style.display = "inline-block";
+      reminderBadge.textContent = state.reminders.length;
+    } else {
+      reminderBadge.style.display = "none";
+    }
+  }
+
+  function isReminded(movieId) {
+    return state.reminders.some(m => m.id === movieId);
+  }
+
+  function toggleReminder(movie, e) {
+    if (e) e.stopPropagation();
+    const idx = state.reminders.findIndex(m => m.id === movie.id);
+    if (idx >= 0) {
+      state.reminders.splice(idx, 1);
+    } else {
+      state.reminders.push({
+        id: movie.id,
+        title: movie.title,
+        poster_path: movie.poster_path,
+        backdrop_path: movie.backdrop_path,
+        release_date: movie.id_release_date || movie.release_date || "",
+        vote_average: movie.vote_average || 0,
+        overview: movie.overview || ""
+      });
+    }
+    syncNativeState();
+    renderMovies();
+    if (state.selectedMovie && state.selectedMovie.id === movie.id) {
+      updateSheetRemindButton(movie.id);
+    }
+  }
+
+  function formatReleaseBadge(dateStr) {
+    if (!dateStr) return { text: "TBA", cls: "" };
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const target = new Date(dateStr + "T00:00:00");
+    if (isNaN(target.getTime())) return { text: dateStr, cls: "" };
+
+    const diffDays = Math.round((target - today) / 86400000);
+    if (diffDays <= 0 && diffDays >= -45) {
+      return { text: "TAYANG", cls: "live" };
+    }
+    if (diffDays > 0 && diffDays <= 14) {
+      return { text: `H-${diffDays}`, cls: "soon" };
+    }
+    const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+    return { text: `${target.getDate()} ${months[target.getMonth()]}`, cls: "" };
+  }
+
+  function renderSubFilters() {
+    if (state.searchQuery.trim()) {
+      subFiltersEl.innerHTML = "";
+      return;
+    }
+    if (state.tab === "id") {
+      subFiltersEl.innerHTML = `
+        <button class="pill ${state.idSubFilter === 'upcoming' ? 'active' : ''}" onclick="setIdFilter('upcoming')">Akan Tayang (ID)</button>
+        <button class="pill ${state.idSubFilter === 'now_playing' ? 'active' : ''}" onclick="setIdFilter('now_playing')">Sedang Tayang (ID)</button>
+      `;
+    } else if (state.tab === "hype") {
+      subFiltersEl.innerHTML = `
+        <button class="pill ${state.hypeSubFilter === 'anticipated' ? 'active' : ''}" onclick="setHypeFilter('anticipated')">High-Hype Global</button>
+        <button class="pill ${state.hypeSubFilter === 'top_rated_upcoming' ? 'active' : ''}" onclick="setHypeFilter('top_rated_upcoming')">Prestige & Festival</button>
+      `;
+    } else {
+      subFiltersEl.innerHTML = "";
+    }
+  }
+
+  function setIdFilter(val) {
+    state.idSubFilter = val;
+    renderSubFilters();
+    loadFeed();
+  }
+
+  function setHypeFilter(val) {
+    state.hypeSubFilter = val;
+    renderSubFilters();
+    loadFeed();
+  }
+
+  async function tmdbFetch(path) {
+    if (!state.apiKey) return null;
+    const sep = path.includes("?") ? "&" : "?";
+    const res = await fetch(`https://api.themoviedb.org/3${path}${sep}api_key=${encodeURIComponent(state.apiKey)}`);
+    if (!res.ok) throw new Error("TMDB API Error");
+    return res.json();
+  }
+
+  async function loadFeed() {
+    renderSubFilters();
+
+    if (state.tab === "reminders" && !state.searchQuery.trim()) {
+      state.movies = [...state.reminders].sort((a, b) => (a.release_date || "9999").localeCompare(b.release_date || "9999"));
+      renderMovies();
+      return;
+    }
+
+    if (!state.apiKey) {
+      contentArea.innerHTML = `
+        <div class="empty-state">
+          Masukkan <strong>TMDB API Key</strong> di menu Pengaturan (pojok kanan atas) untuk memuat jadwal tayang bioskop Indonesia dan radar film upcoming.
+        </div>`;
+      return;
+    }
+
+    contentArea.innerHTML = `<div class="empty-state">Memuat jadwal tayang...</div>`;
+
+    try {
+      let data;
+      const q = state.searchQuery.trim();
+      const todayIso = new Date().toISOString().slice(0, 10);
+
+      if (q) {
+        data = await tmdbFetch(`/search/movie?query=${encodeURIComponent(q)}&region=ID&include_adult=false`);
+      } else if (state.tab === "id") {
+        if (state.idSubFilter === "upcoming") {
+          data = await tmdbFetch(`/movie/upcoming?region=ID&page=1`);
+        } else {
+          data = await tmdbFetch(`/movie/now_playing?region=ID&page=1`);
+        }
+      } else if (state.tab === "hype") {
+        if (state.hypeSubFilter === "anticipated") {
+          data = await tmdbFetch(`/discover/movie?primary_release_date.gte=${todayIso}&sort_by=popularity.desc&with_release_type=2|3&page=1`);
+        } else {
+          data = await tmdbFetch(`/discover/movie?primary_release_date.gte=${todayIso}&sort_by=vote_average.desc&vote_count.gte=25&with_release_type=2|3&page=1`);
+        }
+      }
+
+      state.movies = (data && data.results) ? data.results : [];
+      renderMovies();
+    } catch (err) {
+      contentArea.innerHTML = `<div class="empty-state">Gagal mengambil data dari TMDB. Periksa koneksi atau API Key Anda.</div>`;
+    }
+  }
+
+  function renderMovies() {
+    if (!state.movies || state.movies.length === 0) {
+      const msg = state.tab === "reminders"
+        ? "Belum ada film di daftar Reminder tayang. Tap ikon lonceng pada film yang ingin dipantau jadwal bioskopnya."
+        : "Tidak ada film ditemukan.";
+      contentArea.innerHTML = `<div class="empty-state">${msg}</div>`;
+      return;
+    }
+
+    const html = state.movies.map((m, idx) => {
+      const poster = m.poster_path ? `${IMG_W500}${m.poster_path}` : "";
+      const badge = formatReleaseBadge(m.id_release_date || m.release_date);
+      const score = m.vote_average > 0 ? m.vote_average.toFixed(1) : "NR";
+      const active = isReminded(m.id);
+
+      return `
+        <article class="card" onclick="openDetail(${idx})">
+          <div class="poster-box">
+            ${poster ? `<img src="${poster}" loading="lazy" alt="${escapeHtml(m.title)}" />` : ""}
+            <div class="badge-top">
+              <span class="release-badge ${badge.cls}">${badge.text}</span>
+              <span class="score-badge">${score}</span>
+            </div>
+            <button class="remind-dot ${active ? 'active' : ''}" onclick="toggleReminderByIdx(${idx}, event)" aria-label="Ingatkan Tayang">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="${active ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2.2">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+              </svg>
+            </button>
+          </div>
+          <div class="card-info">
+            <div class="card-title">${escapeHtml(m.title)}</div>
+            <div class="card-meta">${(m.release_date || "Jadwal menyusul").slice(0, 10)}</div>
+          </div>
+        </article>
+      `;
+    }).join("");
+
+    contentArea.innerHTML = `<div class="grid">${html}</div>`;
+  }
+
+  function toggleReminderByIdx(idx, e) {
+    const movie = state.movies[idx];
+    if (movie) toggleReminder(movie, e);
+  }
+
+  function updateSheetRemindButton(movieId) {
+    const btn = document.getElementById("sheetRemindBtn");
+    if (isReminded(movieId)) {
+      btn.className = "act-btn reminded";
+      btn.innerHTML = `<span>Pengingat Aktif</span>`;
+    } else {
+      btn.className = "act-btn primary";
+      btn.innerHTML = `<span>+ Ingatkan Tayang</span>`;
+    }
+  }
+
+  async function openDetail(idx) {
+    const baseMovie = state.movies[idx];
+    if (!baseMovie) return;
+
+    state.selectedMovie = baseMovie;
+    state.selectedTrailerKey = "";
+
+    const backdropImg = document.getElementById("sheetBackdropImg");
+    const posterImg = document.getElementById("sheetPosterImg");
+    backdropImg.src = baseMovie.backdrop_path ? `${IMG_W780}${baseMovie.backdrop_path}` : (baseMovie.poster_path ? `${IMG_W500}${baseMovie.poster_path}` : "");
+    posterImg.src = baseMovie.poster_path ? `${IMG_W500}${baseMovie.poster_path}` : "";
+
+    document.getElementById("sheetTitle").textContent = baseMovie.title;
+    document.getElementById("sheetOverview").textContent = baseMovie.overview || "Sinopsis belum tersedia.";
+    document.getElementById("sheetTags").innerHTML = `<span class="tag id-date">Rilis: ${baseMovie.release_date || "TBA"}</span>`;
+    document.getElementById("castSection").style.display = "none";
+
+    updateSheetRemindButton(baseMovie.id);
+
+    document.getElementById("sheetRemindBtn").onclick = () => toggleReminder(state.selectedMovie);
+
+    // Direct Letterboxd Film Profile Page (via canonical /tmdb/<id> route, NOT search bar!)
+    document.getElementById("sheetLetterboxdBtn").onclick = () => {
+      if (window.AndroidBridge && window.AndroidBridge.openLetterboxd) {
+        window.AndroidBridge.openLetterboxd(baseMovie.id);
+      } else {
+        window.open(`https://letterboxd.com/tmdb/${baseMovie.id}`, "_blank");
+      }
+    };
+
+    // Direct Official Trailer Launch
+    document.getElementById("sheetTrailerBtn").onclick = () => {
+      const year = (baseMovie.release_date || "").slice(0, 4);
+      const fallbackQuery = `${baseMovie.title} ${year} official trailer`.trim();
+      if (window.AndroidBridge && window.AndroidBridge.openTrailer) {
+        window.AndroidBridge.openTrailer(state.selectedTrailerKey, fallbackQuery);
+      } else if (state.selectedTrailerKey) {
+        window.open(`https://www.youtube.com/watch?v=${state.selectedTrailerKey}`, "_blank");
+      } else {
+        window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(fallbackQuery)}`, "_blank");
+      }
+    };
+
+    document.getElementById("detailBackdrop").classList.add("open");
+
+    if (!state.apiKey) return;
+
+    try {
+      const detail = await tmdbFetch(`/movie/${baseMovie.id}?append_to_response=videos,release_dates,credits`);
+      if (!detail || state.selectedMovie.id !== baseMovie.id) return;
+
+      // Extract Indonesia Theatrical Release & Certification
+      let idDate = detail.release_date || "";
+      let idCert = "";
+      if (detail.release_dates && detail.release_dates.results) {
+        const idEntry = detail.release_dates.results.find(r => r.iso_3166_1 === "ID");
+        if (idEntry && idEntry.release_dates && idEntry.release_dates.length > 0) {
+          const theatrical = idEntry.release_dates.find(d => d.type === 3 || d.type === 2) || idEntry.release_dates[0];
+          if (theatrical.release_date) idDate = theatrical.release_date.slice(0, 10);
+          if (theatrical.certification) idCert = theatrical.certification;
+        }
+      }
+
+      state.selectedMovie.id_release_date = idDate;
+
+      const tags = [];
+      if (idDate) tags.push(`<span class="tag id-date">ID: ${idDate}</span>`);
+      if (idCert) tags.push(`<span class="tag">${escapeHtml(idCert)}</span>`);
+      if (detail.runtime > 0) tags.push(`<span class="tag">${detail.runtime} mnt</span>`);
+      if (detail.vote_average > 0) tags.push(`<span class="tag">TMDB ${detail.vote_average.toFixed(1)}</span>`);
+      if (detail.genres && detail.genres.length) {
+        tags.push(`<span class="tag">${detail.genres.slice(0, 2).map(g => g.name).join(", ")}</span>`);
+      }
+      document.getElementById("sheetTags").innerHTML = tags.join("");
+
+      if (detail.overview) {
+        document.getElementById("sheetOverview").textContent = detail.overview;
+      }
+
+      // Pick best official YouTube trailer
+      if (detail.videos && detail.videos.results) {
+        const ytVideos = detail.videos.results.filter(v => v.site === "YouTube");
+        const bestTrailer =
+          ytVideos.find(v => v.type === "Trailer" && v.official) ||
+          ytVideos.find(v => v.type === "Trailer") ||
+          ytVideos.find(v => v.type === "Teaser") ||
+          ytVideos[0];
+        if (bestTrailer) {
+          state.selectedTrailerKey = bestTrailer.key;
+        }
+      }
+
+      // Top Cast
+      if (detail.credits && detail.credits.cast && detail.credits.cast.length > 0) {
+        const castHtml = detail.credits.cast.slice(0, 8).map(c =>
+          `<div class="cast-chip">${escapeHtml(c.name)}</div>`
+        ).join("");
+        document.getElementById("sheetCast").innerHTML = castHtml;
+        document.getElementById("castSection").style.display = "block";
+      }
+    } catch (_) {}
+  }
+
+  function closeDetail() {
+    document.getElementById("detailBackdrop").classList.remove("open");
+    state.selectedMovie = null;
+  }
+
+  function openSettings() {
+    document.getElementById("apiKeyInput").value = state.apiKey;
+    document.getElementById("settingsBackdrop").classList.add("open");
+  }
+
+  function closeSettings() {
+    document.getElementById("settingsBackdrop").classList.remove("open");
+  }
+
+  function saveSettings() {
+    state.apiKey = document.getElementById("apiKeyInput").value.trim();
+    localStorage.setItem("tmdb_api_key", state.apiKey);
+    syncNativeState();
+    closeSettings();
+    loadFeed();
+  }
+
+  function changeAppIcon(variant) {
+    if (window.AndroidBridge && window.AndroidBridge.switchLauncherIcon) {
+      window.AndroidBridge.switchLauncherIcon(variant);
+    }
+  }
+
+  function triggerTestNotif() {
+    const sampleTitle = state.reminders[0]?.title || "Film Radar";
+    if (window.AndroidBridge && window.AndroidBridge.sendTestNotification) {
+      window.AndroidBridge.sendTestNotification(sampleTitle);
+    }
+  }
+
+  function triggerClearCache() {
+    if (window.AndroidBridge && window.AndroidBridge.clearCache) {
+      window.AndroidBridge.clearCache();
+    }
+  }
+
+  // Native Android Back Button handler
+  window.handleNativeBack = function () {
+    if (document.getElementById("detailBackdrop").classList.contains("open")) {
+      closeDetail();
+      return true;
+    }
+    if (document.getElementById("settingsBackdrop").classList.contains("open")) {
+      closeSettings();
+      return true;
+    }
+    return false;
+  };
+
+  function escapeHtml(str) {
+    return String(str || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  // Events
+  document.querySelectorAll(".nav-item").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".nav-item").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      state.tab = btn.dataset.tab;
+      loadFeed();
+    });
+  });
+
+  let searchTimer = null;
+  searchInput.addEventListener("input", () => {
+    state.searchQuery = searchInput.value;
+    clearSearchBtn.style.display = state.searchQuery ? "block" : "none";
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(loadFeed, 320);
+  });
+
+  clearSearchBtn.addEventListener("click", () => {
+    searchInput.value = "";
+    state.searchQuery = "";
+    clearSearchBtn.style.display = "none";
+    loadFeed();
+  });
+
+  document.getElementById("detailBackdrop").addEventListener("click", closeDetail);
+  document.getElementById("closeDetailBtn").addEventListener("click", closeDetail);
+  document.getElementById("openSettingsBtn").addEventListener("click", openSettings);
+  document.getElementById("settingsBackdrop").addEventListener("click", closeSettings);
+
+  // Init
+  syncNativeState();
+  loadFeed();
+</script>
+</body>
+</html>
