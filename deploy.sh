@@ -7,19 +7,22 @@ if [ -z "$ZIP_FILE" ]; then
 fi
 
 echo "📦 Memproses $ZIP_FILE..."
-rm -rf app/src/main/java app/src/main/assets app/src/main/res .github/workflows
-unzip -o -q "$ZIP_FILE"
+rm -rf _tmp_extract app/src/main/java app/src/main/assets app/src/main/res
+mkdir -p _tmp_extract
+unzip -o -q "$ZIP_FILE" -d _tmp_extract
 
-# Kalau hasil ekstrak masuk ke subfolder, otomatis keluarin ke root
-SUBDIR=$(find . -maxdepth 1 -type d -name "CinemaTracker*" | head -n 1)
-if [ -n "$SUBDIR" ]; then
-  cp -rf "$SUBDIR"/. .
-  rm -rf "$SUBDIR"
+# Cari folder utama yang punya folder 'app' atau 'src' di dalamnya
+PROJECT_ROOT=$(find _tmp_extract -maxdepth 2 -type d \( -name "app" -o -name "src" \) | head -n 1 | xargs dirname)
+
+if [ -n "$PROJECT_ROOT" ] && [ "$PROJECT_ROOT" != "." ]; then
+  cp -rf "$PROJECT_ROOT"/. .
+else
+  cp -rf _tmp_extract/. .
 fi
 
-rm -f *.zip
-VER=$(grep "versionName" app/build.gradle.kts | head -n 1 | cut -d'"' -f2)
-echo "🚀 Deploying versi $VER ke GitHub..."
+rm -rf _tmp_extract *.zip
+VER=$(grep "versionName" app/build.gradle.kts 2>/dev/null | head -n 1 | cut -d'"' -f2)
+echo "🚀 Deploying versi ${VER:-terbaru} ke GitHub..."
 
 git add -A
 git commit -m "deploy: Cinema Tracker v${VER:-update}"
