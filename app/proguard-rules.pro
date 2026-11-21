@@ -1,3 +1,4 @@
--keepclassmembers class com.michael.cinematracker.MainActivity$WebAppInterface {
+-keepattributes JavascriptInterface
+-keepclassmembers class * {
     @android.webkit.JavascriptInterface <methods>;
 }
