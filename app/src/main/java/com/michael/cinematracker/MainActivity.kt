@@ -409,7 +409,7 @@ class MainActivity : AppCompatActivity() {
             }
             val html = conn.inputStream.bufferedReader().use { it.readText() }
             conn.disconnect()
-            val match = Regex("\x22videoId\x22:\x22([a-zA-Z0-9_-]{11})\x22").find(html)
+            val match = Regex("\u0022videoId\u0022:\u0022([a-zA-Z0-9_-]{11})\u0022").find(html)
             match?.groupValues?.get(1)
         } catch (_: Exception) {
             null
