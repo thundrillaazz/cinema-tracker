@@ -2784,8 +2784,6 @@
       activeWatchlistTab = tab;
       document.getElementById("wTabConfirmed").classList.toggle("active", tab === "confirmed");
       document.getElementById("wTabTba").classList.toggle("active", tab === "tba");
-      const watchedBtn = document.getElementById("wTabWatched");
-      if (watchedBtn) watchedBtn.classList.toggle("active", tab === "watched");
       document.getElementById("wlToolbar").style.display = tab === "confirmed" ? "block" : "none";
       renderWatchlist();
     }
