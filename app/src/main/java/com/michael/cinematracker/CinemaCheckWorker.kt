@@ -50,7 +50,7 @@ class CinemaCheckWorker(
                 val dayAlert = entry.optBoolean("dayAlert", true)
                 val presaleAlert = entry.optBoolean("presaleAlert", true)
                 val movieData = entry.optJSONObject("movieData") ?: continue
-                val title = movieData.optString("title", "").ifEmpty { continue }
+                val title = movieData.optString("title", ""); if (title.isEmpty()) continue
                 val releaseDateStr = movieData.optString("releaseDate", "")
                 if (releaseDateStr.length < 10 || releaseDateStr == "TBA") continue
 
