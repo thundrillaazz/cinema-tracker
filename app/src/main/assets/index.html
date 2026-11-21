@@ -1464,23 +1464,56 @@
     }
   </style>
 
-<style id="ct-qol-v45">
+<style id="ct-qol-v46">
   * { -webkit-tap-highlight-color: transparent; }
   img { content-visibility: auto; }
-  .ct-saved-active {
+
+  /* 1. Indikator visual jelas saat tersimpan / diklik */
+  .ct-wl-active,
+  button.ct-wl-active,
+  [data-ct-saved="1"] {
     background: #e11d48 !important;
     color: #ffffff !important;
     border-color: #e11d48 !important;
   }
-  .ct-saved-active svg {
+  .ct-wl-active svg,
+  [data-ct-saved="1"] svg {
     fill: #ffffff !important;
     stroke: #ffffff !important;
   }
-  #tab-watchlist .notif-row,
-  #tab-watchlist .wl-actions,
+
+  /* 2. Sembunyikan elemen yang dilingkari putih (star, selesai, status & catatan nonton) */
+  #tab-watchlist [class*="star"],
   #tab-watchlist [class*="priority"],
-  #tab-watchlist [class*="selesai"] {
+  #tab-watchlist [class*="selesai"],
+  #tab-watchlist .wl-actions,
+  #tab-watchlist .notif-row,
+  .ct-hide-clutter {
     display: none !important;
+  }
+
+  /* 3 & 4. Rapikan bagian atas & kartu Watchlist */
+  #tab-watchlist .ct-wl-top-bar {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+    align-items: stretch !important;
+    margin-bottom: 10px !important;
+  }
+  #tab-watchlist .ct-wl-top-bar > * {
+    width: 100% !important;
+    justify-content: center !important;
+    text-align: center !important;
+    margin: 0 !important;
+  }
+  #tab-watchlist .ct-wl-card {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    padding: 10px 12px !important;
+    border-radius: 14px !important;
+    margin-bottom: 8px !important;
   }
 </style>
 </head>
@@ -4428,105 +4461,171 @@
     init();
   </script>
 
-<script id="ct-qol-v45-js">
+<script id="ct-qol-v46-js">
 (function() {
-  function getSavedSet() {
-    const set = new Set();
+  function getSavedKeys() {
+    const keys = new Set();
     for (let i = 0; i < localStorage.length; i++) {
       const k = localStorage.key(i) || '';
       if (!/watch/i.test(k)) continue;
       try {
-        const raw = JSON.parse(localStorage.getItem(k) || 'null');
-        if (Array.isArray(raw)) {
-          raw.forEach(item => {
-            if (item == null) return;
-            if (typeof item === 'object') {
-              [item.id, item.movieId, item.tmdbId, item.slug, item.title].forEach(v => {
-                if (v != null && String(v).trim()) set.add(String(v).trim().toLowerCase());
-              });
-            } else {
-              set.add(String(item).trim().toLowerCase());
-            }
-          });
-        }
+        const data = JSON.parse(localStorage.getItem(k) || 'null');
+        if (!Array.isArray(data)) continue;
+        data.forEach(item => {
+          if (item == null) return;
+          if (typeof item === 'object') {
+            [item.id, item.movieId, item.tmdbId, item.slug, item.title].forEach(v => {
+              if (v != null && String(v).trim()) keys.add(String(v).trim().toLowerCase());
+            });
+          } else {
+            keys.add(String(item).trim().toLowerCase());
+          }
+        });
       } catch (_) {}
     }
-    return set;
+    return keys;
   }
 
-  function syncUI() {
-    const saved = getSavedSet();
+  function applyClutterCleanup() {
+    // Sembunyikan blok status nonton & catatan singkat di modal detail
+    document.querySelectorAll('button, input, textarea, div, section, label').forEach(el => {
+      if (el.children.length > 5) return;
+      const t = (el.textContent || '').trim();
+      const ph = (el.getAttribute && (el.getAttribute('placeholder') || '')).trim();
+      if (
+        t === 'Diincar' ||
+        t === 'Sudah Nonton' ||
+        t === '✓ Selesai' ||
+        t === 'Prioritas' ||
+        /^Ditonton\s*\(\d+\)$/i.test(t) ||
+        /catatan singkat/i.test(t) ||
+        /catatan singkat/i.test(ph)
+      ) {
+        const target = (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') ? el.parentElement : el;
+        if (target && target.children.length <= 3) {
+          target.classList.add('ct-hide-clutter');
+        }
+      }
+    });
 
-    document.querySelectorAll('button').forEach(btn => {
+    // Sembunyikan tombol aksi ekstra di dalam kartu Watchlist (bintang / selesai / pre-sale / h-1 / hari-h)
+    const wlRoot = document.getElementById('tab-watchlist') || document.querySelector('[data-tab="watchlist"]');
+    if (!wlRoot) return;
+
+    wlRoot.querySelectorAll('button').forEach(btn => {
+      if (btn.children.length > 2) return;
       const t = (btn.textContent || '').trim();
-      const card = btn.closest('[data-id], [data-movie-id], [data-tmdb-id], .search-item, .movie-row, .card, li, article') || btn.parentElement;
+      if (
+        t === '★' ||
+        t === '☆' ||
+        t === '✓ Selesai' ||
+        t === 'Selesai' ||
+        t === 'Pre-Sale' ||
+        t === 'H-1' ||
+        t === 'Hari-H'
+      ) {
+        btn.classList.add('ct-hide-clutter');
+      }
+    });
+  }
+
+  function applyWatchlistLayoutAndCopy() {
+    const wlRoot = document.getElementById('tab-watchlist') || document.querySelector('[data-tab="watchlist"]');
+    if (!wlRoot) return;
+
+    // Copywriting lebih modern & ringkas
+    wlRoot.querySelectorAll('button, span, div, h1, h2, h3').forEach(el => {
+      if (el.children.length > 0) return;
+      const raw = (el.textContent || '').trim();
+      const m1 = raw.match(/^Terjadwal\s*\((\d+)\)$/i);
+      if (m1) el.textContent = `Rilis (${m1[1]})`;
+      const m2 = raw.match(/^Menunggu(?:\s+ID)?\s*\((\d+)\)$/i);
+      if (m2) el.textContent = `TBA (${m2[1]})`;
+    });
+
+    // Bar atas dua tab dibuat simetris 2 kolom
+    const firstBtn = wlRoot.querySelector('button');
+    if (firstBtn && firstBtn.parentElement && firstBtn.parentElement.children.length === 2) {
+      firstBtn.parentElement.classList.add('ct-wl-top-bar');
+    }
+
+    // Rapikan kartu film di Watchlist
+    wlRoot.querySelectorAll('img').forEach(img => {
+      const card = img.closest('[class*="card"], [class*="item"], [class*="movie"], li, article') || img.parentElement;
+      if (card && card !== wlRoot) {
+        card.classList.add('ct-wl-card');
+      }
+    });
+  }
+
+  function syncSavedIndicators() {
+    const saved = getSavedKeys();
+
+    document.querySelectorAll('button, [role="button"]').forEach(btn => {
+      const t = (btn.textContent || '').trim();
+      const card = btn.closest('[data-id], [data-movie-id], [data-tmdb-id], [class*="card"], [class*="movie"], [class*="search"], li, article') || btn.parentElement;
       const titleEl = card ? card.querySelector('h1, h2, h3, h4, .title, [class*="title"]') : null;
-      const keys = [
+      const modalTitle = document.querySelector('.modal h1, .modal h2, .modal h3, [class*="modal"] h1, [class*="modal"] h2, [class*="modal"] h3');
+      const isInsideModal = !!(btn.closest('.modal, [class*="modal"], [role="dialog"]'));
+
+      const candidates = [
+        btn.getAttribute('data-id'),
+        btn.getAttribute('data-movie-id'),
+        btn.getAttribute('data-tmdb-id'),
         card && card.getAttribute('data-id'),
         card && card.getAttribute('data-movie-id'),
         card && card.getAttribute('data-tmdb-id'),
-        btn.getAttribute('data-id'),
-        titleEl && titleEl.textContent
+        titleEl && titleEl.textContent,
+        isInsideModal && modalTitle && modalTitle.textContent
       ].filter(Boolean).map(s => String(s).trim().toLowerCase());
 
-      const active = keys.some(k => saved.has(k));
+      const isSaved = candidates.some(c => saved.has(c));
 
-      if (/watchlist/i.test(t) && t.length <= 32) {
-        btn.classList.toggle('ct-saved-active', active);
-        if (/^\+?\s*watchlist$/i.test(t) || /^✓?\s*(di\s*)?watchlist$/i.test(t)) {
-          btn.textContent = active ? '✓ Di Watchlist' : '+ Watchlist';
+      if (/^\+?\s*watchlist$/i.test(t) || /^✓?\s*(di\s*)?watchlist$/i.test(t) || /tersimpan di watchlist/i.test(t)) {
+        btn.classList.toggle('ct-wl-active', isSaved);
+        if (isSaved) {
+          btn.setAttribute('data-ct-saved', '1');
+          if (/^\+?\s*watchlist$/i.test(t) || /^✓?\s*(di\s*)?watchlist$/i.test(t)) {
+            btn.textContent = '✓ Tersimpan';
+          }
+        } else {
+          btn.removeAttribute('data-ct-saved');
+          if (/^✓?\s*(di\s*)?watchlist$/i.test(t) || /^✓\s*tersimpan$/i.test(t)) {
+            btn.textContent = '+ Watchlist';
+          }
         }
       } else if (t === '' && btn.querySelector('svg') && card) {
-        btn.classList.toggle('ct-saved-active', active);
-      }
-    });
-
-    const wlRoot = document.getElementById('tab-watchlist') || document.querySelector('[data-tab="watchlist"]');
-    if (wlRoot) {
-      wlRoot.querySelectorAll('button, span, div').forEach(el => {
-        if (el.children.length > 0) return;
-        const raw = (el.textContent || '').trim();
-        const m1 = raw.match(/^Terjadwal\s*\((\d+)\)$/i);
-        if (m1) el.textContent = `Rilis (${m1[1]})`;
-        const m2 = raw.match(/^Menunggu(?:\s+ID)?\s*\((\d+)\)$/i);
-        if (m2) el.textContent = `TBA (${m2[1]})`;
-        if (raw === 'Prioritas' || raw === '✓ Selesai' || /^Ditonton\s*\(\d+\)$/i.test(raw)) {
-          el.style.display = 'none';
-        }
-      });
-
-      const filterBox = wlRoot.querySelector('.filter-bar, .wl-filters, [class*="filter"]');
-      const subTabs = wlRoot.querySelector('.sub-tabs, .wl-tabs, .segmented, [role="tablist"]');
-      if (filterBox && subTabs && filterBox.parentElement === subTabs.parentElement) {
-        if (subTabs.compareDocumentPosition(filterBox) & Node.DOCUMENT_POSITION_FOLLOWING) {
-          subTabs.parentElement.insertBefore(filterBox, subTabs);
-        }
-      }
-    }
-
-    document.querySelectorAll('button, div, section, label, span').forEach(el => {
-      if (el.children.length > 4) return;
-      const raw = (el.textContent || '').trim();
-      if (/^Ditonton\s*\(\d+\)$/i.test(raw) || raw === 'STATUS & CATATAN NONTON' || raw === 'Status & Catatan Nonton') {
-        el.style.display = 'none';
+        btn.classList.toggle('ct-wl-active', isSaved);
+        if (isSaved) btn.setAttribute('data-ct-saved', '1');
+        else btn.removeAttribute('data-ct-saved');
       }
     });
   }
 
+  function runAll() {
+    syncSavedIndicators();
+    applyClutterCleanup();
+    applyWatchlistLayoutAndCopy();
+  }
+
   document.addEventListener('click', function(e) {
-    const btn = e.target.closest('button');
+    const btn = e.target.closest('button, [role="button"]');
     if (!btn) return;
     const t = (btn.textContent || '').trim();
-    if (/^\+\s*watchlist$/i.test(t)) {
-      btn.classList.add('ct-saved-active');
-      btn.textContent = '✓ Di Watchlist';
+    if (/watchlist/i.test(t) || /tersimpan/i.test(t) || (t === '' && btn.querySelector('svg'))) {
+      const currentlySaved = btn.classList.contains('ct-wl-active') || btn.getAttribute('data-ct-saved') === '1';
+      if (!currentlySaved && (/^\+?\s*watchlist$/i.test(t) || /tersimpan di watchlist/i.test(t) || t === '')) {
+        btn.classList.add('ct-wl-active');
+        btn.setAttribute('data-ct-saved', '1');
+        if (/^\+?\s*watchlist$/i.test(t)) btn.textContent = '✓ Tersimpan';
+      }
+      setTimeout(runAll, 60);
     }
-    setTimeout(syncUI, 40);
   }, false);
 
   window.addEventListener('load', function() {
-    syncUI();
-    setInterval(syncUI, 1500);
+    runAll();
+    setInterval(runAll, 1500);
   });
 })();
 </script>
