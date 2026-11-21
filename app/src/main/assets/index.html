@@ -3295,8 +3295,7 @@
         notePart,
         `— Cinema Tracker`
       ].filter(Boolean);
-      const text = lines.join("
-");
+      const text = lines.join("\n");
       if (window.AndroidBridge && typeof window.AndroidBridge.shareMovieText === "function") {
         window.AndroidBridge.shareMovieText(text);
       } else {
