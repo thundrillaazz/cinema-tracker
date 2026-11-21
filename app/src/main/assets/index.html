@@ -12,7 +12,7 @@
       --border: #e2e8f0;
       --text: #0f172a;
       --muted: #64748b;
-      --header-bg: rgba(255, 255, 255, 0.96);
+      --header-bg: #ffffff;
       --accent: #0f172a;
       --accent-text: #ffffff;
       --blue: #2563eb;
@@ -32,7 +32,7 @@
       --border: #283548;
       --text: #f8fafc;
       --muted: #94a3b8;
-      --header-bg: rgba(11, 15, 25, 0.96);
+      --header-bg: #0b0f19;
       --accent: #f8fafc;
       --accent-text: #0f172a;
       --blue: #3b82f6;
@@ -60,8 +60,8 @@
       top: 0;
       z-index: 30;
       background: var(--header-bg);
-      backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
+      transform: translateZ(0);
     }
     .header-top {
       display: flex;
@@ -252,13 +252,14 @@
     .movie-card {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 10px;
+      border-radius: 12px;
       overflow: hidden;
       display: flex;
       flex-direction: column;
       cursor: pointer;
+      contain: layout paint style;
     }
-    .movie-card:active { opacity: 0.9; }
+    .movie-card:active { opacity: 0.94; }
     .poster-box {
       position: relative;
       width: 100%;
@@ -302,22 +303,30 @@
     }
     .heart-btn {
       position: absolute;
-      top: 6px;
-      right: 6px;
-      z-index: 4;
-      width: 28px;
-      height: 28px;
+      top: 4px;
+      right: 4px;
+      z-index: 6;
+      width: 38px;
+      height: 38px;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.92);
-      border: none;
+      background: rgba(15, 23, 42, 0.62);
+      border: 1px solid rgba(255, 255, 255, 0.22);
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      color: #0f172a;
+      color: #ffffff;
+      touch-action: manipulation;
+      transition: transform 0.12s ease, background-color 0.15s ease;
     }
-    .heart-btn.active { color: #e11d48; }
-    .heart-btn svg { width: 14px; height: 14px; stroke: currentColor; stroke-width: 2.2; fill: none; }
+    .heart-btn:active { transform: scale(0.9); }
+    .heart-btn.active {
+      background: #ffffff;
+      border-color: #fecdd3;
+      color: #e11d48;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+    .heart-btn svg { width: 16px; height: 16px; stroke: currentColor; stroke-width: 2.2; fill: none; pointer-events: none; }
     .heart-btn.active svg { fill: #e11d48; stroke: #e11d48; }
 
     .card-info {
@@ -1091,6 +1100,142 @@
       font-weight: 700;
       cursor: pointer;
     }
+
+    .catalog-quick-search {
+      position: relative;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+    }
+    .catalog-quick-input {
+      width: 100%;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 7px 32px 7px 30px;
+      font-size: 12px;
+      color: var(--text);
+      outline: none;
+    }
+    .catalog-quick-input:focus {
+      border-color: var(--blue);
+      background: var(--surface);
+    }
+    .catalog-search-icon {
+      position: absolute;
+      left: 10px;
+      width: 13px;
+      height: 13px;
+      stroke: var(--muted);
+      stroke-width: 2.2;
+      fill: none;
+      pointer-events: none;
+    }
+    .catalog-clear-btn {
+      position: absolute;
+      right: 7px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: none;
+      background: var(--border);
+      color: var(--text);
+      font-size: 10px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .cal-action-btn {
+      min-height: 34px;
+      padding: 6px 12px;
+      font-size: 11.5px;
+      font-weight: 600;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--text);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      touch-action: manipulation;
+    }
+    .cal-action-btn.saved {
+      background: var(--blue-soft);
+      border-color: var(--blue-border);
+      color: var(--blue);
+    }
+    .api-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10.5px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: var(--surface-2);
+      color: var(--muted);
+    }
+    .api-status-pill.connected {
+      background: var(--emerald-soft);
+      color: var(--emerald);
+    }
+    .api-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+    .api-input-row {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .api-eye-btn {
+      position: absolute;
+      right: 8px;
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 6px;
+      cursor: pointer;
+    }
+    .wl-highlight-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      padding: 9px 12px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 11.5px;
+    }
+    .btn-watch-detail {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 9px;
+      font-size: 12.5px;
+      font-weight: 700;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--text);
+      cursor: pointer;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .btn-watch-detail.saved {
+      background: var(--blue-soft);
+      border-color: var(--blue-border);
+      color: var(--blue);
+    }
   </style>
 </head>
 <body>
@@ -1126,6 +1271,11 @@
   <!-- CATALOG VIEW -->
   <div id="viewCatalog" class="view-container active" style="padding:0;">
     <div class="filter-section">
+      <div class="catalog-quick-search">
+        <svg class="catalog-search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="catalogQuickInput" class="catalog-quick-input" type="text" placeholder="Filter judul atau genre di jadwal..." oninput="onCatalogQuickFilter()" />
+        <button id="catalogClearBtn" class="catalog-clear-btn" onclick="clearCatalogQuickFilter()">✕</button>
+      </div>
       <div class="chips-row">
         <button class="chip active" data-chip="all" onclick="setChip('all', this)">Semua</button>
         <button class="chip" data-chip="id" onclick="setChip('id', this)">Lokal ID</button>
@@ -1227,6 +1377,7 @@
       </div>
     </div>
 
+    <div id="wlHighlightCard" class="wl-highlight-card" style="display:none;"></div>
     <div id="watchlistContainer"></div>
   </div>
 
@@ -1245,11 +1396,17 @@
     </div>
 
     <div class="info-card">
-      <h3>Koneksi Database (TMDB API)</h3>
-      <p>API Key v3 digunakan untuk verifikasi jadwal rilis regional Indonesia serta galeri poster alternatif.</p>
-      <input id="tmdbKeyInput" class="text-input" style="padding-right:12px;" type="text" placeholder="Tempel TMDB API Key..." />
-      <button class="btn-full" onclick="saveAppSettings()">Simpan & Sinkronisasi Sekarang</button>
-      <p id="syncFeedback" style="margin-top:6px; font-weight:600; font-size:12px; color:var(--blue);"></p>
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:6px;">
+        <h3 style="margin:0;">Koneksi TMDB</h3>
+        <span id="apiStatusPill" class="api-status-pill"><span class="api-dot"></span>Belum Terpasang</span>
+      </div>
+      <p>Gunakan API Key v3 untuk sinkronisasi otomatis jadwal bioskop Indonesia & poster alternatif.</p>
+      <div class="api-input-row">
+        <input id="tmdbKeyInput" class="text-input" style="padding-right:58px;" type="password" autocomplete="off" placeholder="Tempel TMDB API Key v3..." />
+        <button id="toggleKeyVisBtn" type="button" class="api-eye-btn" onclick="toggleApiKeyVisibility()">Tampil</button>
+      </div>
+      <button class="btn-full" onclick="saveAppSettings()">Simpan & Perbarui Jadwal</button>
+      <p id="syncFeedback" style="margin-top:7px; font-weight:500; font-size:11.5px; color:var(--muted); min-height:16px;"></p>
     </div>
 
     <div class="info-card">
@@ -1297,13 +1454,9 @@
     </div>
 
     <div style="text-align:center; font-size:11px; color:var(--muted); padding:4px 0 12px;">
-      Cinema Tracker v3.7.0 • Watchlist Countdown & Release Calendar
+      Cinema Tracker v3.8.0 • Fast Smooth UI, Calendar & Smart Watchlist
     </div>
   </div>
-
-    <div style="text-align:center; font-size:11px; color:var(--muted); padding:4px 0 12px;">
-      Cinema Tracker v3.7.0 • Watchlist Countdown & Release Calendar
-    </div>
   <!-- BOTTOM NAVIGATION -->
   <nav class="bottom-nav">
     <button id="navCatalog" class="nav-item active" onclick="switchBottomTab('catalog')">
@@ -1590,7 +1743,7 @@
     }
 
     function loadPersistentState() {
-      let localCustom = JSON.parse(localStorage.getItem("ct_v37_custom_posters") || localStorage.getItem("ct_v36_custom_posters") || "{}");
+      let localCustom = JSON.parse((localStorage.getItem("ct_v38_custom_posters") || localStorage.getItem("ct_v37_custom_posters")) || localStorage.getItem("ct_v36_custom_posters") || "{}");
       if (Object.keys(localCustom).length === 0 && window.AndroidBridge && typeof window.AndroidBridge.getCustomPostersJson === "function") {
         const nativeCp = window.AndroidBridge.getCustomPostersJson();
         if (nativeCp) {
@@ -1599,7 +1752,7 @@
       }
       customPostersMap = localCustom;
 
-      let localWatch = JSON.parse(localStorage.getItem("ct_v37_watchlist") || localStorage.getItem("ct_v36_watchlist") || "{}");
+      let localWatch = JSON.parse((localStorage.getItem("ct_v38_watchlist") || localStorage.getItem("ct_v37_watchlist")) || localStorage.getItem("ct_v36_watchlist") || "{}");
       if (Object.keys(localWatch).length === 0 && window.AndroidBridge && typeof window.AndroidBridge.getWatchlistJson === "function") {
         const nativeWl = window.AndroidBridge.getWatchlistJson();
         if (nativeWl) {
@@ -1630,7 +1783,7 @@
 
     function persistWatchlist() {
       const jsonStr = JSON.stringify(watchlistMap);
-      localStorage.setItem("ct_v37_watchlist", jsonStr);
+      localStorage.setItem("ct_v38_watchlist", jsonStr);
       if (window.AndroidBridge && typeof window.AndroidBridge.saveWatchlistJson === "function") {
         window.AndroidBridge.saveWatchlistJson(jsonStr);
       }
@@ -1638,7 +1791,7 @@
 
     function persistCustomPosters() {
       const jsonStr = JSON.stringify(customPostersMap);
-      localStorage.setItem("ct_v37_custom_posters", jsonStr);
+      localStorage.setItem("ct_v38_custom_posters", jsonStr);
       if (window.AndroidBridge && typeof window.AndroidBridge.saveCustomPostersJson === "function") {
         window.AndroidBridge.saveCustomPostersJson(jsonStr);
       }
@@ -1681,7 +1834,10 @@
 
       if (savedKey) {
         document.getElementById("tmdbKeyInput").value = savedKey;
+        updateApiStatusPill(true, Boolean(localStorage.getItem("ct_last_sync_ts")));
         autoSyncIfStale(savedKey);
+      } else {
+        updateApiStatusPill(false, false);
       }
 
       updateCounts();
@@ -1837,6 +1993,34 @@
       return JSON.stringify(ids);
     }
 
+
+    function toggleApiKeyVisibility() {
+      const inp = document.getElementById("tmdbKeyInput");
+      const btn = document.getElementById("toggleKeyVisBtn");
+      if (inp.type === "password") {
+        inp.type = "text";
+        btn.textContent = "Sembunyi";
+      } else {
+        inp.type = "password";
+        btn.textContent = "Tampil";
+      }
+    }
+
+    function updateApiStatusPill(hasKey, isVerified = false) {
+      const pill = document.getElementById("apiStatusPill");
+      if (!pill) return;
+      if (!hasKey) {
+        pill.className = "api-status-pill";
+        pill.innerHTML = `<span class="api-dot"></span>Belum Terpasang`;
+      } else if (isVerified) {
+        pill.className = "api-status-pill connected";
+        pill.innerHTML = `<span class="api-dot"></span>Terhubung • TMDB v3`;
+      } else {
+        pill.className = "api-status-pill connected";
+        pill.innerHTML = `<span class="api-dot"></span>API Key Tersimpan`;
+      }
+    }
+
     function saveAppSettings() {
       const key = document.getElementById("tmdbKeyInput").value.trim();
       const minHype = parseInt(document.getElementById("minHypeSelect").value, 10) || 85;
@@ -1963,6 +2147,23 @@
       syncTmdbLive(true);
     }
 
+    let catalogQuickQuery = "";
+
+    function onCatalogQuickFilter() {
+      const val = document.getElementById("catalogQuickInput").value;
+      catalogQuickQuery = val.trim().toLowerCase();
+      document.getElementById("catalogClearBtn").style.display = val.length > 0 ? "flex" : "none";
+      renderMovies();
+    }
+
+    function clearCatalogQuickFilter() {
+      const inp = document.getElementById("catalogQuickInput");
+      inp.value = "";
+      catalogQuickQuery = "";
+      document.getElementById("catalogClearBtn").style.display = "none";
+      renderMovies();
+    }
+
     function renderMovies() {
       const grid = document.getElementById("movieGrid");
       const hideTba = document.getElementById("hideTbaCheck").checked;
@@ -1972,6 +2173,11 @@
         if (m.id.startsWith("search_") && m.tba) return false;
         if (m.status !== activeMode) return false;
         if (hideTba && m.tba) return false;
+
+        if (catalogQuickQuery) {
+          const hay = `${m.title} ${m.genre || ""} ${m.director || ""}`.toLowerCase();
+          if (!hay.includes(catalogQuickQuery)) return false;
+        }
 
         if (activeChip === "id" && !m.isIndonesian) return false;
         if (activeChip === "hype" && m.hype < 88) return false;
@@ -2010,7 +2216,7 @@
         else if (m.isIndonesian) badgeText = "LOKAL";
 
         const posterHtml = effectivePoster
-          ? `<img src="${effectivePoster}" alt="${m.title}" loading="lazy" />`
+          ? `<img src="${effectivePoster}" alt="${m.title}" loading="lazy" decoding="async" />`
           : `<div class="poster-art"><div class="poster-art-title">${m.title}</div></div>`;
 
         let rightPill = "";
@@ -2027,7 +2233,7 @@
           <article class="movie-card" onclick="openDetail('${m.id}')">
             <div class="poster-box">
               ${badgeText ? `<span class="poster-badge">${badgeText}</span>` : ''}
-              <button class="heart-btn ${isWatched ? 'active' : ''}" onclick="event.stopPropagation(); toggleWatch('${m.id}')" aria-label="Watchlist">
+              <button type="button" class="heart-btn ${isWatched ? 'active' : ''}" onpointerdown="event.stopPropagation()" onclick="event.preventDefault(); event.stopPropagation(); toggleWatch('${m.id}')" aria-label="Simpan ke Watchlist">
                 <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
               </button>
               ${posterHtml}
@@ -2170,17 +2376,17 @@
           : `<div style="width:100%;height:100%;background:#0f172a;color:#fff;font-size:9px;display:flex;align-items:center;justify-content:center;text-align:center;padding:2px;">${m.title}</div>`;
 
         return `
-          <div class="watch-item" onclick="openDetail('${m.id}')" style="cursor:pointer;">
-            <div class="watch-thumb">${thumb}</div>
+          <div class="watch-item">
+            <div class="watch-thumb" onclick="openDetail('${m.id}')">${thumb}</div>
             <div class="watch-body" style="padding-right:0;">
-              <div class="watch-title">${m.title}</div>
-              <div class="watch-date-row">
+              <div class="watch-title" onclick="openDetail('${m.id}')">${m.title}</div>
+              <div class="watch-date-row" onclick="openDetail('${m.id}')">
                 ${countdownHtml}
                 <span class="watch-date">${(m.chains || ["XXI", "CGV"]).join(" • ")}</span>
               </div>
               <div class="watch-toggles">
-                <button class="toggle-pill ${isWatched ? 'active' : ''}" onclick="event.stopPropagation(); toggleWatch('${m.id}'); renderCalendar();">
-                  ${isWatched ? 'Tersimpan di Watchlist' : '+ Tambah Watchlist'}
+                <button type="button" class="cal-action-btn ${isWatched ? 'saved' : ''}" onclick="event.stopPropagation(); toggleWatch('${m.id}')">
+                  ${isWatched ? '✓ Tersimpan di Watchlist' : '+ Tambah ke Watchlist'}
                 </button>
               </div>
             </div>
@@ -2213,6 +2419,7 @@
       updateCounts();
       renderMovies();
       if (activeBottomTab === "watchlist") renderWatchlist();
+      if (activeBottomTab === "calendar") renderCalendar();
     }
 
     function undoLastWatchlistRemove() {
@@ -2440,6 +2647,13 @@
       }
     }
 
+
+    function toggleDetailWatch(id) {
+      toggleWatch(id);
+      const m = allMovies.find(item => item.id === id) || (watchlistMap[id] && watchlistMap[id].movieData);
+      if (m) renderDetailHtml(m);
+    }
+
     function renderDetailHtml(m) {
       const watchCfg = watchlistMap[m.id] || { presaleAlert: false, dayAlert: false };
       const effectivePoster = getEffectivePoster(m);
@@ -2495,6 +2709,10 @@
           <p><strong>Pemeran:</strong> ${m.cast || 'Memuat...'}</p>
           <p style="margin-top:6px;"><strong>Sinopsis:</strong><br>${m.synopsis}</p>
         </div>
+
+        <button type="button" class="btn-watch-detail ${watchlistMap[m.id] ? 'saved' : ''}" onclick="toggleDetailWatch('${m.id}')">
+          ${watchlistMap[m.id] ? '✓ Tersimpan di Watchlist' : '+ Simpan ke Watchlist'}
+        </button>
 
         <div class="reminder-box">
           <label class="rem-option">
@@ -2807,6 +3025,27 @@
       const activeRemCount = entries.filter(e => e.cfg.presaleAlert || e.cfg.dayAlert).length;
       document.getElementById("wlSummaryText").textContent = `${entries.length} film • ${activeRemCount} pengingat aktif`;
 
+      const hlCard = document.getElementById("wlHighlightCard");
+      if (activeWatchlistTab === "confirmed" && entries.length > 0) {
+        const upcomingSorted = [...entries]
+          .filter(e => {
+            const d = getDaysUntil(e.m.releaseDate);
+            return d !== null && d >= 0;
+          })
+          .sort((a, b) => a.m.releaseDate.localeCompare(b.m.releaseDate));
+        if (upcomingSorted.length > 0) {
+          const nextItem = upcomingSorted[0];
+          const dLeft = getDaysUntil(nextItem.m.releaseDate);
+          const whenLabel = dLeft === 0 ? "Tayang hari ini" : dLeft === 1 ? "Tayang besok" : `H-${dLeft} (${formatShortDate(nextItem.m.releaseDate)})`;
+          hlCard.style.display = "flex";
+          hlCard.innerHTML = `<span style="color:var(--muted);">Rilis terdekat: <strong style="color:var(--text);">${nextItem.m.title}</strong></span><span class="countdown-pill ${dLeft <= 1 ? 'now-pill' : ''}">${whenLabel}</span>`;
+        } else {
+          hlCard.style.display = "none";
+        }
+      } else {
+        hlCard.style.display = "none";
+      }
+
       if (entries.length === 0) {
         container.innerHTML = `<div class="info-card" style="text-align:center; padding:24px 16px;">
           <p style="margin:0;">Tidak ada film di daftar ${activeWatchlistTab === 'confirmed' ? 'Confirmed ID' : 'Menunggu Rilis ID / TBA'} untuk filter ini.</p>
@@ -2991,6 +3230,17 @@
         const upcomingUrl = `https://api.themoviedb.org/3/discover/movie?api_key=${encodeURIComponent(key)}&region=ID&with_release_type=2|3&with_original_language=en|id|ja|ko&release_date.gte=${todayIso}&sort_by=popularity.desc&page=1`;
 
         const [resNow, resUpcoming] = await Promise.all([fetch(nowUrl), fetch(upcomingUrl)]);
+        if (resNow.status === 401 || resUpcoming.status === 401) {
+          updateApiStatusPill(false, false);
+          if (showFeedback) {
+            fb.textContent = "API Key tidak valid. Periksa kembali key TMDB v3 Anda.";
+            fb.style.color = "var(--danger-text)";
+          }
+          return;
+        }
+        if (!resNow.ok && !resUpcoming.ok) {
+          throw new Error("HTTP_" + resNow.status);
+        }
         const dataNow = resNow.ok ? await resNow.json() : { results: [] };
         const dataUpcoming = resUpcoming.ok ? await resUpcoming.json() : { results: [] };
 
@@ -3033,8 +3283,6 @@
         localStorage.setItem("ct_v37_live_now", JSON.stringify(liveNow));
         localStorage.setItem("ct_v37_live_upcoming", JSON.stringify(liveUpcoming));
 
-        await fetchMovieCreditsBatch(key, [...liveNow, ...liveUpcoming]);
-
         rebuildMovieCatalog();
         updateCounts();
         renderMovies();
@@ -3044,18 +3292,26 @@
         const nowTs = Date.now();
         localStorage.setItem("ct_last_sync_ts", nowTs.toString());
         updateLastSyncLabel(nowTs);
+        updateApiStatusPill(true, true);
 
         if (showFeedback) {
-          fb.textContent = "Sinkronisasi berhasil.";
-          fb.style.color = "#16a34a";
+          fb.textContent = "Tersimpan & jadwal bioskop Indonesia berhasil diperbarui.";
+          fb.style.color = "var(--emerald)";
           showToast("Jadwal diperbarui");
         }
+
+        // Fetch credits asynchronously in background without blocking UI or failing sync
+        fetchMovieCreditsBatch(key, [...liveNow, ...liveUpcoming].slice(0, 12)).catch(() => {});
       } catch (e) {
         rebuildMovieCatalog();
         renderMovies();
+        const hasSavedKey = Boolean(localStorage.getItem("ct_tmdb_key"));
+        updateApiStatusPill(hasSavedKey, false);
         if (showFeedback) {
-          fb.textContent = "Gagal sinkronisasi. Cek koneksi internet.";
-          fb.style.color = "#e11d48";
+          fb.textContent = hasSavedKey
+            ? "API Key tersimpan. Sinkronisasi tertunda karena jaringan."
+            : "Tidak dapat terhubung. Periksa koneksi internet Anda.";
+          fb.style.color = hasSavedKey ? "var(--amber)" : "var(--danger-text)";
         }
       } finally {
         isSyncing = false;
