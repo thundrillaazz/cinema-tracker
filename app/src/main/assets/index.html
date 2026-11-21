@@ -320,29 +320,32 @@
     }
     .heart-btn {
       position: absolute;
-      top: 4px;
-      right: 4px;
+      top: 6px;
+      right: 6px;
       z-index: 6;
       width: 40px;
       height: 40px;
       border-radius: 50%;
-      background: rgba(15, 23, 42, 0.68);
-      border: 1px solid rgba(255, 255, 255, 0.22);
+      background: rgba(15, 23, 42, 0.72);
+      border: 1px solid rgba(255, 255, 255, 0.25);
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       color: #ffffff;
       touch-action: manipulation;
+      transition: transform 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
     }
-    .heart-btn:active { transform: scale(0.92); }
+    .heart-btn:active { transform: scale(0.9); }
     .heart-btn.active {
-      background: #ffffff;
-      border-color: #fecdd3;
-      color: #e11d48;
+      background: #e11d48;
+      border-color: #fda4af;
+      color: #ffffff;
+      box-shadow: 0 2px 10px rgba(225, 29, 72, 0.45);
+      transform: scale(1.04);
     }
     .heart-btn svg { width: 16px; height: 16px; stroke: currentColor; stroke-width: 2.2; fill: none; pointer-events: none; }
-    .heart-btn.active svg { fill: #e11d48; stroke: #e11d48; }
+    .heart-btn.active svg { fill: #ffffff; stroke: #ffffff; }
 
     .card-info {
       padding: 10px;
@@ -458,81 +461,166 @@
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 10px 12px;
+      padding: 12px;
       display: flex;
-      gap: 11px;
-      margin-bottom: 9px;
-      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+      align-items: flex-start;
     }
     .watch-thumb {
-      width: 52px;
-      height: 76px;
-      border-radius: 7px;
+      width: 54px;
+      height: 80px;
+      border-radius: 8px;
       overflow: hidden;
       flex-shrink: 0;
       background: #0f172a;
       cursor: pointer;
     }
-    .watch-thumb img { width: 100%; height: 100%; object-fit: cover; }
-    .watch-body { flex: 1; min-width: 0; padding-right: 34px; }
+    .watch-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .watch-body { flex: 1; min-width: 0; }
+    .watch-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+    }
     .watch-title {
       font-size: 13px;
       font-weight: 700;
       color: var(--text);
-      line-height: 1.25;
+      line-height: 1.3;
       cursor: pointer;
-      margin-bottom: 3px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
     .watch-date-row {
       display: flex;
       align-items: center;
       gap: 6px;
-      flex-wrap: wrap;
-      margin-bottom: 7px;
+      flex-wrap: nowrap;
+      min-width: 0;
+      overflow: hidden;
+      margin-top: 3px;
       font-size: 11px;
       color: var(--muted);
       font-variant-numeric: tabular-nums;
     }
-    .watch-toggles { display: flex; gap: 5px; flex-wrap: wrap; align-items: center; }
-    .toggle-pill {
+    .wl-note-line {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .wl-action-footer {
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .wl-rem-seg {
+      display: inline-flex;
+      align-items: center;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 2px;
+      gap: 2px;
+    }
+    .wl-rem-btn {
+      border: none;
+      background: transparent;
+      color: var(--muted);
       font-size: 10.5px;
       font-weight: 600;
       padding: 5px 8px;
       border-radius: 6px;
+      cursor: pointer;
+      white-space: nowrap;
+      touch-action: manipulation;
+    }
+    .wl-rem-btn.active {
+      background: var(--surface);
+      color: var(--blue);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    }
+    .wl-quick-btns {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .wl-compact-btn {
+      height: 28px;
+      padding: 0 8px;
+      border-radius: 7px;
       border: 1px solid var(--border);
       background: var(--surface-2);
       color: var(--muted);
-      cursor: pointer;
+      font-size: 11px;
+      font-weight: 600;
       display: inline-flex;
       align-items: center;
       gap: 4px;
+      cursor: pointer;
       white-space: nowrap;
+      touch-action: manipulation;
     }
+    .wl-compact-btn.priority-on {
+      background: var(--amber-soft);
+      color: var(--amber);
+    }
+    .wl-compact-btn.finish-suggest {
+      background: var(--emerald-soft);
+      color: var(--emerald);
+    }
+    .watch-toggles { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+    .toggle-pill {
+      min-height: 34px;
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--text);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+      touch-action: manipulation;
+      transition: transform 0.14s ease, background-color 0.14s ease, border-color 0.14s ease, color 0.14s ease;
+    }
+    .toggle-pill:active { transform: scale(0.95); }
     .toggle-pill.active {
-      background: var(--blue-soft);
-      border-color: var(--blue-border);
-      color: var(--blue);
+      background: #e11d48;
+      border-color: #f43f5e;
+      color: #ffffff;
     }
     .ghost-remove-btn {
-      position: absolute;
-      top: 6px;
-      right: 6px;
-      width: 34px;
-      height: 34px;
-      border-radius: 8px;
+      width: 28px;
+      height: 28px;
+      margin: -4px -4px 0 0;
+      border-radius: 6px;
       border: none;
       background: transparent;
       color: var(--muted);
       display: flex;
       align-items: center;
       justify-content: center;
+      flex-shrink: 0;
       cursor: pointer;
     }
     .ghost-remove-btn:active {
       background: var(--surface-2);
       color: var(--danger-text);
     }
-    .ghost-remove-btn svg { width: 15px; height: 15px; stroke: currentColor; stroke-width: 2; fill: none; }
+    .ghost-remove-btn svg { width: 14px; height: 14px; stroke: currentColor; stroke-width: 2; fill: none; }
 
     /* CALENDAR VIEW */
     .cal-header-card {
@@ -1153,26 +1241,6 @@
     }
     .wl-tabs-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 10px; }
     .wl-tabs-3 .w-tab { padding: 8px 4px; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .wl-note-chip {
-      font-size: 11px;
-      color: var(--muted);
-      background: var(--surface-2);
-      border-radius: 6px;
-      padding: 4px 8px;
-      margin-bottom: 6px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .wl-conflict-pill {
-      display: inline-block;
-      padding: 1px 6px;
-      border-radius: 4px;
-      background: var(--amber-soft);
-      color: var(--amber);
-      font-size: 10px;
-      font-weight: 600;
-    }
     .status-seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 8px; }
     .status-seg-btn {
       padding: 7px 6px;
@@ -1333,6 +1401,7 @@
       cursor: pointer;
     }
     .wl-highlight-card {
+      width: 100%;
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 10px;
@@ -1343,27 +1412,55 @@
       justify-content: space-between;
       gap: 8px;
       font-size: 11.5px;
+      cursor: pointer;
+      text-align: left;
     }
     .btn-watch-detail {
       width: 100%;
-      padding: 10px 12px;
-      border-radius: 9px;
+      padding: 11px 14px;
+      border-radius: 11px;
       font-size: 12.5px;
       font-weight: 700;
-      border: 1px solid var(--border);
-      background: var(--surface-2);
-      color: var(--text);
+      border: 1px solid var(--accent);
+      background: var(--accent);
+      color: var(--accent-text);
       cursor: pointer;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
       display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 6px;
+      justify-content: space-between;
+      gap: 8px;
+      touch-action: manipulation;
+      transition: transform 0.14s ease, background-color 0.14s ease, border-color 0.14s ease, color 0.14s ease;
     }
+    .btn-watch-detail:active { transform: scale(0.98); }
     .btn-watch-detail.saved {
-      background: var(--blue-soft);
-      border-color: var(--blue-border);
-      color: var(--blue);
+      background: rgba(225, 29, 72, 0.12);
+      border-color: rgba(244, 63, 94, 0.55);
+      color: #e11d48;
+    }
+    html[data-theme="dark"] .btn-watch-detail.saved {
+      color: #fb7185;
+    }
+    .btn-watch-detail-left {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .btn-watch-detail-left svg {
+      width: 15px;
+      height: 15px;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      fill: none;
+    }
+    .btn-watch-detail.saved .btn-watch-detail-left svg {
+      fill: currentColor;
+    }
+    .btn-watch-detail-hint {
+      font-size: 11px;
+      font-weight: 600;
+      opacity: 0.8;
     }
   </style>
 </head>
@@ -1506,8 +1603,9 @@
       <div id="wlToolbar" class="wl-toolbar">
         <div class="wl-chips">
           <button type="button" class="chip active" data-wfilter="all" onclick="setWatchlistFilter('all', this)">Semua</button>
-          <button type="button" class="chip" data-wfilter="priority" onclick="setWatchlistFilter('priority', this)">Prioritas</button>
           <button type="button" class="chip" data-wfilter="soon" onclick="setWatchlistFilter('soon', this)">Segera (≤14 Hari)</button>
+          <button type="button" class="chip" data-wfilter="month" onclick="setWatchlistFilter('month', this)">Bulan Ini</button>
+          <button type="button" class="chip" data-wfilter="priority" onclick="setWatchlistFilter('priority', this)">Prioritas</button>
           <button type="button" class="chip" data-wfilter="imax" onclick="setWatchlistFilter('imax', this)">IMAX</button>
           <button type="button" class="chip" data-wfilter="reminded" onclick="setWatchlistFilter('reminded', this)">Notif Aktif</button>
         </div>
@@ -1515,13 +1613,14 @@
           <span id="wlSummaryText">0 film tersimpan</span>
           <select id="wlSortSelect" class="sort-select" aria-label="Urutan watchlist" onchange="renderWatchlist()">
             <option value="date_asc">Urut: Rilis Terdekat</option>
+            <option value="date_desc">Urut: Rilis Terjauh</option>
             <option value="hype">Urut: Hype Tertinggi</option>
             <option value="title">Urut: Judul A-Z</option>
           </select>
         </div>
       </div>
 
-      <div id="wlHighlightCard" class="wl-highlight-card" style="display:none;"></div>
+      <button type="button" id="wlHighlightCard" class="wl-highlight-card" style="display:none;"></button>
       <div id="watchlistContainer"></div>
     </div>
 
@@ -1830,6 +1929,7 @@
     let customPostersMap = {};
     let watchlistMap = {};
     let searchResultsStore = [];
+    const searchQueryCache = new Map();
     let searchTimeout = null;
     let isSyncing = false;
     let lastManualSyncAt = 0;
@@ -1868,6 +1968,110 @@
 
     function normalizeKey(str) {
       return (str || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+    }
+
+    function extractNumericTmdbId(movieId) {
+      if (!movieId) return 0;
+      const match = /^(?:tmdb_|search_)(\d+)$/.exec(String(movieId));
+      return match ? parseInt(match[1], 10) || 0 : 0;
+    }
+
+    function getMovieCanonicalTmdbId(movie) {
+      if (!movie) return 0;
+      if (movie.tmdbId && movie.tmdbId > 0) return movie.tmdbId;
+      if (movie.id && tmdbIdCache[movie.id]) return tmdbIdCache[movie.id];
+      return extractNumericTmdbId(movie.id);
+    }
+
+    function findWatchlistKey(movie) {
+      if (!movie) return null;
+      if (movie.id && watchlistMap[movie.id]) return movie.id;
+      const targetTmdb = getMovieCanonicalTmdbId(movie);
+      const targetNorm = normalizeKey(movie.title || "");
+      const keys = Object.keys(watchlistMap);
+      for (let i = 0; i < keys.length; i++) {
+        const k = keys[i];
+        const entry = watchlistMap[k];
+        if (!entry) continue;
+        const entryTmdb = entry.tmdbId || getMovieCanonicalTmdbId(entry.movieData) || extractNumericTmdbId(k);
+        if (targetTmdb > 0 && entryTmdb > 0 && targetTmdb === entryTmdb) return k;
+        if (targetNorm && entry.movieData && entry.movieData.title && normalizeKey(entry.movieData.title) === targetNorm) {
+          return k;
+        }
+      }
+      return null;
+    }
+
+    function reconcileWatchlistMap() {
+      const byTitle = new Map();
+      const byTmdb = new Map();
+      allMovies.forEach(m => {
+        const norm = normalizeKey(m.title);
+        if (norm && !byTitle.has(norm)) byTitle.set(norm, m);
+        const tid = getMovieCanonicalTmdbId(m);
+        if (tid > 0 && !byTmdb.has(tid)) byTmdb.set(tid, m);
+      });
+
+      const next = {};
+      let changed = false;
+      Object.keys(watchlistMap).forEach(rawKey => {
+        const entry = watchlistMap[rawKey];
+        if (!entry || !entry.movieData) return;
+        const entryTmdb = entry.tmdbId || getMovieCanonicalTmdbId(entry.movieData) || extractNumericTmdbId(rawKey);
+        const normTitle = normalizeKey(entry.movieData.title);
+        const canonicalMovie = (entryTmdb > 0 ? byTmdb.get(entryTmdb) : null) || (normTitle ? byTitle.get(normTitle) : null);
+        const targetKey = (canonicalMovie && !String(canonicalMovie.id).startsWith("search_")) ? canonicalMovie.id : rawKey;
+        if (targetKey !== rawKey) changed = true;
+
+        const resolvedTmdb = Math.max(entryTmdb, canonicalMovie ? (canonicalMovie.tmdbId || 0) : 0);
+        const mergedMovie = {
+          ...entry.movieData,
+          ...(canonicalMovie || {}),
+          id: targetKey,
+          tmdbId: resolvedTmdb || undefined,
+          poster: entry.movieData.poster || (canonicalMovie ? canonicalMovie.poster : "") || ""
+        };
+        if (!next[targetKey]) {
+          next[targetKey] = {
+            ...entry,
+            tmdbId: resolvedTmdb,
+            movieData: mergedMovie
+          };
+        } else {
+          changed = true;
+          const rank = { watched: 3, priority: 2, want: 1 };
+          const curSt = next[targetKey].watchStatus || "want";
+          const newSt = entry.watchStatus || "want";
+          next[targetKey] = {
+            ...next[targetKey],
+            presaleAlert: Boolean(next[targetKey].presaleAlert || entry.presaleAlert),
+            h1Alert: Boolean(isH1Enabled(next[targetKey]) || isH1Enabled(entry)),
+            dayAlert: Boolean(next[targetKey].dayAlert || entry.dayAlert),
+            isTba: Boolean(mergedMovie.tba),
+            tmdbId: Math.max(next[targetKey].tmdbId || 0, resolvedTmdb),
+            watchStatus: rank[newSt] >= rank[curSt] ? newSt : curSt,
+            note: (next[targetKey].note && next[targetKey].note.trim()) ? next[targetKey].note : entry.note,
+            movieData: mergedMovie
+          };
+        }
+      });
+
+      if (changed) {
+        watchlistMap = next;
+        persistWatchlist();
+      }
+    }
+
+    function getLetterboxdUrl(movie, watchEntry) {
+      const resolvedTmdb = getMovieCanonicalTmdbId(movie) || (watchEntry ? (watchEntry.tmdbId || getMovieCanonicalTmdbId(watchEntry.movieData)) : 0);
+      if (resolvedTmdb > 0) {
+        return `https://letterboxd.com/tmdb/${resolvedTmdb}/`;
+      }
+      const cleanTitle = (movie.searchQuery || movie.title || "").replace(/\(.*?\)/g, "").trim();
+      const year = (movie.releaseDate && movie.releaseDate.length >= 4 && movie.releaseDate !== "TBA" && !movie.isReRelease)
+        ? ` ${movie.releaseDate.slice(0, 4)}`
+        : "";
+      return `https://letterboxd.com/search/${encodeURIComponent(cleanTitle + year)}/`;
     }
 
     function formatShortDate(isoDate) {
@@ -2168,16 +2372,28 @@
 
       Object.keys(watchlistMap).forEach(wId => {
         const entry = watchlistMap[wId];
-        if (entry && entry.movieData && !map.has(wId)) {
-          const savedM = { ...entry.movieData };
-          if (!savedM.tba && savedM.releaseDate && savedM.releaseDate !== "TBA") {
-            const isRel = savedM.releaseDate <= todayIso;
-            savedM.status = isRel ? "now" : "upcoming";
-            savedM.dateLabel = isRel ? "Sedang Tayang" : formatShortDate(savedM.releaseDate);
-            if (savedM.confirmedText) savedM.confirmedText = normalizeIsoDatesInText(savedM.confirmedText);
+        if (!entry || !entry.movieData) return;
+        const savedM = { ...entry.movieData };
+        const norm = normalizeKey(savedM.title);
+        if (map.has(wId)) return;
+        if (norm && seenNormalized.has(norm)) {
+          const existing = map.get(seenNormalized.get(norm));
+          if (existing) {
+            if (!existing.poster && savedM.poster) existing.poster = savedM.poster;
+            if (!existing.tmdbId && (entry.tmdbId || savedM.tmdbId)) {
+              existing.tmdbId = entry.tmdbId || savedM.tmdbId;
+            }
           }
-          map.set(wId, savedM);
+          return;
         }
+        if (!savedM.tba && savedM.releaseDate && savedM.releaseDate !== "TBA") {
+          const isRel = savedM.releaseDate <= todayIso;
+          savedM.status = isRel ? "now" : "upcoming";
+          savedM.dateLabel = isRel ? "Sedang Tayang" : formatShortDate(savedM.releaseDate);
+          if (savedM.confirmedText) savedM.confirmedText = normalizeIsoDatesInText(savedM.confirmedText);
+        }
+        map.set(wId, savedM);
+        if (norm) seenNormalized.set(norm, wId);
       });
 
       posterCache = pruneCache(posterCache, 150);
@@ -2188,6 +2404,7 @@
       localStorage.setItem("ct_v37_poster_cache", JSON.stringify(posterCache));
       localStorage.setItem("ct_v37_tmdbid_cache", JSON.stringify(tmdbIdCache));
       allMovies = Array.from(map.values());
+      reconcileWatchlistMap();
     }
 
     const LAUNCHER_ICON_OPTIONS = [
@@ -2587,7 +2804,7 @@
       }
 
       grid.innerHTML = list.map(m => {
-        const isWatched = Boolean(watchlistMap[m.id]);
+        const isWatched = Boolean(findWatchlistKey(m));
         const effectivePoster = getEffectivePoster(m);
         let badgeText = "";
         if (m.isReRelease) badgeText = "RE-RELEASE";
@@ -2689,7 +2906,7 @@
       const moviesByDate = {};
       allMovies.forEach(m => {
         if (!m.releaseDate || m.releaseDate === "TBA" || m.tba) return;
-        const isWl = Boolean(watchlistMap[m.id]);
+        const isWl = Boolean(findWatchlistKey(m));
         if (calScope === "watchlist" && !isWl) return;
         if (!moviesByDate[m.releaseDate]) moviesByDate[m.releaseDate] = [];
         moviesByDate[m.releaseDate].push({ ...m, isWatchlisted: isWl });
@@ -2751,7 +2968,7 @@
 
       agendaList.innerHTML = selectedMovies.map(m => {
         const effPoster = getEffectivePoster(m);
-        const isWatched = Boolean(watchlistMap[m.id]);
+        const isWatched = Boolean(findWatchlistKey(m));
         const safeId = escapeHtml(m.id);
         const safeTitle = escapeHtml(m.title);
         const countdownHtml = buildCountdownLabel(m.releaseDate, m.tba);
@@ -2791,30 +3008,64 @@
       if (item) openDetail(item.getAttribute("data-movie-id"));
     });
 
+    function syncWatchButtonsInDom() {
+      document.querySelectorAll("#movieGrid [data-watch-id]").forEach(btn => {
+        const mid = btn.getAttribute("data-watch-id");
+        const m = allMovies.find(item => item.id === mid) || { id: mid };
+        const active = Boolean(findWatchlistKey(m));
+        btn.classList.toggle("active", active);
+        btn.setAttribute("aria-pressed", active ? "true" : "false");
+        btn.setAttribute("aria-label", active ? `Hapus ${m.title || "film"} dari Watchlist` : `Simpan ${m.title || "film"} ke Watchlist`);
+      });
+
+      document.querySelectorAll("#globalSearchResults [data-local-watch-id]").forEach(btn => {
+        const mid = btn.getAttribute("data-local-watch-id");
+        const m = allMovies.find(item => item.id === mid) || { id: mid };
+        const active = Boolean(findWatchlistKey(m));
+        btn.classList.toggle("active", active);
+        btn.setAttribute("aria-pressed", active ? "true" : "false");
+        btn.textContent = active ? "✓ Di Watchlist" : "+ Watchlist";
+      });
+
+      document.querySelectorAll("#globalSearchResults [data-search-watch-idx]").forEach(btn => {
+        const idx = parseInt(btn.getAttribute("data-search-watch-idx"), 10);
+        const data = searchResultsStore[idx];
+        if (!data) return;
+        const active = Boolean(findWatchlistKey({ id: "search_" + data.tmdbId, tmdbId: data.tmdbId, title: data.title }));
+        btn.classList.toggle("active", active);
+        btn.setAttribute("aria-pressed", active ? "true" : "false");
+        btn.textContent = active ? "✓ Di Watchlist" : "+ Watchlist";
+      });
+    }
+
     function toggleWatch(id) {
       const m = allMovies.find(item => item.id === id) || (watchlistMap[id] && watchlistMap[id].movieData);
       if (!m) return;
 
-      if (watchlistMap[id]) {
-        lastRemovedWatchItem = { id, entry: { ...watchlistMap[id] } };
-        delete watchlistMap[id];
+      const matchedKey = findWatchlistKey(m);
+      if (matchedKey) {
+        lastRemovedWatchItem = { id: matchedKey, entry: { ...watchlistMap[matchedKey] } };
+        delete watchlistMap[matchedKey];
         showToast("Dihapus dari Watchlist", true);
       } else {
         const effPoster = getEffectivePoster(m);
+        const resolvedTmdb = getMovieCanonicalTmdbId(m);
         watchlistMap[id] = {
           presaleAlert: true,
           h1Alert: true,
           dayAlert: true,
           isTba: Boolean(m.tba),
-          tmdbId: m.tmdbId || 0,
-          movieData: { ...m, poster: effPoster }
+          tmdbId: resolvedTmdb,
+          watchStatus: "want",
+          lastKnownReleaseDate: m.releaseDate,
+          movieData: { ...m, tmdbId: resolvedTmdb || m.tmdbId, poster: effPoster }
         };
-        showToast("Disimpan ke Watchlist");
+        showToast(m.tba ? "Disimpan ke Watchlist TBA" : "Disimpan ke Watchlist");
       }
       persistWatchlist();
       syncWatchlistToNative();
       updateCounts();
-      renderMovies();
+      syncWatchButtonsInDom();
       if (activeBottomTab === "watchlist") renderWatchlist();
       if (activeBottomTab === "calendar") renderCalendar();
     }
@@ -2827,7 +3078,7 @@
       persistWatchlist();
       syncWatchlistToNative();
       updateCounts();
-      renderMovies();
+      syncWatchButtonsInDom();
       if (activeBottomTab === "watchlist") renderWatchlist();
       if (activeBottomTab === "calendar") renderCalendar();
     }
@@ -2882,7 +3133,7 @@
         const effPoster = getEffectivePoster(m);
         const safeId = escapeHtml(m.id);
         const safeTitle = escapeHtml(m.title);
-        const isWatched = Boolean(watchlistMap[m.id]);
+        const isWatched = Boolean(findWatchlistKey(m));
         const statusColor = m.tba ? "var(--amber)" : "var(--emerald)";
         const statusText = m.tba ? "Menunggu jadwal ID (TBA)" : (m.status === "now" ? "Sedang Tayang ID" : `Confirmed ID · ${formatFullDate(m.releaseDate)}`);
         const thumb = effPoster
@@ -2892,14 +3143,43 @@
         return `
           <div class="watch-item" data-local-id="${safeId}">
             <div class="watch-thumb">${thumb}</div>
-            <div class="watch-body" style="padding-right:0;">
+            <div class="watch-body">
               <div class="watch-title">${safeTitle}</div>
               <div class="watch-date-row">
                 <span>${escapeHtml((m.chains || []).join(" · "))}</span>
                 <span>·</span>
                 <span style="color:${statusColor}; font-weight:600;">${escapeHtml(statusText)}</span>
               </div>
-              <button type="button" class="toggle-pill ${isWatched ? "active" : ""}" data-local-watch-id="${safeId}">
+              <div style="margin-top:8px;">
+                <button type="button" class="toggle-pill ${isWatched ? "active" : ""}" aria-pressed="${isWatched}" data-local-watch-id="${safeId}">
+                  ${isWatched ? "✓ Di Watchlist" : "+ Watchlist"}
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderRemoteSearchStore() {
+      const resContainer = document.getElementById("globalSearchResults");
+      resContainer.innerHTML = searchResultsStore.map((item, idx) => {
+        const idKey = "search_" + item.tmdbId;
+        const safeTitle = escapeHtml(item.title.toUpperCase());
+        const statusText = !item.isTba ? `Confirmed ID · ${formatFullDate(item.releaseDate)}` : "Menunggu jadwal ID (TBA)";
+        const badgeColor = !item.isTba ? "var(--emerald)" : "var(--amber)";
+        const isWatched = Boolean(findWatchlistKey({ id: idKey, tmdbId: item.tmdbId, title: item.title }));
+
+        return `
+          <div class="watch-item" data-search-idx="${idx}">
+            <div class="watch-thumb">
+              ${item.poster ? `<img src="${escapeHtml(item.poster)}" alt="${safeTitle}" referrerpolicy="no-referrer" />` : `<div class="poster-art" style="padding:4px;"><div class="poster-art-title" style="font-size:9px;">${safeTitle}</div></div>`}
+            </div>
+            <div class="watch-body">
+              <div class="watch-title">${safeTitle}</div>
+              <div class="watch-date-row">Rilis Global: ${escapeHtml(item.globalRelease)}</div>
+              <div style="font-size:11px; font-weight:600; color:${badgeColor}; margin-bottom:8px;">${escapeHtml(statusText)}</div>
+              <button type="button" class="toggle-pill ${isWatched ? "active" : ""}" aria-pressed="${isWatched}" data-search-watch-idx="${idx}">
                 ${isWatched ? "✓ Di Watchlist" : "+ Watchlist"}
               </button>
             </div>
@@ -2910,11 +3190,17 @@
 
     async function executeGlobalSearch() {
       const q = document.getElementById("globalSearchInput").value.trim();
-      const resContainer = document.getElementById("globalSearchResults");
       if (q.length < 2) return;
 
       const key = localStorage.getItem("ct_tmdb_key") || "";
       if (!key) return;
+
+      const cacheKey = q.toLowerCase();
+      if (searchQueryCache.has(cacheKey)) {
+        searchResultsStore = searchQueryCache.get(cacheKey);
+        renderRemoteSearchStore();
+        return;
+      }
 
       try {
         const res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${encodeURIComponent(key)}&query=${encodeURIComponent(q)}&page=1`);
@@ -2946,7 +3232,6 @@
           return { ...item, idReleaseDate, sourceDetail };
         }));
 
-        // Avoid re-rendering if user typed something else since request started
         if (document.getElementById("globalSearchInput").value.trim() !== q) return;
 
         searchResultsStore = enriched.map(item => {
@@ -2959,34 +3244,17 @@
             releaseDate: item.idReleaseDate || item.release_date || "TBA",
             isTba: !item.idReleaseDate,
             sourceBadge: item.sourceDetail,
-            poster: customPostersMap[idKey] || defaultPoster,
+            poster: customPostersMap[idKey] || customPostersMap["tmdb_" + item.id] || defaultPoster,
             overview: item.overview || ""
           };
         });
 
-        resContainer.innerHTML = searchResultsStore.map((item, idx) => {
-          const idKey = "search_" + item.tmdbId;
-          const safeTitle = escapeHtml(item.title.toUpperCase());
-          const statusText = !item.isTba ? `Confirmed ID · ${formatFullDate(item.releaseDate)}` : "Menunggu jadwal ID (TBA)";
-          const badgeColor = !item.isTba ? "var(--emerald)" : "var(--amber)";
-          const isWatched = Boolean(watchlistMap[idKey]);
-
-          return `
-            <div class="watch-item" data-search-idx="${idx}">
-              <div class="watch-thumb">
-                ${item.poster ? `<img src="${escapeHtml(item.poster)}" alt="${safeTitle}" referrerpolicy="no-referrer" />` : `<div class="poster-art" style="padding:4px;"><div class="poster-art-title" style="font-size:9px;">${safeTitle}</div></div>`}
-              </div>
-              <div class="watch-body" style="padding-right:0;">
-                <div class="watch-title">${safeTitle}</div>
-                <div class="watch-date-row">Rilis Global: ${escapeHtml(item.globalRelease)}</div>
-                <div style="font-size:11px; font-weight:600; color:${badgeColor}; margin-bottom:6px;">${escapeHtml(statusText)}</div>
-                <button type="button" class="toggle-pill ${isWatched ? "active" : ""}" data-search-watch-idx="${idx}">
-                  ${isWatched ? "✓ Di Watchlist" : "+ Watchlist"}
-                </button>
-              </div>
-            </div>
-          `;
-        }).join("");
+        if (searchQueryCache.size >= 15) {
+          const oldest = searchQueryCache.keys().next().value;
+          if (oldest) searchQueryCache.delete(oldest);
+        }
+        searchQueryCache.set(cacheKey, searchResultsStore);
+        renderRemoteSearchStore();
       } catch (_) {}
     }
 
@@ -3061,39 +3329,51 @@
       const data = searchResultsStore[idx];
       if (!data) return;
       const movieObj = buildMovieFromSearchData(data);
-      const idKey = movieObj.id;
+      const canonical = allMovies.find(m =>
+        (data.tmdbId && getMovieCanonicalTmdbId(m) === data.tmdbId) ||
+        normalizeKey(m.title) === normalizeKey(movieObj.title)
+      );
+      const saveTarget = canonical || movieObj;
+      const matchedKey = findWatchlistKey(movieObj);
 
-      if (watchlistMap[idKey]) {
-        lastRemovedWatchItem = { id: idKey, entry: { ...watchlistMap[idKey] } };
-        delete watchlistMap[idKey];
+      if (matchedKey) {
+        lastRemovedWatchItem = { id: matchedKey, entry: { ...watchlistMap[matchedKey] } };
+        delete watchlistMap[matchedKey];
         showToast("Dihapus dari Watchlist", true);
       } else {
-        watchlistMap[idKey] = {
+        const effPoster = getEffectivePoster(saveTarget) || movieObj.poster;
+        watchlistMap[saveTarget.id] = {
           presaleAlert: true,
           h1Alert: true,
           dayAlert: true,
-          isTba: data.isTba,
-          tmdbId: data.tmdbId,
-          movieData: { ...movieObj }
+          isTba: Boolean(saveTarget.tba),
+          tmdbId: getMovieCanonicalTmdbId(saveTarget) || data.tmdbId || 0,
+          watchStatus: "want",
+          lastKnownReleaseDate: saveTarget.releaseDate,
+          movieData: { ...saveTarget, tmdbId: getMovieCanonicalTmdbId(saveTarget) || data.tmdbId, poster: effPoster }
         };
-        if (!allMovies.some(m => m.id === idKey)) allMovies.push(movieObj);
-        showToast(data.isTba ? "Disimpan ke Watchlist TBA" : "Disimpan ke Watchlist");
+        if (!allMovies.some(m => m.id === saveTarget.id)) allMovies.push(saveTarget);
+        showToast(saveTarget.tba ? "Disimpan ke Watchlist TBA" : "Disimpan ke Watchlist");
       }
       persistWatchlist();
       syncWatchlistToNative();
       updateCounts();
-      executeGlobalSearch();
+      syncWatchButtonsInDom();
       if (activeBottomTab === "watchlist") renderWatchlist();
+      if (activeBottomTab === "calendar") renderCalendar();
     }
 
-    function openLetterboxd(id) {
+    async function openLetterboxd(id) {
       const m = allMovies.find(item => item.id === id) || (watchlistMap[id] && watchlistMap[id].movieData);
       if (!m) return;
-      const cleanTitle = (m.searchQuery || m.title || "").replace(/\(.*?\)/g, "").trim();
-      const year = (m.releaseDate && m.releaseDate.length >= 4 && m.releaseDate !== "TBA" && !m.isReRelease)
-        ? ` ${m.releaseDate.slice(0, 4)}`
-        : "";
-      const url = `https://letterboxd.com/search/${encodeURIComponent(cleanTitle + year)}/`;
+      const matchedKey = findWatchlistKey(m);
+      const watchEntry = matchedKey ? watchlistMap[matchedKey] : null;
+      let resolvedTmdb = getMovieCanonicalTmdbId(m) || (watchEntry ? watchEntry.tmdbId : 0);
+      const key = localStorage.getItem("ct_tmdb_key") || "";
+      if (!resolvedTmdb && key) {
+        resolvedTmdb = await resolveMovieTmdbId(m, key);
+      }
+      const url = getLetterboxdUrl(resolvedTmdb ? { ...m, tmdbId: resolvedTmdb } : m, watchEntry);
       if (window.AndroidBridge && typeof window.AndroidBridge.openExternalUrl === "function") {
         window.AndroidBridge.openExternalUrl(url);
       } else {
@@ -3220,24 +3500,26 @@
 
     function updateWatchStatus(id, status) {
       let m = allMovies.find(item => item.id === id) || (watchlistMap[id] && watchlistMap[id].movieData);
-      if (!watchlistMap[id] && m) {
-        watchlistMap[id] = {
+      const matchedKey = findWatchlistKey(m || { id }) || id;
+      if (!watchlistMap[matchedKey] && m) {
+        const resolvedTmdb = getMovieCanonicalTmdbId(m);
+        watchlistMap[matchedKey] = {
           presaleAlert: true,
           h1Alert: true,
           dayAlert: true,
           isTba: Boolean(m.tba),
-          tmdbId: m.tmdbId || 0,
+          tmdbId: resolvedTmdb,
           watchStatus: status,
           lastKnownReleaseDate: m.releaseDate,
-          movieData: { ...m, poster: getEffectivePoster(m) }
+          movieData: { ...m, id: matchedKey, tmdbId: resolvedTmdb || m.tmdbId, poster: getEffectivePoster(m) }
         };
-      } else if (watchlistMap[id]) {
-        watchlistMap[id].watchStatus = status;
+      } else if (watchlistMap[matchedKey]) {
+        watchlistMap[matchedKey].watchStatus = status;
       }
       persistWatchlist();
       syncWatchlistToNative();
       updateCounts();
-      renderMovies();
+      syncWatchButtonsInDom();
       if (activeBottomTab === "watchlist") renderWatchlist();
       if (m && document.getElementById("detailOverlay").classList.contains("open")) renderDetailHtml(m);
       if (status === "watched") showToast("Ditandai sudah ditonton");
@@ -3246,28 +3528,34 @@
 
     function updateWatchNote(id, noteVal) {
       let m = allMovies.find(item => item.id === id) || (watchlistMap[id] && watchlistMap[id].movieData);
-      if (!watchlistMap[id] && m) {
-        watchlistMap[id] = {
+      const matchedKey = findWatchlistKey(m || { id }) || id;
+      if (!watchlistMap[matchedKey] && m) {
+        const resolvedTmdb = getMovieCanonicalTmdbId(m);
+        watchlistMap[matchedKey] = {
           presaleAlert: true,
           h1Alert: true,
           dayAlert: true,
           isTba: Boolean(m.tba),
-          tmdbId: m.tmdbId || 0,
+          tmdbId: resolvedTmdb,
           watchStatus: "want",
           note: noteVal.slice(0, 80),
           lastKnownReleaseDate: m.releaseDate,
-          movieData: { ...m, poster: getEffectivePoster(m) }
+          movieData: { ...m, id: matchedKey, tmdbId: resolvedTmdb || m.tmdbId, poster: getEffectivePoster(m) }
         };
-      } else if (watchlistMap[id]) {
-        watchlistMap[id].note = noteVal.slice(0, 80);
+        updateCounts();
+        syncWatchButtonsInDom();
+      } else if (watchlistMap[matchedKey]) {
+        watchlistMap[matchedKey].note = noteVal.slice(0, 80);
       }
       persistWatchlist();
       if (activeBottomTab === "watchlist") renderWatchlist();
     }
 
     function renderDetailHtml(m) {
-      const watchCfg = watchlistMap[m.id] || { presaleAlert: false, h1Alert: false, dayAlert: false, watchStatus: "want", note: "" };
-      const isSaved = Boolean(watchlistMap[m.id]);
+      const matchedKey = findWatchlistKey(m);
+      const watchEntry = matchedKey ? watchlistMap[matchedKey] : null;
+      const watchCfg = watchEntry || { presaleAlert: false, h1Alert: false, dayAlert: false, watchStatus: "want", note: "" };
+      const isSaved = Boolean(watchEntry);
       const h1Checked = isH1Enabled(watchCfg);
       const effectivePoster = getEffectivePoster(m);
       const safeTitle = escapeHtml(m.title);
@@ -3276,6 +3564,8 @@
       const net = getNetworkAvailabilityInfo(m);
       const netLine = net.formatNote ? `${net.summary} · ${net.formatNote}` : net.summary;
       const curStatus = watchCfg.watchStatus || "want";
+      const lbxdUrl = getLetterboxdUrl(m, watchEntry);
+      const lbxdSub = lbxdUrl.includes("/tmdb/") ? "Halaman Film" : "Buka Film";
 
       const posterHtml = effectivePoster
         ? `<img src="${escapeHtml(effectivePoster)}" alt="${safeTitle}" referrerpolicy="no-referrer" />`
@@ -3339,7 +3629,7 @@
             </span>
             <div style="min-width:0;">
               <div class="media-btn-title">Letterboxd</div>
-              <div class="media-btn-sub">Review</div>
+              <div class="media-btn-sub">${lbxdSub}</div>
             </div>
           </button>
         </div>
@@ -3356,8 +3646,12 @@
           </div>
         </div>
 
-        <button type="button" class="btn-watch-detail ${isSaved ? "saved" : ""}" onclick="toggleDetailWatch('${safeId}')">
-          ${isSaved ? "✓ Tersimpan di Watchlist" : "+ Simpan ke Watchlist"}
+        <button type="button" class="btn-watch-detail ${isSaved ? "saved" : ""}" aria-pressed="${isSaved}" onclick="toggleDetailWatch('${safeId}')">
+          <span class="btn-watch-detail-left">
+            <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+            <span>${isSaved ? "Tersimpan di Watchlist" : "Simpan ke Watchlist"}</span>
+          </span>
+          <span class="btn-watch-detail-hint">${isSaved ? "Ketuk untuk hapus" : "+ Tambah"}</span>
         </button>
 
         <div class="verify-box" style="margin-bottom:12px;">
@@ -3658,10 +3952,11 @@
       if (!m && watchlistMap[id] && watchlistMap[id].movieData) {
         m = watchlistMap[id].movieData;
       }
+      const matchedKey = findWatchlistKey(m || { id }) || id;
       const isTbaVal = m ? Boolean(m.tba) : false;
-      const tmdbIdVal = m ? (m.tmdbId || 0) : 0;
+      const tmdbIdVal = m ? getMovieCanonicalTmdbId(m) : 0;
 
-      const existing = watchlistMap[id];
+      const existing = watchlistMap[matchedKey];
       const current = existing || {
         presaleAlert: false,
         h1Alert: false,
@@ -3670,19 +3965,19 @@
         tmdbId: tmdbIdVal,
         watchStatus: "want",
         lastKnownReleaseDate: m ? m.releaseDate : undefined,
-        movieData: m ? { ...m, poster: getEffectivePoster(m) } : null
+        movieData: m ? { ...m, id: matchedKey, tmdbId: tmdbIdVal || m.tmdbId, poster: getEffectivePoster(m) } : null
       };
       if (current.h1Alert === undefined) current.h1Alert = Boolean(current.dayAlert);
       current[field] = enabled;
       current.isTba = isTbaVal;
-      current.tmdbId = tmdbIdVal;
-      if (m) current.movieData = { ...m, poster: getEffectivePoster(m) };
+      current.tmdbId = tmdbIdVal || current.tmdbId || 0;
+      if (m) current.movieData = { ...m, id: matchedKey, tmdbId: tmdbIdVal || m.tmdbId, poster: getEffectivePoster(m) };
 
-      watchlistMap[id] = current;
+      watchlistMap[matchedKey] = current;
       persistWatchlist();
       syncWatchlistToNative();
       updateCounts();
-      renderMovies();
+      syncWatchButtonsInDom();
       if (activeBottomTab === "watchlist") renderWatchlist();
     }
 
@@ -3693,22 +3988,17 @@
       persistWatchlist();
       syncWatchlistToNative();
       updateCounts();
-      renderMovies();
+      syncWatchButtonsInDom();
       renderWatchlist();
       showToast("Dihapus dari Watchlist", true);
     }
 
-    function chronoDiffDays(dateA, dateB) {
-      if (!dateA || !dateB || dateA === "TBA" || dateB === "TBA") return 999;
-      const a = new Date(dateA.slice(0, 10) + "T00:00:00");
-      const b = new Date(dateB.slice(0, 10) + "T00:00:00");
-      if (isNaN(a.getTime()) || isNaN(b.getTime())) return 999;
-      return Math.round((a.getTime() - b.getTime()) / 86400000);
-    }
-
     function renderWatchlist() {
+      updateCounts();
       const container = document.getElementById("watchlistContainer");
       const sortBy = document.getElementById("wlSortSelect").value;
+      const todayIso = getLocalTodayIso();
+      const monthPrefix = todayIso.slice(0, 7);
       const ids = Object.keys(watchlistMap);
 
       let entries = ids
@@ -3728,26 +4018,15 @@
           return activeWatchlistTab === "tba" ? item.cfg.isTba : !item.cfg.isTba;
         });
 
-      const conflictIds = new Set();
       if (activeWatchlistTab === "confirmed") {
-        const upOnly = entries.filter(e => {
-          const d = getDaysUntil(e.m.releaseDate);
-          return d !== null && d >= 0;
-        });
-        for (let i = 0; i < upOnly.length; i++) {
-          for (let j = i + 1; j < upOnly.length; j++) {
-            if (Math.abs(chronoDiffDays(upOnly[i].m.releaseDate, upOnly[j].m.releaseDate)) <= 6) {
-              conflictIds.add(upOnly[i].id);
-              conflictIds.add(upOnly[j].id);
-            }
-          }
-        }
-
         entries = entries.filter(item => {
           if (activeWatchlistFilter === "priority") return item.cfg.watchStatus === "priority";
           if (activeWatchlistFilter === "soon") {
             const d = getDaysUntil(item.m.releaseDate);
             return d !== null && d >= 0 && d <= 14;
+          }
+          if (activeWatchlistFilter === "month") {
+            return Boolean(item.m.releaseDate && item.m.releaseDate.startsWith(monthPrefix));
           }
           if (activeWatchlistFilter === "imax") return Boolean(item.m.imax);
           if (activeWatchlistFilter === "reminded") return Boolean(item.cfg.presaleAlert || isH1Enabled(item.cfg) || item.cfg.dayAlert);
@@ -3759,6 +4038,12 @@
             const da = (a.m.releaseDate && a.m.releaseDate !== "TBA") ? a.m.releaseDate : "9999-12-31";
             const db = (b.m.releaseDate && b.m.releaseDate !== "TBA") ? b.m.releaseDate : "9999-12-31";
             return da.localeCompare(db);
+          });
+        } else if (sortBy === "date_desc") {
+          entries.sort((a, b) => {
+            const da = (a.m.releaseDate && a.m.releaseDate !== "TBA") ? a.m.releaseDate : "0000-01-01";
+            const db = (b.m.releaseDate && b.m.releaseDate !== "TBA") ? b.m.releaseDate : "0000-01-01";
+            return db.localeCompare(da);
           });
         } else if (sortBy === "hype") {
           entries.sort((a, b) => (b.m.hype || 0) - (a.m.hype || 0));
@@ -3783,11 +4068,10 @@
         if (upcomingSorted.length > 0) {
           const nextItem = upcomingSorted[0];
           const dLeft = getDaysUntil(nextItem.m.releaseDate);
-          const whenLabel = dLeft === 0 ? "Hari ini" : dLeft === 1 ? "Besok" : `H-${dLeft} (${formatShortDate(nextItem.m.releaseDate)})`;
-          const sameWeekCount = upcomingSorted.filter(e => Math.abs(chronoDiffDays(nextItem.m.releaseDate, e.m.releaseDate)) <= 6).length - 1;
-          const weekNote = sameWeekCount > 0 ? ` (+${sameWeekCount} sepekan)` : "";
+          const whenLabel = dLeft === 0 ? "Hari Ini" : dLeft === 1 ? "Besok" : `H-${dLeft} · ${formatShortDate(nextItem.m.releaseDate)}`;
           hlCard.style.display = "flex";
-          hlCard.innerHTML = `<span style="color:var(--muted);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Terdekat: <strong style="color:var(--text);">${escapeHtml(nextItem.m.title)}</strong>${escapeHtml(weekNote)}</span><span class="countdown-text ${dLeft <= 1 ? "now-tone" : ""}">${escapeHtml(whenLabel)}</span>`;
+          hlCard.setAttribute("onclick", `openDetail('${escapeHtml(nextItem.id)}')`);
+          hlCard.innerHTML = `<span style="color:var(--muted);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Terdekat: <strong style="color:var(--text);">${escapeHtml(nextItem.m.title)}</strong></span><span class="countdown-text ${dLeft <= 1 ? "now-tone" : ""}">${escapeHtml(whenLabel)}</span>`;
         } else {
           hlCard.style.display = "none";
         }
@@ -3797,12 +4081,12 @@
 
       if (entries.length === 0) {
         const emptyText = (activeWatchlistTab === "confirmed" && activeWatchlistFilter !== "all")
-          ? "Tidak ada film sesuai filter Watchlist."
+          ? "Tidak ada film untuk filter ini."
           : activeWatchlistTab === "watched"
-          ? "Belum ada film yang ditandai sudah ditonton."
-          : `Belum ada film di daftar ${activeWatchlistTab === "confirmed" ? "Terjadwal" : "Menunggu ID"}.`;
+          ? "Belum ada film yang ditandai selesai."
+          : `Daftar ${activeWatchlistTab === "confirmed" ? "Terjadwal" : "Menunggu ID"} masih kosong.`;
         const resetBtn = (activeWatchlistTab === "confirmed" && activeWatchlistFilter !== "all")
-          ? `<div style="margin-top:10px;"><button type="button" class="cal-mini-btn" onclick="setWatchlistFilter('all', null)">Reset Filter</button></div>`
+          ? `<div style="margin-top:10px;"><button type="button" class="cal-mini-btn" onclick="setWatchlistFilter('all', null)">Lihat Semua</button></div>`
           : "";
         container.innerHTML = `<div class="info-card" style="text-align:center; padding:24px 16px;">
           <p style="margin:0;">${emptyText}</p>${resetBtn}
@@ -3816,42 +4100,49 @@
         const safeTitle = escapeHtml(m.title);
         const h1On = isH1Enabled(cfg);
         const countdownHtml = buildCountdownLabel(m.releaseDate, cfg.isTba);
+        const daysVal = getDaysUntil(m.releaseDate);
         const isPriority = cfg.watchStatus === "priority";
         const isWatched = cfg.watchStatus === "watched";
-        const hasOverlap = conflictIds.has(m.id);
+        const showSuggestFinish = activeWatchlistTab === "confirmed" && daysVal !== null && daysVal <= -14;
+        const chainText = [...(m.chains || []), ...(m.imax ? ["IMAX"] : [])].join(" · ");
 
         const thumb = effPoster
-          ? `<img src="${escapeHtml(effPoster)}" alt="${safeTitle}" referrerpolicy="no-referrer" />`
+          ? `<img src="${escapeHtml(effPoster)}" alt="${safeTitle}" loading="lazy" decoding="async" referrerpolicy="no-referrer" />`
           : `<div class="poster-art" style="padding:4px;"><div class="poster-art-title" style="font-size:9px;">${safeTitle}</div></div>`;
 
-        const controlsHtml = isWatched
-          ? `<div class="watch-toggles"><button type="button" class="toggle-pill" onclick="event.stopPropagation(); updateWatchStatus('${safeId}', 'want')">Pindah ke Terjadwal</button></div>`
-          : `<div class="watch-toggles">
-               <button type="button" class="toggle-pill ${isPriority ? "active" : ""}" onclick="event.stopPropagation(); updateWatchStatus('${safeId}', '${isPriority ? "want" : "priority"}')">★ Prioritas</button>
-               <button type="button" class="toggle-pill ${cfg.presaleAlert ? "active" : ""}" data-rem-id="${safeId}" data-rem-field="presaleAlert" data-rem-next="${!cfg.presaleAlert}">Pre-Sale</button>
-               <button type="button" class="toggle-pill ${h1On ? "active" : ""}" data-rem-id="${safeId}" data-rem-field="h1Alert" data-rem-next="${!h1On}">H-1</button>
-               <button type="button" class="toggle-pill ${cfg.dayAlert ? "active" : ""}" data-rem-id="${safeId}" data-rem-field="dayAlert" data-rem-next="${!cfg.dayAlert}">Hari-H</button>
-               <button type="button" class="toggle-pill" onclick="event.stopPropagation(); updateWatchStatus('${safeId}', 'watched')">✓ Selesai</button>
+        const dateMetaParts = [
+          countdownHtml,
+          !cfg.isTba ? `<span style="white-space:nowrap;">${escapeHtml(formatShortDate(m.releaseDate))}</span>` : "",
+          chainText ? `<span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(chainText)}</span>` : ""
+        ].filter(Boolean).join("<span>·</span>");
+
+        const footerHtml = isWatched
+          ? `<div class="wl-action-footer"><button type="button" class="toggle-pill" style="min-height:30px; padding:4px 10px; font-size:11px;" onclick="event.stopPropagation(); updateWatchStatus('${safeId}', 'want')">Kembalikan ke Terjadwal</button></div>`
+          : `<div class="wl-action-footer">
+               <div class="wl-rem-seg" role="group" aria-label="Pengingat ${safeTitle}">
+                 <button type="button" class="wl-rem-btn ${cfg.presaleAlert ? "active" : ""}" data-rem-id="${safeId}" data-rem-field="presaleAlert" data-rem-next="${!cfg.presaleAlert}">Pre-Sale</button>
+                 <button type="button" class="wl-rem-btn ${h1On ? "active" : ""}" data-rem-id="${safeId}" data-rem-field="h1Alert" data-rem-next="${!h1On}">H-1</button>
+                 <button type="button" class="wl-rem-btn ${cfg.dayAlert ? "active" : ""}" data-rem-id="${safeId}" data-rem-field="dayAlert" data-rem-next="${!cfg.dayAlert}">Hari-H</button>
+               </div>
+               <div class="wl-quick-btns">
+                 <button type="button" class="wl-compact-btn ${isPriority ? "priority-on" : ""}" aria-label="Prioritas ${safeTitle}" onclick="event.stopPropagation(); updateWatchStatus('${safeId}', '${isPriority ? "want" : "priority"}')">★</button>
+                 <button type="button" class="wl-compact-btn ${showSuggestFinish ? "finish-suggest" : ""}" aria-label="Tandai ${safeTitle} selesai" onclick="event.stopPropagation(); updateWatchStatus('${safeId}', 'watched')">✓ Selesai</button>
+               </div>
              </div>`;
 
         return `
-          <div class="watch-item" data-wl-movie-id="${safeId}" style="align-items:flex-start;">
-            <button type="button" class="ghost-remove-btn" data-wl-remove-id="${safeId}" title="Hapus" aria-label="Hapus ${safeTitle}">
-              <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            </button>
+          <div class="watch-item" data-wl-movie-id="${safeId}">
             <div class="watch-thumb">${thumb}</div>
             <div class="watch-body">
-              <div class="watch-title">${safeTitle}</div>
-              <div class="watch-date-row">
-                ${countdownHtml}
-                <span>·</span>
-                <span style="white-space:nowrap;">${cfg.isTba ? "TBA ID" : escapeHtml(formatShortDate(m.releaseDate))}</span>
-                <span>·</span>
-                <span>${escapeHtml((m.chains || []).join("/"))}</span>
-                ${hasOverlap ? `<span class="wl-conflict-pill">Sepekan</span>` : ""}
+              <div class="watch-head">
+                <div class="watch-title">${safeTitle}</div>
+                <button type="button" class="ghost-remove-btn" data-wl-remove-id="${safeId}" title="Hapus" aria-label="Hapus ${safeTitle}">
+                  <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
               </div>
-              ${cfg.note && cfg.note.trim() ? `<div class="wl-note-chip">${escapeHtml(cfg.note.trim())}</div>` : ""}
-              ${controlsHtml}
+              <div class="watch-date-row">${dateMetaParts}</div>
+              ${cfg.note && cfg.note.trim() ? `<div class="wl-note-line">Catatan: ${escapeHtml(cfg.note.trim())}</div>` : ""}
+              ${footerHtml}
             </div>
           </div>
         `;
