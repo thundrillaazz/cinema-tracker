@@ -1,0 +1,1810 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Cinema Tracker</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --surface-2: #f1f5f9;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --muted: #64748b;
+      --header-bg: #ffffff;
+      --accent: #0f172a;
+      --accent-text: #ffffff;
+      --blue: #2563eb;
+      --blue-soft: #eff6ff;
+      --blue-border: #bfdbfe;
+      --emerald: #16a34a;
+      --emerald-soft: #dcfce7;
+      --amber: #d97706;
+      --amber-soft: #fef3c7;
+      --rose: #e11d48;
+      --rose-soft: #ffe4e6;
+      --rose-border: #fecdd3;
+    }
+
+    html[data-theme="dark"] {
+      --bg: #09090b;
+      --surface: #111114;
+      --surface-2: #18181b;
+      --border: #27272a;
+      --text: #f4f4f5;
+      --muted: #a1a1aa;
+      --header-bg: #09090b;
+      --accent: #f4f4f5;
+      --accent-text: #09090b;
+      --blue: #60a5fa;
+      --blue-soft: rgba(59, 130, 246, 0.16);
+      --blue-border: rgba(96, 165, 250, 0.35);
+      --emerald: #4ade80;
+      --emerald-soft: rgba(34, 197, 94, 0.16);
+      --amber: #fbbf24;
+      --amber-soft: rgba(245, 158, 11, 0.16);
+      --rose: #fb7185;
+      --rose-soft: rgba(225, 29, 72, 0.18);
+      --rose-border: rgba(251, 113, 133, 0.35);
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0;
+      padding: 0 0 74px 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 13px;
+      line-height: 1.4;
+      overflow-x: hidden;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      background: var(--header-bg);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 14px;
+    }
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      cursor: pointer;
+    }
+    .brand-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      background: var(--accent);
+      color: var(--accent-text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .brand-icon svg { width: 18px; height: 18px; }
+    .brand-title { font-size: 15px; font-weight: 700; color: var(--text); letter-spacing: -0.01em; }
+    .brand-sub { font-size: 11px; color: var(--muted); }
+
+    .header-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    .icon-btn {
+      position: relative;
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .icon-btn:active { background: var(--surface-2); }
+    .icon-btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
+    .bell-badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      min-width: 16px;
+      height: 16px;
+      border-radius: 999px;
+      background: var(--rose);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 4px;
+    }
+
+    .main-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .main-tab {
+      padding: 10px 8px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      user-select: none;
+    }
+    .main-tab.active { color: var(--text); border-bottom-color: var(--accent); }
+
+    .container { padding: 12px 14px; }
+    .page-view { display: none; }
+    .page-view.active { display: block; }
+
+    .filter-search-wrap { position: relative; margin-bottom: 9px; }
+    .filter-search-input {
+      width: 100%;
+      padding: 8px 30px 8px 32px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      font-size: 12.5px;
+      background: var(--surface);
+      color: var(--text);
+      outline: none;
+    }
+    .filter-search-input:focus { border-color: var(--blue); }
+    .filter-search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 14px;
+      height: 14px;
+      stroke: var(--muted);
+      fill: none;
+      stroke-width: 2;
+      pointer-events: none;
+    }
+    .filter-clear-btn {
+      position: absolute;
+      right: 6px;
+      top: 50%;
+      transform: translateY(-50%);
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-size: 14px;
+      cursor: pointer;
+      padding: 2px 6px;
+      display: none;
+    }
+    .filter-clear-btn.visible { display: block; }
+
+    .chips-row {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      scrollbar-width: none;
+    }
+    .chips-row::-webkit-scrollbar { display: none; }
+    .chip {
+      flex: 0 0 auto;
+      padding: 5px 11px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .chip.active { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+
+    .toolbar-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin: 6px 0 10px 0;
+      font-size: 11.5px;
+      color: var(--muted);
+    }
+    .tba-toggle { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; }
+    .sort-select {
+      padding: 5px 8px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-size: 11.5px;
+      font-weight: 600;
+    }
+
+    .status-strip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px 11px;
+      border-radius: 9px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      margin-bottom: 12px;
+      font-size: 11.5px;
+      color: var(--muted);
+    }
+    .status-pill-inline {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--emerald); }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 11px;
+    }
+    .movie-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+    }
+    .movie-card:active { border-color: var(--blue); }
+    .poster-wrap {
+      position: relative;
+      aspect-ratio: 2 / 3;
+      background: var(--surface-2);
+      overflow: hidden;
+    }
+    .poster-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .poster-badge-imax {
+      position: absolute;
+      top: 7px;
+      left: 7px;
+      background: rgba(9, 9, 11, 0.85);
+      color: #fbbf24;
+      font-size: 9.5px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 5px;
+      letter-spacing: 0.04em;
+    }
+    .poster-badge-rerelease {
+      position: absolute;
+      bottom: 7px;
+      left: 7px;
+      background: rgba(37, 99, 235, 0.9);
+      color: #ffffff;
+      font-size: 9.5px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 5px;
+    }
+    .save-btn {
+      position: absolute;
+      top: 7px;
+      right: 7px;
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      background: rgba(9, 9, 11, 0.72);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .save-btn.saved {
+      background: var(--rose);
+      border-color: var(--rose);
+      color: #ffffff;
+    }
+    .save-btn svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2.2; }
+    .save-btn.saved svg { fill: currentColor; }
+
+    .card-body { padding: 9px 10px 10px 10px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+    .card-title { font-size: 12.5px; font-weight: 700; color: var(--text); line-height: 1.28; }
+    .card-meta { font-size: 11px; color: var(--muted); }
+    .card-date-line {
+      margin-top: auto;
+      padding-top: 5px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--blue);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 4px;
+    }
+
+    /* Watchlist: clean schedule & countdown focus */
+    .wl-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .wl-tab {
+      padding: 8px 10px;
+      border-radius: 9px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-align: center;
+      cursor: pointer;
+    }
+    .wl-tab.active {
+      background: var(--accent);
+      color: var(--accent-text);
+      border-color: var(--accent);
+    }
+
+    .wl-next-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 9px 12px;
+      border-radius: 9px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      margin-bottom: 10px;
+      font-size: 12px;
+    }
+    .wl-next-title { font-weight: 700; color: var(--text); }
+    .wl-next-cd { font-weight: 700; color: var(--blue); white-space: nowrap; }
+
+    .wl-list { display: flex; flex-direction: column; gap: 9px; }
+    .wl-card {
+      display: flex;
+      gap: 11px;
+      padding: 10px;
+      border-radius: 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      align-items: center;
+    }
+    .wl-poster {
+      width: 52px;
+      height: 78px;
+      border-radius: 7px;
+      object-fit: cover;
+      background: var(--surface-2);
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+    .wl-info { flex: 1; min-width: 0; cursor: pointer; }
+    .wl-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+    .wl-schedule { font-size: 11.5px; font-weight: 700; color: var(--blue); }
+    .wl-chains { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .wl-actions-col { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
+    .wl-cd-pill {
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      background: var(--blue-soft);
+      color: var(--blue);
+    }
+    .wl-cd-pill.urgent { background: var(--rose-soft); color: var(--rose); }
+    .wl-cd-pill.tba { background: var(--amber-soft); color: var(--amber); }
+    .wl-rem-mini { display: flex; gap: 4px; }
+    .rem-mini-btn {
+      padding: 4px 7px;
+      border-radius: 7px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--muted);
+      font-size: 10.5px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .rem-mini-btn.on {
+      background: var(--blue-soft);
+      border-color: var(--blue-border);
+      color: var(--blue);
+    }
+    .wl-remove-btn {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1;
+      padding: 2px 4px;
+      cursor: pointer;
+    }
+    .wl-remove-btn:hover { color: var(--rose); }
+
+    /* Search */
+    .search-box-wrap { position: relative; margin-bottom: 10px; }
+    .search-input {
+      width: 100%;
+      padding: 10px 34px 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-size: 13px;
+      outline: none;
+    }
+    .search-input:focus { border-color: var(--blue); }
+    .search-item {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      padding: 9px 10px;
+      border-radius: 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      margin-bottom: 8px;
+    }
+    .search-item img { width: 46px; height: 69px; border-radius: 6px; object-fit: cover; background: var(--surface-2); flex-shrink: 0; }
+    .search-item-info { flex: 1; min-width: 0; cursor: pointer; }
+    .search-item-title { font-size: 12.5px; font-weight: 700; color: var(--text); }
+    .search-item-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .search-save-btn {
+      padding: 7px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--text);
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .search-save-btn.saved {
+      background: var(--rose-soft);
+      border-color: var(--rose-border);
+      color: var(--rose);
+    }
+
+    /* Settings */
+    .section-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      padding: 12px;
+      margin-bottom: 11px;
+    }
+    .section-title { font-size: 12.5px; font-weight: 700; margin-bottom: 8px; color: var(--text); }
+    .btn-primary {
+      width: 100%;
+      padding: 9px 12px;
+      border-radius: 9px;
+      border: none;
+      background: var(--accent);
+      color: var(--accent-text);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-secondary {
+      width: 100%;
+      padding: 9px 12px;
+      border-radius: 9px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .launcher-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-top: 6px;
+    }
+    .launcher-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .launcher-option.active { border-color: var(--blue); background: var(--blue-soft); color: var(--blue); }
+    .launcher-swatch { width: 20px; height: 20px; border-radius: 5px; flex-shrink: 0; }
+
+    /* Detail Sheet */
+    .sheet-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.55);
+      z-index: 60;
+      display: none;
+      align-items: flex-end;
+    }
+    .sheet-backdrop.open { display: flex; }
+    .sheet-panel {
+      width: 100%;
+      max-height: 88vh;
+      overflow-y: auto;
+      background: var(--surface);
+      border-top-left-radius: 16px;
+      border-top-right-radius: 16px;
+      padding: 14px 16px 24px 16px;
+    }
+    .sheet-handle {
+      width: 36px;
+      height: 4px;
+      border-radius: 999px;
+      background: var(--border);
+      margin: 0 auto 12px auto;
+    }
+    .sheet-top { display: flex; gap: 12px; margin-bottom: 12px; }
+    .sheet-poster { width: 84px; height: 126px; border-radius: 9px; object-fit: cover; background: var(--surface-2); flex-shrink: 0; }
+    .sheet-title { font-size: 16px; font-weight: 700; margin: 0 0 4px 0; }
+    .sheet-sub { font-size: 12px; color: var(--blue); font-weight: 700; margin-bottom: 4px; }
+    .sheet-meta { font-size: 11.5px; color: var(--muted); }
+
+    .sheet-watch-btn {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 9px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--text);
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+    .sheet-watch-btn.saved {
+      background: var(--rose-soft);
+      border-color: var(--rose-border);
+      color: var(--rose);
+    }
+
+    .sheet-box {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-bottom: 10px;
+      background: var(--bg);
+    }
+    .sheet-box-title { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; margin-bottom: 6px; }
+    .links-row { display: flex; flex-wrap: wrap; gap: 6px; }
+    .link-chip {
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-size: 11.5px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .alert-toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 0;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .alert-toggle-row input { width: 17px; height: 17px; accent-color: var(--blue); }
+
+    .sheet-footer-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+
+    /* Calendar modal */
+    .cal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.55);
+      z-index: 65;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 14px;
+    }
+    .cal-backdrop.open { display: flex; }
+    .cal-card {
+      width: 100%;
+      max-width: 400px;
+      max-height: 82vh;
+      overflow-y: auto;
+      background: var(--surface);
+      border-radius: 14px;
+      padding: 14px;
+      border: 1px solid var(--border);
+    }
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; margin: 8px 0; }
+    .cal-day {
+      padding: 7px 2px;
+      border-radius: 7px;
+      font-size: 11.5px;
+      cursor: pointer;
+      position: relative;
+    }
+    .cal-day.has-rel { font-weight: 700; background: var(--blue-soft); color: var(--blue); }
+    .cal-day.selected { background: var(--accent); color: var(--accent-text); }
+
+    /* Bottom nav */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 58px;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      z-index: 40;
+    }
+    .nav-item {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      font-size: 10.5px;
+      font-weight: 700;
+      cursor: pointer;
+      position: relative;
+    }
+    .nav-item.active { color: var(--text); }
+    .nav-item svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; }
+    .nav-badge {
+      position: absolute;
+      top: 5px;
+      right: 22%;
+      min-width: 15px;
+      height: 15px;
+      border-radius: 999px;
+      background: var(--rose);
+      color: #fff;
+      font-size: 9.5px;
+      font-weight: 700;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 0 3px;
+    }
+    .nav-badge.visible { display: inline-flex; }
+
+    .toast {
+      position: fixed;
+      bottom: 68px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #09090b;
+      color: #ffffff;
+      padding: 8px 14px;
+      border-radius: 9px;
+      font-size: 12px;
+      font-weight: 600;
+      z-index: 80;
+      display: none;
+      white-space: nowrap;
+    }
+    .toast.show { display: block; }
+    .empty-state { text-align: center; padding: 28px 14px; color: var(--muted); font-size: 12px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-top">
+      <div class="brand" onclick="switchBottomTab('catalog')">
+        <div class="brand-icon" id="headerBrandIcon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="16" rx="2" />
+            <polygon points="10,9 15,12 10,15" fill="currentColor" stroke="none" />
+          </svg>
+        </div>
+        <div>
+          <div class="brand-title">Cinema Tracker</div>
+          <div class="brand-sub">Jadwal &amp; rilis bioskop ID</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" onclick="openCalendarModal()" title="Kalender">
+          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </button>
+        <button class="icon-btn" onclick="switchBottomTab('watchlist')" title="Watchlist">
+          <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span id="headerBellBadge" class="bell-badge" style="display:none;">0</span>
+        </button>
+        <button class="icon-btn" onclick="syncFromTmdb(true)" title="Sync">
+          <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- CATALOG VIEW -->
+  <div id="viewCatalog" class="page-view active">
+    <div class="main-tabs">
+      <div id="tabNow" class="main-tab active" onclick="switchCatalogSubTab('now')">SEDANG TAYANG (0)</div>
+      <div id="tabUpcoming" class="main-tab" onclick="switchCatalogSubTab('upcoming')">AKAN DATANG (0)</div>
+    </div>
+    <div class="container">
+      <div class="filter-search-wrap">
+        <svg class="filter-search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="catalogFilterInput" class="filter-search-input" type="text" placeholder="Filter judul, sutradara, atau genre..." oninput="onCatalogFilterInput()" />
+        <button id="catalogClearBtn" class="filter-clear-btn" onclick="clearCatalogFilter()">&times;</button>
+      </div>
+
+      <div class="chips-row" id="chipRow">
+        <button class="chip active" data-chip="all" onclick="setChip('all')">Semua</button>
+        <button class="chip" data-chip="local" onclick="setChip('local')">Lokal ID</button>
+        <button class="chip" data-chip="rerelease" onclick="setChip('rerelease')">Re-Release</button>
+        <button class="chip" data-chip="hype" onclick="setChip('hype')">High Hype</button>
+        <button class="chip" data-chip="imax" onclick="setChip('imax')">IMAX</button>
+      </div>
+
+      <div class="toolbar-row">
+        <label class="tba-toggle">
+          <input type="checkbox" id="hideTbaCheck" onchange="renderCatalog()" />
+          <span>Sembunyikan TBA</span>
+        </label>
+        <select id="sortSelect" class="sort-select" onchange="renderCatalog()">
+          <option value="date">Urut: Tanggal Rilis</option>
+          <option value="hype">Urut: Hype Tertinggi</option>
+          <option value="title">Urut: Judul A-Z</option>
+        </select>
+      </div>
+
+      <div class="status-strip">
+        <span class="status-pill-inline"><span class="status-dot"></span>Jadwal Bioskop ID</span>
+        <span id="lastSyncText">Belum sync</span>
+      </div>
+
+      <div id="movieGrid" class="grid"></div>
+    </div>
+  </div>
+
+  <!-- SEARCH VIEW -->
+  <div id="viewSearch" class="page-view">
+    <div class="container">
+      <div class="search-box-wrap">
+        <input id="searchInput" class="search-input" type="text" placeholder="Cari judul film..." oninput="onSearchInput()" />
+        <button id="searchClearBtn" class="filter-clear-btn visible" onclick="clearSearchInput()">&times;</button>
+      </div>
+      <div id="searchResults">
+        <div class="empty-state">Ketik judul film untuk cek jadwal rilis Indonesia.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WATCHLIST VIEW -->
+  <div id="viewWatchlist" class="page-view">
+    <div class="container">
+      <div class="wl-tabs">
+        <div id="wlTabScheduled" class="wl-tab active" onclick="switchWatchlistSubTab('scheduled')">Terjadwal (0)</div>
+        <div id="wlTabTba" class="wl-tab" onclick="switchWatchlistSubTab('tba')">Menunggu Jadwal (0)</div>
+      </div>
+
+      <div id="wlNextBar" class="wl-next-bar" style="display:none;">
+        <span class="wl-next-title" id="wlNextTitle">-</span>
+        <span class="wl-next-cd" id="wlNextCd">-</span>
+      </div>
+
+      <div id="watchlistList" class="wl-list"></div>
+    </div>
+  </div>
+
+  <!-- SETTINGS VIEW -->
+  <div id="viewSettings" class="page-view">
+    <div class="container">
+      <div class="section-card">
+        <div class="section-title">Tema</div>
+        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:6px;">
+          <button class="btn-secondary" id="themeBtnLight" onclick="setTheme('light')">Light</button>
+          <button class="btn-secondary" id="themeBtnDark" onclick="setTheme('dark')">Dark</button>
+          <button class="btn-secondary" id="themeBtnSystem" onclick="setTheme('system')">System</button>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <div class="section-title">API Key TMDB</div>
+        <input id="apiKeyInput" class="search-input" type="password" placeholder="Masukkan TMDB API Key" style="margin-bottom:8px;" />
+        <button class="btn-primary" onclick="saveApiAndSync()">Simpan &amp; Sync</button>
+      </div>
+
+      <div class="section-card">
+        <div class="section-title">Pengingat Latar Belakang</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px;">
+          <select id="minHypeSelect" class="sort-select" onchange="saveWorkerPrefs()">
+            <option value="75">Hype &ge; 75%</option>
+            <option value="85" selected>Hype &ge; 85%</option>
+            <option value="92">Hype &ge; 92%</option>
+          </select>
+          <select id="intervalSelect" class="sort-select" onchange="saveWorkerPrefs()">
+            <option value="3">Tiap 3 Jam</option>
+            <option value="6" selected>Tiap 6 Jam</option>
+            <option value="12">Tiap 12 Jam</option>
+          </select>
+        </div>
+        <button class="btn-secondary" onclick="triggerWorkerNow()">Cek Notifikasi Sekarang</button>
+      </div>
+
+      <div class="section-card">
+        <div class="section-title">Ikon Aplikasi</div>
+        <div class="launcher-grid">
+          <div class="launcher-option active" id="iconOptLauncherDefault" onclick="setLauncherIcon('LauncherDefault')">
+            <span class="launcher-swatch" style="background:#2563eb;"></span><span>Cinema Blue</span>
+          </div>
+          <div class="launcher-option" id="iconOptLauncherSciFi" onclick="setLauncherIcon('LauncherSciFi')">
+            <span class="launcher-swatch" style="background:#ea580c;"></span><span>Dune Amber</span>
+          </div>
+          <div class="launcher-option" id="iconOptLauncherAction" onclick="setLauncherIcon('LauncherAction')">
+            <span class="launcher-swatch" style="background:#10b981;"></span><span>Emerald</span>
+          </div>
+          <div class="launcher-option" id="iconOptLauncherImax" onclick="setLauncherIcon('LauncherImax')">
+            <span class="launcher-swatch" style="background:#eab308;"></span><span>IMAX Gold</span>
+          </div>
+          <div class="launcher-option" id="iconOptLauncherNoir" onclick="setLauncherIcon('LauncherNoir')">
+            <span class="launcher-swatch" style="background:#27272a;"></span><span>Noir Frame</span>
+          </div>
+          <div class="launcher-option" id="iconOptLauncherSolaris" onclick="setLauncherIcon('LauncherSolaris')">
+            <span class="launcher-swatch" style="background:#fb7185;"></span><span>Solaris</span>
+          </div>
+          <div class="launcher-option" id="iconOptLauncherReel35" onclick="setLauncherIcon('LauncherReel35')">
+            <span class="launcher-swatch" style="background:#38bdf8;"></span><span>Reel 35mm</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align:center; font-size:11px; color:var(--muted); padding:6px 0 10px;">
+        Cinema Tracker v4.2.0
+      </div>
+    </div>
+  </div>
+
+  <!-- DETAIL SHEET -->
+  <div id="detailSheet" class="sheet-backdrop" onclick="onSheetBackdropClick(event)">
+    <div class="sheet-panel" id="detailPanel">
+      <div class="sheet-handle"></div>
+      <div class="sheet-top">
+        <img id="sheetPoster" class="sheet-poster" src="" alt="" />
+        <div style="flex:1; min-width:0;">
+          <h3 id="sheetTitle" class="sheet-title">Judul</h3>
+          <div id="sheetScheduleLine" class="sheet-sub">-</div>
+          <div id="sheetMeta" class="sheet-meta">-</div>
+        </div>
+      </div>
+
+      <button id="sheetWatchBtn" class="sheet-watch-btn" onclick="toggleWatchFromDetail()">Simpan ke Watchlist</button>
+
+      <div class="sheet-box">
+        <div class="sheet-box-title">Pengingat</div>
+        <label class="alert-toggle-row">
+          <span>Notif Pre-Sale</span>
+          <input type="checkbox" id="sheetPresaleCheck" onchange="updateDetailAlerts()" />
+        </label>
+        <label class="alert-toggle-row">
+          <span>Notif H-1 &amp; Hari-H</span>
+          <input type="checkbox" id="sheetDayCheck" onchange="updateDetailAlerts()" />
+        </label>
+      </div>
+
+      <div class="sheet-box">
+        <div class="sheet-box-title">Jaringan &amp; Tautan</div>
+        <div id="sheetChainsText" style="font-size:11.5px; color:var(--muted); margin-bottom:8px;">-</div>
+        <div class="links-row" id="sheetLinksRow"></div>
+      </div>
+
+      <div class="sheet-box">
+        <div class="sheet-box-title">Info Film</div>
+        <div id="sheetCreditsText" style="font-size:11.5px; color:var(--muted); margin-bottom:6px;">-</div>
+        <div id="sheetOverviewText" style="font-size:12px; color:var(--text);">-</div>
+      </div>
+
+      <div class="sheet-footer-btns">
+        <button class="btn-primary" onclick="addCurrentDetailToCalendar()">Simpan Kalender</button>
+        <button class="btn-secondary" onclick="shareCurrentDetail()">Bagikan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALENDAR MODAL -->
+  <div id="calendarModal" class="cal-backdrop" onclick="onCalBackdropClick(event)">
+    <div class="cal-card">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <strong id="calMonthLabel">Bulan</strong>
+        <button class="btn-secondary" style="width:auto; padding:4px 10px;" onclick="closeCalendarModal()">Tutup</button>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+      <div id="calDateMovies"></div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" id="navCatalog" onclick="switchBottomTab('catalog')">
+      <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+      <span>Bioskop</span>
+    </button>
+    <button class="nav-item" id="navSearch" onclick="switchBottomTab('search')">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <span>Cari</span>
+    </button>
+    <button class="nav-item" id="navWatchlist" onclick="switchBottomTab('watchlist')">
+      <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+      <span id="navWatchBadge" class="nav-badge">0</span>
+      <span>Watchlist</span>
+    </button>
+    <button class="nav-item" id="navSettings" onclick="switchBottomTab('settings')">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <span>Settings</span>
+    </button>
+  </nav>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    const STORAGE_KEY_MOVIES = "ct_v42_movies_cache";
+    const STORAGE_KEY_WATCHLIST = "ct_v42_watchlist";
+    const STORAGE_KEY_META = "ct_v42_meta";
+
+    const GENRE_MAP = {
+      28: "Action", 12: "Adventure", 16: "Animation", 35: "Comedy", 80: "Crime",
+      99: "Documentary", 18: "Drama", 10751: "Family", 14: "Fantasy", 36: "History",
+      27: "Horror", 10402: "Music", 9648: "Mystery", 10749: "Romance", 878: "Sci-Fi",
+      10770: "TV Movie", 53: "Thriller", 10752: "War", 37: "Western"
+    };
+
+    let movies = [];
+    let watchlist = {};
+    let currentSubTab = "now";
+    let currentChip = "all";
+    let currentWlSubTab = "scheduled";
+    let activeDetailMovie = null;
+    let searchTimer = null;
+    let lastSearchItems = [];
+    let calCurrentDate = new Date();
+    let calSelectedIso = "";
+    let lastSyncMs = 0;
+
+    function getLocalTodayIso() {
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, "0");
+      const d = String(now.getDate()).padStart(2, "0");
+      return `${y}-${m}-${d}`;
+    }
+
+    function formatDateDmy(iso) {
+      if (!iso || iso === "TBA" || iso.length < 10) return "TBA";
+      const parts = iso.slice(0, 10).split("-");
+      if (parts.length !== 3) return iso;
+      return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+
+    function getDaysUntil(iso) {
+      if (!iso || iso === "TBA" || iso.length < 10) return null;
+      const todayParts = getLocalTodayIso().split("-").map(Number);
+      const relParts = iso.slice(0, 10).split("-").map(Number);
+      const t0 = Date.UTC(todayParts[0], todayParts[1] - 1, todayParts[2]);
+      const t1 = Date.UTC(relParts[0], relParts[1] - 1, relParts[2]);
+      return Math.round((t1 - t0) / 86400000);
+    }
+
+    function formatCountdownBadge(days) {
+      if (days === null || days === undefined) return "TBA";
+      if (days < 0) return "Sedang Tayang";
+      if (days === 0) return "Hari Ini";
+      if (days === 1) return "Besok";
+      return `H-${days}`;
+    }
+
+    function showToast(msg) {
+      const el = document.getElementById("toast");
+      el.textContent = msg;
+      el.classList.add("show");
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => el.classList.remove("show"), 1800);
+    }
+
+    function setTheme(mode) {
+      localStorage.setItem("ct_app_theme", mode);
+      applyTheme(mode);
+      if (window.AndroidBridge && typeof window.AndroidBridge.saveThemeMode === "function") {
+        window.AndroidBridge.saveThemeMode(mode);
+      }
+    }
+
+    function applyTheme(mode) {
+      let effective = mode;
+      if (mode === "system") {
+        effective = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      document.documentElement.setAttribute("data-theme", effective);
+      ["light", "dark", "system"].forEach(m => {
+        const btn = document.getElementById("themeBtn" + m.charAt(0).toUpperCase() + m.slice(1));
+        if (btn) {
+          btn.style.borderColor = (mode === m) ? "var(--blue)" : "var(--border)";
+          btn.style.color = (mode === m) ? "var(--blue)" : "var(--text)";
+        }
+      });
+    }
+
+    function setLauncherIcon(aliasName) {
+      localStorage.setItem("ct_launcher_icon", aliasName);
+      highlightLauncherOption(aliasName);
+      if (window.AndroidBridge && typeof window.AndroidBridge.changeLauncherIcon === "function") {
+        window.AndroidBridge.changeLauncherIcon(aliasName);
+      }
+    }
+
+    function highlightLauncherOption(aliasName) {
+      document.querySelectorAll(".launcher-option").forEach(el => el.classList.remove("active"));
+      const activeEl = document.getElementById("iconOpt" + aliasName);
+      if (activeEl) activeEl.classList.add("active");
+    }
+
+    function loadState() {
+      const savedTheme = localStorage.getItem("ct_app_theme") || "light";
+      applyTheme(savedTheme);
+
+      const savedIcon = localStorage.getItem("ct_launcher_icon") || "LauncherDefault";
+      highlightLauncherOption(savedIcon);
+
+      try {
+        const rawWl = localStorage.getItem(STORAGE_KEY_WATCHLIST);
+        watchlist = rawWl ? JSON.parse(rawWl) : {};
+      } catch (_) {
+        watchlist = {};
+      }
+
+      if (Object.keys(watchlist).length === 0 && window.AndroidBridge && typeof window.AndroidBridge.getWatchlistFullJson === "function") {
+        try {
+          const nativeWl = JSON.parse(window.AndroidBridge.getWatchlistFullJson() || "{}");
+          if (nativeWl && typeof nativeWl === "object") watchlist = nativeWl;
+        } catch (_) {}
+      }
+
+      try {
+        const rawMov = localStorage.getItem(STORAGE_KEY_MOVIES);
+        movies = rawMov ? JSON.parse(rawMov) : [];
+      } catch (_) {
+        movies = [];
+      }
+
+      try {
+        const rawMeta = localStorage.getItem(STORAGE_KEY_META);
+        if (rawMeta) {
+          const meta = JSON.parse(rawMeta);
+          lastSyncMs = meta.lastSyncMs || 0;
+          if (meta.lastSyncLabel) {
+            document.getElementById("lastSyncText").textContent = meta.lastSyncLabel;
+          }
+          if (meta.minHype) document.getElementById("minHypeSelect").value = String(meta.minHype);
+          if (meta.intervalHours) document.getElementById("intervalSelect").value = String(meta.intervalHours);
+        }
+      } catch (_) {}
+
+      if (window.AndroidBridge && typeof window.AndroidBridge.getSavedApiKey === "function") {
+        const k = window.AndroidBridge.getSavedApiKey();
+        if (k) document.getElementById("apiKeyInput").value = k;
+      }
+
+      updateBadges();
+    }
+
+    function persistWatchlist() {
+      try {
+        localStorage.setItem(STORAGE_KEY_WATCHLIST, JSON.stringify(watchlist));
+      } catch (_) {}
+      const tbaIds = [];
+      Object.values(watchlist).forEach(entry => {
+        if (entry && entry.isTba && entry.movie && entry.movie.tmdbId) {
+          tbaIds.push(entry.movie.tmdbId);
+        }
+      });
+      if (window.AndroidBridge && typeof window.AndroidBridge.syncWatchlistReminders === "function") {
+        try {
+          window.AndroidBridge.syncWatchlistReminders(JSON.stringify(watchlist), JSON.stringify(tbaIds));
+        } catch (_) {}
+      }
+      updateBadges();
+    }
+
+    function updateBadges() {
+      const count = Object.keys(watchlist).length;
+      const bell = document.getElementById("headerBellBadge");
+      const navBadge = document.getElementById("navWatchBadge");
+      if (bell) {
+        bell.textContent = String(count);
+        bell.style.display = count > 0 ? "flex" : "none";
+      }
+      if (navBadge) {
+        navBadge.textContent = String(count);
+        navBadge.classList.toggle("visible", count > 0);
+      }
+    }
+
+    function isWatchlisted(id) {
+      return Boolean(watchlist[String(id)]);
+    }
+
+    function toggleWatchlistMovie(movie) {
+      if (!movie || !movie.id) return;
+      const key = String(movie.id);
+      if (watchlist[key]) {
+        delete watchlist[key];
+        persistWatchlist();
+        showToast("Dihapus dari Watchlist");
+      } else {
+        const isTba = !movie.releaseDate || movie.releaseDate === "TBA";
+        watchlist[key] = {
+          movie: movie,
+          isTba: isTba,
+          presaleAlert: true,
+          dayAlert: true
+        };
+        persistWatchlist();
+        showToast("Masuk Watchlist");
+      }
+      refreshAllWatchIndicators();
+      if (document.getElementById("viewWatchlist").classList.contains("active")) {
+        renderWatchlist();
+      }
+      if (activeDetailMovie && String(activeDetailMovie.id) === key) {
+        syncDetailWatchButton();
+      }
+    }
+
+    function refreshAllWatchIndicators() {
+      document.querySelectorAll("[data-watch-id]").forEach(btn => {
+        const wid = btn.getAttribute("data-watch-id");
+        const saved = isWatchlisted(wid);
+        btn.classList.toggle("saved", saved);
+        if (btn.classList.contains("search-save-btn")) {
+          btn.textContent = saved ? "Tersimpan" : "+ Watchlist";
+        }
+      });
+    }
+
+    function switchBottomTab(tab) {
+      ["catalog", "search", "watchlist", "settings"].forEach(t => {
+        const cap = t.charAt(0).toUpperCase() + t.slice(1);
+        document.getElementById("view" + cap).classList.toggle("active", t === tab);
+        document.getElementById("nav" + cap).classList.toggle("active", t === tab);
+      });
+      if (tab === "watchlist") renderWatchlist();
+      if (tab === "search") refreshAllWatchIndicators();
+    }
+
+    function switchCatalogSubTab(sub) {
+      currentSubTab = sub;
+      document.getElementById("tabNow").classList.toggle("active", sub === "now");
+      document.getElementById("tabUpcoming").classList.toggle("active", sub === "upcoming");
+      renderCatalog();
+    }
+
+    function setChip(chip) {
+      currentChip = chip;
+      document.querySelectorAll("#chipRow .chip").forEach(el => {
+        el.classList.toggle("active", el.getAttribute("data-chip") === chip);
+      });
+      renderCatalog();
+    }
+
+    function onCatalogFilterInput() {
+      const val = document.getElementById("catalogFilterInput").value;
+      document.getElementById("catalogClearBtn").classList.toggle("visible", val.length > 0);
+      renderCatalog();
+    }
+
+    function clearCatalogFilter() {
+      document.getElementById("catalogFilterInput").value = "";
+      document.getElementById("catalogClearBtn").classList.remove("visible");
+      renderCatalog();
+    }
+
+    function renderCatalog() {
+      const todayIso = getLocalTodayIso();
+      const nowList = movies.filter(m => m.releaseDate && m.releaseDate !== "TBA" && m.releaseDate <= todayIso);
+      const upList = movies.filter(m => !m.releaseDate || m.releaseDate === "TBA" || m.releaseDate > todayIso);
+
+      document.getElementById("tabNow").textContent = `SEDANG TAYANG (${nowList.length})`;
+      document.getElementById("tabUpcoming").textContent = `AKAN DATANG (${upList.length})`;
+
+      let base = currentSubTab === "now" ? nowList : upList;
+      const q = (document.getElementById("catalogFilterInput").value || "").trim().toLowerCase();
+      const hideTba = document.getElementById("hideTbaCheck").checked;
+      const sortBy = document.getElementById("sortSelect").value;
+
+      if (hideTba) {
+        base = base.filter(m => m.releaseDate && m.releaseDate !== "TBA");
+      }
+      if (currentChip === "local") {
+        base = base.filter(m => m.originalLanguage === "id");
+      } else if (currentChip === "rerelease") {
+        base = base.filter(m => Boolean(m.isReRelease));
+      } else if (currentChip === "hype") {
+        base = base.filter(m => (m.hype || 0) >= 85);
+      } else if (currentChip === "imax") {
+        base = base.filter(m => Boolean(m.isImax));
+      }
+      if (q) {
+        base = base.filter(m =>
+          (m.title || "").toLowerCase().includes(q) ||
+          (m.director || "").toLowerCase().includes(q) ||
+          (m.genresText || "").toLowerCase().includes(q)
+        );
+      }
+
+      const sorted = [...base].sort((a, b) => {
+        if (sortBy === "hype") return (b.hype || 0) - (a.hype || 0);
+        if (sortBy === "title") return (a.title || "").localeCompare(b.title || "");
+        const da = (!a.releaseDate || a.releaseDate === "TBA") ? "9999-12-31" : a.releaseDate;
+        const db = (!b.releaseDate || b.releaseDate === "TBA") ? "9999-12-31" : b.releaseDate;
+        return currentSubTab === "now" ? db.localeCompare(da) : da.localeCompare(db);
+      });
+
+      const grid = document.getElementById("movieGrid");
+      if (sorted.length === 0) {
+        grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;">Belum ada jadwal film. Tap Sync atau cek tab Cari.</div>';
+        return;
+      }
+
+      grid.innerHTML = sorted.map(m => {
+        const saved = isWatchlisted(m.id);
+        const days = getDaysUntil(m.releaseDate);
+        const dateLabel = m.releaseDate && m.releaseDate !== "TBA"
+          ? `${formatDateDmy(m.releaseDate)} • ${formatCountdownBadge(days)}`
+          : "TBA";
+        const chains = (m.chains && m.chains.length) ? m.chains.join(" · ") : "XXI · CGV · Cinépolis";
+
+        return `
+          <div class="movie-card" onclick='openMovieDetailById("${String(m.id)}")'>
+            <div class="poster-wrap">
+              <img src="${m.poster || ""}" alt="${escapeHtml(m.title)}" loading="lazy" />
+              ${m.isImax ? '<span class="poster-badge-imax">IMAX</span>' : ""}
+              ${m.isReRelease ? '<span class="poster-badge-rerelease">Re-Release</span>' : ""}
+              <button class="save-btn ${saved ? "saved" : ""}" data-watch-id="${m.id}" onclick='event.stopPropagation(); toggleWatchlistById("${String(m.id)}")' title="Watchlist">
+                <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+              </button>
+            </div>
+            <div class="card-body">
+              <div class="card-title">${escapeHtml(m.title)}</div>
+              <div class="card-meta">${escapeHtml(chains)}</div>
+              <div class="card-date-line"><span>${escapeHtml(dateLabel)}</span></div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function findMovieById(id) {
+      const target = String(id);
+      const fromCatalog = movies.find(m => String(m.id) === target);
+      if (fromCatalog) return fromCatalog;
+      const fromSearch = lastSearchItems.find(m => String(m.id) === target);
+      if (fromSearch) return fromSearch;
+      if (watchlist[target] && watchlist[target].movie) return watchlist[target].movie;
+      return null;
+    }
+
+    function toggleWatchlistById(id) {
+      const m = findMovieById(id);
+      if (m) toggleWatchlistMovie(m);
+    }
+
+    function openMovieDetailById(id) {
+      const m = findMovieById(id);
+      if (!m) return;
+      activeDetailMovie = m;
+
+      document.getElementById("sheetPoster").src = m.poster || "";
+      document.getElementById("sheetTitle").textContent = m.title || "";
+
+      const days = getDaysUntil(m.releaseDate);
+      const schedText = m.releaseDate && m.releaseDate !== "TBA"
+        ? `Rilis ${formatDateDmy(m.releaseDate)} (${formatCountdownBadge(days)})`
+        : "Jadwal Indonesia TBA";
+      document.getElementById("sheetScheduleLine").textContent = schedText;
+
+      const metaBits = [];
+      if (m.genresText) metaBits.push(m.genresText);
+      if (m.runtime) metaBits.push(`${m.runtime} mnt`);
+      if (m.hype) metaBits.push(`Hype ${m.hype}%`);
+      document.getElementById("sheetMeta").textContent = metaBits.join(" • ") || "Bioskop Indonesia";
+
+      const chains = (m.chains && m.chains.length) ? m.chains.join(" • ") : "XXI • CGV • Cinépolis";
+      document.getElementById("sheetChainsText").textContent = chains;
+
+      const enc = encodeURIComponent(m.title || "");
+      document.getElementById("sheetLinksRow").innerHTML = `
+        <a class="link-chip" href="https://www.youtube.com/results?search_query=${enc}+trailer" target="_blank">YouTube</a>
+        <a class="link-chip" href="https://letterboxd.com/search/${enc}/" target="_blank">Letterboxd</a>
+        <a class="link-chip" href="https://tixid.id/" target="_blank">TIX ID</a>
+        <a class="link-chip" href="https://21cineplex.com/" target="_blank">XXI</a>
+        <a class="link-chip" href="https://www.cgv.id/" target="_blank">CGV</a>
+      `;
+
+      const dir = m.director || "-";
+      const cast = (m.cast && m.cast.length) ? m.cast.slice(0, 4).join(", ") : "-";
+      document.getElementById("sheetCreditsText").textContent = `Sutradara: ${dir} • Pemeran: ${cast}`;
+      document.getElementById("sheetOverviewText").textContent = m.overview || "Sinopsis belum tersedia.";
+
+      syncDetailWatchButton();
+      document.getElementById("detailSheet").classList.add("open");
+    }
+
+    function syncDetailWatchButton() {
+      if (!activeDetailMovie) return;
+      const key = String(activeDetailMovie.id);
+      const saved = isWatchlisted(key);
+      const btn = document.getElementById("sheetWatchBtn");
+      btn.classList.toggle("saved", saved);
+      btn.textContent = saved ? "Tersimpan di Watchlist (Tap untuk Hapus)" : "Simpan ke Watchlist";
+
+      const entry = watchlist[key] || { presaleAlert: true, dayAlert: true };
+      document.getElementById("sheetPresaleCheck").checked = Boolean(entry.presaleAlert);
+      document.getElementById("sheetDayCheck").checked = Boolean(entry.dayAlert);
+    }
+
+    function toggleWatchFromDetail() {
+      if (!activeDetailMovie) return;
+      toggleWatchlistMovie(activeDetailMovie);
+    }
+
+    function updateDetailAlerts() {
+      if (!activeDetailMovie) return;
+      const key = String(activeDetailMovie.id);
+      if (!watchlist[key]) {
+        toggleWatchlistMovie(activeDetailMovie);
+      }
+      if (watchlist[key]) {
+        watchlist[key].presaleAlert = document.getElementById("sheetPresaleCheck").checked;
+        watchlist[key].dayAlert = document.getElementById("sheetDayCheck").checked;
+        persistWatchlist();
+      }
+    }
+
+    function closeDetailSheet() {
+      document.getElementById("detailSheet").classList.remove("open");
+      activeDetailMovie = null;
+    }
+
+    function onSheetBackdropClick(e) {
+      if (e.target && e.target.id === "detailSheet") closeDetailSheet();
+    }
+
+    function addCurrentDetailToCalendar() {
+      if (!activeDetailMovie) return;
+      const iso = (activeDetailMovie.releaseDate && activeDetailMovie.releaseDate !== "TBA")
+        ? activeDetailMovie.releaseDate
+        : getLocalTodayIso();
+      if (window.AndroidBridge && typeof window.AndroidBridge.addCalendarEvent === "function") {
+        window.AndroidBridge.addCalendarEvent(
+          activeDetailMovie.title,
+          iso,
+          `Jadwal bioskop: ${activeDetailMovie.title}`
+        );
+      } else {
+        showToast("Kalender tersedia di APK Android");
+      }
+    }
+
+    function shareCurrentDetail() {
+      if (!activeDetailMovie) return;
+      const dateStr = activeDetailMovie.releaseDate && activeDetailMovie.releaseDate !== "TBA"
+        ? formatDateDmy(activeDetailMovie.releaseDate)
+        : "TBA";
+      const text = `${activeDetailMovie.title} — Rilis ID: ${dateStr}`;
+      if (window.AndroidBridge && typeof window.AndroidBridge.shareText === "function") {
+        window.AndroidBridge.shareText(text);
+      } else if (navigator.clipboard) {
+        navigator.clipboard.writeText(text);
+        showToast("Teks disalin");
+      }
+    }
+
+    /* Watchlist rendering: focused strictly on release date & countdown */
+    function switchWatchlistSubTab(sub) {
+      currentWlSubTab = sub;
+      document.getElementById("wlTabScheduled").classList.toggle("active", sub === "scheduled");
+      document.getElementById("wlTabTba").classList.toggle("active", sub === "tba");
+      renderWatchlist();
+    }
+
+    function renderWatchlist() {
+      const entries = Object.values(watchlist).filter(e => e && e.movie);
+      const scheduled = entries.filter(e => e.movie.releaseDate && e.movie.releaseDate !== "TBA");
+      const tba = entries.filter(e => !e.movie.releaseDate || e.movie.releaseDate === "TBA");
+
+      document.getElementById("wlTabScheduled").textContent = `Terjadwal (${scheduled.length})`;
+      document.getElementById("wlTabTba").textContent = `Menunggu Jadwal (${tba.length})`;
+
+      const list = currentWlSubTab === "scheduled" ? [...scheduled] : [...tba];
+      list.sort((a, b) => {
+        const da = a.movie.releaseDate || "9999-12-31";
+        const db = b.movie.releaseDate || "9999-12-31";
+        return da.localeCompare(db);
+      });
+
+      const nextBar = document.getElementById("wlNextBar");
+      const upcomingSched = scheduled
+        .map(e => ({ e, d: getDaysUntil(e.movie.releaseDate) }))
+        .filter(x => x.d !== null && x.d >= 0)
+        .sort((a, b) => a.d - b.d);
+
+      if (currentWlSubTab === "scheduled" && upcomingSched.length > 0) {
+        const top = upcomingSched[0];
+        nextBar.style.display = "flex";
+        document.getElementById("wlNextTitle").textContent = top.e.movie.title;
+        document.getElementById("wlNextCd").textContent = `${formatCountdownBadge(top.d)} • ${formatDateDmy(top.e.movie.releaseDate)}`;
+      } else {
+        nextBar.style.display = "none";
+      }
+
+      const container = document.getElementById("watchlistList");
+      if (list.length === 0) {
+        container.innerHTML = '<div class="empty-state">Belum ada film di daftar ini.</div>';
+        return;
+      }
+
+      container.innerHTML = list.map(entry => {
+        const m = entry.movie;
+        const id = String(m.id);
+        const days = getDaysUntil(m.releaseDate);
+        const isTba = !m.releaseDate || m.releaseDate === "TBA";
+        const cdText = isTba ? "TBA" : formatCountdownBadge(days);
+        const cdClass = isTba ? "tba" : ((days !== null && days <= 3) ? "urgent" : "");
+        const dateLine = isTba ? "Menunggu jadwal rilis ID" : `Rilis ${formatDateDmy(m.releaseDate)}`;
+        const chains = (m.chains && m.chains.length) ? m.chains.join(" · ") : "XXI · CGV · Cinépolis";
+
+        return `
+          <div class="wl-card">
+            <img class="wl-poster" src="${m.poster || ""}" alt="${escapeHtml(m.title)}" onclick='openMovieDetailById("${id}")' />
+            <div class="wl-info" onclick='openMovieDetailById("${id}")'>
+              <div class="wl-title">${escapeHtml(m.title)}</div>
+              <div class="wl-schedule">${escapeHtml(dateLine)}</div>
+              <div class="wl-chains">${escapeHtml(chains)}</div>
+            </div>
+            <div class="wl-actions-col">
+              <div style="display:flex; align-items:center; gap:6px;">
+                <span class="wl-cd-pill ${cdClass}">${escapeHtml(cdText)}</span>
+                <button class="wl-remove-btn" onclick='toggleWatchlistById("${id}")' title="Hapus">&times;</button>
+              </div>
+              <div class="wl-rem-mini">
+                <button class="rem-mini-btn ${entry.presaleAlert ? "on" : ""}" onclick='toggleEntryAlert("${id}", "presaleAlert")'>Pre-Sale</button>
+                <button class="rem-mini-btn ${entry.dayAlert ? "on" : ""}" onclick='toggleEntryAlert("${id}", "dayAlert")'>Hari-H</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function toggleEntryAlert(id, field) {
+      const entry = watchlist[String(id)];
+      if (!entry) return;
+      entry[field] = !entry[field];
+      persistWatchlist();
+      renderWatchlist();
+    }
+
+    /* Search */
+    function onSearchInput() {
+      clearTimeout(searchTimer);
+      const q = (document.getElementById("searchInput").value || "").trim();
+      if (!q) {
+        document.getElementById("searchResults").innerHTML = '<div class="empty-state">Ketik judul film untuk cek jadwal rilis Indonesia.</div>';
+        return;
+      }
+      searchTimer = setTimeout(() => runSearchTmdb(q), 320);
+    }
+
+    function clearSearchInput() {
+      document.getElementById("searchInput").value = "";
+      document.getElementById("searchResults").innerHTML = '<div class="empty-state">Ketik judul film untuk cek jadwal rilis Indonesia.</div>';
+    }
+
+    function getApiKey() {
+      const inp = (document.getElementById("apiKeyInput").value || "").trim();
+      if (inp) return inp;
+      if (window.AndroidBridge && typeof window.AndroidBridge.getSavedApiKey === "function") {
+        return (window.AndroidBridge.getSavedApiKey() || "").trim();
+      }
+      return "";
+    }
+
+    async function runSearchTmdb(query) {
+      const apiKey = getApiKey();
+      const box = document.getElementById("searchResults");
+      if (!apiKey) {
+        box.innerHTML = '<div class="empty-state">Isi TMDB API Key di menu Settings terlebih dahulu.</div>';
+        return;
+      }
+      box.innerHTML = '<div class="empty-state">Mencari...</div>';
+      try {
+        const res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${encodeURIComponent(apiKey)}&query=${encodeURIComponent(query)}&language=en-US&page=1`);
+        const data = await res.json();
+        const raw = Array.isArray(data.results) ? data.results.slice(0, 12) : [];
+
+        const enriched = await Promise.all(raw.map(async item => {
+          let idDate = "";
+          try {
+            const relRes = await fetch(`https://api.themoviedb.org/3/movie/${item.id}/release_dates?api_key=${encodeURIComponent(apiKey)}`);
+            const relJson = await relRes.json();
+            const cList = Array.isArray(relJson.results) ? relJson.results : [];
+            const idEntry = cList.find(c => c.iso_3166_1 === "ID");
+            if (idEntry && Array.isArray(idEntry.release_dates)) {
+              const theatrical = idEntry.release_dates.find(r => (r.type === 2 || r.type === 3) && r.release_date);
+              if (theatrical) idDate = theatrical.release_date.slice(0, 10);
+            }
+          } catch (_) {}
+
+          return normalizeMovie(item, idDate || "TBA");
+        }));
+
+        lastSearchItems = enriched;
+        if (enriched.length === 0) {
+          box.innerHTML = '<div class="empty-state">Film tidak ditemukan.</div>';
+          return;
+        }
+
+        box.innerHTML = enriched.map(m => {
+          const saved = isWatchlisted(m.id);
+          const schedLabel = m.releaseDate && m.releaseDate !== "TBA"
+            ? `Rilis ID: ${formatDateDmy(m.releaseDate)}`
+            : "Jadwal ID: TBA";
+          return `
+            <div class="search-item">
+              <img src="${m.poster || ""}" alt="${escapeHtml(m.title)}" onclick='openMovieDetailById("${m.id}")' />
+              <div class="search-item-info" onclick='openMovieDetailById("${m.id}")'>
+                <div class="search-item-title">${escapeHtml(m.title)}</div>
+                <div class="search-item-sub">${escapeHtml(schedLabel)}</div>
+              </div>
+              <button class="search-save-btn ${saved ? "saved" : ""}" data-watch-id="${m.id}" onclick='toggleWatchlistById("${m.id}")'>
+                ${saved ? "Tersimpan" : "+ Watchlist"}
+              </button>
+            </div>
+          `;
+        }).join("");
+      } catch (_) {
+        box.innerHTML = '<div class="empty-state">Gagal memuat pencarian. Periksa koneksi.</div>';
+      }
+    }
+
+    function normalizeMovie(item, idReleaseDate) {
+      const genres = Array.isArray(item.genre_ids)
+        ? item.genre_ids.map(g => GENRE_MAP[g]).filter(Boolean)
+        : [];
+      const pop = Number(item.popularity || 0);
+      const hype = Math.min(98, Math.max(70, Math.round(74 + Math.min(24, pop / 4))));
+      const globalYear = (item.release_date || "").slice(0, 4);
+      const relDate = idReleaseDate || item.release_date || "TBA";
+      const isReRelease = Boolean(
+        idReleaseDate &&
+        idReleaseDate !== "TBA" &&
+        globalYear &&
+        Number(idReleaseDate.slice(0, 4)) > Number(globalYear)
+      );
+      const isImax = hype >= 88 || genres.includes("Sci-Fi") || genres.includes("Action");
+
+      return {
+        id: String(item.id),
+        tmdbId: item.id,
+        title: item.title || item.original_title || "Untitled",
+        releaseDate: relDate,
+        originalLanguage: item.original_language || "en",
+        genresText: genres.slice(0, 2).join(", "),
+        hype: hype,
+        isImax: isImax,
+        isReRelease: isReRelease,
+        chains: isImax ? ["XXI", "CGV", "Cinépolis", "IMAX"] : ["XXI", "CGV", "Cinépolis"],
+        poster: item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : "",
+        overview: item.overview || "",
+        director: "",
+        cast: [],
+        runtime: item.runtime || 0
+      };
+    }
+
+    async function syncFromTmdb(force) {
+      const apiKey = getApiKey();
+      if (!apiKey) {
+        renderCatalog();
+        return;
+      }
+      const now = Date.now();
+      if (!force && lastSyncMs && (now - lastSyncMs) < 20 * 60 * 1000) {
+        renderCatalog();
+        return;
+      }
+
+      document.getElementById("lastSyncText").textContent = "Menyinkronkan...";
+      try {
+        const today = getLocalTodayIso();
+        const urlId = `https://api.themoviedb.org/3/discover/movie?api_key=${encodeURIComponent(apiKey)}&region=ID&with_release_type=2|3&release_date.gte=2026-10-01&sort_by=popularity.desc&page=1`;
+        const urlLocal = `https://api.themoviedb.org/3/discover/movie?api_key=${encodeURIComponent(apiKey)}&region=ID&with_original_language=id&with_release_type=2|3&release_date.gte=2026-10-01&sort_by=popularity.desc&page=1`;
+
+        const [res1, res2] = await Promise.all([fetch(urlId), fetch(urlLocal)]);
+        const [j1, j2] = await Promise.all([res1.json(), res2.json()]);
+
+        const map = new Map();
+        [...(j1.results || []), ...(j2.results || [])].forEach(item => {
+          if (!item || !item.id || !item.poster_path) return;
+          const m = normalizeMovie(item, item.release_date || "TBA");
+          map.set(String(m.id), m);
+        });
+
+        movies = Array.from(map.values());
+        lastSyncMs = Date.now();
+        const d = new Date(lastSyncMs);
+        const hh = String(d.getHours()).padStart(2, "0");
+        const mm = String(d.getMinutes()).padStart(2, "0");
+        const label = `Update ${hh}:${mm}`;
+
+        document.getElementById("lastSyncText").textContent = label;
+        localStorage.setItem(STORAGE_KEY_MOVIES, JSON.stringify(movies));
+        localStorage.setItem(STORAGE_KEY_META, JSON.stringify({
+          lastSyncMs: lastSyncMs,
+          lastSyncLabel: label,
+          minHype: Number(document.getElementById("minHypeSelect").value || 85),
+          intervalHours: Number(document.getElementById("intervalSelect").value || 6)
+        }));
+        renderCatalog();
+      } catch (_) {
+        document.getElementById("lastSyncText").textContent = "Offline / Gagal sync";
+        renderCatalog();
+      }
+    }
+
+    function saveApiAndSync() {
+      const key = (document.getElementById("apiKeyInput").value || "").trim();
+      if (window.AndroidBridge && typeof window.AndroidBridge.saveApiKey === "function") {
+        window.AndroidBridge.saveApiKey(key);
+      }
+      saveWorkerPrefs();
+      syncFromTmdb(true);
+      showToast("API Key disimpan");
+    }
+
+    function saveWorkerPrefs() {
+      const minHype = Number(document.getElementById("minHypeSelect").value || 85);
+      const interval = Number(document.getElementById("intervalSelect").value || 6);
+      const tbaIds = [];
+      Object.values(watchlist).forEach(entry => {
+        if (entry && entry.isTba && entry.movie && entry.movie.tmdbId) {
+          tbaIds.push(entry.movie.tmdbId);
+        }
+      });
+      if (window.AndroidBridge && typeof window.AndroidBridge.saveWorkerSettings === "function") {
+        window.AndroidBridge.saveWorkerSettings(minHype, interval, JSON.stringify(tbaIds));
+      }
+    }
+
+    function triggerWorkerNow() {
+      if (window.AndroidBridge && typeof window.AndroidBridge.runWorkerNow === "function") {
+        window.AndroidBridge.runWorkerNow();
+        showToast("Pemeriksaan notifikasi dijalankan");
+      } else {
+        showToast("Hanya berjalan di Android");
+      }
+    }
+
+    /* Calendar */
+    function openCalendarModal() {
+      calCurrentDate = new Date();
+      calSelectedIso = getLocalTodayIso();
+      renderCalendarModal();
+      document.getElementById("calendarModal").classList.add("open");
+    }
+
+    function closeCalendarModal() {
+      document.getElementById("calendarModal").classList.remove("open");
+    }
+
+    function onCalBackdropClick(e) {
+      if (e.target && e.target.id === "calendarModal") closeCalendarModal();
+    }
+
+    function renderCalendarModal() {
+      const y = calCurrentDate.getFullYear();
+      const m = calCurrentDate.getMonth();
+      const firstDay = new Date(y, m, 1).getDay();
+      const daysInMonth = new Date(y, m + 1, 0).getDate();
+      document.getElementById("calMonthLabel").textContent = `${m + 1}/${y}`;
+
+      const relDatesSet = new Set(movies.map(x => (x.releaseDate || "").slice(0, 10)));
+      let html = "";
+      for (let i = 0; i < firstDay; i++) html += "<div></div>";
+      for (let d = 1; d <= daysInMonth; d++) {
+        const iso = `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+        const hasRel = relDatesSet.has(iso);
+        const sel = iso === calSelectedIso;
+        html += `<div class="cal-day ${hasRel ? "has-rel" : ""} ${sel ? "selected" : ""}" onclick='selectCalDate("${iso}")'>${d}</div>`;
+      }
+      document.getElementById("calGrid").innerHTML = html;
+      renderCalMoviesForDate(calSelectedIso);
+    }
+
+    function selectCalDate(iso) {
+      calSelectedIso = iso;
+      renderCalendarModal();
+    }
+
+    function renderCalMoviesForDate(iso) {
+      const matches = movies.filter(x => (x.releaseDate || "").slice(0, 10) === iso);
+      const box = document.getElementById("calDateMovies");
+      if (matches.length === 0) {
+        box.innerHTML = `<div class="empty-state" style="padding:10px;">Tidak ada rilis pada ${formatDateDmy(iso)}.</div>`;
+        return;
+      }
+      box.innerHTML = matches.map(x => `
+        <div style="padding:7px 8px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick='closeCalendarModal(); openMovieDetailById("${x.id}")'>
+          <strong>${escapeHtml(x.title)}</strong>
+          <span style="font-size:11px; color:var(--blue);">${formatDateDmy(x.releaseDate)}</span>
+        </div>
+      `).join("");
+    }
+
+    function escapeHtml(str) {
+      return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    window.handleAndroidBack = function() {
+      const sheet = document.getElementById("detailSheet");
+      if (sheet && sheet.classList.contains("open")) {
+        closeDetailSheet();
+        return "true";
+      }
+      const cal = document.getElementById("calendarModal");
+      if (cal && cal.classList.contains("open")) {
+        closeCalendarModal();
+        return "true";
+      }
+      return "false";
+    };
+
+    window.onNativeResume = function() {
+      const mode = localStorage.getItem("ct_app_theme") || "light";
+      applyTheme(mode);
+      renderCatalog();
+      updateBadges();
+    };
+
+    loadState();
+    renderCatalog();
+    syncFromTmdb(false);
+  </script>
+</body>
+</html>
