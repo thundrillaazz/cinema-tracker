@@ -72,10 +72,7 @@ class MainActivity : AppCompatActivity() {
             addJavascriptInterface(WebAppInterface(this@MainActivity), "AndroidBridge")
             webChromeClient = WebChromeClient()
             webViewClient = object : WebViewClient() {
-                override fun shouldOverrideUrlLoading(
-                    view: WebView?,
-                    request: WebResourceRequest?
-                ): Boolean {
+                override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
                     val uri = request?.url ?: return false
                     val scheme = uri.scheme ?: return false
                     if (scheme == "file") return false
@@ -93,14 +90,10 @@ class MainActivity : AppCompatActivity() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 webView.evaluateJavascript(
-                    "(function(){ if(window.handleNativeBack && window.handleNativeBack()) return 'handled'; if(document.getElementById('movie-modal').classList.contains('active')) { closeModal(); return 'handled'; } return 'exit'; })()"
+                    "(function(){ if(window.handleNativeBack && window.handleNativeBack()) return 'handled'; return 'exit'; })()"
                 ) { result ->
                     if (result != "\"handled\"") {
-                        if (webView.canGoBack()) {
-                            webView.goBack()
-                        } else {
-                            finish()
-                        }
+                        if (webView.canGoBack()) webView.goBack() else finish()
                     }
                 }
             }
@@ -109,22 +102,16 @@ class MainActivity : AppCompatActivity() {
 
     private fun openExternalUri(uri: Uri) {
         try {
-            val intent = Intent(Intent.ACTION_VIEW, uri).apply {
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            }
+            val intent = Intent(Intent.ACTION_VIEW, uri).apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) }
             startActivity(intent)
         } catch (_: ActivityNotFoundException) {
-            Toast.makeText(this, "Tidak ada aplikasi untuk membuka tautan ini", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Aplikasi tidak ditemukan", Toast.LENGTH_SHORT).show()
         }
     }
 
     private fun requestNotificationPermissionIfNeeded() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            val granted = ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.POST_NOTIFICATIONS
-            ) == PackageManager.PERMISSION_GRANTED
-            if (!granted) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
                 notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
         }
@@ -133,32 +120,16 @@ class MainActivity : AppCompatActivity() {
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
-                CinemaCheckWorker.CHANNEL_ID,
-                "Radar Bioskop, TBA & Presale",
-                NotificationManager.IMPORTANCE_HIGH
-            ).apply {
-                description = "Notifikasi film masuk jadwal ID, TBA terkonfirmasi, presale, H-1, dan hari-H"
-                enableVibration(true)
-            }
-            val manager = getSystemService(NotificationManager::class.java)
-            manager.createNotificationChannel(channel)
+                CinemaCheckWorker.CHANNEL_ID, "Radar Bioskop & Presale", NotificationManager.IMPORTANCE_HIGH
+            ).apply { description = "Notifikasi jadwal rilis, presale, dan H-1" }
+            getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
         }
     }
 
     private fun scheduleReleaseWorker() {
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-
-        val workRequest = PeriodicWorkRequestBuilder<CinemaCheckWorker>(6, TimeUnit.HOURS)
-            .setConstraints(constraints)
-            .build()
-
-        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
-            "cinema_tracker_release_sync",
-            ExistingPeriodicWorkPolicy.KEEP,
-            workRequest
-        )
+        val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
+        val workRequest = PeriodicWorkRequestBuilder<CinemaCheckWorker>(6, TimeUnit.HOURS).setConstraints(constraints).build()
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork("cinema_tracker_sync", ExistingPeriodicWorkPolicy.KEEP, workRequest)
     }
 
     inner class WebAppInterface(private val context: Context) {
@@ -166,11 +137,7 @@ class MainActivity : AppCompatActivity() {
         @JavascriptInterface
         fun openLetterboxdDirect(tmdbId: Int, slugFallback: String) {
             runOnUiThread {
-                val url = if (tmdbId > 0) {
-                    "https://letterboxd.com/tmdb/$tmdbId/"
-                } else {
-                    "https://letterboxd.com/search/$slugFallback/"
-                }
+                val url = if (tmdbId > 0) "https://letterboxd.com/tmdb/$tmdbId/" else "https://letterboxd.com/film/$slugFallback/"
                 openExternalUri(Uri.parse(url))
             }
         }
@@ -180,25 +147,20 @@ class MainActivity : AppCompatActivity() {
             runOnUiThread {
                 if (youtubeKey.isNotBlank()) {
                     try {
-                        startActivity(
-                            Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:$youtubeKey"))
-                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        )
-                        return@runOnUiThread
+                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:$youtubeKey")).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
                     } catch (_: ActivityNotFoundException) {
                         openExternalUri(Uri.parse("https://www.youtube.com/watch?v=$youtubeKey"))
-                        return@runOnUiThread
                     }
+                } else {
+                    val q = Uri.encode("$movieTitle official trailer")
+                    openExternalUri(Uri.parse("https://m.youtube.com/results?search_query=$q"))
                 }
-                val q = Uri.encode("$movieTitle official trailer")
-                openExternalUri(Uri.parse("https://m.youtube.com/results?search_query=$q"))
             }
         }
 
         @JavascriptInterface
         fun syncRadarState(watchlistJson: String, tbaJson: String, apiKey: String) {
-            context.getSharedPreferences(CinemaCheckWorker.PREFS_NAME, Context.MODE_PRIVATE)
-                .edit()
+            context.getSharedPreferences(CinemaCheckWorker.PREFS_NAME, Context.MODE_PRIVATE).edit()
                 .putString(CinemaCheckWorker.KEY_WATCHLIST, watchlistJson)
                 .putString(CinemaCheckWorker.KEY_TBA, tbaJson)
                 .putString(CinemaCheckWorker.KEY_API_KEY, apiKey)
@@ -232,22 +194,42 @@ class MainActivity : AppCompatActivity() {
                         val uri = context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
                         if (uri != null) {
                             context.contentResolver.openOutputStream(uri)?.use { it.write(bytes) }
-                            Toast.makeText(context, "Poster HD disimpan ke Galeri", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "Poster tersimpan di Galeri", Toast.LENGTH_SHORT).show()
                             return@runOnUiThread
                         }
                     }
-
-                    val dir = File(
-                        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
-                        "CinemaTracker"
-                    )
+                    val dir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "CinemaTracker")
                     if (!dir.exists()) dir.mkdirs()
-                    val outFile = File(dir, safeName)
-                    FileOutputStream(outFile).use { it.write(bytes) }
-                    Toast.makeText(context, "Poster HD tersimpan", Toast.LENGTH_SHORT).show()
+                    FileOutputStream(File(dir, safeName)).use { it.write(bytes) }
+                    Toast.makeText(context, "Poster tersimpan", Toast.LENGTH_SHORT).show()
                 } catch (_: Exception) {
                     Toast.makeText(context, "Gagal menyimpan poster", Toast.LENGTH_SHORT).show()
                 }
+            }
+        }
+
+        @JavascriptInterface
+        fun switchLauncherIcon(styleKey: String) {
+            runOnUiThread {
+                val map = mapOf(
+                    "cinema_blue" to "com.michael.cinematracker.LauncherCinemaBlue",
+                    "kino_trio" to "com.michael.cinematracker.LauncherKinoTrio",
+                    "arrakis_spice" to "com.michael.cinematracker.LauncherArrakisSpice",
+                    "monolith_2001" to "com.michael.cinematracker.LauncherMonolith2001",
+                    "grand_budapest" to "com.michael.cinematracker.LauncherGrandBudapest",
+                    "neon_2049" to "com.michael.cinematracker.LauncherNeon2049",
+                    "imax_horizon" to "com.michael.cinematracker.LauncherImaxHorizon",
+                    "kodak_35mm" to "com.michael.cinematracker.LauncherKodak35mm",
+                    "trinity_ember" to "com.michael.cinematracker.LauncherTrinityEmber",
+                    "emerald_cut" to "com.michael.cinematracker.LauncherEmeraldCut"
+                )
+                val targetClass = map[styleKey] ?: return@runOnUiThread
+                val pm = context.packageManager
+                map.values.forEach { cls ->
+                    val state = if (cls == targetClass) PackageManager.COMPONENT_ENABLED_STATE_ENABLED else PackageManager.COMPONENT_ENABLED_STATE_DISABLED
+                    pm.setComponentEnabledSetting(ComponentName(context, cls), state, PackageManager.DONT_KILL_APP)
+                }
+                Toast.makeText(context, "Ikon aplikasi diperbarui", Toast.LENGTH_SHORT).show()
             }
         }
     }
