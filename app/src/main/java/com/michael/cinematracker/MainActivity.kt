@@ -341,7 +341,7 @@ class MainActivity : AppCompatActivity() {
                 var bitmap: Bitmap? = null
                 try {
                     if (posterUrl.isNotEmpty()) {
-                        val url = URL(posterUrl)
+                        val url = URL(posterUrl.replace("/w500/", "/w342/"))
                         val connection = url.openConnection() as HttpURLConnection
                         connection.doInput = true
                         connection.connectTimeout = 5000
@@ -373,11 +373,6 @@ class MainActivity : AppCompatActivity() {
 
                 if (bitmap != null) {
                     builder.setLargeIcon(bitmap)
-                    builder.setStyle(
-                        NotificationCompat.BigPictureStyle()
-                            .bigPicture(bitmap)
-                            .bigLargeIcon(null as Bitmap?)
-                    )
                 }
 
                 val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
