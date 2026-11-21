@@ -759,28 +759,37 @@
     .detail-sheet {
       width: 100%;
       max-width: 520px;
-      max-height: 88vh;
+      max-height: 90vh;
       overflow-y: auto;
       background: var(--surface);
-      border-radius: 16px 16px 0 0;
-      padding: 16px 16px 24px;
+      border-radius: 20px 20px 0 0;
+      padding: 10px 18px 26px;
       position: relative;
       border-top: 1px solid var(--border);
+      box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.25);
+    }
+    .sheet-drag-handle {
+      width: 36px;
+      height: 4px;
+      border-radius: 99px;
+      background: var(--border);
+      margin: 0 auto 12px;
     }
     .sheet-top-actions {
       position: absolute;
-      top: 12px;
-      right: 12px;
+      top: 14px;
+      right: 16px;
       display: flex;
       gap: 6px;
+      z-index: 5;
     }
     .sheet-icon-btn {
-      width: 28px;
-      height: 28px;
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
       background: var(--surface-2);
       border: 1px solid var(--border);
-      font-size: 12px;
+      font-size: 13px;
       color: var(--text);
       cursor: pointer;
       display: flex;
@@ -791,89 +800,247 @@
 
     .detail-header {
       display: flex;
-      gap: 12px;
-      margin-bottom: 12px;
-      padding-right: 64px;
+      gap: 14px;
+      margin-bottom: 14px;
+      padding-right: 74px;
+      align-items: flex-start;
     }
     .detail-poster-wrap {
       position: relative;
-      width: 84px;
-      height: 124px;
-      border-radius: 8px;
+      width: 92px;
+      height: 138px;
+      border-radius: 10px;
       overflow: hidden;
       flex-shrink: 0;
-      background: #0f172a;
+      background: #18181b;
       cursor: pointer;
       border: 1px solid var(--border);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.16);
     }
     .detail-poster-wrap img { width: 100%; height: 100%; object-fit: cover; }
-    .poster-zoom-pill {
+    .poster-zoom-icon {
       position: absolute;
-      bottom: 4px;
-      left: 4px;
-      right: 4px;
-      background: rgba(15, 23, 42, 0.82);
+      bottom: 6px;
+      right: 6px;
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      background: rgba(9, 9, 11, 0.78);
       color: #fff;
-      font-size: 9px;
-      font-weight: 600;
-      text-align: center;
-      padding: 2px 0;
-      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255,255,255,0.16);
     }
-    .detail-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .poster-zoom-icon svg { width: 11px; height: 11px; stroke: currentColor; stroke-width: 2.2; fill: none; }
+    .detail-kicker {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-wrap: wrap;
+      margin-bottom: 6px;
+    }
+    .meta-chip {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      padding: 2px 7px;
+      border-radius: 5px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+    .meta-chip.status-confirmed {
+      background: rgba(16, 185, 129, 0.12);
+      border-color: rgba(16, 185, 129, 0.28);
+      color: var(--emerald);
+    }
+    .meta-chip.status-tba {
+      background: rgba(217, 119, 6, 0.12);
+      border-color: rgba(217, 119, 6, 0.28);
+      color: var(--amber);
+    }
+    .detail-title {
+      font-size: 17px;
+      font-weight: 800;
+      line-height: 1.22;
+      letter-spacing: -0.015em;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .detail-genre-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-bottom: 8px;
+    }
+    .genre-tag {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--muted);
+      background: var(--surface-2);
+      padding: 2px 8px;
+      border-radius: 99px;
+    }
+    .hype-meter-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .hype-bar-track {
+      flex: 1;
+      max-width: 110px;
+      height: 5px;
+      border-radius: 99px;
+      background: var(--surface-2);
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .hype-bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      background: var(--text);
+    }
+    .hype-meter-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .detail-media-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .media-pill-btn {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      padding: 9px 12px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      cursor: pointer;
+      text-align: left;
+      color: var(--text);
+    }
+    .media-pill-btn:active { opacity: 0.8; }
+    .trailer-minimal-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 7px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text);
+      flex-shrink: 0;
+    }
+    .trailer-minimal-icon svg { width: 11px; height: 11px; fill: currentColor; margin-left: 1px; }
+    .lbxd-dots-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 7px;
+      background: #14181c;
+      border: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2.5px;
+      flex-shrink: 0;
+    }
+    .lbxd-dot { width: 5px; height: 5px; border-radius: 50%; display: inline-block; }
+    .media-btn-title { font-size: 12px; font-weight: 700; color: var(--text); line-height: 1.2; }
+    .media-btn-sub { font-size: 10px; color: var(--muted); line-height: 1.2; margin-top: 1px; }
 
     .verify-box {
       background: var(--surface-2);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 10px;
-      margin-bottom: 10px;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 12px;
       font-size: 11.5px;
     }
     .verify-source-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 4px;
+      margin-bottom: 5px;
     }
     .verify-source-tag {
       font-size: 10px;
-      font-weight: 700;
-      padding: 2px 6px;
-      border-radius: 4px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 5px;
       background: var(--surface);
       border: 1px solid var(--border);
-      color: var(--text);
+      color: var(--muted);
     }
-    .verify-date { font-weight: 700; color: var(--blue); margin-bottom: 2px; }
+    .verify-date { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
 
     .quick-verify-bar {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 6px;
-      margin-bottom: 12px;
     }
     .verify-link-btn {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 7px 4px;
-      font-size: 10.5px;
-      font-weight: 600;
+      border-radius: 8px;
+      padding: 8px 4px;
+      font-size: 11px;
+      font-weight: 700;
       color: var(--text);
       text-align: center;
       cursor: pointer;
     }
+    .verify-link-btn:active { opacity: 0.78; }
 
-    .credits-block { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
-    .credits-block p { margin-bottom: 3px; }
-    .credits-block strong { color: var(--text); }
+    .credits-block {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .credits-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      padding-bottom: 9px;
+      margin-bottom: 9px;
+      border-bottom: 1px solid var(--border);
+    }
+    .credit-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      margin-bottom: 2px;
+    }
+    .credit-val {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.35;
+    }
+    .synopsis-text {
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--text);
+      opacity: 0.9;
+    }
 
     .reminder-box {
       background: var(--surface-2);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 10px;
+      border-radius: 12px;
+      padding: 10px 12px;
       margin-bottom: 12px;
     }
     .rem-option {
@@ -881,12 +1048,49 @@
       align-items: center;
       justify-content: space-between;
       gap: 8px;
-      padding: 6px 0;
-      font-size: 11.5px;
+      padding: 7px 0;
+      font-size: 12px;
       cursor: pointer;
     }
+    .rem-option + .rem-option { border-top: 1px solid var(--border); }
     .rem-title { font-weight: 600; color: var(--text); }
-    .rem-check { width: 16px; height: 16px; accent-color: var(--blue); }
+    .switch-wrap {
+      position: relative;
+      width: 38px;
+      height: 22px;
+      flex-shrink: 0;
+    }
+    .switch-wrap input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute;
+    }
+    .switch-slider {
+      position: absolute;
+      inset: 0;
+      border-radius: 99px;
+      background: var(--border);
+      transition: background 0.18s ease;
+    }
+    .switch-slider::before {
+      content: "";
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      left: 3px;
+      top: 3px;
+      border-radius: 50%;
+      background: #fff;
+      transition: transform 0.18s ease;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+    }
+    .switch-wrap input:checked + .switch-slider {
+      background: var(--blue);
+    }
+    .switch-wrap input:checked + .switch-slider::before {
+      transform: translateX(16px);
+    }
 
     .detail-actions {
       display: grid;
@@ -897,20 +1101,20 @@
       background: var(--accent);
       color: var(--accent-text);
       border: none;
-      border-radius: 8px;
-      padding: 10px;
+      border-radius: 10px;
+      padding: 11px;
       font-size: 12px;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
     }
     .btn-push {
       background: var(--surface-2);
       color: var(--text);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 10px;
+      border-radius: 10px;
+      padding: 11px;
       font-size: 12px;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
     }
     .empty-msg {
@@ -1237,38 +1441,6 @@
       color: var(--blue);
     }
 
-    .trailer-hero-btn {
-      width: 100%;
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 10px 12px;
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      cursor: pointer;
-      color: var(--text);
-      text-align: left;
-    }
-    .trailer-hero-btn:active { opacity: 0.85; }
-    .trailer-play-badge {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: #e11d48;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-    .trailer-play-badge svg { width: 14px; height: 14px; fill: currentColor; margin-left: 2px; }
-    .verify-link-btn.lbxd {
-      border-color: rgba(0, 224, 84, 0.35);
-      color: var(--emerald);
-    }
 
   </style>
 </head>
@@ -1489,7 +1661,7 @@
     </div>
 
     <div style="text-align:center; font-size:11px; color:var(--muted); padding:4px 0 12px;">
-      Cinema Tracker v3.9.1 • DD/MM/YYYY Format, Direct Trailer & Letterboxd
+      Cinema Tracker v3.9.2 • Editorial Sheet, Clean Dates & Framed Alerts
     </div>
   </div>
   <!-- BOTTOM NAVIGATION -->
@@ -1737,16 +1909,23 @@
     function formatShortDate(isoDate) {
       if (!isoDate || isoDate === "TBA") return "TBA";
       const clean = String(isoDate).slice(0, 10);
+      const dObj = new Date(clean + "T00:00:00");
+      if (isNaN(dObj.getTime())) return isoDate;
+      return dObj.toLocaleDateString("id-ID", {
+        day: "numeric",
+        month: "short",
+        year: clean.startsWith("2027") ? "numeric" : undefined
+      });
+    }
+
+    function formatFullDate(isoDate) {
+      if (!isoDate || isoDate === "TBA") return "TBA";
+      const clean = String(isoDate).slice(0, 10);
       const parts = clean.split("-");
       if (parts.length === 3 && parts[0].length === 4) {
         return `${parts[2]}/${parts[1]}/${parts[0]}`;
       }
-      const dObj = new Date(clean + "T00:00:00");
-      if (isNaN(dObj.getTime())) return isoDate;
-      const dd = String(dObj.getDate()).padStart(2, "0");
-      const mm = String(dObj.getMonth() + 1).padStart(2, "0");
-      const yyyy = dObj.getFullYear();
-      return `${dd}/${mm}/${yyyy}`;
+      return clean;
     }
 
     function normalizeIsoDatesInText(txt) {
@@ -1944,8 +2123,8 @@
       const todayIso = getLocalTodayIso();
       localStorage.setItem("ct_rendered_date", todayIso);
 
-      const liveNow = JSON.parse(localStorage.getItem("ct_v37_live_now") || localStorage.getItem("ct_v36_live_now") || "[]");
-      const liveUpcoming = JSON.parse(localStorage.getItem("ct_v37_live_upcoming") || localStorage.getItem("ct_v36_live_upcoming") || "[]");
+      const liveNow = JSON.parse(localStorage.getItem("ct_v392_live_now") || "[]");
+      const liveUpcoming = JSON.parse(localStorage.getItem("ct_v392_live_upcoming") || "[]");
 
       const map = new Map();
       const seenNormalized = new Map();
@@ -2751,6 +2930,7 @@
       if (platform === "TIX ID") url = `https://www.tix.id/search?q=${q}`;
       else if (platform === "XXI") url = `https://21cineplex.com/`;
       else if (platform === "CGV") url = `https://www.cgv.id/en/movies/now_playing`;
+      else if (platform === "Cinépolis") url = `https://cinepolis.co.id/`;
       else if (platform === "Trailer") url = `https://www.youtube.com/results?search_query=${encodeURIComponent(movieTitle + " official trailer")}`;
 
       if (window.AndroidBridge && typeof window.AndroidBridge.openExternalUrl === "function") {
@@ -2785,64 +2965,78 @@
         ? `<img src="${effectivePoster}" alt="${m.title}" />`
         : `<div class="poster-art" style="padding:10px;"><div class="poster-art-title" style="font-size:11px;">${m.title}</div></div>`;
 
-      const safeTitle = m.title.replace(/'/g, "\'");
+      const safeTitle = m.title.replace(/'/g, "\\'");
+      const genreTags = (m.genre || "Bioskop").split(",").map(g => g.trim()).filter(Boolean)
+        .map(g => `<span class="genre-tag">${g}</span>`).join("");
+      const releaseDisplay = m.confirmedText || (`Rilis: ${formatFullDate(m.releaseDate)}`);
 
       document.getElementById("detailContent").innerHTML = `
+        <div class="sheet-drag-handle"></div>
         <div class="sheet-top-actions">
           <button class="sheet-icon-btn" onclick="shareMovieInfo('${m.id}')" title="Bagikan">
             <svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
           </button>
-          <button class="sheet-icon-btn" onclick="closeDetail()">✕</button>
+          <button class="sheet-icon-btn" onclick="closeDetail()" title="Tutup">✕</button>
         </div>
+
         <div class="detail-header">
           <div class="detail-poster-wrap" onclick="openPosterCustomizer('${m.id}')">
             ${posterHtml}
-            <div class="poster-zoom-pill">Poster</div>
+            <div class="poster-zoom-icon" title="Lihat & Ubah Poster">
+              <svg viewBox="0 0 24 24"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+            </div>
           </div>
           <div style="flex:1; min-width:0;">
-            <div style="display:flex; gap:4px; margin-bottom:4px; flex-wrap:wrap;">
-              <span class="age-pill">${m.age || 'R 13+'}</span>
-              <span class="age-pill">${m.runtime || 'TBA'}</span>
-              ${m.imax ? '<span class="age-pill" style="background:#0f172a;color:#fff;">IMAX</span>' : ''}
-              ${m.tba ? '<span class="age-pill" style="background:#d97706;color:#fff;">TBA ID</span>' : '<span class="age-pill" style="background:#16a34a;color:#fff;">Confirmed ID</span>'}
+            <div class="detail-kicker">
+              <span class="meta-chip">${m.age || 'R 13+'}</span>
+              <span class="meta-chip">${m.runtime || 'TBA'}</span>
+              ${m.imax ? '<span class="meta-chip">IMAX</span>' : ''}
+              ${m.tba ? '<span class="meta-chip status-tba">TBA ID</span>' : '<span class="meta-chip status-confirmed">Confirmed ID</span>'}
             </div>
             <div class="detail-title">${m.title}</div>
-            <div style="font-size:12px; color:var(--muted); margin-bottom:4px;">Genre: ${m.genre}</div>
-            <div style="font-size:12px; font-weight:600; color:var(--text);">Hype Index: ${m.hype}%</div>
+            <div class="detail-genre-row">${genreTags}</div>
+            <div class="hype-meter-row">
+              <div class="hype-bar-track"><div class="hype-bar-fill" style="width:${Math.min(100, Math.max(10, m.hype || 80))}%;"></div></div>
+              <span class="hype-meter-label">${m.hype}% Hype</span>
+            </div>
           </div>
         </div>
 
-        <button type="button" class="trailer-hero-btn" onclick="playOfficialTrailer('${m.id}')">
-          <div style="display:flex; align-items:center; gap:10px; min-width:0;">
-            <span class="trailer-play-badge"><svg viewBox="0 0 24 24"><polygon points="6 4 20 12 6 20 6 4"/></svg></span>
+        <div class="detail-media-grid">
+          <button type="button" class="media-pill-btn" onclick="playOfficialTrailer('${m.id}')">
+            <span class="trailer-minimal-icon">
+              <svg viewBox="0 0 24 24"><polygon points="6 4 20 12 6 20 6 4"/></svg>
+            </span>
             <div style="min-width:0;">
-              <div style="font-size:12.5px; font-weight:700; color:var(--text);">Tonton Official Trailer</div>
-              <div id="trailerSubLabel_${m.id}" style="font-size:11px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${m.trailerKey ? 'Putar langsung di YouTube' : 'Buka trailer resmi'}</div>
+              <div class="media-btn-title">Official Trailer</div>
+              <div id="trailerSubLabel_${m.id}" class="media-btn-sub">${m.trailerKey ? 'Putar langsung' : 'Tonton di YouTube'}</div>
             </div>
-          </div>
-          <span style="font-size:11px; font-weight:600; color:var(--blue); flex-shrink:0;">Putar ›</span>
-        </button>
+          </button>
+          <button type="button" class="media-pill-btn" onclick="openLetterboxd('${m.id}')">
+            <span class="lbxd-dots-icon">
+              <span class="lbxd-dot" style="background:#ff8000;"></span>
+              <span class="lbxd-dot" style="background:#00e054;"></span>
+              <span class="lbxd-dot" style="background:#40bcf4;"></span>
+            </span>
+            <div style="min-width:0;">
+              <div class="media-btn-title">Letterboxd</div>
+              <div class="media-btn-sub">Review & watchlist</div>
+            </div>
+          </button>
+        </div>
 
         <div class="verify-box">
           <div class="verify-source-header">
-            <span style="font-size:10px; font-weight:700; color:var(--muted); text-transform:uppercase;">Jadwal Tayang</span>
+            <span style="font-size:10px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.04em;">Jadwal & Tiket Bioskop</span>
             <span class="verify-source-tag">${m.sourceBadge || 'Bioskop ID'}</span>
           </div>
-          <div class="verify-date">${m.confirmedText || ('Rilis: ' + formatShortDate(m.releaseDate))}</div>
-          <div style="color:var(--muted);">${(m.chains || ['XXI', 'CGV', 'Cinépolis']).join(' • ')}</div>
-        </div>
-
-        <div class="quick-verify-bar">
-          <button class="verify-link-btn" onclick="openTicketSearch('TIX ID', '${safeTitle}')">TIX ID</button>
-          <button class="verify-link-btn" onclick="openTicketSearch('XXI', '${safeTitle}')">XXI</button>
-          <button class="verify-link-btn" onclick="openTicketSearch('CGV', '${safeTitle}')">CGV</button>
-          <button class="verify-link-btn lbxd" onclick="openLetterboxd('${m.id}')">Letterboxd</button>
-        </div>
-
-        <div class="credits-block">
-          <p><strong>Sutradara:</strong> ${m.director || 'Memuat...'}</p>
-          <p><strong>Pemeran:</strong> ${m.cast || 'Memuat...'}</p>
-          <p style="margin-top:6px;"><strong>Sinopsis:</strong><br>${m.synopsis}</p>
+          <div class="verify-date">${releaseDisplay}</div>
+          <div class="quick-verify-bar">
+            <button class="verify-link-btn" onclick="openTicketSearch('TIX ID', '${safeTitle}')">TIX ID</button>
+            <button class="verify-link-btn" onclick="openTicketSearch('XXI', '${safeTitle}')">XXI</button>
+            <button class="verify-link-btn" onclick="openTicketSearch('CGV', '${safeTitle}')">CGV</button>
+            <button class="verify-link-btn" onclick="openTicketSearch('Cinépolis', '${safeTitle}')">Cinépolis</button>
+          </div>
         </div>
 
         <button type="button" class="btn-watch-detail ${watchlistMap[m.id] ? 'saved' : ''}" onclick="toggleDetailWatch('${m.id}')">
@@ -2851,18 +3045,39 @@
 
         <div class="reminder-box">
           <label class="rem-option">
-            <span class="rem-title">Notifikasi Presale Tiket</span>
-            <input type="checkbox" class="rem-check" ${watchCfg.presaleAlert ? 'checked' : ''} onchange="updateReminder('${m.id}', 'presaleAlert', this.checked)" />
+            <span class="rem-title">Notifikasi Pre-Sale Tiket</span>
+            <span class="switch-wrap">
+              <input type="checkbox" ${watchCfg.presaleAlert ? 'checked' : ''} onchange="updateReminder('${m.id}', 'presaleAlert', this.checked)" />
+              <span class="switch-slider"></span>
+            </span>
           </label>
           <label class="rem-option">
             <span class="rem-title">Notifikasi Hari-H Rilis</span>
-            <input type="checkbox" class="rem-check" ${watchCfg.dayAlert ? 'checked' : ''} onchange="updateReminder('${m.id}', 'dayAlert', this.checked)" />
+            <span class="switch-wrap">
+              <input type="checkbox" ${watchCfg.dayAlert ? 'checked' : ''} onchange="updateReminder('${m.id}', 'dayAlert', this.checked)" />
+              <span class="switch-slider"></span>
+            </span>
           </label>
+        </div>
+
+        <div class="credits-block">
+          <div class="credits-grid">
+            <div>
+              <div class="credit-label">Sutradara</div>
+              <div class="credit-val">${m.director || 'Memuat...'}</div>
+            </div>
+            <div>
+              <div class="credit-label">Pemeran</div>
+              <div class="credit-val">${m.cast || 'Memuat...'}</div>
+            </div>
+          </div>
+          <div class="credit-label">Sinopsis</div>
+          <div class="synopsis-text">${m.synopsis}</div>
         </div>
 
         <div class="detail-actions">
           <button class="btn-cal" onclick="saveMovieToCalendar('${m.id}')">Simpan Kalender</button>
-          <button class="btn-push" onclick="testMoviePush('${m.id}')">Test Notif Poster</button>
+          <button class="btn-push" onclick="testMoviePush('${m.id}')">Preview Notif</button>
         </div>
       `;
     }
@@ -3216,10 +3431,10 @@
               </div>
               <div class="watch-toggles">
                 <button class="toggle-pill ${cfg.presaleAlert ? 'active' : ''}" onclick="updateReminder('${m.id}', 'presaleAlert', ${!cfg.presaleAlert})">
-                  ${cfg.presaleAlert ? '🔔 Pre-Sale' : 'Pre-Sale'}
+                  <svg viewBox="0 0 24 24" style="width:11px;height:11px;stroke:currentColor;stroke-width:2.2;fill:${cfg.presaleAlert ? 'currentColor' : 'none'};vertical-align:-1px;margin-right:3px;"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Pre-Sale
                 </button>
                 <button class="toggle-pill ${cfg.dayAlert ? 'active' : ''}" onclick="updateReminder('${m.id}', 'dayAlert', ${!cfg.dayAlert})">
-                  ${cfg.dayAlert ? '🔔 Hari-H' : 'Hari-H'}
+                  <svg viewBox="0 0 24 24" style="width:11px;height:11px;stroke:currentColor;stroke-width:2.2;fill:${cfg.dayAlert ? 'currentColor' : 'none'};vertical-align:-1px;margin-right:3px;"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Hari-H
                 </button>
               </div>
             </div>
@@ -3246,8 +3461,8 @@
     function testMoviePush(id) {
       let m = allMovies.find(item => item.id === id) || (watchlistMap[id] && watchlistMap[id].movieData);
       if (!m) return;
-      const title = `${m.title} • Tayang Bioskop`;
-      const body = `${m.confirmedText}.`;
+      const title = m.title;
+      const body = m.confirmedText || (`Rilis ${formatFullDate(m.releaseDate)}`);
       const posterUrl = getEffectivePoster(m);
 
       if (window.AndroidBridge && typeof window.AndroidBridge.sendCustomNotification === "function") {
@@ -3367,7 +3582,7 @@
 
         const nowUrl = `https://api.themoviedb.org/3/movie/now_playing?api_key=${encodeURIComponent(key)}&region=ID&page=1`;
         const upcomingUrl = `https://api.themoviedb.org/3/discover/movie?api_key=${encodeURIComponent(key)}&region=ID&with_release_type=2|3&release_date.gte=${todayIso}&sort_by=popularity.desc&page=1`;
-        const localIdUrl = `https://api.themoviedb.org/3/discover/movie?api_key=${encodeURIComponent(key)}&region=ID&with_original_language=id&release_date.gte=${todayIso}&sort_by=release_date.asc&page=1`;
+        const localIdUrl = `https://api.themoviedb.org/3/discover/movie?api_key=${encodeURIComponent(key)}&region=ID&with_release_type=2|3&with_original_language=id&release_date.gte=${todayIso}&sort_by=popularity.desc&page=1`;
 
         const [resNow, resUpcoming, resLocalId] = await Promise.all([fetch(nowUrl), fetch(upcomingUrl), fetch(localIdUrl)]);
         if (resNow.status === 401 || resUpcoming.status === 401) {
@@ -3385,12 +3600,20 @@
         const dataUpcoming = resUpcoming.ok ? await resUpcoming.json() : { results: [] };
         const dataLocalId = resLocalId.ok ? await resLocalId.json() : { results: [] };
 
+        const junkPattern = /experimental film|student film|short film|tugas akhir|skripsi|film pendek/i;
         const parseItems = (results) => {
           return (results || [])
             .filter(item => {
               const rDate = item.release_date || "";
               if (!rDate || rDate < "2026-10-01" || rDate > "2027-12-31") return false;
               if (!item.poster_path) return false;
+              const pop = Number(item.popularity || 0);
+              const isLocalId = item.original_language === "id";
+              if (pop < (isLocalId ? 2.2 : 5.0)) return false;
+              const gIds = item.genre_ids || [];
+              if (gIds.includes(99) && pop < 12.0) return false;
+              const rawText = `${item.title || ""} ${item.original_title || ""} ${item.overview || ""}`;
+              if (junkPattern.test(rawText)) return false;
               return true;
             })
             .map(item => {
@@ -3406,8 +3629,8 @@
               return {
                 id: idKey, tmdbId: item.id, status: resolvedStatus, isIndonesian: item.original_language === "id", isReRelease: Boolean(item.release_date && item.release_date >= "2026-10-01" && (item.title || "").toLowerCase().includes("re-release")),
                 title: (item.title || item.original_title || "").toUpperCase(), releaseDate: item.release_date,
-                dateLabel: dateLabel, confirmedText: isReleased ? "Sedang tayang di bioskop Indonesia" : `Confirmed Rilis: ${formatShortDate(item.release_date)}`,
-                presaleText: "Cek presale di TIX ID, M-TIX, atau CGV.", sourceBadge: "TMDB Region ID (Type 3)",
+                dateLabel: dateLabel, confirmedText: isReleased ? "Sedang tayang di bioskop Indonesia" : `Confirmed Rilis: ${formatFullDate(item.release_date)}`,
+                presaleText: "Cek presale di TIX ID, XXI, CGV & Cinépolis.", sourceBadge: "TMDB Region ID (Type 3)",
                 age: item.adult ? "D 17+" : "R 13+", runtime: cachedCred.runtime || "TBA", genre: genresText,
                 hype: hypeScore, rating: ((item.vote_average || 8.2)).toFixed(1), presale: false,
                 imax: (item.popularity || 0) >= 65, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
@@ -3421,8 +3644,8 @@
         const liveNow = parseItems(dataNow.results);
         const liveUpcoming = parseItems([...(dataUpcoming.results || []), ...(dataLocalId.results || [])]);
 
-        localStorage.setItem("ct_v37_live_now", JSON.stringify(liveNow));
-        localStorage.setItem("ct_v37_live_upcoming", JSON.stringify(liveUpcoming));
+        localStorage.setItem("ct_v392_live_now", JSON.stringify(liveNow));
+        localStorage.setItem("ct_v392_live_upcoming", JSON.stringify(liveUpcoming));
 
         rebuildMovieCatalog();
         updateCounts();

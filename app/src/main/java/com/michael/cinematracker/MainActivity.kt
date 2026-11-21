@@ -338,18 +338,57 @@ class MainActivity : AppCompatActivity() {
         @JavascriptInterface
         fun sendCustomNotification(title: String, body: String, posterUrl: String) {
             executor.execute {
-                var bitmap: Bitmap? = null
+                var rawBitmap: Bitmap? = null
+                var bannerBitmap: Bitmap? = null
+                var connection: HttpURLConnection? = null
                 try {
                     if (posterUrl.isNotEmpty()) {
                         val url = URL(posterUrl.replace("/w500/", "/w342/"))
-                        val connection = url.openConnection() as HttpURLConnection
-                        connection.doInput = true
-                        connection.connectTimeout = 5000
-                        connection.readTimeout = 5000
+                        connection = (url.openConnection() as HttpURLConnection).apply {
+                            doInput = true
+                            connectTimeout = 5000
+                            readTimeout = 5000
+                        }
                         connection.connect()
-                        bitmap = BitmapFactory.decodeStream(connection.inputStream)
+                        rawBitmap = BitmapFactory.decodeStream(connection.inputStream)
+                        if (rawBitmap != null) {
+                            val w = 640
+                            val h = 320
+                            val out = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+                            val canvas = android.graphics.Canvas(out)
+                            val bgPaint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
+                                shader = android.graphics.LinearGradient(
+                                    0f, 0f, w.toFloat(), h.toFloat(),
+                                    0xFF09090B.toInt(), 0xFF1F2430.toInt(),
+                                    android.graphics.Shader.TileMode.CLAMP
+                                )
+                            }
+                            canvas.drawRect(0f, 0f, w.toFloat(), h.toFloat(), bgPaint)
+                            val pH = 280f
+                            val pW = pH * (2f / 3f)
+                            val left = (w - pW) / 2f
+                            val top = (h - pH) / 2f
+                            val rect = android.graphics.RectF(left, top, left + pW, top + pH)
+                            val clipPath = android.graphics.Path().apply {
+                                addRoundRect(rect, 16f, 16f, android.graphics.Path.Direction.CW)
+                            }
+                            canvas.save()
+                            canvas.clipPath(clipPath)
+                            canvas.drawBitmap(rawBitmap, null, rect, android.graphics.Paint(android.graphics.Paint.FILTER_BITMAP_FLAG))
+                            canvas.restore()
+                            val borderPaint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
+                                color = 0x33FFFFFF
+                                style = android.graphics.Paint.Style.STROKE
+                                strokeWidth = 2f
+                            }
+                            canvas.drawRoundRect(rect, 16f, 16f, borderPaint)
+                            bannerBitmap = out
+                        }
                     }
-                } catch (_: Exception) {}
+                } catch (_: Exception) {
+                } finally {
+                    connection?.disconnect()
+                }
 
                 val intent = Intent(context, MainActivity::class.java).apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
@@ -364,15 +403,25 @@ class MainActivity : AppCompatActivity() {
 
                 val builder = NotificationCompat.Builder(context, CHANNEL_ID)
                     .setSmallIcon(R.drawable.ic_notification)
+                    .setColor(0xFF18181B.toInt())
+                    .setSubText("Jadwal Bioskop ID")
                     .setContentTitle(title)
                     .setContentText(body)
-                    .setStyle(NotificationCompat.BigTextStyle().bigText(body))
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
                     .setAutoCancel(true)
                     .setContentIntent(pendingIntent)
 
-                if (bitmap != null) {
-                    builder.setLargeIcon(bitmap)
+                if (rawBitmap != null && bannerBitmap != null) {
+                    builder.setLargeIcon(rawBitmap)
+                    builder.setStyle(
+                        NotificationCompat.BigPictureStyle()
+                            .bigPicture(bannerBitmap)
+                            .bigLargeIcon(null as Bitmap?)
+                            .setBigContentTitle(title)
+                            .setSummaryText(body)
+                    )
+                } else {
+                    builder.setStyle(NotificationCompat.BigTextStyle().bigText(body).setBigContentTitle(title))
                 }
 
                 val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

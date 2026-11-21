@@ -6,6 +6,12 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Canvas
+import android.graphics.LinearGradient
+import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.RectF
+import android.graphics.Shader
 import androidx.core.app.NotificationCompat
 import androidx.work.Worker
 import androidx.work.WorkerParameters
@@ -16,7 +22,6 @@ import java.net.URL
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
-import java.util.Locale
 
 class CinemaCheckWorker(
     private val appContext: Context,
@@ -34,7 +39,7 @@ class CinemaCheckWorker(
         return try {
             val today = LocalDate.now()
             val todayStr = today.toString()
-            val shortDateFmt = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+            val fullDateFmt = DateTimeFormatter.ofPattern("dd/MM/yyyy")
             val notifiedIds = prefs.getStringSet("notified_movie_ids", emptySet())?.toMutableSet()
                 ?: mutableSetOf()
             val customPosters = try { JSONObject(customPostersJson) } catch (_: Exception) { JSONObject() }
@@ -61,15 +66,16 @@ class CinemaCheckWorker(
                 val daysUntil = ChronoUnit.DAYS.between(today, relDate)
                 val defaultPoster = movieData.optString("poster", "")
                 val chosenPoster = customPosters.optString(wId, defaultPoster)
-                val prettyDate = relDate.format(shortDateFmt)
+                val prettyDate = relDate.format(fullDateFmt)
 
                 if (dayAlert && daysUntil == 0L) {
                     val key = "wl_day0_${wId}_$releaseDateStr"
                     if (!notifiedIds.contains(key)) {
                         sendMovieNotification(
                             key.hashCode(),
-                            "$title • Tayang Hari Ini",
-                            "Sudah tayang di bioskop Indonesia.",
+                            "Tayang Hari Ini",
+                            title,
+                            "Resmi tayang di bioskop Indonesia hari ini ($prettyDate).",
                             chosenPoster
                         )
                         notifiedIds.add(key)
@@ -80,7 +86,8 @@ class CinemaCheckWorker(
                     if (!notifiedIds.contains(key)) {
                         sendMovieNotification(
                             key.hashCode(),
-                            "$title • Tayang Besok",
+                            "Tayang Besok • H-1",
+                            title,
                             "Mulai tayang di bioskop besok ($prettyDate).",
                             chosenPoster
                         )
@@ -92,8 +99,9 @@ class CinemaCheckWorker(
                     if (!notifiedIds.contains(key)) {
                         sendMovieNotification(
                             key.hashCode(),
-                            "$title • Tiket Pre-Sale Dibuka",
-                            "Rilis $prettyDate (H-$daysUntil). Tiket sudah mulai dibuka.",
+                            "Tiket Pre-Sale Dibuka",
+                            title,
+                            "Rilis $prettyDate (H-$daysUntil). Tiket mulai tersedia.",
                             chosenPoster
                         )
                         notifiedIds.add(key)
@@ -140,11 +148,12 @@ class CinemaCheckWorker(
                     val defaultPoster = if (posterPath.isNotEmpty()) "https://image.tmdb.org/t/p/w500$posterPath" else ""
                     val chosenPoster = customPosters.optString("search_$tmdbId", "")
                         .ifEmpty { customPosters.optString("tmdb_$tmdbId", defaultPoster) }
-                    val parsedDate = try { LocalDate.parse(idReleaseDate).format(shortDateFmt) } catch (_: Exception) { idReleaseDate }
+                    val parsedDate = try { LocalDate.parse(idReleaseDate).format(fullDateFmt) } catch (_: Exception) { idReleaseDate }
                     sendMovieNotification(
                         notifyKey.hashCode(),
-                        "$title • Resmi Masuk Indo",
-                        "Jadwal tayang bioskop Indonesia: $parsedDate.",
+                        "Resmi Masuk Indonesia",
+                        title,
+                        "Jadwal tayang bioskop: $parsedDate.",
                         chosenPoster
                     )
                     notifiedIds.add(notifyKey)
@@ -152,7 +161,7 @@ class CinemaCheckWorker(
                 }
             }
 
-            // 3. Scan Upcoming Indonesian theatrical releases (including re-releases via region=ID)
+            // 3. Scan High-Hype Theatrical Indonesian Releases (strict theatrical filter)
             val endpoint = "https://api.themoviedb.org/3/discover/movie?api_key=$apiKey" +
                 "&region=ID&with_release_type=2|3" +
                 "&release_date.gte=$todayStr&sort_by=popularity.desc&page=1"
@@ -168,19 +177,31 @@ class CinemaCheckWorker(
                     val releaseDate = item.optString("release_date", "")
                     val posterPath = item.optString("poster_path", "")
 
-                    if (releaseDate.isEmpty() || releaseDate < todayStr) continue
+                    if (releaseDate.isEmpty() || releaseDate < todayStr || posterPath.isEmpty()) continue
 
                     val popularity = item.optDouble("popularity", 0.0)
+                    if (popularity < 5.0) continue
+
+                    val genreIds = item.optJSONArray("genre_ids")
+                    var isDoc = false
+                    if (genreIds != null) {
+                        for (g in 0 until genreIds.length()) {
+                            if (genreIds.optInt(g) == 99) isDoc = true
+                        }
+                    }
+                    if (isDoc && popularity < 12.0) continue
+
                     val hypeScore = Math.min(98, Math.max(75, Math.round(74 + Math.min(24.0, popularity / 4.0)).toInt()))
 
                     if (hypeScore >= minHype && !notifiedIds.contains(id)) {
-                        val defaultPoster = if (posterPath.isNotEmpty()) "https://image.tmdb.org/t/p/w500$posterPath" else ""
+                        val defaultPoster = "https://image.tmdb.org/t/p/w500$posterPath"
                         val chosenPoster = customPosters.optString("tmdb_$id", defaultPoster)
-                        val parsedDate = try { LocalDate.parse(releaseDate).format(shortDateFmt) } catch (_: Exception) { releaseDate }
+                        val parsedDate = try { LocalDate.parse(releaseDate).format(fullDateFmt) } catch (_: Exception) { releaseDate }
                         sendMovieNotification(
                             id.hashCode(),
-                            "$title • Masuk Jadwal Indo",
-                            "Tayang mulai $parsedDate • Hype $hypeScore%.",
+                            "Jadwal Bioskop ID • Hype $hypeScore%",
+                            title,
+                            "Mulai tayang $parsedDate di bioskop Indonesia.",
                             chosenPoster
                         )
                         notifiedIds.add(id)
@@ -217,8 +238,54 @@ class CinemaCheckWorker(
         }
     }
 
-    private fun sendMovieNotification(notificationId: Int, title: String, bodyText: String, posterUrl: String) {
-        var bitmap: Bitmap? = null
+    private fun buildFramedPosterBanner(rawPoster: Bitmap): Bitmap {
+        val width = 640
+        val height = 320
+        val out = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(out)
+
+        val bgPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            shader = LinearGradient(
+                0f, 0f, width.toFloat(), height.toFloat(),
+                0xFF09090B.toInt(), 0xFF1F2430.toInt(),
+                Shader.TileMode.CLAMP
+            )
+        }
+        canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), bgPaint)
+
+        val posterH = 280f
+        val posterW = posterH * (2f / 3f)
+        val left = (width - posterW) / 2f
+        val top = (height - posterH) / 2f
+        val rect = RectF(left, top, left + posterW, top + posterH)
+
+        val borderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = 0x33FFFFFF
+            style = Paint.Style.STROKE
+            strokeWidth = 2f
+        }
+
+        val clipPath = Path().apply {
+            addRoundRect(rect, 16f, 16f, Path.Direction.CW)
+        }
+        canvas.save()
+        canvas.clipPath(clipPath)
+        canvas.drawBitmap(rawPoster, null, rect, Paint(Paint.FILTER_BITMAP_FLAG))
+        canvas.restore()
+        canvas.drawRoundRect(rect, 16f, 16f, borderPaint)
+
+        return out
+    }
+
+    private fun sendMovieNotification(
+        notificationId: Int,
+        subLabel: String,
+        movieTitle: String,
+        bodyText: String,
+        posterUrl: String
+    ) {
+        var rawBitmap: Bitmap? = null
+        var bannerBitmap: Bitmap? = null
         var conn: HttpURLConnection? = null
         try {
             if (posterUrl.isNotEmpty()) {
@@ -229,7 +296,10 @@ class CinemaCheckWorker(
                     readTimeout = 5000
                 }
                 conn.connect()
-                bitmap = BitmapFactory.decodeStream(conn.inputStream)
+                rawBitmap = BitmapFactory.decodeStream(conn.inputStream)
+                if (rawBitmap != null) {
+                    bannerBitmap = buildFramedPosterBanner(rawBitmap)
+                }
             }
         } catch (_: Exception) {
         } finally {
@@ -248,15 +318,25 @@ class CinemaCheckWorker(
 
         val builder = NotificationCompat.Builder(appContext, MainActivity.CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle(title)
+            .setColor(0xFF18181B.toInt())
+            .setSubText(subLabel)
+            .setContentTitle(movieTitle)
             .setContentText(bodyText)
-            .setStyle(NotificationCompat.BigTextStyle().bigText(bodyText).setBigContentTitle(title))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
 
-        if (bitmap != null) {
-            builder.setLargeIcon(bitmap)
+        if (rawBitmap != null && bannerBitmap != null) {
+            builder.setLargeIcon(rawBitmap)
+            builder.setStyle(
+                NotificationCompat.BigPictureStyle()
+                    .bigPicture(bannerBitmap)
+                    .bigLargeIcon(null as Bitmap?)
+                    .setBigContentTitle(movieTitle)
+                    .setSummaryText(bodyText)
+            )
+        } else {
+            builder.setStyle(NotificationCompat.BigTextStyle().bigText(bodyText).setBigContentTitle(movieTitle))
         }
 
         val manager = appContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
