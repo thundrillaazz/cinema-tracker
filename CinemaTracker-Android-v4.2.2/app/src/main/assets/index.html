@@ -2589,7 +2589,7 @@
         .filter(m => !m.tba && m.releaseDate && m.releaseDate !== "TBA")
         .map(m => {
           const d = getDaysUntil(m.releaseDate);
-          const inWl = Boolean(watchlistMap[m.id] && watchlistMap[m.id].watchStatus !== "watched");
+          const inWl = Boolean(watchlistMap[m.id] );
           return { movie: m, daysUntil: d, inWatchlist: inWl };
         })
         .filter(item => item.daysUntil !== null && item.daysUntil >= -1 && item.daysUntil <= 7 && (item.inWatchlist || (item.movie.hype || 0) >= 85))
@@ -3046,6 +3046,16 @@
       else btnEl.removeAttribute("data-saved");
       if (mode === "search") btnEl.textContent = isActive ? "✓ Di Watchlist" : "+ Watchlist";
       void btnEl.offsetHeight;
+    }
+
+    function setSearchButtonVisual(btn, isSaved) {
+      if (!btn) return;
+      btn.classList.toggle("active", isSaved);
+      btn.setAttribute("aria-pressed", isSaved ? "true" : "false");
+      if (isSaved) btn.setAttribute("data-saved", "1");
+      else btn.removeAttribute("data-saved");
+      btn.textContent = isSaved ? "✓ Di Watchlist" : "+ Watchlist";
+      void btn.offsetHeight;
     }
 
     function syncWatchButtonsInDom() {
