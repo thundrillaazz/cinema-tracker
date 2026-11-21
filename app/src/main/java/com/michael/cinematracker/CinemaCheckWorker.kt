@@ -16,13 +16,17 @@ import java.net.URL
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
-class CinemaCheckWorker(appContext: Context, workerParams: WorkerParameters) : CoroutineWorker(appContext, workerParams) {
+class CinemaCheckWorker(
+    appContext: Context,
+    workerParams: WorkerParameters
+) : CoroutineWorker(appContext, workerParams) {
+
     companion object {
-        const val PREFS_NAME = "cinema_tracker_prefs"
+        const val PREFS_NAME = "cinema_tracker_v50_prefs"
         const val KEY_WATCHLIST = "watchlist_json"
         const val KEY_TBA = "tba_json"
         const val KEY_API_KEY = "tmdb_api_key"
-        const val CHANNEL_ID = "cinema_tracker_alerts"
+        const val CHANNEL_ID = "cinema_tracker_radar_alerts"
     }
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
@@ -35,14 +39,24 @@ class CinemaCheckWorker(appContext: Context, workerParams: WorkerParameters) : C
 
         try {
             val today = LocalDate.now()
+
             val tbaList = JSONArray(tbaRaw)
             for (i in 0 until tbaList.length()) {
                 val item = tbaList.getJSONObject(i)
                 val movieId = item.optInt("id", 0)
                 val title = item.optString("title", "Film TBA")
                 if (movieId == 0) continue
+
                 val idDate = fetchIndonesiaReleaseDate(movieId, apiKey)
-                if (!idDate.isNullOrBlank()) notifyOnce(prefs, movieId, "tba_indo_$idDate", "TBA Masuk Jadwal Indo: $title", "Jadwal tayang bioskop Indonesia terkonfirmasi: $idDate.")
+                if (!idDate.isNullOrBlank()) {
+                    notifyOnce(
+                        prefs,
+                        movieId,
+                        "tba_indo_$idDate",
+                        "TBA Masuk Jadwal Indo: $title",
+                        "Jadwal tayang bioskop Indonesia terkonfirmasi: $idDate."
+                    )
+                }
             }
 
             val watchlist = JSONArray(watchlistRaw)
@@ -56,17 +70,44 @@ class CinemaCheckWorker(appContext: Context, workerParams: WorkerParameters) : C
 
                 var releaseDate = item.optString("release_date", "")
                 val refreshed = fetchIndonesiaReleaseDate(movieId, apiKey)
-                if (!refreshed.isNullOrBlank()) releaseDate = refreshed
+                if (!refreshed.isNullOrBlank()) {
+                    releaseDate = refreshed
+                }
 
                 if (releaseDate.length >= 10) {
                     val target = LocalDate.parse(releaseDate.substring(0, 10))
                     val days = ChronoUnit.DAYS.between(today, target)
 
-                    if (days == 7L && notifyPresale) notifyOnce(prefs, movieId, "presale_$releaseDate", "Open Pre-Sale: $title", "Tayang $releaseDate. Cek presale tiket bioskop sekarang!")
-                    if (days == 1L && notifyH1) notifyOnce(prefs, movieId, "h1_$releaseDate", "Besok Tayang (H-1): $title", "$title mulai tayang besok di bioskop Indonesia.")
-                    if (days == 0L && notifyH0) notifyOnce(prefs, movieId, "h0_$releaseDate", "Hari Perdana: $title", "$title resmi tayang hari ini di bioskop.")
+                    if (days == 7L && notifyPresale) {
+                        notifyOnce(
+                            prefs,
+                            movieId,
+                            "presale_$releaseDate",
+                            "Open Pre-Sale Radar: $title",
+                            "Tayang $releaseDate di bioskop ID. Pantau presale tiket XXI, CGV & Cinépolis."
+                        )
+                    }
+                    if (days == 1L && notifyH1) {
+                        notifyOnce(
+                            prefs,
+                            movieId,
+                            "h1_$releaseDate",
+                            "Besok Tayang (H-1): $title",
+                            "$title mulai tayang besok di bioskop Indonesia."
+                        )
+                    }
+                    if (days == 0L && notifyH0) {
+                        notifyOnce(
+                            prefs,
+                            movieId,
+                            "h0_$releaseDate",
+                            "Hari Perdana (Hari-H): $title",
+                            "$title resmi tayang hari ini di bioskop."
+                        )
+                    }
                 }
             }
+
             Result.success()
         } catch (_: Exception) {
             Result.retry()
@@ -75,7 +116,10 @@ class CinemaCheckWorker(appContext: Context, workerParams: WorkerParameters) : C
 
     private fun fetchIndonesiaReleaseDate(movieId: Int, apiKey: String): String? {
         val urlStr = "https://api.themoviedb.org/3/movie/$movieId/release_dates?api_key=$apiKey"
-        val conn = (URL(urlStr).openConnection() as HttpURLConnection).apply { connectTimeout = 8000; readTimeout = 8000 }
+        val conn = (URL(urlStr).openConnection() as HttpURLConnection).apply {
+            connectTimeout = 6000
+            readTimeout = 6000
+        }
         return try {
             if (conn.responseCode != 200) return null
             val body = conn.inputStream.bufferedReader().use { it.readText() }
@@ -86,10 +130,15 @@ class CinemaCheckWorker(appContext: Context, workerParams: WorkerParameters) : C
                     val dates = country.optJSONArray("release_dates") ?: continue
                     for (j in 0 until dates.length()) {
                         val d = dates.getJSONObject(j)
-                        if (d.optInt("type", 0) == 3 || d.optInt("type", 0) == 2) {
+                        val type = d.optInt("type", 0)
+                        if (type == 3 || type == 2) {
                             val date = d.optString("release_date").take(10)
                             if (date.isNotBlank()) return date
                         }
+                    }
+                    if (dates.length() > 0) {
+                        val date = dates.getJSONObject(0).optString("release_date").take(10)
+                        if (date.isNotBlank()) return date
                     }
                 }
             }
@@ -99,12 +148,25 @@ class CinemaCheckWorker(appContext: Context, workerParams: WorkerParameters) : C
         }
     }
 
-    private fun notifyOnce(prefs: android.content.SharedPreferences, movieId: Int, tag: String, title: String, message: String) {
+    private fun notifyOnce(
+        prefs: android.content.SharedPreferences,
+        movieId: Int,
+        tag: String,
+        title: String,
+        message: String
+    ) {
         val key = "alert_${movieId}_$tag"
         if (prefs.getBoolean(key, false)) return
 
-        val intent = Intent(applicationContext, MainActivity::class.java).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP }
-        val pi = PendingIntent.getActivity(applicationContext, movieId, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        val intent = Intent(applicationContext, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+        val pi = PendingIntent.getActivity(
+            applicationContext,
+            movieId,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
 
         val manager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val notif = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
