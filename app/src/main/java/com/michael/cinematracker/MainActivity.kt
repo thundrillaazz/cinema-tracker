@@ -30,11 +30,15 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.FrameLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.work.Constraints
 import androidx.work.Data
@@ -54,6 +58,7 @@ import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var rootContainer: FrameLayout
     private lateinit var webView: WebView
     private val executor = Executors.newSingleThreadExecutor()
     private var isPageLoaded = false
@@ -67,6 +72,12 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
+        val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val initialDark = prefs.getBoolean("is_dark_theme", false)
+        val initialBarColor = if (initialDark) Color.parseColor("#09090B") else Color.parseColor("#FFFFFF")
+        val initialPageBg = if (initialDark) Color.parseColor("#09090B") else Color.parseColor("#F8FAFC")
 
         createNotificationChannels()
         requestNotificationPermissionIfNeeded()
@@ -74,7 +85,7 @@ class MainActivity : AppCompatActivity() {
         captureDeepLinkIntent(intent)
 
         webView = WebView(this).apply {
-            setBackgroundColor(Color.parseColor("#F8FAFC"))
+            setBackgroundColor(initialPageBg)
             settings.javaScriptEnabled = true
             settings.domStorageEnabled = true
             settings.loadsImagesAutomatically = true
@@ -108,7 +119,30 @@ class MainActivity : AppCompatActivity() {
             loadUrl("file:///android_asset/index.html")
         }
 
-        setContentView(webView)
+        rootContainer = FrameLayout(this).apply {
+            setBackgroundColor(initialBarColor)
+            addView(
+                webView,
+                FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT,
+                    FrameLayout.LayoutParams.MATCH_PARENT
+                )
+            )
+        }
+
+        ViewCompat.setOnApplyWindowInsetsListener(rootContainer) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or
+                    WindowInsetsCompat.Type.displayCutout() or
+                    WindowInsetsCompat.Type.ime()
+            )
+            view.setPadding(insets.left, insets.top, insets.right, insets.bottom)
+            WindowInsetsCompat.CONSUMED
+        }
+
+        setContentView(rootContainer)
+        ViewCompat.requestApplyInsets(rootContainer)
+        applySystemBarAppearance(initialDark)
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -262,21 +296,34 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun applySystemBarAppearance(isDark: Boolean) {
+        val barColor = if (isDark) Color.parseColor("#09090B") else Color.parseColor("#FFFFFF")
+        val pageBg = if (isDark) Color.parseColor("#09090B") else Color.parseColor("#F8FAFC")
+        if (::rootContainer.isInitialized) {
+            rootContainer.setBackgroundColor(barColor)
+        }
+        @Suppress("DEPRECATION")
+        window.statusBarColor = barColor
+        @Suppress("DEPRECATION")
+        window.navigationBarColor = barColor
+        if (::webView.isInitialized) {
+            webView.setBackgroundColor(pageBg)
+        }
+        val controller = WindowInsetsControllerCompat(window, window.decorView)
+        controller.isAppearanceLightStatusBars = !isDark
+        controller.isAppearanceLightNavigationBars = !isDark
+    }
+
     inner class AndroidBridge(private val context: Context) {
 
         @JavascriptInterface
         fun setSystemBarTheme(isDark: Boolean) {
+            context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+                .edit()
+                .putBoolean("is_dark_theme", isDark)
+                .apply()
             runOnUiThread {
-                val bgColor = if (isDark) Color.parseColor("#09090B") else Color.parseColor("#FFFFFF")
-                val pageBg = if (isDark) Color.parseColor("#09090B") else Color.parseColor("#F8FAFC")
-                window.statusBarColor = bgColor
-                window.navigationBarColor = bgColor
-                if (::webView.isInitialized) {
-                    webView.setBackgroundColor(pageBg)
-                }
-                val controller = WindowInsetsControllerCompat(window, window.decorView)
-                controller.isAppearanceLightStatusBars = !isDark
-                controller.isAppearanceLightNavigationBars = !isDark
+                applySystemBarAppearance(isDark)
             }
         }
 

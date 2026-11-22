@@ -22,6 +22,10 @@
       --emerald-soft: #dcfce7;
       --amber: #b45309;
       --amber-soft: #fef3c7;
+      --gold: #f59e0b;
+      --gold-border: #d97706;
+      --gold-text: #92400e;
+      --gold-soft: rgba(245, 158, 11, 0.14);
       --danger-text: #be123c;
     }
 
@@ -42,6 +46,10 @@
       --emerald-soft: rgba(52, 211, 153, 0.14);
       --amber: #fbbf24;
       --amber-soft: rgba(251, 191, 36, 0.14);
+      --gold: #fbbf24;
+      --gold-border: #f59e0b;
+      --gold-text: #fcd34d;
+      --gold-soft: rgba(251, 191, 36, 0.15);
       --danger-text: #fb7185;
     }
 
@@ -338,14 +346,14 @@
     }
     .heart-btn:active { transform: scale(0.9); }
     .heart-btn.active {
-      background: #e11d48;
-      border-color: #fda4af;
-      color: #ffffff;
-      box-shadow: 0 2px 10px rgba(225, 29, 72, 0.45);
+      background: #f59e0b;
+      border-color: #fde68a;
+      color: #09090b;
+      box-shadow: 0 2px 10px rgba(245, 158, 11, 0.42);
       transform: scale(1.04);
     }
     .heart-btn svg { width: 16px; height: 16px; stroke: currentColor; stroke-width: 2.2; fill: none; pointer-events: none; }
-    .heart-btn.active svg { fill: #ffffff; stroke: #ffffff; }
+    .heart-btn.active svg { fill: #09090b; stroke: #09090b; }
 
     .card-info {
       padding: 10px;
@@ -497,27 +505,59 @@
       overflow: hidden;
     }
     .wl-release-row {
-      margin-top: 6px;
+      margin-top: 7px;
+      padding: 6px 9px;
+      border-radius: 9px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
       display: flex;
       align-items: center;
-      gap: 7px;
+      justify-content: space-between;
+      gap: 8px;
       flex-wrap: wrap;
       cursor: pointer;
     }
     .wl-countdown-pill {
-      padding: 2px 8px;
+      padding: 3px 9px;
       border-radius: 6px;
-      font-size: 11px;
-      font-weight: 700;
+      font-size: 11.5px;
+      font-weight: 800;
+      letter-spacing: 0.01em;
       white-space: nowrap;
       font-variant-numeric: tabular-nums;
+      border: 1px solid transparent;
     }
-    .wl-countdown-pill.now { background: var(--emerald-soft); color: var(--emerald); }
-    .wl-countdown-pill.soon { background: var(--blue-soft); color: var(--blue); }
-    .wl-countdown-pill.muted { background: var(--surface-2); color: var(--muted); }
+    .wl-countdown-pill.now {
+      background: var(--emerald-soft);
+      color: var(--emerald);
+      border-color: rgba(21, 128, 61, 0.22);
+    }
+    html[data-theme="dark"] .wl-countdown-pill.now {
+      border-color: rgba(52, 211, 153, 0.28);
+    }
+    .wl-countdown-pill.soon {
+      background: var(--blue-soft);
+      color: var(--blue);
+      border-color: var(--blue-border);
+    }
+    .wl-countdown-pill.scheduled {
+      background: var(--surface);
+      color: var(--text);
+      border-color: var(--border);
+    }
+    .wl-countdown-pill.tba {
+      background: var(--amber-soft);
+      color: var(--amber);
+      border-color: rgba(180, 83, 9, 0.24);
+    }
+    .wl-countdown-pill.muted {
+      background: var(--surface);
+      color: var(--text);
+      border-color: var(--border);
+    }
     .wl-date-primary {
-      font-size: 12px;
-      font-weight: 600;
+      font-size: 12.5px;
+      font-weight: 700;
       color: var(--text);
       font-variant-numeric: tabular-nums;
     }
@@ -600,9 +640,9 @@
     }
     .toggle-pill:active { transform: scale(0.95); }
     .toggle-pill.active {
-      background: #e11d48;
-      border-color: #f43f5e;
-      color: #ffffff;
+      background: var(--gold);
+      border-color: var(--gold-border);
+      color: #09090b;
     }
     .ghost-remove-btn {
       width: 28px;
@@ -1376,9 +1416,9 @@
       touch-action: manipulation;
     }
     .cal-action-btn.saved {
-      background: #e11d48;
-      border-color: #f43f5e;
-      color: #ffffff;
+      background: var(--gold);
+      border-color: var(--gold-border);
+      color: #09090b;
     }
     .api-status-text {
       font-size: 11px;
@@ -1418,12 +1458,9 @@
     }
     .btn-watch-detail:active { transform: scale(0.98); }
     .btn-watch-detail.saved {
-      background: rgba(225, 29, 72, 0.12);
-      border-color: rgba(244, 63, 94, 0.55);
-      color: #e11d48;
-    }
-    html[data-theme="dark"] .btn-watch-detail.saved {
-      color: #fb7185;
+      background: var(--gold-soft);
+      border-color: var(--gold-border);
+      color: var(--gold-text);
     }
     .btn-watch-detail-left {
       display: inline-flex;
@@ -1913,6 +1950,7 @@
     let isSyncing = false;
     let lastManualSyncAt = 0;
     let activePosterModalMovieId = null;
+    let activeDetailMovieId = null;
     let toastTimer = null;
     let lastRemovedWatchItem = null;
     let catalogQuickQuery = "";
@@ -1943,7 +1981,6 @@
         if (!withUndo) lastRemovedWatchItem = null;
       }, withUndo ? 3600 : 2400);
     }
-    window.showToast = (msg) => showToast(msg, false);
 
     function normalizeKey(str) {
       return (str || "").toLowerCase().replace(/[^a-z0-9]/g, "");
@@ -3032,6 +3069,15 @@
         btn.setAttribute("aria-pressed", active ? "true" : "false");
         btn.textContent = active ? "✓ Di Watchlist" : "+ Simpan ke Watchlist";
       });
+
+      document.querySelectorAll("#calAgendaList [data-watch-id]").forEach(btn => {
+        const mid = btn.getAttribute("data-watch-id");
+        const m = allMovies.find(item => item.id === mid) || { id: mid };
+        const active = Boolean(findWatchlistKey(m));
+        btn.classList.toggle("saved", active);
+        btn.setAttribute("aria-pressed", active ? "true" : "false");
+        btn.textContent = active ? "✓ Di Watchlist" : "+ Watchlist";
+      });
     }
 
     function toggleWatch(id) {
@@ -3039,10 +3085,13 @@
       if (!m) return;
 
       const matchedKey = findWatchlistKey(m);
+      let toastMsg = "";
+      let toastUndo = false;
       if (matchedKey) {
         lastRemovedWatchItem = { id: matchedKey, entry: { ...watchlistMap[matchedKey] } };
         delete watchlistMap[matchedKey];
-        showToast("Dihapus dari Watchlist", true);
+        toastMsg = "Dihapus dari Watchlist";
+        toastUndo = true;
       } else {
         const effPoster = getEffectivePoster(m);
         const resolvedTmdb = getMovieCanonicalTmdbId(m);
@@ -3055,7 +3104,7 @@
           lastKnownReleaseDate: m.releaseDate,
           movieData: { ...m, tmdbId: resolvedTmdb || m.tmdbId, poster: effPoster }
         };
-        showToast(m.tba ? "Disimpan ke Watchlist (Menunggu ID)" : "Disimpan ke Watchlist");
+        toastMsg = m.tba ? "Disimpan ke Watchlist (Menunggu ID)" : "Disimpan ke Watchlist";
       }
       persistWatchlist();
       syncWatchButtonsInDom();
@@ -3063,6 +3112,7 @@
       syncWatchlistToNative();
       if (activeBottomTab === "watchlist") renderWatchlist();
       if (activeBottomTab === "calendar") renderCalendar();
+      showToast(toastMsg, toastUndo);
     }
 
     function undoLastWatchlistRemove() {
@@ -3076,13 +3126,19 @@
       syncWatchlistToNative();
       if (activeBottomTab === "watchlist") renderWatchlist();
       if (activeBottomTab === "calendar") renderCalendar();
+      if (activeDetailMovieId && document.getElementById("detailOverlay").classList.contains("open")) {
+        const dm = allMovies.find(item => item.id === activeDetailMovieId) || (watchlistMap[activeDetailMovieId] && watchlistMap[activeDetailMovieId].movieData);
+        if (dm) renderDetailHtml(dm);
+      }
     }
 
     function syncWatchlistToNative() {
-      const tbaJson = getTbaTmdbIdsJson();
-      if (window.AndroidBridge && typeof window.AndroidBridge.updateTbaWatchlistJson === "function") {
-        window.AndroidBridge.updateTbaWatchlistJson(tbaJson);
-      }
+      try {
+        const tbaJson = getTbaTmdbIdsJson();
+        if (window.AndroidBridge && typeof window.AndroidBridge.updateTbaWatchlistJson === "function") {
+          window.AndroidBridge.updateTbaWatchlistJson(tbaJson);
+        }
+      } catch (_) {}
     }
 
     function clearGlobalSearch() {
@@ -3347,12 +3403,15 @@
         normalizeKey(m.title) === normalizeKey(movieObj.title)
       );
       const saveTarget = canonical || movieObj;
-      const matchedKey = findWatchlistKey(movieObj);
+      const matchedKey = findWatchlistKey(saveTarget) || findWatchlistKey(movieObj);
 
+      let toastMsg = "";
+      let toastUndo = false;
       if (matchedKey) {
         lastRemovedWatchItem = { id: matchedKey, entry: { ...watchlistMap[matchedKey] } };
         delete watchlistMap[matchedKey];
-        showToast("Dihapus dari Watchlist", true);
+        toastMsg = "Dihapus dari Watchlist";
+        toastUndo = true;
       } else {
         const effPoster = getEffectivePoster(saveTarget) || movieObj.poster;
         const resolvedTmdb = getMovieCanonicalTmdbId(saveTarget) || data.tmdbId || 0;
@@ -3366,7 +3425,7 @@
           movieData: { ...saveTarget, tmdbId: resolvedTmdb, poster: effPoster }
         };
         if (!allMovies.some(m => m.id === saveTarget.id)) allMovies.push(saveTarget);
-        showToast(saveTarget.tba ? "Disimpan ke Watchlist (Menunggu ID)" : "Disimpan ke Watchlist");
+        toastMsg = saveTarget.tba ? "Disimpan ke Watchlist (Menunggu ID)" : "Disimpan ke Watchlist";
       }
       persistWatchlist();
       syncWatchButtonsInDom();
@@ -3374,6 +3433,7 @@
       syncWatchlistToNative();
       if (activeBottomTab === "watchlist") renderWatchlist();
       if (activeBottomTab === "calendar") renderCalendar();
+      showToast(toastMsg, toastUndo);
     }
 
     async function openLetterboxd(id) {
@@ -3724,6 +3784,7 @@
       }
       if (!m) return;
 
+      activeDetailMovieId = m.id;
       renderDetailHtml(m);
       document.getElementById("detailOverlay").classList.add("open");
 
@@ -3746,11 +3807,12 @@
               creditsCache[m.id] = { director: m.director, cast: m.cast, runtime: m.runtime };
               creditsCache = pruneCache(creditsCache, 120);
               localStorage.setItem("ct_v37_credits_cache", JSON.stringify(creditsCache));
-              if (watchlistMap[m.id]) {
-                watchlistMap[m.id].movieData = { ...m };
+              const wKey = findWatchlistKey(m);
+              if (wKey && watchlistMap[wKey]) {
+                watchlistMap[wKey].movieData = { ...m, id: wKey };
                 persistWatchlist();
               }
-              if (document.getElementById("detailOverlay").classList.contains("open")) {
+              if (activeDetailMovieId === m.id && document.getElementById("detailOverlay").classList.contains("open")) {
                 renderDetailHtml(m);
               }
             }
@@ -3760,6 +3822,7 @@
     }
 
     function closeDetail() {
+      activeDetailMovieId = null;
       document.getElementById("detailOverlay").classList.remove("open");
     }
 
@@ -4040,10 +4103,16 @@
         const safeTitle = escapeHtml(m.title);
         const h1On = isH1Enabled(cfg);
         const cd = getCountdownInfo(m.releaseDate, cfg.isTba);
-        const pillTone = cd.tone === "now" ? "now" : cd.tone === "soon" ? "soon" : "muted";
+        const pillTone = cfg.isTba
+          ? "tba"
+          : cd.tone === "now"
+          ? "now"
+          : cd.tone === "soon"
+          ? "soon"
+          : "scheduled";
         const pillLabel = cd.label === "Tayang" ? "Sedang Tayang" : cd.label;
         const datePrimaryText = cfg.isTba
-          ? (m.releaseDate && m.releaseDate !== "TBA" ? `Rilis global ${formatShortDate(m.releaseDate)}` : "Jadwal ID belum diumumkan")
+          ? (m.releaseDate && m.releaseDate !== "TBA" ? `Rilis global ${formatShortDate(m.releaseDate)}` : "Jadwal ID belum keluar")
           : formatHumanDate(m.releaseDate);
         const chainText = [...(m.chains || []), ...(m.imax ? ["IMAX"] : [])].join(" · ");
 
