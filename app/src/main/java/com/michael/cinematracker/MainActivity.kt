@@ -25,6 +25,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.webkit.JavascriptInterface
+import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
@@ -36,6 +37,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -53,6 +55,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.net.HttpURLConnection
 import java.net.URL
+import java.nio.charset.StandardCharsets
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
@@ -64,10 +67,19 @@ class MainActivity : AppCompatActivity() {
     private var isPageLoaded = false
     private var pendingMovieId: String? = null
     private var pendingTab: String? = null
+    private var fileChooserCallback: ValueCallback<Array<Uri>>? = null
 
     private val notificationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { _ -> }
+
+    private val fileChooserLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val uris = WebChromeClient.FileChooserParams.parseResult(result.resultCode, result.data)
+        fileChooserCallback?.onReceiveValue(uris)
+        fileChooserCallback = null
+    }
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -114,7 +126,30 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
-            webChromeClient = WebChromeClient()
+            webChromeClient = object : WebChromeClient() {
+                override fun onShowFileChooser(
+                    webView: WebView?,
+                    filePathCallback: ValueCallback<Array<Uri>>?,
+                    fileChooserParams: FileChooserParams?
+                ): Boolean {
+                    fileChooserCallback?.onReceiveValue(null)
+                    fileChooserCallback = filePathCallback
+                    return try {
+                        val intent = fileChooserParams?.createIntent()
+                            ?: Intent(Intent.ACTION_GET_CONTENT).apply {
+                                addCategory(Intent.CATEGORY_OPENABLE)
+                                type = "application/json"
+                            }
+                        fileChooserLauncher.launch(intent)
+                        true
+                    } catch (_: Exception) {
+                        fileChooserCallback?.onReceiveValue(null)
+                        fileChooserCallback = null
+                        showJsToast("Gunakan opsi tempel teks JSON backup")
+                        false
+                    }
+                }
+            }
             addJavascriptInterface(AndroidBridge(this@MainActivity), "AndroidBridge")
             loadUrl("file:///android_asset/index.html")
         }
@@ -639,6 +674,81 @@ class MainActivity : AppCompatActivity() {
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
                 context.startActivity(intent)
             } catch (_: Exception) {}
+        }
+
+        @JavascriptInterface
+        fun exportWatchlistBackup(jsonStr: String, fileName: String) {
+            val safeName = fileName.replace(Regex("[^a-zA-Z0-9._-]"), "_").ifEmpty {
+                "cinema_tracker_backup.json"
+            }
+            executor.execute {
+                try {
+                    val bytes = jsonStr.toByteArray(StandardCharsets.UTF_8)
+
+                    try {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                            val values = ContentValues().apply {
+                                put(MediaStore.Downloads.DISPLAY_NAME, safeName)
+                                put(MediaStore.Downloads.MIME_TYPE, "application/json")
+                                put(
+                                    MediaStore.Downloads.RELATIVE_PATH,
+                                    Environment.DIRECTORY_DOWNLOADS + "/CinemaTracker"
+                                )
+                                put(MediaStore.Downloads.IS_PENDING, 1)
+                            }
+                            val resolver = context.contentResolver
+                            val dlUri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values)
+                            if (dlUri != null) {
+                                resolver.openOutputStream(dlUri)?.use { it.write(bytes) }
+                                values.clear()
+                                values.put(MediaStore.Downloads.IS_PENDING, 0)
+                                resolver.update(dlUri, values, null, null)
+                            }
+                        } else if (ContextCompat.checkSelfPermission(
+                                context,
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE
+                            ) == PackageManager.PERMISSION_GRANTED
+                        ) {
+                            @Suppress("DEPRECATION")
+                            val dir = File(
+                                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+                                "CinemaTracker"
+                            )
+                            if (!dir.exists()) dir.mkdirs()
+                            FileOutputStream(File(dir, safeName)).use { it.write(bytes) }
+                        }
+                    } catch (_: Exception) {}
+
+                    val backupDir = File(context.cacheDir, "backups")
+                    if (!backupDir.exists()) backupDir.mkdirs()
+                    backupDir.listFiles()?.forEach { old -> if (old.name != safeName) old.delete() }
+                    val cacheFile = File(backupDir, safeName)
+                    FileOutputStream(cacheFile).use { it.write(bytes) }
+
+                    val shareUri = FileProvider.getUriForFile(
+                        context,
+                        "${context.packageName}.fileprovider",
+                        cacheFile
+                    )
+                    val sendIntent = Intent(Intent.ACTION_SEND).apply {
+                        type = "application/json"
+                        putExtra(Intent.EXTRA_STREAM, shareUri)
+                        putExtra(Intent.EXTRA_SUBJECT, "Backup Watchlist Cinema Tracker")
+                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    }
+                    val chooser = Intent.createChooser(sendIntent, "Simpan / Bagikan Backup Watchlist")
+                    runOnUiThread {
+                        try {
+                            context.startActivity(chooser)
+                            showJsToast("Backup siap disimpan")
+                        } catch (_: Exception) {
+                            showJsToast("Backup tersimpan di Downloads/CinemaTracker")
+                        }
+                    }
+                } catch (_: Exception) {
+                    showJsToast("Gagal membuat file backup")
+                }
+            }
         }
 
         @JavascriptInterface

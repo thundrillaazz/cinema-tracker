@@ -506,14 +506,16 @@
     }
     .wl-release-row {
       margin-top: 7px;
-      padding: 6px 9px;
-      border-radius: 9px;
+      padding: 5px 9px;
+      border-radius: 8px;
       background: var(--surface-2);
       border: 1px solid var(--border);
-      display: flex;
+      display: inline-flex;
+      width: fit-content;
+      max-width: 100%;
       align-items: center;
-      justify-content: space-between;
-      gap: 8px;
+      justify-content: flex-start;
+      gap: 10px;
       flex-wrap: wrap;
       cursor: pointer;
     }
@@ -1074,6 +1076,21 @@
       text-transform: uppercase;
     }
     .verify-date { font-size: 13.5px; font-weight: 700; color: var(--text); line-height: 1.3; font-variant-numeric: tabular-nums; }
+    .verify-primary-btn {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 9px 10px;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--text);
+      text-align: center;
+      cursor: pointer;
+      margin-bottom: 6px;
+      display: block;
+    }
+    .verify-primary-btn:active { transform: scale(0.98); }
     .quick-verify-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
     .verify-link-btn {
       background: var(--surface);
@@ -1081,11 +1098,12 @@
       border-radius: 8px;
       padding: 9px 4px;
       font-size: 11px;
-      font-weight: 700;
+      font-weight: 600;
       color: var(--text);
       text-align: center;
       cursor: pointer;
     }
+    .verify-link-btn:active { transform: scale(0.96); }
 
     .credits-block {
       background: var(--surface-2);
@@ -1290,10 +1308,29 @@
     .launcher-meta { min-width: 0; }
     .launcher-label { font-size: 12px; font-weight: 700; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .launcher-sub { font-size: 10.5px; color: var(--muted); line-height: 1.2; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .verify-link-btn.preferred {
-      background: var(--blue-soft);
-      border-color: var(--blue-border);
+    .backup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .backup-link-btn {
+      margin-top: 8px;
+      background: none;
+      border: none;
+      padding: 0;
       color: var(--blue);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .backup-textarea {
+      width: 100%;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 11.5px;
+      color: var(--text);
+      outline: none;
+      margin-top: 8px;
+      resize: vertical;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     }
     .digest-card {
       display: flex;
@@ -1500,7 +1537,7 @@
           </div>
           <div>
             <div class="brand-title">Cinema Tracker</div>
-            <div class="brand-sub">XXI · CGV · Cinépolis · IMAX</div>
+            <div class="brand-sub">Jadwal bioskop Indonesia</div>
           </div>
         </button>
         <div class="header-actions">
@@ -1529,7 +1566,7 @@
       <div class="filter-section">
         <div class="catalog-quick-search">
           <svg class="catalog-search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input id="catalogQuickInput" class="catalog-quick-input" type="text" placeholder="Filter judul, genre, atau jaringan..." oninput="onCatalogQuickFilter()" />
+          <input id="catalogQuickInput" class="catalog-quick-input" type="text" placeholder="Filter judul, sutradara, atau genre..." oninput="onCatalogQuickFilter()" />
           <button id="catalogClearBtn" type="button" class="catalog-clear-btn" aria-label="Hapus filter" onclick="clearCatalogQuickFilter()">✕</button>
         </div>
         <div class="chips-row">
@@ -1539,9 +1576,6 @@
           <button type="button" class="chip" data-chip="rerelease" onclick="setChip('rerelease', this)">Re-Release</button>
           <button type="button" class="chip" data-chip="hype" onclick="setChip('hype', this)">High Hype</button>
           <button type="button" class="chip" data-chip="imax" onclick="setChip('imax', this)">IMAX</button>
-          <button type="button" class="chip" data-chip="XXI" onclick="setChip('XXI', this)">XXI</button>
-          <button type="button" class="chip" data-chip="CGV" onclick="setChip('CGV', this)">CGV</button>
-          <button type="button" class="chip" data-chip="Cinépolis" onclick="setChip('Cinépolis', this)">Cinépolis</button>
         </div>
         <div class="controls-row">
           <label class="checkbox-label">
@@ -1631,6 +1665,7 @@
           <select id="wlSortSelect" class="sort-select" aria-label="Urutan watchlist" onchange="renderWatchlist()">
             <option value="date_asc">Urut: Rilis Terdekat</option>
             <option value="date_desc">Urut: Rilis Terjauh</option>
+            <option value="hype">Urut: Hype Tertinggi</option>
             <option value="title">Urut: Judul A–Z</option>
           </select>
         </div>
@@ -1689,13 +1724,33 @@
       </div>
 
       <div class="info-card">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:4px;">
+          <h3 style="margin:0;">Backup &amp; Pindah Perangkat</h3>
+          <span id="wlBackupCount" style="font-size:11px; font-weight:600; color:var(--muted); font-variant-numeric:tabular-nums;">0 film</span>
+        </div>
+        <p>Simpan file Watchlist ke Google Drive, Telegram, atau memori HP agar aman saat reset atau ganti perangkat.</p>
+        <div class="backup-grid">
+          <button type="button" class="btn-full" style="margin-top:0;" onclick="exportWatchlistBackup()">Simpan Backup</button>
+          <button type="button" class="btn-secondary-full" style="margin-top:0;" onclick="document.getElementById('importBackupFileInput').click()">Pulihkan File</button>
+        </div>
+        <input id="importBackupFileInput" type="file" accept=".json,application/json" aria-label="Pilih file backup Watchlist" style="display:none;" onchange="onImportBackupFileChange(this)" />
+        <button id="toggleBackupPasteBtn" type="button" class="backup-link-btn" onclick="toggleBackupPasteBox()">Atau tempel teks JSON backup</button>
+        <div id="backupPasteBox" style="display:none;">
+          <textarea id="backupPasteTextarea" class="backup-textarea" rows="3" placeholder="Tempel isi file .json di sini..." aria-label="Teks JSON backup"></textarea>
+          <button type="button" class="btn-full" style="background:var(--blue); color:#fff;" onclick="applyBackupFromPasteBox()">Terapkan Backup</button>
+        </div>
+        <p id="backupFeedback" style="margin-top:6px; margin-bottom:0; font-size:11.5px; font-weight:500; min-height:0;"></p>
+      </div>
+
+      <div class="info-card">
         <h3>Ikon Aplikasi</h3>
         <p>Pilih gaya ikon untuk header dan launcher Android.</p>
         <div id="launcherIconGrid" class="launcher-grid"></div>
       </div>
 
-      <div style="text-align:center; font-size:11px; color:var(--muted); padding:4px 0 12px;">
-        Cinema Tracker · Jadwal Bioskop Indonesia
+      <div style="text-align:center; font-size:11px; color:var(--muted); padding:4px 0 12px; line-height:1.5;">
+        <div>Cinema Tracker v4.2 (Stable) · Made by Thundrilla</div>
+        <div style="font-size:10px; opacity:0.75;">Jadwal Bioskop Indonesia</div>
       </div>
     </div>
   </div>
@@ -1795,135 +1850,135 @@
     const BASE_CURATED_MOVIES = [
       {
         id: "now_1", isIndonesian: true, title: "HAMKA: AWAL MULA (VOL. 3)", searchQuery: "Buya Hamka Vol 3",
-        releaseDate: "2026-11-12", confirmedText: "Tayang di XXI, CGV & Cinépolis",
-        presaleText: "Tiket tersedia di TIX ID, M-TIX & CGV.", sourceBadge: "LSF SU • XXI", age: "SU", runtime: "128m",
-        genre: "Biopic, Drama", hype: 88, rating: "8.8", presale: false, imax: false, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        releaseDate: "2026-11-12", confirmedText: "Sedang tayang di bioskop Indonesia",
+        presaleText: "Pantau ketersediaan jadwal & tiket di bioskop terdekat.", sourceBadge: "LSF SU", age: "SU", runtime: "128m",
+        genre: "Biopic, Drama", hype: 88, rating: "8.8", presale: false, imax: false, tba: false, chains: [],
         director: "Fajar Bustomi", cast: "Vino G. Bastian, Laudya Cynthia Bella", synopsis: "Babak penutup perjalanan hidup Buya Hamka.", poster: ""
       },
       {
         id: "now_2", isIndonesian: false, title: "THE HUNGER GAMES: SUNRISE ON THE REAPING", searchQuery: "Sunrise on the Reaping",
-        releaseDate: "2026-11-18", confirmedText: "Tayang di IMAX XXI, CGV & Cinépolis",
-        presaleText: "Tersedia format IMAX & Regular.", sourceBadge: "TMDB ID • IMAX", age: "R 13+", runtime: "144m",
-        genre: "Action, Fantasy", hype: 96, rating: "9.4", presale: false, imax: true, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        releaseDate: "2026-11-18", confirmedText: "Sedang tayang di bioskop Indonesia",
+        presaleText: "Tersedia format IMAX & Regular.", sourceBadge: "TMDB ID · IMAX", age: "R 13+", runtime: "144m",
+        genre: "Action, Fantasy", hype: 96, rating: "9.4", presale: false, imax: true, tba: false, chains: [],
         director: "Francis Lawrence", cast: "Joseph Zada, Whitney Peak", synopsis: "Kisah Quarter Quell ke-50 Haymitch Abernathy.", poster: ""
       },
       {
         id: "now_3", isIndonesian: false, title: "LOOK BACK (LIVE-ACTION)", searchQuery: "Look Back",
-        releaseDate: "2026-11-11", confirmedText: "Tayang di CGV & Cinépolis",
-        presaleText: "Tersedia di jaringan CGV & Cinépolis.", sourceBadge: "CGV ID • Cinépolis", age: "R 13+", runtime: "110m",
-        genre: "Drama", hype: 95, rating: "9.3", presale: false, imax: false, tba: false, chains: ["CGV", "Cinépolis"],
+        releaseDate: "2026-11-11", confirmedText: "Sedang tayang di bioskop Indonesia",
+        presaleText: "Pantau ketersediaan jadwal & tiket di bioskop terdekat.", sourceBadge: "TMDB ID", age: "R 13+", runtime: "110m",
+        genre: "Drama", hype: 95, rating: "9.3", presale: false, imax: false, tba: false, chains: [],
         director: "Hirokazu Kore-eda", cast: "Mana Ashida, Mizuki Yoshida", synopsis: "Adaptasi live-action manga Tatsuki Fujimoto.", poster: ""
       },
       {
         id: "now_4", isIndonesian: true, title: "SEPORSI MIE AYAM SEBELUM MATI", searchQuery: "Seporsi Mie Ayam Sebelum Mati",
-        releaseDate: "2026-11-12", confirmedText: "Tayang di XXI, CGV & Cinépolis",
-        presaleText: "Tiket tersedia di bioskop.", sourceBadge: "LSF R13+ • XXI", age: "R 13+", runtime: "105m",
-        genre: "Drama", hype: 90, rating: "8.9", presale: false, imax: false, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        releaseDate: "2026-11-12", confirmedText: "Sedang tayang di bioskop Indonesia",
+        presaleText: "Pantau ketersediaan jadwal & tiket di bioskop terdekat.", sourceBadge: "LSF R13+", age: "R 13+", runtime: "105m",
+        genre: "Drama", hype: 90, rating: "8.9", presale: false, imax: false, tba: false, chains: [],
         director: "Yandy Laurens", cast: "Baskara Mahendra, Rachel Amanda", synopsis: "Adaptasi novel Brian Khrisna.", poster: ""
       },
       {
         id: "now_5", isIndonesian: false, title: "NOW YOU SEE ME: NOW YOU DON'T", searchQuery: "Now You See Me Now You Don't",
-        releaseDate: "2026-11-11", confirmedText: "Tayang di XXI, CGV & Cinépolis",
-        presaleText: "Tiket tersedia di bioskop.", sourceBadge: "TMDB ID • Verified", age: "R 13+", runtime: "122m",
-        genre: "Action, Mystery", hype: 87, rating: "8.4", presale: false, imax: false, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        releaseDate: "2026-11-11", confirmedText: "Sedang tayang di bioskop Indonesia",
+        presaleText: "Pantau ketersediaan jadwal & tiket di bioskop terdekat.", sourceBadge: "TMDB ID", age: "R 13+", runtime: "122m",
+        genre: "Action, Mystery", hype: 87, rating: "8.4", presale: false, imax: false, tba: false, chains: [],
         director: "Ruben Fleischer", cast: "Jesse Eisenberg, Woody Harrelson", synopsis: "Aksi pencurian baru Four Horsemen.", poster: ""
       },
       {
         id: "up_rerelease_yourname", isIndonesian: false, isReRelease: true, tmdbId: 372058, title: "YOUR NAME (4K RE-RELEASE)", searchQuery: "Your Name",
         releaseDate: "2026-12-02", confirmedText: "Tayang kembali 02/12/2026",
-        presaleText: "Tersedia di TIX ID, CGV & Cinépolis.", sourceBadge: "TIX ID • Re-Release", age: "R 13+", runtime: "106m",
-        genre: "Animation, Romance", hype: 95, rating: "8.9", presale: true, imax: false, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        presaleText: "Pantau ketersediaan jadwal & tiket di bioskop terdekat.", sourceBadge: "Re-Release ID", age: "R 13+", runtime: "106m",
+        genre: "Animation, Romance", hype: 95, rating: "8.9", presale: true, imax: false, tba: false, chains: [],
         director: "Makoto Shinkai", cast: "Ryunosuke Kamiki, Mone Kamishiraishi", synopsis: "Dua remaja yang terhubung lewat pertukaran tubuh misterius melintasi ruang dan waktu.", poster: ""
       },
       {
         id: "up_1", isIndonesian: false, title: "BLUE LOCK: EPISODE NAGI - STAGE 2", searchQuery: "Blue Lock Episode Nagi",
         releaseDate: "2026-11-20", confirmedText: "20/11/2026",
-        presaleText: "Tersedia di TIX ID, XXI & CGV.", sourceBadge: "CGV & XXI", age: "R 13+", runtime: "108m",
-        genre: "Anime, Sports", hype: 92, rating: "9.0", presale: false, imax: false, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        presaleText: "Pantau ketersediaan jadwal & tiket di bioskop terdekat.", sourceBadge: "TMDB ID", age: "R 13+", runtime: "108m",
+        genre: "Anime, Sports", hype: 92, rating: "9.0", presale: false, imax: false, tba: false, chains: [],
         director: "Shunsuke Ishikawa", cast: "Nobunaga Shimazaki, Yuma Uchida", synopsis: "Neo Egoist League.", poster: ""
       },
       {
         id: "up_2", isIndonesian: false, title: "HOW TO ROB A BANK", searchQuery: "How to Rob a Bank",
         releaseDate: "2026-11-20", confirmedText: "20/11/2026",
-        presaleText: "Tersedia di XXI & CGV.", sourceBadge: "TMDB ID", age: "D 17+", runtime: "118m",
-        genre: "Action, Crime", hype: 88, rating: "8.6", presale: false, imax: false, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        presaleText: "Pantau ketersediaan jadwal & tiket di bioskop terdekat.", sourceBadge: "TMDB ID", age: "D 17+", runtime: "118m",
+        genre: "Action, Crime", hype: 88, rating: "8.6", presale: false, imax: false, tba: false, chains: [],
         director: "David Leitch", cast: "Nicholas Hoult, Zoë Kravitz", synopsis: "Perampokan berisiko tinggi.", poster: ""
       },
       {
         id: "up_3", isIndonesian: false, title: "THE FURTHER MIS-ADVENTURES OF CLIFF BOOTH", searchQuery: "The Adventures of Cliff Booth",
         releaseDate: "2026-11-25", confirmedText: "25/11/2026",
-        presaleText: "Presale dibuka di TIX ID & XXI.", sourceBadge: "TMDB ID • LSF", age: "D 17+", runtime: "136m",
-        genre: "Drama, Crime", hype: 95, rating: "9.1", presale: true, imax: true, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        presaleText: "Tersedia format IMAX & Regular.", sourceBadge: "TMDB ID · LSF", age: "D 17+", runtime: "136m",
+        genre: "Drama, Crime", hype: 95, rating: "9.1", presale: true, imax: true, tba: false, chains: [],
         director: "David Fincher", cast: "Brad Pitt, Elizabeth Debicki", synopsis: "Hollywood era 1970-an.", poster: ""
       },
       {
         id: "up_4", isIndonesian: false, title: "FOCKER-IN-LAW", searchQuery: "Focker-in-Law",
         releaseDate: "2026-11-27", confirmedText: "27/11/2026",
-        presaleText: "Estimasi presale 24/11/2026 di M-TIX.", sourceBadge: "TMDB ID", age: "R 13+", runtime: "110m",
-        genre: "Comedy", hype: 81, rating: "8.0", presale: false, imax: false, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        presaleText: "Pantau ketersediaan jadwal & tiket di bioskop terdekat.", sourceBadge: "TMDB ID", age: "R 13+", runtime: "110m",
+        genre: "Comedy", hype: 81, rating: "8.0", presale: false, imax: false, tba: false, chains: [],
         director: "John Hamburg", cast: "Robert De Niro, Ben Stiller", synopsis: "Keluarga Byrnes kembali.", poster: ""
       },
       {
         id: "up_5", isIndonesian: false, title: "HEXED", searchQuery: "Hexed",
         releaseDate: "2026-11-27", confirmedText: "27/11/2026",
-        presaleText: "Estimasi presale IMAX 23/11/2026.", sourceBadge: "IMAX XXI • TMDB ID", age: "SU", runtime: "104m",
-        genre: "Animation, Fantasy", hype: 91, rating: "8.7", presale: false, imax: true, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        presaleText: "Tersedia format IMAX & Regular.", sourceBadge: "IMAX · TMDB ID", age: "SU", runtime: "104m",
+        genre: "Animation, Fantasy", hype: 91, rating: "8.7", presale: false, imax: true, tba: false, chains: [],
         director: "Josie Trinidad", cast: "Disney Animation", synopsis: "Petualangan sihir remaja.", poster: ""
       },
       {
         id: "up_6", isIndonesian: false, title: "VIOLENT NIGHT 2", searchQuery: "Violent Night 2",
         releaseDate: "2026-12-02", confirmedText: "02/12/2026",
-        presaleText: "Estimasi presale 28/11/2026 di TIX ID.", sourceBadge: "TMDB ID", age: "D 17+", runtime: "115m",
-        genre: "Action, Thriller", hype: 90, rating: "8.5", presale: false, imax: false, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        presaleText: "Pantau ketersediaan jadwal & tiket di bioskop terdekat.", sourceBadge: "TMDB ID", age: "D 17+", runtime: "115m",
+        genre: "Action, Thriller", hype: 90, rating: "8.5", presale: false, imax: false, tba: false, chains: [],
         director: "Tommy Wirkola", cast: "David Harbour, Kristen Bell", synopsis: "Santa Claus kembali beraksi.", poster: ""
       },
       {
         id: "up_7", isIndonesian: true, title: "3726 MDPL", searchQuery: "3726 MDPL",
         releaseDate: "2026-12-03", confirmedText: "03/12/2026",
-        presaleText: "Estimasi presale 30/11/2026 di M-TIX.", sourceBadge: "LSF • XXI", age: "R 13+", runtime: "116m",
-        genre: "Adventure, Romance", hype: 86, rating: "8.4", presale: false, imax: false, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        presaleText: "Pantau ketersediaan jadwal & tiket di bioskop terdekat.", sourceBadge: "LSF ID", age: "R 13+", runtime: "116m",
+        genre: "Adventure, Romance", hype: 86, rating: "8.4", presale: false, imax: false, tba: false, chains: [],
         director: "Rako Prijanto", cast: "Angga Yunanda, Syifa Hadju", synopsis: "Pendakian Gunung Rinjani.", poster: ""
       },
       {
         id: "up_8", isIndonesian: false, isReRelease: true, title: "DUNE: PART TWO (IMAX RE-RELEASE)", searchQuery: "Dune Part Two",
         releaseDate: "2026-12-09", confirmedText: "09/12/2026",
-        presaleText: "Presale IMAX buka 04/12/2026.", sourceBadge: "IMAX ID", age: "R 13+", runtime: "166m",
-        genre: "Sci-Fi, Adventure", hype: 94, rating: "9.2", presale: false, imax: true, tba: false, chains: ["XXI", "CGV"],
+        presaleText: "Penayangan ulang spesial format IMAX.", sourceBadge: "IMAX ID", age: "R 13+", runtime: "166m",
+        genre: "Sci-Fi, Adventure", hype: 94, rating: "9.2", presale: false, imax: true, tba: false, chains: [],
         director: "Denis Villeneuve", cast: "Timothée Chalamet, Zendaya", synopsis: "Penayangan ulang spesial IMAX.", poster: ""
       },
       {
         id: "up_10", isIndonesian: false, title: "DUNE: PART THREE", searchQuery: "Dune Part Three",
         releaseDate: "2026-12-16", confirmedText: "16/12/2026",
-        presaleText: "Estimasi presale IMAX 09/12/2026.", sourceBadge: "TMDB ID • IMAX XXI", age: "R 13+", runtime: "162m",
-        genre: "Sci-Fi, Action", hype: 98, rating: "9.5", presale: false, imax: true, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        presaleText: "Tersedia format IMAX & Regular.", sourceBadge: "TMDB ID · IMAX", age: "R 13+", runtime: "162m",
+        genre: "Sci-Fi, Action", hype: 98, rating: "9.5", presale: false, imax: true, tba: false, chains: [],
         director: "Denis Villeneuve", cast: "Timothée Chalamet, Zendaya", synopsis: "Babak puncak Dune Messiah.", poster: ""
       },
       {
         id: "up_11", isIndonesian: false, title: "AVENGERS: DOOMSDAY", searchQuery: "Avengers Doomsday",
         releaseDate: "2026-12-16", confirmedText: "16/12/2026",
-        presaleText: "Estimasi presale IMAX 08/12/2026.", sourceBadge: "TMDB ID • IMAX XXI", age: "R 13+", runtime: "158m",
-        genre: "Action, Superhero", hype: 99, rating: "9.6", presale: false, imax: true, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        presaleText: "Tersedia format IMAX & Regular.", sourceBadge: "TMDB ID · IMAX", age: "R 13+", runtime: "158m",
+        genre: "Action, Superhero", hype: 99, rating: "9.6", presale: false, imax: true, tba: false, chains: [],
         director: "Anthony & Joe Russo", cast: "Robert Downey Jr., Pedro Pascal", synopsis: "Menghadapi Victor Von Doom.", poster: ""
       },
       {
         id: "up_12", isIndonesian: true, title: "5 CM: REVOLUSI HATI", searchQuery: "5 cm",
         releaseDate: "2026-12-24", confirmedText: "24/12/2026",
-        presaleText: "Estimasi presale 19/12/2026.", sourceBadge: "LSF • XXI", age: "R 13+", runtime: "124m",
-        genre: "Drama, Adventure", hype: 87, rating: "8.5", presale: false, imax: false, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        presaleText: "Pantau ketersediaan jadwal & tiket di bioskop terdekat.", sourceBadge: "LSF ID", age: "R 13+", runtime: "124m",
+        genre: "Drama, Adventure", hype: 87, rating: "8.5", presale: false, imax: false, tba: false, chains: [],
         director: "Rizal Mantovani", cast: "Herjunot Ali, Fedi Nuril", synopsis: "Reuni sahabat Mahameru.", poster: ""
       },
       {
         id: "up_15", isIndonesian: false, title: "THE BEEKEEPER 2", searchQuery: "The Beekeeper 2",
         releaseDate: "2027-01-13", confirmedText: "13/01/2027",
-        presaleText: "Estimasi presale 09/01/2027.", sourceBadge: "TMDB ID", age: "D 17+", runtime: "112m",
-        genre: "Action, Thriller", hype: 95, rating: "8.9", presale: false, imax: true, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        presaleText: "Tersedia format IMAX & Regular.", sourceBadge: "TMDB ID · IMAX", age: "D 17+", runtime: "112m",
+        genre: "Action, Thriller", hype: 95, rating: "8.9", presale: false, imax: true, tba: false, chains: [],
         director: "Timo Tjahjanto", cast: "Jason Statham, Pom Klementieff", synopsis: "Disutradarai Timo Tjahjanto.", poster: ""
       },
       {
         id: "up_17", isIndonesian: false, title: "THE MANDALORIAN AND GROGU", searchQuery: "The Mandalorian and Grogu",
         releaseDate: "2027-01-20", confirmedText: "20/01/2027",
-        presaleText: "Estimasi presale IMAX 15/01/2027.", sourceBadge: "TMDB ID • IMAX XXI", age: "R 13+", runtime: "130m",
-        genre: "Sci-Fi, Adventure", hype: 94, rating: "9.0", presale: false, imax: true, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+        presaleText: "Tersedia format IMAX & Regular.", sourceBadge: "TMDB ID · IMAX", age: "R 13+", runtime: "130m",
+        genre: "Sci-Fi, Adventure", hype: 94, rating: "9.0", presale: false, imax: true, tba: false, chains: [],
         director: "Jon Favreau", cast: "Pedro Pascal, Sigourney Weaver", synopsis: "Misi baru New Republic.", poster: ""
       }
     ];
@@ -2044,11 +2099,15 @@
         if (targetKey !== rawKey || entry.watchStatus !== undefined || entry.note !== undefined) changed = true;
 
         const resolvedTmdb = Math.max(entryTmdb, canonicalMovie ? (canonicalMovie.tmdbId || 0) : 0);
+        const isUnverifiedLive = String(targetKey).startsWith("tmdb_") || String(targetKey).startsWith("search_");
+        const nextChains = canonicalMovie ? (canonicalMovie.chains || []) : (isUnverifiedLive ? [] : (entry.movieData.chains || []));
+        if ((entry.movieData.chains || []).length !== nextChains.length) changed = true;
         const mergedMovie = {
           ...entry.movieData,
           ...(canonicalMovie || {}),
           id: targetKey,
           tmdbId: resolvedTmdb || undefined,
+          chains: nextChains,
           poster: entry.movieData.poster || (canonicalMovie ? canonicalMovie.poster : "") || ""
         };
         if (!next[targetKey]) {
@@ -2361,7 +2420,7 @@
         if (m.confirmedText) m.confirmedText = normalizeIsoDatesInText(m.confirmedText);
         if (isReleased && m.presale) {
           m.presale = false;
-          m.confirmedText = "Tayang di XXI, CGV & Cinépolis";
+          m.confirmedText = "Sedang tayang di bioskop Indonesia";
         }
         if (!m.tmdbId && tmdbIdCache[m.id]) m.tmdbId = tmdbIdCache[m.id];
         if (!m.poster && posterCache[m.id]) m.poster = posterCache[m.id];
@@ -2691,6 +2750,10 @@
       } else {
         navBadge.style.display = "none";
       }
+      const backupCountEl = document.getElementById("wlBackupCount");
+      if (backupCountEl) {
+        backupCountEl.textContent = `${totalWatch} film`;
+      }
     }
 
     function setMode(mode) {
@@ -2702,9 +2765,6 @@
 
     function setChip(chip, el) {
       activeChip = chip;
-      if (chip === "XXI" || chip === "CGV" || chip === "Cinépolis") {
-        localStorage.setItem("ct_pref_chain", chip);
-      }
       document.querySelectorAll("#viewCatalog .chip").forEach(c => c.classList.remove("active"));
       el.classList.add("active");
       renderMovies();
@@ -2802,7 +2862,7 @@
         if (hideTba && m.tba) return false;
 
         if (catalogQuickQuery) {
-          const hay = `${m.title} ${m.genre || ""} ${m.director || ""} ${(m.chains || []).join(" ")}`.toLowerCase();
+          const hay = `${m.title} ${m.genre || ""} ${m.director || ""}`.toLowerCase();
           if (!hay.includes(catalogQuickQuery)) return false;
         }
 
@@ -2811,7 +2871,6 @@
         if (activeChip === "rerelease" && !m.isReRelease) return false;
         if (activeChip === "hype" && (m.hype || 0) < 88) return false;
         if (activeChip === "imax" && !m.imax) return false;
-        if (["XXI", "CGV", "Cinépolis"].includes(activeChip) && !(m.chains || []).includes(activeChip)) return false;
         return true;
       });
 
@@ -2852,15 +2911,28 @@
           : `<div class="poster-art"><div class="poster-art-title">${safeTitle}</div></div>`;
 
         let rightLabel = "";
+        const hypePct = m.hype || 85;
+        const ratingNum = parseFloat(m.rating || "");
+        const ratingLabel = !isNaN(ratingNum) && ratingNum > 0 ? `★ ${ratingNum.toFixed(1)}` : "★ —";
+
         if (activeMode === "upcoming") {
           const daysLeft = getDaysUntil(m.releaseDate);
           if (daysLeft === 0) rightLabel = `<span class="countdown-text now-tone">Hari Ini</span>`;
           else if (daysLeft === 1) rightLabel = `<span class="countdown-text">Besok</span>`;
           else if (daysLeft !== null && daysLeft > 1 && daysLeft <= 14) rightLabel = `<span class="countdown-text">H-${daysLeft}</span>`;
+        } else {
+          const hypeTone = hypePct >= 90 ? "now-tone" : "muted-tone";
+          rightLabel = `<span class="countdown-text ${hypeTone}">Hype ${hypePct}%</span>`;
         }
 
-        const chainsStr = (m.chains || []).join(" · ") + (m.imax ? " · IMAX" : "");
-        const footerLeft = activeMode === "upcoming" ? escapeHtml(m.dateLabel) : `Rating ${escapeHtml(m.rating || "8.8")}`;
+        const verifiedChains = (m.chains && m.chains.length > 0)
+          ? (m.imax ? `${m.chains.join(" · ")} · IMAX` : m.chains.join(" · "))
+          : (m.imax ? "Format IMAX" : "");
+        const subLine = verifiedChains || (activeMode === "upcoming" ? (m.genre || "") : "");
+        const topMetaLine = activeMode === "upcoming"
+          ? `${escapeHtml(m.age || "R 13+")} · ${escapeHtml(ratingLabel)} · Hype ${hypePct}%`
+          : `${escapeHtml(m.age || "R 13+")} · ${escapeHtml(m.genre)}`;
+        const footerLeft = activeMode === "upcoming" ? escapeHtml(m.dateLabel) : escapeHtml(ratingLabel);
 
         return `
           <article class="movie-card" data-movie-id="${safeId}">
@@ -2873,9 +2945,9 @@
             </div>
             <div class="card-info">
               <div>
-                <div class="meta-top">${escapeHtml(m.age || "R 13+")} · ${escapeHtml(m.genre)}</div>
+                <div class="meta-top">${topMetaLine}</div>
                 <div class="card-title">${safeTitle}</div>
-                <div class="card-chains">${escapeHtml(chainsStr)}</div>
+                ${subLine ? `<div class="card-chains">${escapeHtml(subLine)}</div>` : ""}
               </div>
               <div class="card-footer">
                 <span>${footerLeft}</span>
@@ -3009,6 +3081,10 @@
           ? `<img src="${escapeHtml(effPoster)}" alt="${safeTitle}" referrerpolicy="no-referrer" />`
           : `<div class="poster-art" style="padding:4px;"><div class="poster-art-title" style="font-size:9px;">${safeTitle}</div></div>`;
 
+        const calSub = (m.chains && m.chains.length > 0)
+          ? (m.imax ? `${m.chains.join(" · ")} · IMAX` : m.chains.join(" · "))
+          : (m.imax ? "Format IMAX" : (m.genre || ""));
+
         return `
           <div class="watch-item" data-movie-id="${safeId}">
             <div class="watch-thumb">${thumb}</div>
@@ -3016,8 +3092,7 @@
               <div class="watch-title">${safeTitle}</div>
               <div class="watch-date-row">
                 ${countdownHtml}
-                <span>·</span>
-                <span>${escapeHtml((m.chains || ["XXI", "CGV"]).join(" · "))}${m.imax ? " · IMAX" : ""}</span>
+                ${calSub ? `<span>·</span><span>${escapeHtml(calSub)}</span>` : ""}
               </div>
               <div class="watch-toggles">
                 <button type="button" class="cal-action-btn ${isWatched ? "saved" : ""}" data-watch-id="${safeId}">
@@ -3195,7 +3270,9 @@
         const cd = getCountdownInfo(m.releaseDate, m.tba);
         const statusColor = m.tba ? "var(--amber)" : (m.status === "now" ? "var(--emerald)" : "var(--blue)");
         const datePart = m.tba ? "TBA ID" : formatShortDate(m.releaseDate);
-        const chainsPart = (m.chains || []).join("/");
+        const chainsPart = (m.chains && m.chains.length > 0)
+          ? (m.imax ? `${m.chains.join(" · ")} · IMAX` : m.chains.join(" · "))
+          : (m.imax ? "Format IMAX" : "");
         const thumb = effPoster
           ? `<img src="${escapeHtml(effPoster)}" alt="${safeTitle}" referrerpolicy="no-referrer" />`
           : `<div class="poster-art" style="padding:4px;"><div class="poster-art-title" style="font-size:9px;">${safeTitle}</div></div>`;
@@ -3366,7 +3443,7 @@
         releaseDate: data.releaseDate,
         dateLabel: data.isTba ? "TBA ID" : formatShortDate(data.releaseDate),
         confirmedText: data.isTba ? "Jadwal bioskop Indonesia belum diumumkan" : `Mulai tayang ${formatShortDate(data.releaseDate)}`,
-        presaleText: data.isTba ? "Notif otomatis aktif saat tanggal Indonesia keluar." : "Pantau kursi di TIX ID, XXI, CGV & Cinépolis.",
+        presaleText: data.isTba ? "Notif otomatis aktif saat tanggal Indonesia keluar." : "Pantau ketersediaan jadwal & tiket di bioskop terdekat.",
         sourceBadge: data.sourceBadge,
         age: "R 13+",
         runtime: "",
@@ -3376,7 +3453,7 @@
         presale: false,
         imax: false,
         tba: data.isTba,
-        chains: ["XXI", "CGV", "Cinépolis"],
+        chains: [],
         director: "",
         cast: "",
         synopsis: data.overview || "Belum ada ringkasan sinopsis.",
@@ -3508,32 +3585,38 @@
 
     function getNetworkAvailabilityInfo(m) {
       const isTmdbOnly = m.id.startsWith("tmdb_") || m.id.startsWith("search_");
-      if (m.tba || isTmdbOnly) {
+      const chains = (!isTmdbOnly && !m.tba && m.chains && m.chains.length > 0) ? m.chains : [];
+      if (chains.length > 0) {
+        const joined = chains.length > 1
+          ? `${chains.slice(0, -1).join(", ")} & ${chains[chains.length - 1]}`
+          : chains[0];
         return {
-          confirmed: false,
-          summary: "Cek jadwal di jaringan terkait",
-          formatNote: m.imax ? "Pantau jadwal IMAX di TIX ID / XXI" : ""
+          confirmed: true,
+          summary: `Tayang di ${joined}`,
+          formatNote: m.imax ? "Tersedia format IMAX" : ""
         };
       }
-      const chains = (m.chains && m.chains.length > 0) ? m.chains : ["XXI", "CGV", "Cinépolis"];
-      const joined = chains.length > 1
-        ? `${chains.slice(0, -1).join(", ")} & ${chains[chains.length - 1]}`
-        : chains[0];
       return {
-        confirmed: true,
-        summary: `Tayang di ${joined}`,
+        confirmed: false,
+        summary: m.tba ? "Jadwal bioskop ID belum terkonfirmasi" : "Cek jadwal jaringan bioskop di bawah",
         formatNote: m.imax ? "Tersedia format IMAX" : ""
       };
     }
 
+    function getTicketPortalUrl(platform, movieTitle) {
+      const cleanTitle = String(movieTitle || "").replace(/\(.*?\)/g, "").trim();
+      if (platform === "Jadwal Terdekat") {
+        return `https://www.google.com/search?q=${encodeURIComponent(`jadwal bioskop ${cleanTitle} hari ini`)}`;
+      }
+      if (platform === "TIX ID") return "https://www.tix.id/";
+      if (platform === "XXI") return "https://m.21cineplex.com/";
+      if (platform === "CGV") return "https://www.cgv.id/";
+      if (platform === "Cinépolis") return "https://cinepolis.co.id/";
+      return `https://www.google.com/search?q=${encodeURIComponent(`${cleanTitle} bioskop ${platform}`)}`;
+    }
+
     function openTicketSearch(platform, movieTitle) {
-      localStorage.setItem("ct_pref_chain", platform);
-      const q = encodeURIComponent(movieTitle);
-      let url = `https://www.google.com/search?q=${encodeURIComponent(movieTitle + " bioskop " + platform)}`;
-      if (platform === "TIX ID") url = `https://www.tix.id/search?q=${q}`;
-      else if (platform === "XXI") url = `https://21cineplex.com/`;
-      else if (platform === "CGV") url = `https://www.cgv.id/en/movies/now_playing`;
-      else if (platform === "Cinépolis") url = `https://cinepolis.co.id/`;
+      const url = getTicketPortalUrl(platform, movieTitle);
 
       if (window.AndroidBridge && typeof window.AndroidBridge.openExternalUrl === "function") {
         window.AndroidBridge.openExternalUrl(url);
@@ -3552,7 +3635,11 @@
       } else {
         lines.push(`Rilis ID: ${formatHumanDate(m.releaseDate)}`);
       }
-      lines.push(`${net.summary}${m.imax ? " · IMAX" : ""}`);
+      if (net.confirmed) {
+        lines.push(`${net.summary}${m.imax ? " · IMAX" : ""}`);
+      } else {
+        lines.push(m.imax ? "Jadwal bioskop Indonesia · Format IMAX" : "Jadwal bioskop Indonesia");
+      }
       const text = lines.join("\n");
       if (window.AndroidBridge && typeof window.AndroidBridge.shareMovieText === "function") {
         window.AndroidBridge.shareMovieText(text);
@@ -3576,10 +3663,9 @@
       const effectivePoster = getEffectivePoster(m);
       const safeTitle = escapeHtml(m.title);
       const safeId = escapeHtml(m.id);
-      const prefChain = localStorage.getItem("ct_pref_chain") || "";
       const net = getNetworkAvailabilityInfo(m);
       const lbxdUrl = getLetterboxdUrl(m, watchEntry);
-      const lbxdSub = lbxdUrl.includes("/tmdb/") ? "Halaman Film" : "Cari Film";
+      const lbxdSub = lbxdUrl.includes("/tmdb/") ? "Skor & Review" : "Cari Film";
       const cd = getCountdownInfo(m.releaseDate, m.tba);
 
       const posterHtml = effectivePoster
@@ -3587,14 +3673,18 @@
         : `<div class="poster-art" style="padding:10px;"><div class="poster-art-title" style="font-size:11px;">${safeTitle}</div></div>`;
 
       const runtimeClean = (m.runtime && m.runtime !== "TBA") ? m.runtime : "";
+      const ratingNum = parseFloat(m.rating || "");
       const kickerParts = [
         m.age || "R 13+",
         runtimeClean,
         m.imax ? "IMAX" : "",
-        m.rating ? `★ ${m.rating}` : ""
+        !isNaN(ratingNum) && ratingNum > 0 ? `★ ${ratingNum.toFixed(1)}` : "",
+        m.hype ? `Hype ${m.hype}%` : ""
       ].filter(Boolean).map((p, idx) => `<span style="white-space:nowrap;display:inline-flex;align-items:center;gap:6px;">${idx > 0 ? '<span aria-hidden="true">·</span>' : ''}<span>${escapeHtml(p)}</span></span>`).join("");
 
-      const chainsStr = (m.chains || []).join(" · ") + (m.imax ? " · IMAX" : "");
+      const chainsStr = (m.chains && m.chains.length > 0)
+        ? (m.imax ? `${m.chains.join(" · ")} · IMAX` : m.chains.join(" · "))
+        : (m.imax ? "Format IMAX" : "");
 
       const cdPillTone = cd.tone === "now" ? "now" : cd.tone === "soon" ? "soon" : "muted";
       const cdLabelText = cd.label === "Tayang" ? "Sedang Tayang" : cd.label;
@@ -3720,9 +3810,13 @@
         </div>
 
         <div class="verify-box">
-          <div class="credit-label" style="margin-bottom:8px;">Cek Kursi & Tiket</div>
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:8px;">
+            <div class="credit-label" style="margin-bottom:0;">Cek Jadwal &amp; Tiket</div>
+            ${(m.tba || m.status === "upcoming") ? `<span style="font-size:10px; color:var(--muted);">${m.tba ? "Jadwal ID belum keluar" : "Pantau pre-sale"}</span>` : ""}
+          </div>
+          <button type="button" class="verify-primary-btn" data-platform="Jadwal Terdekat">Cari Jadwal Bioskop Terdekat</button>
           <div class="quick-verify-bar" data-ticket-title="${safeTitle}">
-            ${["TIX ID", "XXI", "CGV", "Cinépolis"].map(p => `<button type="button" class="verify-link-btn ${prefChain === p ? "preferred" : ""}" data-platform="${p}">${p}</button>`).join("")}
+            ${["TIX ID", "XXI", "CGV", "Cinépolis"].map(p => `<button type="button" class="verify-link-btn" data-platform="${p}">${p}</button>`).join("")}
           </div>
         </div>
 
@@ -3746,7 +3840,7 @@
     document.getElementById("detailContent").addEventListener("click", (e) => {
       const ticketBtn = e.target.closest("[data-platform]");
       if (ticketBtn) {
-        const bar = ticketBtn.closest("[data-ticket-title]");
+        const bar = document.querySelector("#detailContent [data-ticket-title]");
         const title = bar ? bar.getAttribute("data-ticket-title") : "";
         openTicketSearch(ticketBtn.getAttribute("data-platform"), title);
       }
@@ -4073,6 +4167,14 @@
             const db = (b.m.releaseDate && b.m.releaseDate !== "TBA") ? b.m.releaseDate : "0000-01-01";
             return db.localeCompare(da);
           });
+        } else if (sortBy === "hype") {
+          entries.sort((a, b) => {
+            const diff = (b.m.hype || 0) - (a.m.hype || 0);
+            if (diff !== 0) return diff;
+            const da = (a.m.releaseDate && a.m.releaseDate !== "TBA") ? a.m.releaseDate : "9999-12-31";
+            const db = (b.m.releaseDate && b.m.releaseDate !== "TBA") ? b.m.releaseDate : "9999-12-31";
+            return da.localeCompare(db);
+          });
         } else if (sortBy === "title") {
           entries.sort((a, b) => a.m.title.localeCompare(b.m.title));
         }
@@ -4114,7 +4216,9 @@
         const datePrimaryText = cfg.isTba
           ? (m.releaseDate && m.releaseDate !== "TBA" ? `Rilis global ${formatShortDate(m.releaseDate)}` : "Jadwal ID belum keluar")
           : formatHumanDate(m.releaseDate);
-        const chainText = [...(m.chains || []), ...(m.imax ? ["IMAX"] : [])].join(" · ");
+        const chainText = (m.chains && m.chains.length > 0)
+          ? (m.imax ? `${m.chains.join(" · ")} · IMAX` : m.chains.join(" · "))
+          : (m.imax ? "Format IMAX" : "");
 
         const thumb = effPoster
           ? `<img src="${escapeHtml(effPoster)}" alt="${safeTitle}" loading="lazy" decoding="async" referrerpolicy="no-referrer" />`
@@ -4188,7 +4292,7 @@
       const startMillis = parsed.getTime();
       const title = `Nonton: ${m.title}`;
       const desc = `${m.confirmedText}\n${m.presaleText}`;
-      const loc = (m.chains || ["Bioskop Indonesia"]).join(", ");
+      const loc = (m.chains && m.chains.length > 0) ? m.chains.join(", ") : "Bioskop Indonesia";
 
       if (window.AndroidBridge && typeof window.AndroidBridge.addCalendarEvent === "function") {
         window.AndroidBridge.addCalendarEvent(title, desc, loc, startMillis);
@@ -4345,10 +4449,10 @@
                 isReRelease: Boolean((item.title || "").toLowerCase().includes("re-release")),
                 title: (item.title || item.original_title || "").toUpperCase(), releaseDate: item.release_date,
                 dateLabel, confirmedText: isReleased ? "Sedang tayang di bioskop Indonesia" : `Confirmed ID: ${formatFullDate(item.release_date)}`,
-                presaleText: "Cek tiket di TIX ID, XXI, CGV & Cinépolis.", sourceBadge: "TMDB ID",
+                presaleText: "Pantau ketersediaan jadwal & tiket di bioskop terdekat.", sourceBadge: "TMDB ID",
                 age: item.adult ? "D 17+" : "R 13+", runtime: cachedCred.runtime || "TBA", genre: genresText,
                 hype: hypeScore, rating: ((item.vote_average || 8.2)).toFixed(1), presale: false,
-                imax: (item.popularity || 0) >= 65, tba: false, chains: ["XXI", "CGV", "Cinépolis"],
+                imax: (item.popularity || 0) >= 65, tba: false, chains: [],
                 director: cachedCred.director || "Belum dimuat", cast: cachedCred.cast || "Belum dimuat",
                 synopsis: item.overview || "Tayang di bioskop Indonesia.",
                 poster: `https://image.tmdb.org/t/p/w500${item.poster_path}`
@@ -4391,6 +4495,198 @@
         isSyncing = false;
         refreshBtn.classList.remove("spinning");
       }
+    }
+
+    function createWatchlistBackupPayload() {
+      return {
+        app: "CinemaTracker",
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        watchlist: watchlistMap,
+        customPosters: customPostersMap,
+        preferences: {
+          theme: localStorage.getItem("ct_app_theme") || "light",
+          minHype: parseInt(localStorage.getItem("ct_min_hype") || "85", 10) || 85,
+          syncInterval: parseInt(localStorage.getItem("ct_sync_interval") || "6", 10) || 6,
+          launcherIcon: localStorage.getItem("ct_launcher_icon") || "LauncherDefault",
+          tmdbApiKey: (localStorage.getItem("ct_tmdb_key") || "").trim() || undefined
+        }
+      };
+    }
+
+    function exportWatchlistBackup() {
+      const payload = createWatchlistBackupPayload();
+      const jsonStr = JSON.stringify(payload, null, 2);
+      const fileName = `cinema-tracker-backup-${getLocalTodayIso()}.json`;
+      if (window.AndroidBridge && typeof window.AndroidBridge.exportWatchlistBackup === "function") {
+        window.AndroidBridge.exportWatchlistBackup(jsonStr, fileName);
+        return;
+      }
+      const blob = new Blob([jsonStr], { type: "application/json;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileName;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      showToast(`Backup tersimpan (${Object.keys(watchlistMap).length} film)`);
+    }
+
+    function toggleBackupPasteBox() {
+      const box = document.getElementById("backupPasteBox");
+      const btn = document.getElementById("toggleBackupPasteBtn");
+      const isOpen = box.style.display !== "none";
+      box.style.display = isOpen ? "none" : "block";
+      btn.textContent = isOpen ? "Atau tempel teks JSON backup" : "Tutup input kode backup";
+      const fb = document.getElementById("backupFeedback");
+      if (fb) fb.textContent = "";
+    }
+
+    function applyBackupJsonText(rawText) {
+      const fb = document.getElementById("backupFeedback");
+      const setFb = (msg, ok) => {
+        if (!fb) return;
+        fb.textContent = msg;
+        fb.style.color = ok ? "var(--emerald)" : "var(--danger-text)";
+      };
+      if (!rawText || !rawText.trim()) {
+        const msg = "File atau kode backup kosong.";
+        setFb(msg, false);
+        showToast(msg);
+        return false;
+      }
+      let parsed;
+      try {
+        parsed = JSON.parse(rawText);
+      } catch (_) {
+        const msg = "Format backup tidak valid (bukan JSON).";
+        setFb(msg, false);
+        showToast(msg);
+        return false;
+      }
+      if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+        const msg = "Struktur data backup tidak dikenali.";
+        setFb(msg, false);
+        showToast(msg);
+        return false;
+      }
+
+      const rawWl = (parsed.watchlist && typeof parsed.watchlist === "object" && !Array.isArray(parsed.watchlist))
+        ? parsed.watchlist
+        : parsed;
+      let restoredCount = 0;
+      Object.keys(rawWl).forEach(rKey => {
+        const entry = rawWl[rKey];
+        if (!entry || typeof entry !== "object") return;
+        if (entry.watchStatus === "watched") return;
+        if (!entry.movieData || typeof entry.movieData !== "object" || !entry.movieData.title) return;
+        const cleanEntry = {
+          presaleAlert: entry.presaleAlert !== undefined ? Boolean(entry.presaleAlert) : true,
+          h1Alert: entry.h1Alert !== undefined ? Boolean(entry.h1Alert) : Boolean(entry.dayAlert !== undefined ? entry.dayAlert : true),
+          dayAlert: entry.dayAlert !== undefined ? Boolean(entry.dayAlert) : true,
+          isTba: Boolean(entry.isTba),
+          tmdbId: Number(entry.tmdbId || entry.movieData.tmdbId || 0) || 0,
+          lastKnownReleaseDate: entry.lastKnownReleaseDate || entry.movieData.releaseDate,
+          movieData: { ...entry.movieData, id: entry.movieData.id || rKey }
+        };
+        const matched = findWatchlistKey({ ...cleanEntry.movieData, tmdbId: cleanEntry.tmdbId });
+        const targetKey = matched || rKey;
+        if (watchlistMap[targetKey]) {
+          const prev = watchlistMap[targetKey];
+          watchlistMap[targetKey] = {
+            ...prev,
+            ...cleanEntry,
+            presaleAlert: Boolean(prev.presaleAlert || cleanEntry.presaleAlert),
+            h1Alert: Boolean(isH1Enabled(prev) || isH1Enabled(cleanEntry)),
+            dayAlert: Boolean(prev.dayAlert || cleanEntry.dayAlert),
+            tmdbId: Math.max(prev.tmdbId || 0, cleanEntry.tmdbId || 0),
+            movieData: { ...cleanEntry.movieData, ...prev.movieData, id: targetKey }
+          };
+        } else {
+          watchlistMap[targetKey] = cleanEntry;
+        }
+        restoredCount++;
+      });
+
+      if (restoredCount === 0 && !parsed.app) {
+        const msg = "Tidak ada data Watchlist yang valid di backup ini.";
+        setFb(msg, false);
+        showToast(msg);
+        return false;
+      }
+
+      if (parsed.customPosters && typeof parsed.customPosters === "object" && !Array.isArray(parsed.customPosters)) {
+        Object.keys(parsed.customPosters).forEach(pk => {
+          const pv = parsed.customPosters[pk];
+          if (typeof pv === "string" && pv.startsWith("http")) customPostersMap[pk] = pv;
+        });
+        persistCustomPosters();
+      }
+
+      const prefs = (parsed.preferences && typeof parsed.preferences === "object") ? parsed.preferences : {};
+      if (prefs.theme === "light" || prefs.theme === "dark" || prefs.theme === "system") {
+        document.getElementById("themeSelect").value = prefs.theme;
+        changeAppTheme(prefs.theme);
+      }
+      if (typeof prefs.minHype === "number" && isFinite(prefs.minHype)) {
+        localStorage.setItem("ct_min_hype", String(prefs.minHype));
+        document.getElementById("minHypeSelect").value = String(prefs.minHype);
+      }
+      if (typeof prefs.syncInterval === "number" && isFinite(prefs.syncInterval)) {
+        localStorage.setItem("ct_sync_interval", String(prefs.syncInterval));
+        document.getElementById("syncIntervalSelect").value = String(prefs.syncInterval);
+      }
+      if (typeof prefs.launcherIcon === "string" && prefs.launcherIcon) {
+        localStorage.setItem("ct_launcher_icon", prefs.launcherIcon);
+        if (typeof renderLauncherIcons === "function") renderLauncherIcons();
+      }
+      const existingKey = (localStorage.getItem("ct_tmdb_key") || "").trim();
+      if (!existingKey && typeof prefs.tmdbApiKey === "string" && prefs.tmdbApiKey.trim()) {
+        const k = prefs.tmdbApiKey.trim();
+        localStorage.setItem("ct_tmdb_key", k);
+        document.getElementById("tmdbKeyInput").value = k;
+        if (typeof updateApiStatusPill === "function") updateApiStatusPill(true, false);
+      }
+
+      persistWatchlist();
+      rebuildMovieCatalog();
+      reconcileWatchlistMap();
+      syncWatchButtonsInDom();
+      updateCounts();
+      syncWatchlistToNative();
+      renderMovies();
+      renderWatchlist();
+      if (activeBottomTab === "calendar") renderCalendar();
+
+      const total = Object.keys(watchlistMap).length;
+      const okMsg = `${restoredCount} film dipulihkan · total ${total} film di Watchlist`;
+      setFb(okMsg, true);
+      showToast(okMsg);
+      return true;
+    }
+
+    function applyBackupFromPasteBox() {
+      const ta = document.getElementById("backupPasteTextarea");
+      if (!ta) return;
+      if (applyBackupJsonText(ta.value)) {
+        ta.value = "";
+        document.getElementById("backupPasteBox").style.display = "none";
+        document.getElementById("toggleBackupPasteBtn").textContent = "Atau tempel teks JSON backup";
+      }
+    }
+
+    function onImportBackupFileChange(input) {
+      const file = input.files && input.files[0];
+      input.value = "";
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        applyBackupJsonText(typeof reader.result === "string" ? reader.result : "");
+      };
+      reader.onerror = () => {
+        showToast("Gagal membaca file backup");
+      };
+      reader.readAsText(file);
     }
 
     init();
