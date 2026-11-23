@@ -50,9 +50,13 @@ import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import org.json.JSONArray
 import org.json.JSONObject
+import org.xmlpull.v1.XmlPullParser
+import org.xmlpull.v1.XmlPullParserFactory
 import java.io.File
 import java.io.FileOutputStream
+import java.io.StringReader
 import java.net.HttpURLConnection
 import java.net.URL
 import java.nio.charset.StandardCharsets
@@ -327,6 +331,16 @@ class MainActivity : AppCompatActivity() {
         runOnUiThread {
             if (::webView.isInitialized) {
                 webView.evaluateJavascript("window.showToast && window.showToast($quoted)", null)
+            }
+        }
+    }
+
+    private fun dispatchRssCallback(callbackId: String, jsonArrayStr: String) {
+        val qId = JSONObject.quote(callbackId)
+        val qPayload = JSONObject.quote(jsonArrayStr)
+        runOnUiThread {
+            if (::webView.isInitialized) {
+                webView.evaluateJavascript("window.__onAndroidRssResult && window.__onAndroidRssResult($qId, $qPayload)", null)
             }
         }
     }
@@ -765,6 +779,81 @@ class MainActivity : AppCompatActivity() {
                     }
                 } catch (_: Exception) {
                     showJsToast("Gagal membuat file backup")
+                }
+            }
+        }
+
+        @JavascriptInterface
+        fun fetchGoogleNewsRss(callbackId: String, movieTitle: String) {
+            val cleanTitle = movieTitle.trim().take(100)
+            if (cleanTitle.length < 2) {
+                dispatchRssCallback(callbackId, "[]")
+                return
+            }
+            executor.execute {
+                var conn: HttpURLConnection? = null
+                try {
+                    val query = "\"$cleanTitle\" (XXI OR CGV OR Cinepolis OR bioskop OR LSF OR \"pre-sale\" OR IMAX) when:90d"
+                    val rssUrl = "https://news.google.com/rss/search?q=${Uri.encode(query)}&hl=id&gl=ID&ceid=ID:id"
+                    conn = (URL(rssUrl).openConnection() as HttpURLConnection).apply {
+                        connectTimeout = 7000
+                        readTimeout = 7000
+                        setRequestProperty("User-Agent", "Mozilla/5.0 (compatible; CinemaTrackerRadar/4.2)")
+                    }
+                    if (conn.responseCode !in 200..299) {
+                        dispatchRssCallback(callbackId, "[]")
+                        return@execute
+                    }
+                    val xml = conn.inputStream.bufferedReader(StandardCharsets.UTF_8).use { it.readText() }
+                    val factory = XmlPullParserFactory.newInstance()
+                    val parser = factory.newPullParser()
+                    parser.setInput(StringReader(xml))
+
+                    val items = JSONArray()
+                    var inItem = false
+                    var currentTag = ""
+                    var curTitle = ""
+                    var curLink = ""
+                    var curSource = ""
+                    var eventType = parser.eventType
+                    while (eventType != XmlPullParser.END_DOCUMENT && items.length() < 6) {
+                        when (eventType) {
+                            XmlPullParser.START_TAG -> {
+                                currentTag = parser.name ?: ""
+                                if (currentTag == "item") {
+                                    inItem = true
+                                    curTitle = ""
+                                    curLink = ""
+                                    curSource = ""
+                                } else if (inItem && currentTag in listOf("title", "link", "source")) {
+                                    val txt = parser.nextText().trim()
+                                    when (currentTag) {
+                                        "title" -> curTitle = txt
+                                        "link" -> curLink = txt
+                                        "source" -> curSource = txt
+                                    }
+                                }
+                            }
+                            XmlPullParser.END_TAG -> {
+                                if (parser.name == "item" && inItem) {
+                                    if (curTitle.isNotEmpty() && curLink.startsWith("http")) {
+                                        items.put(JSONObject().apply {
+                                            put("title", curTitle)
+                                            put("link", curLink)
+                                            put("source", curSource)
+                                        })
+                                    }
+                                    inItem = false
+                                }
+                            }
+                        }
+                        eventType = parser.next()
+                    }
+                    dispatchRssCallback(callbackId, items.toString())
+                } catch (_: Exception) {
+                    dispatchRssCallback(callbackId, "[]")
+                } finally {
+                    conn?.disconnect()
                 }
             }
         }

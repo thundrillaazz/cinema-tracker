@@ -3949,6 +3949,154 @@
       }
     }
 
+    const androidRssPending = {};
+    window.__onAndroidRssResult = function(cbId, jsonStr) {
+      const resolver = androidRssPending[cbId];
+      if (!resolver) return;
+      delete androidRssPending[cbId];
+      try {
+        resolver(JSON.parse(jsonStr || "[]"));
+      } catch (_) {
+        resolver([]);
+      }
+    };
+
+    function fetchNativeAndroidRss(movieTitle) {
+      return new Promise(resolve => {
+        if (!window.AndroidBridge || typeof window.AndroidBridge.fetchGoogleNewsRss !== "function") {
+          resolve([]);
+          return;
+        }
+        const cbId = "rss_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7);
+        const timer = setTimeout(() => {
+          if (androidRssPending[cbId]) {
+            delete androidRssPending[cbId];
+            resolve([]);
+          }
+        }, 8500);
+        androidRssPending[cbId] = items => {
+          clearTimeout(timer);
+          resolve(Array.isArray(items) ? items : []);
+        };
+        try {
+          window.AndroidBridge.fetchGoogleNewsRss(cbId, movieTitle);
+        } catch (_) {
+          clearTimeout(timer);
+          delete androidRssPending[cbId];
+          resolve([]);
+        }
+      });
+    }
+
+    function titleMatchesHeadlineAndroid(movieTitle, headline) {
+      const cleanHead = normalizeKey(headline || "");
+      const tokens = String(movieTitle || "")
+        .toLowerCase()
+        .split(/[^a-z0-9]+/)
+        .filter(w => w.length >= 3 && !["the", "and", "for", "with", "part", "movie"].includes(w));
+      if (tokens.length === 0) return cleanHead.includes(normalizeKey(movieTitle || ""));
+      const hits = tokens.filter(t => cleanHead.includes(t));
+      return tokens.length === 1 ? hits.length === 1 : hits.length >= Math.min(2, tokens.length);
+    }
+
+    async function fetchTmdbIdMetaDirect(tmdbId, apiKey) {
+      if (!tmdbId || !apiKey) return null;
+      try {
+        const res = await fetch(`https://api.themoviedb.org/3/movie/${tmdbId}/release_dates?api_key=${encodeURIComponent(apiKey)}`);
+        if (!res.ok) return null;
+        const data = await res.json();
+        const idEntry = (data.results || []).find(r => r.iso_3166_1 === "ID");
+        if (!idEntry || !Array.isArray(idEntry.release_dates)) return null;
+        const theatrical = idEntry.release_dates
+          .filter(d => [2, 3].includes(Number(d.type)) && d.release_date)
+          .sort((a, b) => String(a.release_date).localeCompare(String(b.release_date)))[0];
+        const picked = theatrical || idEntry.release_dates[0];
+        if (!picked) return null;
+        const rel = String(picked.release_date || "").slice(0, 10);
+        return {
+          releaseDateId: /^\d{4}-\d{2}-\d{2}$/.test(rel) ? rel : "",
+          certification: String(picked.certification || "").trim().slice(0, 24)
+        };
+      } catch (_) {
+        return null;
+      }
+    }
+
+    function applyVerifiedRadarEntry(entry, cacheKey) {
+      radarByKey[cacheKey] = entry;
+      radarByKey = pruneCache(radarByKey, 120);
+      localStorage.setItem("ct_v43_radar_cache", JSON.stringify(radarByKey));
+
+      applyRadarToWatchlist(getLocalTodayIso());
+      rebuildMovieCatalog();
+      updateCounts();
+      renderMovies();
+      if (activeBottomTab === "watchlist") renderWatchlist();
+      if (activeBottomTab === "calendar") renderCalendar();
+      showToast(entry.releaseDateId ? `Radar ID: ${formatShortDate(entry.releaseDateId)}` : "Kabar Radar diperbarui");
+    }
+
+    async function verifyViaNativeAndroidRadar(m, resolvedId, tmdbKey, cacheKey) {
+      if (radarFeedUrl) {
+        await fetchCloudRadarFeed(true);
+        const fromFeed = findMatchingRadarEntry(m);
+        if (fromFeed) {
+          showToast(fromFeed.releaseDateId ? `Radar ID: ${formatShortDate(fromFeed.releaseDateId)}` : "Sinkron dari Cloud Radar Feed");
+          return true;
+        }
+      }
+
+      const [rssItems, idMeta] = await Promise.all([
+        fetchNativeAndroidRss(m.title),
+        fetchTmdbIdMetaDirect(resolvedId, tmdbKey)
+      ]);
+      const matched = rssItems.filter(it => titleMatchesHeadlineAndroid(m.title, it.title));
+      if (matched.length === 0 && !(idMeta && idMeta.releaseDateId)) {
+        return false;
+      }
+
+      const joined = matched.map(x => x.title).join(" | ");
+      const chains = [];
+      if (/\b(xxi|cinema\s*21|cinema\s*xxi|21cineplex)\b/i.test(joined)) chains.push("XXI");
+      if (/\bcgv\b/i.test(joined)) chains.push("CGV");
+      if (/cin[eé]polis/i.test(joined)) chains.push("Cinépolis");
+      const imax = /\bimax\b/i.test(joined);
+      const presaleActive = /\b(pre-?sale|presale|tiket sudah tersedia|buka penjualan)\b/i.test(joined);
+      const lsfMention = /\b(lsf|lulus sensor)\b/i.test(joined);
+
+      let status = "upcoming_global";
+      if (presaleActive) status = "presale";
+      else if ((idMeta && idMeta.releaseDateId) || chains.length > 0) status = "confirmed";
+      else if (lsfMention) status = "lsf_passed";
+
+      const lsfStatus = (idMeta && idMeta.certification)
+        ? `Klasifikasi TMDB ID: ${idMeta.certification}`
+        : (lsfMention ? "Disebutkan pada berita sensor LSF" : "");
+
+      const summaryParts = [];
+      if (idMeta && idMeta.releaseDateId) summaryParts.push(`Jadwal TMDB ID: ${formatShortDate(idMeta.releaseDateId)}.`);
+      if (matched[0] && matched[0].title) summaryParts.push(`Google News ID: ${matched[0].title}`);
+
+      const rawEntry = {
+        key: cacheKey,
+        tmdbId: resolvedId || undefined,
+        title: m.title,
+        releaseDateId: (idMeta && idMeta.releaseDateId) || undefined,
+        status,
+        chains,
+        imax,
+        presaleActive,
+        lsfStatus,
+        summary: summaryParts.join(" ").slice(0, 280) || "Terdeteksi di sumber bioskop Indonesia.",
+        sources: matched.slice(0, 3).map(x => ({ title: (x.source || "Google News ID").slice(0, 64), url: x.link })),
+        checkedAt: new Date().toISOString()
+      };
+      const parsed = parseRadarFeedPayload({ entries: [rawEntry] });
+      if (!parsed.entries[0]) return false;
+      applyVerifiedRadarEntry(parsed.entries[0], cacheKey);
+      return true;
+    }
+
     async function verifyRadarMovie(id, force = false) {
       const m = allMovies.find(item => item.id === id) || (watchlistMap[id] && watchlistMap[id].movieData);
       if (!m) return;
@@ -3964,49 +4112,43 @@
       }
 
       const base = getRadarApiBase();
-      if (base === null) {
-        radarErrorMessage = "Isi URL Server Radar di Settings untuk verifikasi kabar live di APK.";
-        if (activeDetailMovieId === m.id) renderDetailHtml(m);
-        return;
-      }
-
       verifyingRadarMovieId = m.id;
       if (activeDetailMovieId === m.id) renderDetailHtml(m);
 
       try {
-        const res = await fetch(`${base}/api/radar/verify`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            title: m.title,
-            originalTitle: m.searchQuery || undefined,
-            releaseDate: m.releaseDate,
-            tmdbId: resolvedId || undefined,
-            force
-          })
-        });
-        const data = await res.json();
-        if (!res.ok) {
-          radarErrorMessage = (data && data.message) || "Verifikasi kabar bioskop ID belum tersedia saat ini.";
-          return;
+        if (base !== null) {
+          try {
+            const res = await fetch(`${base}/api/radar/verify`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                title: m.title,
+                originalTitle: m.searchQuery || undefined,
+                releaseDate: m.releaseDate,
+                tmdbId: resolvedId || undefined,
+                force
+              })
+            });
+            if (res.ok) {
+              const data = await res.json();
+              const parsed = parseRadarFeedPayload({ entries: [data] });
+              const entry = parsed.entries[0];
+              if (entry) {
+                applyVerifiedRadarEntry(entry, cacheKey);
+                return;
+              }
+            }
+          } catch (_) {
+            // Fall back cleanly to Cloud Radar Feed + Android native Google News ID RSS
+          }
         }
-        const parsed = parseRadarFeedPayload({ entries: [data] });
-        const entry = parsed.entries[0];
-        if (!entry) return;
 
-        radarByKey[cacheKey] = entry;
-        radarByKey = pruneCache(radarByKey, 120);
-        localStorage.setItem("ct_v43_radar_cache", JSON.stringify(radarByKey));
-
-        applyRadarToWatchlist(getLocalTodayIso());
-        rebuildMovieCatalog();
-        updateCounts();
-        renderMovies();
-        if (activeBottomTab === "watchlist") renderWatchlist();
-        if (activeBottomTab === "calendar") renderCalendar();
-        showToast(entry.releaseDateId ? `Radar ID: ${formatShortDate(entry.releaseDateId)}` : "Kabar Radar diperbarui");
-      } catch (_) {
-        radarErrorMessage = "Tidak dapat menghubungi server verifikasi Radar.";
+        const nativeOk = await verifyViaNativeAndroidRadar(m, resolvedId, key, cacheKey);
+        if (!nativeOk) {
+          radarErrorMessage = base !== null
+            ? "Server Radar tidak terjangkau (pastikan URL aktif) dan belum ada berita baru di Google News ID."
+            : "Belum ditemukan berita bioskop ID terbaru di Cloud Radar atau Google News ID untuk film ini.";
+        }
       } finally {
         verifyingRadarMovieId = null;
         if (activeDetailMovieId === id && document.getElementById("detailOverlay").classList.contains("open")) {
