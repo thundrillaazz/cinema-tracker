@@ -1519,6 +1519,121 @@
       font-weight: 600;
       opacity: 0.8;
     }
+    .detail-ratings-strip {
+      margin-top: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 3px 7px;
+      font-variant-numeric: tabular-nums;
+    }
+    .detail-rating-lbl { color: var(--muted); font-weight: 500; }
+    .radar-divider {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+    .radar-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .radar-title {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+    }
+    .radar-status {
+      font-size: 10.5px;
+      font-weight: 600;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+    .radar-summary {
+      font-size: 11.5px;
+      color: var(--text);
+      line-height: 1.45;
+      margin-bottom: 6px;
+    }
+    .radar-sources {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+    .radar-src-btn {
+      min-height: 32px;
+      padding: 4px 8px;
+      border-radius: 7px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--blue);
+      font-size: 10.5px;
+      font-weight: 600;
+      cursor: pointer;
+      max-width: 195px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .radar-verify-btn {
+      width: 100%;
+      min-height: 44px;
+      padding: 9px 12px;
+      border-radius: 9px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+    }
+    .radar-verify-btn:disabled { opacity: 0.6; cursor: default; }
+    .radar-config-toggle {
+      margin-top: 10px;
+      background: none;
+      border: none;
+      padding: 0;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--blue);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: left;
+    }
+    .radar-config-box {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+      display: none;
+    }
+    .radar-field-label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
   </style>
 </head>
 <body>
@@ -1698,6 +1813,21 @@
           <input id="tmdbKeyInput" class="text-input" style="padding-right:64px;" type="password" autocomplete="off" placeholder="Tempel TMDB API Key v3..." />
           <button id="toggleKeyVisBtn" type="button" class="api-eye-btn" onclick="toggleApiKeyVisibility()">Tampil</button>
         </div>
+        <button id="toggleRadarConfigBtn" type="button" class="radar-config-toggle" onclick="toggleRadarConfigBox()">
+          <span>Atur Cloud Radar &amp; Server APK (Opsional)</span>
+          <span id="radarStatusLabel" style="color:var(--muted); font-weight:500;">Opsional</span>
+        </button>
+        <div id="radarConfigBox" class="radar-config-box">
+          <div style="margin-bottom:8px;">
+            <label for="radarFeedInput" class="radar-field-label">URL Feed Cloud Radar JSON</label>
+            <input id="radarFeedInput" class="text-input" type="url" autocomplete="off" placeholder="https://raw.githubusercontent.com/.../public/radar-id.json" />
+          </div>
+          <div>
+            <label for="radarServerInput" class="radar-field-label">URL Server Radar (Khusus APK Android)</label>
+            <input id="radarServerInput" class="text-input" type="url" autocomplete="off" placeholder="https://nama-app-anda.run.app" />
+            <p style="font-size:10.5px; color:var(--muted); margin:4px 0 0;">Isi URL server agar fitur cek kabar bioskop &amp; rating IMDb/RT aktif di APK Android.</p>
+          </div>
+        </div>
         <button type="button" class="btn-full" onclick="saveAppSettings()">Simpan & Perbarui Jadwal</button>
         <p id="syncFeedback" style="margin-top:7px; font-weight:500; font-size:11.5px; color:var(--muted); min-height:16px;"></p>
       </div>
@@ -1847,141 +1977,7 @@
       9648: "Mystery", 10749: "Romance", 878: "Sci-Fi", 53: "Thriller"
     };
 
-    const BASE_CURATED_MOVIES = [
-      {
-        id: "now_1", isIndonesian: true, title: "HAMKA: AWAL MULA (VOL. 3)", searchQuery: "Buya Hamka Vol 3",
-        releaseDate: "2026-11-12", confirmedText: "Sedang tayang di bioskop Indonesia",
-        presaleText: "Pantau ketersediaan jadwal & tiket di bioskop terdekat.", sourceBadge: "LSF SU", age: "SU", runtime: "128m",
-        genre: "Biopic, Drama", hype: 88, rating: "8.8", presale: false, imax: false, tba: false, chains: [],
-        director: "Fajar Bustomi", cast: "Vino G. Bastian, Laudya Cynthia Bella", synopsis: "Babak penutup perjalanan hidup Buya Hamka.", poster: ""
-      },
-      {
-        id: "now_2", isIndonesian: false, title: "THE HUNGER GAMES: SUNRISE ON THE REAPING", searchQuery: "Sunrise on the Reaping",
-        releaseDate: "2026-11-18", confirmedText: "Sedang tayang di bioskop Indonesia",
-        presaleText: "Tersedia format IMAX & Regular.", sourceBadge: "TMDB ID · IMAX", age: "R 13+", runtime: "144m",
-        genre: "Action, Fantasy", hype: 96, rating: "9.4", presale: false, imax: true, tba: false, chains: [],
-        director: "Francis Lawrence", cast: "Joseph Zada, Whitney Peak", synopsis: "Kisah Quarter Quell ke-50 Haymitch Abernathy.", poster: ""
-      },
-      {
-        id: "now_3", isIndonesian: false, title: "LOOK BACK (LIVE-ACTION)", searchQuery: "Look Back",
-        releaseDate: "2026-11-11", confirmedText: "Sedang tayang di bioskop Indonesia",
-        presaleText: "Pantau ketersediaan jadwal & tiket di bioskop terdekat.", sourceBadge: "TMDB ID", age: "R 13+", runtime: "110m",
-        genre: "Drama", hype: 95, rating: "9.3", presale: false, imax: false, tba: false, chains: [],
-        director: "Hirokazu Kore-eda", cast: "Mana Ashida, Mizuki Yoshida", synopsis: "Adaptasi live-action manga Tatsuki Fujimoto.", poster: ""
-      },
-      {
-        id: "now_4", isIndonesian: true, title: "SEPORSI MIE AYAM SEBELUM MATI", searchQuery: "Seporsi Mie Ayam Sebelum Mati",
-        releaseDate: "2026-11-12", confirmedText: "Sedang tayang di bioskop Indonesia",
-        presaleText: "Pantau ketersediaan jadwal & tiket di bioskop terdekat.", sourceBadge: "LSF R13+", age: "R 13+", runtime: "105m",
-        genre: "Drama", hype: 90, rating: "8.9", presale: false, imax: false, tba: false, chains: [],
-        director: "Yandy Laurens", cast: "Baskara Mahendra, Rachel Amanda", synopsis: "Adaptasi novel Brian Khrisna.", poster: ""
-      },
-      {
-        id: "now_5", isIndonesian: false, title: "NOW YOU SEE ME: NOW YOU DON'T", searchQuery: "Now You See Me Now You Don't",
-        releaseDate: "2026-11-11", confirmedText: "Sedang tayang di bioskop Indonesia",
-        presaleText: "Pantau ketersediaan jadwal & tiket di bioskop terdekat.", sourceBadge: "TMDB ID", age: "R 13+", runtime: "122m",
-        genre: "Action, Mystery", hype: 87, rating: "8.4", presale: false, imax: false, tba: false, chains: [],
-        director: "Ruben Fleischer", cast: "Jesse Eisenberg, Woody Harrelson", synopsis: "Aksi pencurian baru Four Horsemen.", poster: ""
-      },
-      {
-        id: "up_rerelease_yourname", isIndonesian: false, isReRelease: true, tmdbId: 372058, title: "YOUR NAME (4K RE-RELEASE)", searchQuery: "Your Name",
-        releaseDate: "2026-12-02", confirmedText: "Tayang kembali 02/12/2026",
-        presaleText: "Pantau ketersediaan jadwal & tiket di bioskop terdekat.", sourceBadge: "Re-Release ID", age: "R 13+", runtime: "106m",
-        genre: "Animation, Romance", hype: 95, rating: "8.9", presale: true, imax: false, tba: false, chains: [],
-        director: "Makoto Shinkai", cast: "Ryunosuke Kamiki, Mone Kamishiraishi", synopsis: "Dua remaja yang terhubung lewat pertukaran tubuh misterius melintasi ruang dan waktu.", poster: ""
-      },
-      {
-        id: "up_1", isIndonesian: false, title: "BLUE LOCK: EPISODE NAGI - STAGE 2", searchQuery: "Blue Lock Episode Nagi",
-        releaseDate: "2026-11-20", confirmedText: "20/11/2026",
-        presaleText: "Pantau ketersediaan jadwal & tiket di bioskop terdekat.", sourceBadge: "TMDB ID", age: "R 13+", runtime: "108m",
-        genre: "Anime, Sports", hype: 92, rating: "9.0", presale: false, imax: false, tba: false, chains: [],
-        director: "Shunsuke Ishikawa", cast: "Nobunaga Shimazaki, Yuma Uchida", synopsis: "Neo Egoist League.", poster: ""
-      },
-      {
-        id: "up_2", isIndonesian: false, title: "HOW TO ROB A BANK", searchQuery: "How to Rob a Bank",
-        releaseDate: "2026-11-20", confirmedText: "20/11/2026",
-        presaleText: "Pantau ketersediaan jadwal & tiket di bioskop terdekat.", sourceBadge: "TMDB ID", age: "D 17+", runtime: "118m",
-        genre: "Action, Crime", hype: 88, rating: "8.6", presale: false, imax: false, tba: false, chains: [],
-        director: "David Leitch", cast: "Nicholas Hoult, Zoë Kravitz", synopsis: "Perampokan berisiko tinggi.", poster: ""
-      },
-      {
-        id: "up_3", isIndonesian: false, title: "THE FURTHER MIS-ADVENTURES OF CLIFF BOOTH", searchQuery: "The Adventures of Cliff Booth",
-        releaseDate: "2026-11-25", confirmedText: "25/11/2026",
-        presaleText: "Tersedia format IMAX & Regular.", sourceBadge: "TMDB ID · LSF", age: "D 17+", runtime: "136m",
-        genre: "Drama, Crime", hype: 95, rating: "9.1", presale: true, imax: true, tba: false, chains: [],
-        director: "David Fincher", cast: "Brad Pitt, Elizabeth Debicki", synopsis: "Hollywood era 1970-an.", poster: ""
-      },
-      {
-        id: "up_4", isIndonesian: false, title: "FOCKER-IN-LAW", searchQuery: "Focker-in-Law",
-        releaseDate: "2026-11-27", confirmedText: "27/11/2026",
-        presaleText: "Pantau ketersediaan jadwal & tiket di bioskop terdekat.", sourceBadge: "TMDB ID", age: "R 13+", runtime: "110m",
-        genre: "Comedy", hype: 81, rating: "8.0", presale: false, imax: false, tba: false, chains: [],
-        director: "John Hamburg", cast: "Robert De Niro, Ben Stiller", synopsis: "Keluarga Byrnes kembali.", poster: ""
-      },
-      {
-        id: "up_5", isIndonesian: false, title: "HEXED", searchQuery: "Hexed",
-        releaseDate: "2026-11-27", confirmedText: "27/11/2026",
-        presaleText: "Tersedia format IMAX & Regular.", sourceBadge: "IMAX · TMDB ID", age: "SU", runtime: "104m",
-        genre: "Animation, Fantasy", hype: 91, rating: "8.7", presale: false, imax: true, tba: false, chains: [],
-        director: "Josie Trinidad", cast: "Disney Animation", synopsis: "Petualangan sihir remaja.", poster: ""
-      },
-      {
-        id: "up_6", isIndonesian: false, title: "VIOLENT NIGHT 2", searchQuery: "Violent Night 2",
-        releaseDate: "2026-12-02", confirmedText: "02/12/2026",
-        presaleText: "Pantau ketersediaan jadwal & tiket di bioskop terdekat.", sourceBadge: "TMDB ID", age: "D 17+", runtime: "115m",
-        genre: "Action, Thriller", hype: 90, rating: "8.5", presale: false, imax: false, tba: false, chains: [],
-        director: "Tommy Wirkola", cast: "David Harbour, Kristen Bell", synopsis: "Santa Claus kembali beraksi.", poster: ""
-      },
-      {
-        id: "up_7", isIndonesian: true, title: "3726 MDPL", searchQuery: "3726 MDPL",
-        releaseDate: "2026-12-03", confirmedText: "03/12/2026",
-        presaleText: "Pantau ketersediaan jadwal & tiket di bioskop terdekat.", sourceBadge: "LSF ID", age: "R 13+", runtime: "116m",
-        genre: "Adventure, Romance", hype: 86, rating: "8.4", presale: false, imax: false, tba: false, chains: [],
-        director: "Rako Prijanto", cast: "Angga Yunanda, Syifa Hadju", synopsis: "Pendakian Gunung Rinjani.", poster: ""
-      },
-      {
-        id: "up_8", isIndonesian: false, isReRelease: true, title: "DUNE: PART TWO (IMAX RE-RELEASE)", searchQuery: "Dune Part Two",
-        releaseDate: "2026-12-09", confirmedText: "09/12/2026",
-        presaleText: "Penayangan ulang spesial format IMAX.", sourceBadge: "IMAX ID", age: "R 13+", runtime: "166m",
-        genre: "Sci-Fi, Adventure", hype: 94, rating: "9.2", presale: false, imax: true, tba: false, chains: [],
-        director: "Denis Villeneuve", cast: "Timothée Chalamet, Zendaya", synopsis: "Penayangan ulang spesial IMAX.", poster: ""
-      },
-      {
-        id: "up_10", isIndonesian: false, title: "DUNE: PART THREE", searchQuery: "Dune Part Three",
-        releaseDate: "2026-12-16", confirmedText: "16/12/2026",
-        presaleText: "Tersedia format IMAX & Regular.", sourceBadge: "TMDB ID · IMAX", age: "R 13+", runtime: "162m",
-        genre: "Sci-Fi, Action", hype: 98, rating: "9.5", presale: false, imax: true, tba: false, chains: [],
-        director: "Denis Villeneuve", cast: "Timothée Chalamet, Zendaya", synopsis: "Babak puncak Dune Messiah.", poster: ""
-      },
-      {
-        id: "up_11", isIndonesian: false, title: "AVENGERS: DOOMSDAY", searchQuery: "Avengers Doomsday",
-        releaseDate: "2026-12-16", confirmedText: "16/12/2026",
-        presaleText: "Tersedia format IMAX & Regular.", sourceBadge: "TMDB ID · IMAX", age: "R 13+", runtime: "158m",
-        genre: "Action, Superhero", hype: 99, rating: "9.6", presale: false, imax: true, tba: false, chains: [],
-        director: "Anthony & Joe Russo", cast: "Robert Downey Jr., Pedro Pascal", synopsis: "Menghadapi Victor Von Doom.", poster: ""
-      },
-      {
-        id: "up_12", isIndonesian: true, title: "5 CM: REVOLUSI HATI", searchQuery: "5 cm",
-        releaseDate: "2026-12-24", confirmedText: "24/12/2026",
-        presaleText: "Pantau ketersediaan jadwal & tiket di bioskop terdekat.", sourceBadge: "LSF ID", age: "R 13+", runtime: "124m",
-        genre: "Drama, Adventure", hype: 87, rating: "8.5", presale: false, imax: false, tba: false, chains: [],
-        director: "Rizal Mantovani", cast: "Herjunot Ali, Fedi Nuril", synopsis: "Reuni sahabat Mahameru.", poster: ""
-      },
-      {
-        id: "up_15", isIndonesian: false, title: "THE BEEKEEPER 2", searchQuery: "The Beekeeper 2",
-        releaseDate: "2027-01-13", confirmedText: "13/01/2027",
-        presaleText: "Tersedia format IMAX & Regular.", sourceBadge: "TMDB ID · IMAX", age: "D 17+", runtime: "112m",
-        genre: "Action, Thriller", hype: 95, rating: "8.9", presale: false, imax: true, tba: false, chains: [],
-        director: "Timo Tjahjanto", cast: "Jason Statham, Pom Klementieff", synopsis: "Disutradarai Timo Tjahjanto.", poster: ""
-      },
-      {
-        id: "up_17", isIndonesian: false, title: "THE MANDALORIAN AND GROGU", searchQuery: "The Mandalorian and Grogu",
-        releaseDate: "2027-01-20", confirmedText: "20/01/2027",
-        presaleText: "Tersedia format IMAX & Regular.", sourceBadge: "TMDB ID · IMAX", age: "R 13+", runtime: "130m",
-        genre: "Sci-Fi, Adventure", hype: 94, rating: "9.0", presale: false, imax: true, tba: false, chains: [],
-        director: "Jon Favreau", cast: "Pedro Pascal, Sigourney Weaver", synopsis: "Misi baru New Republic.", poster: ""
-      }
-    ];
+    const BASE_CURATED_MOVIES = [];
 
     const ID_MONTHS = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
@@ -1996,6 +1992,13 @@
     let tmdbIdCache = JSON.parse(localStorage.getItem("ct_v37_tmdbid_cache") || "{}");
     let creditsCache = JSON.parse(localStorage.getItem("ct_v37_credits_cache") || "{}");
     let trailerCache = JSON.parse(localStorage.getItem("ct_v39_trailer_cache") || "{}");
+    let radarByKey = JSON.parse(localStorage.getItem("ct_v43_radar_cache") || "{}");
+    let ratingsCache = JSON.parse(localStorage.getItem("ct_v43_ratings_cache") || "{}");
+    let radarFeedUrl = localStorage.getItem("ct_radar_feed_url") || "";
+    let radarServerUrl = localStorage.getItem("ct_radar_server_url") || "";
+    let radarCapabilities = null;
+    let verifyingRadarMovieId = null;
+    let radarErrorMessage = "";
     let customPostersMap = {};
     let watchlistMap = {};
     let searchResultsStore = [];
@@ -2100,7 +2103,8 @@
 
         const resolvedTmdb = Math.max(entryTmdb, canonicalMovie ? (canonicalMovie.tmdbId || 0) : 0);
         const isUnverifiedLive = String(targetKey).startsWith("tmdb_") || String(targetKey).startsWith("search_");
-        const nextChains = canonicalMovie ? (canonicalMovie.chains || []) : (isUnverifiedLive ? [] : (entry.movieData.chains || []));
+        const hasRadarChains = Boolean(entry.movieData.radarInfo && entry.movieData.radarInfo.chains && entry.movieData.radarInfo.chains.length > 0);
+        const nextChains = canonicalMovie ? (canonicalMovie.chains || []) : ((isUnverifiedLive && !hasRadarChains) ? [] : (entry.movieData.chains || []));
         if ((entry.movieData.chains || []).length !== nextChains.length) changed = true;
         const mergedMovie = {
           ...entry.movieData,
@@ -2269,22 +2273,6 @@
         }
       }
 
-      if (Object.keys(localWatch).length === 0 && !localStorage.getItem("ct_v37_initialized")) {
-        ["up_1", "up_10", "up_11"].forEach(id => {
-          const found = BASE_CURATED_MOVIES.find(m => m.id === id);
-          if (found) {
-            localWatch[id] = {
-              presaleAlert: true,
-              h1Alert: true,
-              dayAlert: true,
-              isTba: false,
-              tmdbId: 0,
-              movieData: { ...found }
-            };
-          }
-        });
-      }
-
       watchlistMap = localWatch;
       localStorage.setItem("ct_v37_initialized", "1");
       persistWatchlist();
@@ -2338,9 +2326,28 @@
       const savedInterval = localStorage.getItem("ct_sync_interval") || "6";
       const savedIcon = localStorage.getItem("ct_launcher_icon") || "LauncherDefault";
 
+      if ((!radarFeedUrl || !radarServerUrl) && window.AndroidBridge && typeof window.AndroidBridge.getRadarConfigJson === "function") {
+        try {
+          const bridgeCfg = JSON.parse(window.AndroidBridge.getRadarConfigJson() || "{}");
+          if (!radarFeedUrl && bridgeCfg.feedUrl) {
+            radarFeedUrl = bridgeCfg.feedUrl;
+            localStorage.setItem("ct_radar_feed_url", radarFeedUrl);
+          }
+          if (!radarServerUrl && bridgeCfg.serverUrl) {
+            radarServerUrl = bridgeCfg.serverUrl;
+            localStorage.setItem("ct_radar_server_url", radarServerUrl);
+          }
+        } catch (_) {}
+      }
+
       document.getElementById("minHypeSelect").value = savedHype;
       document.getElementById("syncIntervalSelect").value = savedInterval;
+      document.getElementById("radarFeedInput").value = radarFeedUrl;
+      document.getElementById("radarServerInput").value = radarServerUrl;
+      updateRadarStatusLabel();
       highlightLauncherOption(savedIcon);
+      probeRadarCapabilities();
+      fetchCloudRadarFeed(false);
 
       if (savedKey) {
         document.getElementById("tmdbKeyInput").value = savedKey;
@@ -2385,6 +2392,7 @@
       renderMovies();
       if (activeBottomTab === "watchlist") renderWatchlist();
       if (activeBottomTab === "calendar") renderCalendar();
+      fetchCloudRadarFeed(false);
       const key = localStorage.getItem("ct_tmdb_key") || "";
       if (key) autoSyncIfStale(key);
     };
@@ -2411,27 +2419,6 @@
 
       const map = new Map();
       const seenNormalized = new Map();
-
-      BASE_CURATED_MOVIES.forEach(item => {
-        const m = { ...item };
-        const isReleased = m.releaseDate !== "TBA" && m.releaseDate <= todayIso;
-        m.status = isReleased ? "now" : "upcoming";
-        m.dateLabel = isReleased ? "Sedang Tayang" : formatShortDate(m.releaseDate);
-        if (m.confirmedText) m.confirmedText = normalizeIsoDatesInText(m.confirmedText);
-        if (isReleased && m.presale) {
-          m.presale = false;
-          m.confirmedText = "Sedang tayang di bioskop Indonesia";
-        }
-        if (!m.tmdbId && tmdbIdCache[m.id]) m.tmdbId = tmdbIdCache[m.id];
-        if (!m.poster && posterCache[m.id]) m.poster = posterCache[m.id];
-        if (creditsCache[m.id]) {
-          m.director = creditsCache[m.id].director || m.director;
-          m.cast = creditsCache[m.id].cast || m.cast;
-          m.runtime = creditsCache[m.id].runtime || m.runtime;
-        }
-        map.set(m.id, m);
-        seenNormalized.set(normalizeKey(m.title), m.id);
-      });
 
       [...liveNow, ...liveUpcoming].forEach(item => {
         const m = { ...item };
@@ -2467,6 +2454,7 @@
         }
       });
 
+      const hasLiveNow = liveNow.length > 0;
       Object.keys(watchlistMap).forEach(wId => {
         const entry = watchlistMap[wId];
         if (!entry || !entry.movieData) return;
@@ -2484,7 +2472,9 @@
           return;
         }
         if (!savedM.tba && savedM.releaseDate && savedM.releaseDate !== "TBA") {
+          if (savedM.releaseDate < minDate || savedM.releaseDate > maxDate) return;
           const isRel = savedM.releaseDate <= todayIso;
+          if (isRel && hasLiveNow) return;
           savedM.status = isRel ? "now" : "upcoming";
           savedM.dateLabel = isRel ? "Sedang Tayang" : formatShortDate(savedM.releaseDate);
           if (savedM.confirmedText) savedM.confirmedText = normalizeIsoDatesInText(savedM.confirmedText);
@@ -2497,10 +2487,12 @@
       tmdbIdCache = pruneCache(tmdbIdCache, 150);
       creditsCache = pruneCache(creditsCache, 120);
       trailerCache = pruneCache(trailerCache, 120);
+      radarByKey = pruneCache(radarByKey, 120);
+      ratingsCache = pruneCache(ratingsCache, 120);
 
       localStorage.setItem("ct_v37_poster_cache", JSON.stringify(posterCache));
       localStorage.setItem("ct_v37_tmdbid_cache", JSON.stringify(tmdbIdCache));
-      allMovies = Array.from(map.values());
+      allMovies = Array.from(map.values()).map(m => mergeRadarIntoMovie(m, todayIso));
       reconcileWatchlistMap();
     }
 
@@ -2613,22 +2605,297 @@
       }
     }
 
+    function toggleRadarConfigBox() {
+      const box = document.getElementById("radarConfigBox");
+      const btn = document.getElementById("toggleRadarConfigBtn");
+      const isOpen = box.style.display === "block";
+      box.style.display = isOpen ? "none" : "block";
+      const labelEl = btn.querySelector("span");
+      if (labelEl) {
+        labelEl.textContent = isOpen ? "Atur Cloud Radar & Server APK (Opsional)" : "Tutup URL Cloud Radar (Opsional)";
+      }
+    }
+
+    function updateRadarStatusLabel() {
+      const el = document.getElementById("radarStatusLabel");
+      if (!el) return;
+      const parts = [];
+      if (radarFeedUrl.trim()) parts.push("Cloud Feed");
+      if (radarServerUrl.trim()) parts.push("Server APK");
+      el.textContent = parts.length ? parts.join(" · ") : "Opsional";
+    }
+
+    function getRadarApiBase(overrideServerUrl) {
+      const raw = String(overrideServerUrl !== undefined ? overrideServerUrl : radarServerUrl).trim().replace(/\/+$/, "");
+      if (/^https?:\/\//i.test(raw)) return raw;
+      if (window.location.protocol === "http:" || window.location.protocol === "https:") return "";
+      return null;
+    }
+
+    async function probeRadarCapabilities() {
+      const base = getRadarApiBase();
+      if (base === null) {
+        radarCapabilities = null;
+        return;
+      }
+      try {
+        const res = await fetch(`${base}/api/radar/status`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data && typeof data.geminiConfigured === "boolean") {
+            radarCapabilities = {
+              geminiConfigured: Boolean(data.geminiConfigured),
+              omdbConfigured: Boolean(data.omdbConfigured)
+            };
+          }
+        }
+      } catch (_) {}
+    }
+
+    async function mapWithConcurrency(items, concurrency, worker) {
+      if (!items || items.length === 0) return [];
+      const cap = Math.max(1, Math.min(concurrency, items.length));
+      const results = new Array(items.length);
+      let cursor = 0;
+      async function runner() {
+        while (cursor < items.length) {
+          const idx = cursor++;
+          results[idx] = await worker(items[idx], idx);
+        }
+      }
+      await Promise.all(Array.from({ length: cap }, () => runner()));
+      return results;
+    }
+
+    function parseRadarFeedPayload(raw) {
+      if (!raw || typeof raw !== "object" || Array.isArray(raw)) {
+        return { version: 1, updatedAt: "", entries: [] };
+      }
+      const validStatuses = new Set(["confirmed", "presale", "lsf_passed", "upcoming_global", "unconfirmed"]);
+      const entries = [];
+      (Array.isArray(raw.entries) ? raw.entries : []).forEach(e => {
+        if (!e || typeof e !== "object") return;
+        const title = String(e.title || "").trim();
+        if (!title) return;
+        const tmdbId = Number(e.tmdbId || 0) || undefined;
+        const key = (typeof e.key === "string" && e.key)
+          ? e.key
+          : (tmdbId ? `tmdb_${tmdbId}` : `title_${normalizeKey(title)}`);
+        const chains = Array.isArray(e.chains)
+          ? e.chains.filter(c => c === "XXI" || c === "CGV" || c === "Cinépolis")
+          : [];
+        const sources = Array.isArray(e.sources)
+          ? e.sources
+              .filter(s => s && typeof s === "object" && typeof s.url === "string" && /^https?:\/\//i.test(s.url))
+              .slice(0, 4)
+              .map(s => ({ title: String(s.title || "Sumber Web").slice(0, 64), url: s.url }))
+          : [];
+        const rawRel = typeof e.releaseDateId === "string" ? e.releaseDateId.trim().slice(0, 10) : "";
+        const releaseDateId = /^\d{4}-\d{2}-\d{2}$/.test(rawRel) ? rawRel : undefined;
+        const statusStr = String(e.status || "unconfirmed");
+        entries.push({
+          key,
+          tmdbId,
+          title,
+          releaseDateId,
+          status: validStatuses.has(statusStr) ? statusStr : "unconfirmed",
+          chains,
+          imax: Boolean(e.imax),
+          presaleActive: Boolean(e.presaleActive),
+          lsfStatus: typeof e.lsfStatus === "string" ? e.lsfStatus : "",
+          summary: typeof e.summary === "string" ? e.summary : "",
+          sources,
+          checkedAt: typeof e.checkedAt === "string" ? e.checkedAt : new Date().toISOString()
+        });
+      });
+      return {
+        version: Number(raw.version || 1) || 1,
+        updatedAt: typeof raw.updatedAt === "string" ? raw.updatedAt : "",
+        entries
+      };
+    }
+
+    function findMatchingRadarEntry(m) {
+      if (!m || !radarByKey) return null;
+      const tid = getMovieCanonicalTmdbId(m);
+      if (tid > 0 && radarByKey[`tmdb_${tid}`]) return radarByKey[`tmdb_${tid}`];
+      const norm = normalizeKey(m.title || "");
+      if (norm && radarByKey[`title_${norm}`]) return radarByKey[`title_${norm}`];
+      const vals = Object.values(radarByKey);
+      for (let i = 0; i < vals.length; i++) {
+        const entry = vals[i];
+        if (!entry) continue;
+        if (tid > 0 && entry.tmdbId && entry.tmdbId === tid) return entry;
+        if (norm && entry.title && normalizeKey(entry.title) === norm) return entry;
+      }
+      return null;
+    }
+
+    function mergeRadarIntoMovie(m, todayIso) {
+      const radar = findMatchingRadarEntry(m);
+      if (!radar) return m;
+      const next = { ...m, radarInfo: radar };
+      if (radar.releaseDateId && (m.tba || !m.releaseDate || m.releaseDate === "TBA")) {
+        const isRel = radar.releaseDateId <= todayIso;
+        next.tba = false;
+        next.releaseDate = radar.releaseDateId;
+        next.status = isRel ? "now" : "upcoming";
+        next.dateLabel = isRel ? "Sedang Tayang" : formatShortDate(radar.releaseDateId);
+        next.confirmedText = isRel ? "Sedang tayang di bioskop Indonesia" : `Terkonfirmasi ID · ${formatShortDate(radar.releaseDateId)}`;
+        next.sourceBadge = "Radar Bioskop ID";
+      }
+      if (radar.chains && radar.chains.length > 0) next.chains = radar.chains;
+      if (radar.imax) next.imax = true;
+      if (radar.presaleActive) {
+        next.presale = true;
+        next.presaleText = "Tiket pre-sale dilaporkan sudah dibuka.";
+      }
+      return next;
+    }
+
+    function applyRadarToWatchlist(todayIso) {
+      let mutated = false;
+      const newlyConfirmed = [];
+      Object.keys(watchlistMap).forEach(wKey => {
+        const entry = watchlistMap[wKey];
+        if (!entry || !entry.movieData) return;
+        const radar = findMatchingRadarEntry({ ...entry.movieData, tmdbId: entry.tmdbId || entry.movieData.tmdbId });
+        if (!radar) return;
+
+        const prevM = entry.movieData;
+        const promotedFromTba = Boolean(entry.isTba && radar.releaseDateId);
+        const nextRelease = (radar.releaseDateId && (entry.isTba || !prevM.releaseDate || prevM.releaseDate === "TBA"))
+          ? radar.releaseDateId
+          : prevM.releaseDate;
+        const nextTba = radar.releaseDateId ? false : Boolean(entry.isTba);
+        const nextChains = (radar.chains && radar.chains.length > 0) ? radar.chains : (prevM.chains || []);
+        const nextImax = Boolean(prevM.imax || radar.imax);
+        const nextPresale = Boolean(prevM.presale || radar.presaleActive);
+
+        const changed = promotedFromTba ||
+          nextRelease !== prevM.releaseDate ||
+          nextChains.join(",") !== (prevM.chains || []).join(",") ||
+          nextImax !== Boolean(prevM.imax) ||
+          nextPresale !== Boolean(prevM.presale) ||
+          (prevM.radarInfo && prevM.radarInfo.checkedAt) !== radar.checkedAt;
+
+        if (changed) {
+          mutated = true;
+          if (promotedFromTba) newlyConfirmed.push(wKey);
+          const isRel = Boolean(nextRelease && nextRelease !== "TBA" && nextRelease <= todayIso);
+          watchlistMap[wKey] = {
+            ...entry,
+            isTba: nextTba,
+            lastKnownReleaseDate: nextRelease,
+            movieData: {
+              ...prevM,
+              tba: nextTba,
+              releaseDate: nextRelease,
+              status: nextTba ? prevM.status : (isRel ? "now" : "upcoming"),
+              dateLabel: nextTba ? "TBA ID" : (isRel ? "Sedang Tayang" : formatShortDate(nextRelease)),
+              confirmedText: (!nextTba && radar.releaseDateId) ? `Terkonfirmasi ID · ${formatShortDate(radar.releaseDateId)}` : prevM.confirmedText,
+              chains: nextChains,
+              imax: nextImax,
+              presale: nextPresale,
+              radarInfo: radar
+            }
+          };
+        }
+      });
+      if (mutated) {
+        persistWatchlist();
+        syncWatchlistToNative();
+      }
+      return newlyConfirmed;
+    }
+
+    async function fetchCloudRadarFeed(force = false, overrideFeedUrl, overrideServerUrl) {
+      const lastFeedTs = parseInt(localStorage.getItem("ct_radar_feed_ts") || "0", 10) || 0;
+      const TTL_6H = 6 * 60 * 60 * 1000;
+      if (!force && lastFeedTs > 0 && (Date.now() - lastFeedTs) < TTL_6H) {
+        return radarByKey;
+      }
+
+      const customUrl = String(overrideFeedUrl !== undefined ? overrideFeedUrl : radarFeedUrl).trim();
+      const apiBase = getRadarApiBase(overrideServerUrl);
+      const targetUrl = /^https?:\/\//i.test(customUrl)
+        ? customUrl
+        : (apiBase !== null ? `${apiBase}/api/radar/feed` : "");
+      if (!targetUrl) return radarByKey;
+
+      try {
+        const headers = {};
+        const prevEtag = localStorage.getItem("ct_radar_feed_etag") || "";
+        if (!force && prevEtag) headers["If-None-Match"] = prevEtag;
+
+        const res = await fetch(targetUrl, { headers });
+        if (res.status === 304) {
+          localStorage.setItem("ct_radar_feed_ts", String(Date.now()));
+          return radarByKey;
+        }
+        if (!res.ok) return radarByKey;
+
+        const nextEtag = res.headers.get("etag");
+        if (nextEtag) localStorage.setItem("ct_radar_feed_etag", nextEtag);
+        localStorage.setItem("ct_radar_feed_ts", String(Date.now()));
+
+        const payload = parseRadarFeedPayload(await res.json());
+        if (payload.entries.length === 0) return radarByKey;
+
+        payload.entries.forEach(entry => {
+          const prev = radarByKey[entry.key];
+          if (!prev || entry.checkedAt >= prev.checkedAt) {
+            radarByKey[entry.key] = entry;
+          }
+        });
+        radarByKey = pruneCache(radarByKey, 120);
+        localStorage.setItem("ct_v43_radar_cache", JSON.stringify(radarByKey));
+
+        const todayIso = getLocalTodayIso();
+        applyRadarToWatchlist(todayIso);
+        rebuildMovieCatalog();
+        updateCounts();
+        renderMovies();
+        if (activeBottomTab === "watchlist") renderWatchlist();
+        if (activeBottomTab === "calendar") renderCalendar();
+        if (activeDetailMovieId && document.getElementById("detailOverlay").classList.contains("open")) {
+          const dm = allMovies.find(item => item.id === activeDetailMovieId) || (watchlistMap[activeDetailMovieId] && watchlistMap[activeDetailMovieId].movieData);
+          if (dm) renderDetailHtml(dm);
+        }
+        return radarByKey;
+      } catch (_) {
+        return radarByKey;
+      }
+    }
+
     function saveAppSettings() {
       const key = document.getElementById("tmdbKeyInput").value.trim();
+      const feedUrl = document.getElementById("radarFeedInput").value.trim();
+      const serverUrl = document.getElementById("radarServerInput").value.trim();
       const minHype = parseInt(document.getElementById("minHypeSelect").value, 10) || 85;
       const interval = parseInt(document.getElementById("syncIntervalSelect").value, 10) || 6;
 
+      radarFeedUrl = feedUrl;
+      radarServerUrl = serverUrl;
       localStorage.setItem("ct_tmdb_key", key);
+      localStorage.setItem("ct_radar_feed_url", feedUrl);
+      localStorage.setItem("ct_radar_server_url", serverUrl);
       localStorage.setItem("ct_min_hype", minHype.toString());
       localStorage.setItem("ct_sync_interval", interval.toString());
+      updateRadarStatusLabel();
+      probeRadarCapabilities();
 
       if (window.AndroidBridge && typeof window.AndroidBridge.saveSettings === "function") {
         window.AndroidBridge.saveSettings(key, minHype, interval, getTbaTmdbIdsJson());
+      }
+      if (window.AndroidBridge && typeof window.AndroidBridge.saveRadarConfig === "function") {
+        window.AndroidBridge.saveRadarConfig(feedUrl, serverUrl);
       }
 
       if (key) {
         syncTmdbLive(true);
       } else {
+        fetchCloudRadarFeed(true, feedUrl, serverUrl);
         updateApiStatusPill(false, false);
         const fb = document.getElementById("syncFeedback");
         fb.textContent = "Pengaturan disimpan.";
@@ -2888,10 +3155,28 @@
         : `Akan Datang · ${list.length} film`;
 
       if (list.length === 0) {
-        grid.innerHTML = `<div class="empty-msg">
-          <div style="margin-bottom:10px;">Tidak ada film sesuai filter.</div>
-          <button type="button" class="cal-mini-btn" onclick="resetCatalogFilters()">Reset Filter</button>
-        </div>`;
+        if (allMovies.length === 0) {
+          const savedKey = (document.getElementById("tmdbKeyInput")?.value || localStorage.getItem("ct_tmdb_key") || "").trim();
+          if (!savedKey) {
+            grid.innerHTML = `<div class="empty-msg">
+              <div style="color:var(--text);font-weight:700;font-size:14px;margin-bottom:6px;">Jadwal live TMDB belum aktif</div>
+              <div style="margin-bottom:12px;line-height:1.5;">Masukkan TMDB API Key (gratis) di Settings untuk menarik jadwal film Indonesia secara otomatis.</div>
+              <button type="button" class="cal-mini-btn primary" onclick="switchBottomTab('settings')">Buka Settings</button>
+            </div>`;
+          } else if (isSyncing) {
+            grid.innerHTML = `<div class="empty-msg">Sedang memuat jadwal bioskop Indonesia dari TMDB...</div>`;
+          } else {
+            grid.innerHTML = `<div class="empty-msg">
+              <div style="margin-bottom:10px;">Belum ada jadwal bioskop tersimpan.</div>
+              <button type="button" class="cal-mini-btn primary" onclick="forceQuickSync()">Muat Jadwal Sekarang</button>
+            </div>`;
+          }
+        } else {
+          grid.innerHTML = `<div class="empty-msg">
+            <div style="margin-bottom:10px;">Tidak ada film sesuai filter.</div>
+            <button type="button" class="cal-mini-btn" onclick="resetCatalogFilters()">Reset Filter</button>
+          </div>`;
+        }
         return;
       }
 
@@ -3585,7 +3870,8 @@
 
     function getNetworkAvailabilityInfo(m) {
       const isTmdbOnly = m.id.startsWith("tmdb_") || m.id.startsWith("search_");
-      const chains = (!isTmdbOnly && !m.tba && m.chains && m.chains.length > 0) ? m.chains : [];
+      const hasRadarVerifiedChains = Boolean(m.radarInfo && m.radarInfo.chains && m.radarInfo.chains.length > 0);
+      const chains = ((!isTmdbOnly || hasRadarVerifiedChains) && !m.tba && m.chains && m.chains.length > 0) ? m.chains : [];
       if (chains.length > 0) {
         const joined = chains.length > 1
           ? `${chains.slice(0, -1).join(", ")} & ${chains[chains.length - 1]}`
@@ -3654,6 +3940,82 @@
       if (m) renderDetailHtml(m);
     }
 
+    function openExternalUrlSafe(url) {
+      if (!url || !/^https?:\/\//i.test(url)) return;
+      if (window.AndroidBridge && typeof window.AndroidBridge.openExternalUrl === "function") {
+        window.AndroidBridge.openExternalUrl(url);
+      } else {
+        window.open(url, "_blank");
+      }
+    }
+
+    async function verifyRadarMovie(id, force = false) {
+      const m = allMovies.find(item => item.id === id) || (watchlistMap[id] && watchlistMap[id].movieData);
+      if (!m) return;
+      radarErrorMessage = "";
+
+      const key = localStorage.getItem("ct_tmdb_key") || "";
+      const resolvedId = getMovieCanonicalTmdbId(m) || (key ? await resolveMovieTmdbId(m, key) : 0);
+      const cacheKey = resolvedId > 0 ? `tmdb_${resolvedId}` : `title_${normalizeKey(m.title)}`;
+      const existing = findMatchingRadarEntry(m);
+      const TTL_6H = 6 * 60 * 60 * 1000;
+      if (!force && existing && (Date.now() - new Date(existing.checkedAt).getTime()) < TTL_6H) {
+        return;
+      }
+
+      const base = getRadarApiBase();
+      if (base === null) {
+        radarErrorMessage = "Isi URL Server Radar di Settings untuk verifikasi kabar live di APK.";
+        if (activeDetailMovieId === m.id) renderDetailHtml(m);
+        return;
+      }
+
+      verifyingRadarMovieId = m.id;
+      if (activeDetailMovieId === m.id) renderDetailHtml(m);
+
+      try {
+        const res = await fetch(`${base}/api/radar/verify`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: m.title,
+            originalTitle: m.searchQuery || undefined,
+            releaseDate: m.releaseDate,
+            tmdbId: resolvedId || undefined,
+            force
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          radarErrorMessage = (data && data.message) || "Verifikasi kabar bioskop ID belum tersedia saat ini.";
+          return;
+        }
+        const parsed = parseRadarFeedPayload({ entries: [data] });
+        const entry = parsed.entries[0];
+        if (!entry) return;
+
+        radarByKey[cacheKey] = entry;
+        radarByKey = pruneCache(radarByKey, 120);
+        localStorage.setItem("ct_v43_radar_cache", JSON.stringify(radarByKey));
+
+        applyRadarToWatchlist(getLocalTodayIso());
+        rebuildMovieCatalog();
+        updateCounts();
+        renderMovies();
+        if (activeBottomTab === "watchlist") renderWatchlist();
+        if (activeBottomTab === "calendar") renderCalendar();
+        showToast(entry.releaseDateId ? `Radar ID: ${formatShortDate(entry.releaseDateId)}` : "Kabar Radar diperbarui");
+      } catch (_) {
+        radarErrorMessage = "Tidak dapat menghubungi server verifikasi Radar.";
+      } finally {
+        verifyingRadarMovieId = null;
+        if (activeDetailMovieId === id && document.getElementById("detailOverlay").classList.contains("open")) {
+          const refreshed = allMovies.find(item => item.id === id) || (watchlistMap[id] && watchlistMap[id].movieData) || m;
+          renderDetailHtml(refreshed);
+        }
+      }
+    }
+
     function renderDetailHtml(m) {
       const matchedKey = findWatchlistKey(m);
       const watchEntry = matchedKey ? watchlistMap[matchedKey] : null;
@@ -3663,44 +4025,77 @@
       const effectivePoster = getEffectivePoster(m);
       const safeTitle = escapeHtml(m.title);
       const safeId = escapeHtml(m.id);
-      const net = getNetworkAvailabilityInfo(m);
-      const lbxdUrl = getLetterboxdUrl(m, watchEntry);
+      const activeRadar = m.radarInfo || findMatchingRadarEntry(m);
+      const effectiveMovie = activeRadar ? mergeRadarIntoMovie(m, getLocalTodayIso()) : m;
+      const net = getNetworkAvailabilityInfo(effectiveMovie);
+      const lbxdUrl = getLetterboxdUrl(effectiveMovie, watchEntry);
       const lbxdSub = lbxdUrl.includes("/tmdb/") ? "Skor & Review" : "Cari Film";
-      const cd = getCountdownInfo(m.releaseDate, m.tba);
+      const cd = getCountdownInfo(effectiveMovie.releaseDate, effectiveMovie.tba);
 
       const posterHtml = effectivePoster
         ? `<img src="${escapeHtml(effectivePoster)}" alt="${safeTitle}" referrerpolicy="no-referrer" />`
         : `<div class="poster-art" style="padding:10px;"><div class="poster-art-title" style="font-size:11px;">${safeTitle}</div></div>`;
 
-      const runtimeClean = (m.runtime && m.runtime !== "TBA") ? m.runtime : "";
-      const ratingNum = parseFloat(m.rating || "");
+      const runtimeClean = (effectiveMovie.runtime && effectiveMovie.runtime !== "TBA") ? effectiveMovie.runtime : "";
+      const ratingNum = parseFloat(effectiveMovie.rating || "");
       const kickerParts = [
-        m.age || "R 13+",
+        effectiveMovie.age || "R 13+",
         runtimeClean,
-        m.imax ? "IMAX" : "",
-        !isNaN(ratingNum) && ratingNum > 0 ? `★ ${ratingNum.toFixed(1)}` : "",
-        m.hype ? `Hype ${m.hype}%` : ""
+        effectiveMovie.imax ? "IMAX" : "",
+        effectiveMovie.hype ? `Hype ${effectiveMovie.hype}%` : ""
       ].filter(Boolean).map((p, idx) => `<span style="white-space:nowrap;display:inline-flex;align-items:center;gap:6px;">${idx > 0 ? '<span aria-hidden="true">·</span>' : ''}<span>${escapeHtml(p)}</span></span>`).join("");
 
-      const chainsStr = (m.chains && m.chains.length > 0)
-        ? (m.imax ? `${m.chains.join(" · ")} · IMAX` : m.chains.join(" · "))
-        : (m.imax ? "Format IMAX" : "");
+      const ratingKey = effectiveMovie.tmdbId ? `tmdb_${effectiveMovie.tmdbId}` : `title_${normalizeKey(effectiveMovie.title)}`;
+      const enrichedRating = ratingsCache[ratingKey];
+      const ratingTokens = [];
+      if (!isNaN(ratingNum) && ratingNum > 0) {
+        ratingTokens.push({ label: "TMDB", value: `★ ${ratingNum.toFixed(1)}` });
+      }
+      if (enrichedRating && enrichedRating.imdbRating) {
+        ratingTokens.push({ label: "IMDb", value: enrichedRating.imdbRating });
+      }
+      if (enrichedRating && enrichedRating.rottenTomatoes) {
+        ratingTokens.push({ label: "RT", value: enrichedRating.rottenTomatoes });
+      }
+      const ratingsStripHtml = ratingTokens.length > 0
+        ? `<div class="detail-ratings-strip">${ratingTokens.map((tok, idx) => `${idx > 0 ? '<span class="detail-rating-lbl">·</span>' : ''}<span style="white-space:nowrap;"><span class="detail-rating-lbl">${escapeHtml(tok.label)}</span> ${escapeHtml(tok.value)}</span>`).join("")}</div>`
+        : "";
+
+      const chainsStr = (effectiveMovie.chains && effectiveMovie.chains.length > 0)
+        ? (effectiveMovie.imax ? `${effectiveMovie.chains.join(" · ")} · IMAX` : effectiveMovie.chains.join(" · "))
+        : (effectiveMovie.imax ? "Format IMAX" : "");
 
       const cdPillTone = cd.tone === "now" ? "now" : cd.tone === "soon" ? "soon" : "muted";
       const cdLabelText = cd.label === "Tayang" ? "Sedang Tayang" : cd.label;
-      const scheduleHeadline = m.tba
+      const scheduleHeadline = effectiveMovie.tba
         ? "Jadwal bioskop Indonesia belum diumumkan"
         : cd.label === "Tayang"
-        ? `Sedang tayang · Sejak ${formatHumanDate(m.releaseDate)}`
+        ? `Sedang tayang · Sejak ${formatHumanDate(effectiveMovie.releaseDate)}`
         : cd.label === "Hari Ini"
-        ? `Tayang hari ini · ${formatHumanDate(m.releaseDate)}`
-        : `Mulai tayang ${formatHumanDate(m.releaseDate)}`;
-      const scheduleSub = m.tba
-        ? (m.releaseDate && m.releaseDate !== "TBA" ? `Rilis global ${formatShortDate(m.releaseDate)} · ${net.summary}` : net.summary)
+        ? `Tayang hari ini · ${formatHumanDate(effectiveMovie.releaseDate)}`
+        : `Mulai tayang ${formatHumanDate(effectiveMovie.releaseDate)}`;
+      const scheduleSub = effectiveMovie.tba
+        ? (effectiveMovie.releaseDate && effectiveMovie.releaseDate !== "TBA" ? `Rilis global ${formatShortDate(effectiveMovie.releaseDate)} · ${net.summary}` : net.summary)
         : (net.formatNote ? `${net.summary} · ${net.formatNote}` : net.summary);
 
-      const cleanDirector = (m.director && m.director !== "Belum dimuat" && m.director !== "Memuat...") ? m.director : "—";
-      const cleanCast = (m.cast && m.cast !== "Belum dimuat" && m.cast !== "Memuat...") ? m.cast : "—";
+      const radarStatusLabels = {
+        confirmed: "Terkonfirmasi ID",
+        presale: "Pre-Sale Aktif",
+        lsf_passed: "Lulus Sensor LSF",
+        upcoming_global: "Menunggu Jadwal ID",
+        unconfirmed: "Belum Terkonfirmasi ID"
+      };
+      const radarDateTag = activeRadar && activeRadar.checkedAt ? formatShortDate(activeRadar.checkedAt.slice(0, 10)) : "";
+      const radarStatusText = activeRadar
+        ? `${radarStatusLabels[activeRadar.status] || "Terperiksa"}${radarDateTag ? ` · ${radarDateTag}` : ""}`
+        : "";
+      const radarSourcesHtml = (activeRadar && activeRadar.sources && activeRadar.sources.length > 0)
+        ? `<div class="radar-sources">${activeRadar.sources.map(src => `<button type="button" class="radar-src-btn" data-external-url="${escapeHtml(src.url)}">${escapeHtml(src.title)} ↗</button>`).join("")}</div>`
+        : "";
+      const isVerifyingNow = verifyingRadarMovieId === m.id;
+
+      const cleanDirector = (effectiveMovie.director && effectiveMovie.director !== "Belum dimuat" && effectiveMovie.director !== "Memuat...") ? effectiveMovie.director : "—";
+      const cleanCast = (effectiveMovie.cast && effectiveMovie.cast !== "Belum dimuat" && effectiveMovie.cast !== "Memuat...") ? effectiveMovie.cast : "—";
 
       document.getElementById("detailContent").innerHTML = `
         <div class="sheet-drag-handle"></div>
@@ -3721,8 +4116,9 @@
           <div style="flex:1; min-width:0; padding-top:2px;">
             <div class="detail-kicker">${kickerParts}</div>
             <div class="detail-title">${safeTitle}</div>
-            <div class="detail-genre-line">${escapeHtml(m.genre || "Theatrical")}</div>
-            ${chainsStr ? `<div class="detail-chains-line">${escapeHtml(chainsStr)}</div>` : ""}
+            <div class="detail-genre-line">${escapeHtml(effectiveMovie.genre || "Theatrical")}</div>
+            ${ratingsStripHtml}
+            ${chainsStr ? `<div class="detail-chains-line" style="color:var(--blue); font-weight:600;">${escapeHtml(chainsStr)}</div>` : ""}
           </div>
         </div>
 
@@ -3733,6 +4129,23 @@
           </div>
           <div class="verify-date">${escapeHtml(scheduleHeadline)}</div>
           <div style="font-size:11px; color:var(--muted); margin-top:4px;">${escapeHtml(scheduleSub)}</div>
+
+          <div class="radar-divider">
+            <div class="radar-head">
+              <span class="radar-title">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="var(--blue)" stroke-width="2.2"><path d="M12 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49"/><path d="M7.76 16.24a6 6 0 0 1 0 -8.49"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M4.93 19.07a10 10 0 0 1 0 -14.14"/></svg>
+                <span>Radar Bioskop ID</span>
+              </span>
+              ${radarStatusText ? `<span class="radar-status">${escapeHtml(radarStatusText)}</span>` : ""}
+            </div>
+            ${activeRadar
+              ? `<div class="radar-summary">${activeRadar.lsfStatus ? `${escapeHtml(activeRadar.lsfStatus)} — ` : ""}${escapeHtml(activeRadar.summary)}</div>${radarSourcesHtml}`
+              : `<div style="font-size:11px; color:var(--muted); line-height:1.4; margin-bottom:8px;">Cek pengumuman terbaru XXI, CGV, Cinépolis, LSF, atau pre-sale langsung dari web resmi.</div>`}
+            ${radarErrorMessage ? `<div style="font-size:11px; color:var(--amber); font-weight:600; margin-bottom:8px;">${escapeHtml(radarErrorMessage)}</div>` : ""}
+            <button type="button" class="radar-verify-btn" ${isVerifyingNow ? "disabled" : ""} onclick="verifyRadarMovie('${safeId}', ${Boolean(activeRadar)})">
+              <span>${isVerifyingNow ? "Memeriksa kabar bioskop ID..." : (activeRadar ? "Perbarui Kabar Bioskop ID" : "Verifikasi Kabar Bioskop ID")}</span>
+            </button>
+          </div>
         </div>
 
         <button type="button" class="btn-watch-detail ${isSaved ? "saved" : ""}" aria-pressed="${isSaved}" onclick="toggleDetailWatch('${safeId}')">
@@ -3812,7 +4225,7 @@
         <div class="verify-box">
           <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:8px;">
             <div class="credit-label" style="margin-bottom:0;">Cek Jadwal &amp; Tiket</div>
-            ${(m.tba || m.status === "upcoming") ? `<span style="font-size:10px; color:var(--muted);">${m.tba ? "Jadwal ID belum keluar" : "Pantau pre-sale"}</span>` : ""}
+            ${(effectiveMovie.tba || effectiveMovie.status === "upcoming") ? `<span style="font-size:10px; color:var(--muted);">${effectiveMovie.tba ? "Jadwal ID belum keluar" : "Pantau pre-sale"}</span>` : ""}
           </div>
           <button type="button" class="verify-primary-btn" data-platform="Jadwal Terdekat">Cari Jadwal Bioskop Terdekat</button>
           <div class="quick-verify-bar" data-ticket-title="${safeTitle}">
@@ -3832,12 +4245,17 @@
             </div>
           </div>
           <div class="credit-label">Sinopsis</div>
-          <div class="synopsis-text">${escapeHtml(m.synopsis || "Belum ada ringkasan sinopsis.")}</div>
+          <div class="synopsis-text">${escapeHtml(effectiveMovie.synopsis || "Belum ada ringkasan sinopsis.")}</div>
         </div>
       `;
     }
 
     document.getElementById("detailContent").addEventListener("click", (e) => {
+      const extBtn = e.target.closest("[data-external-url]");
+      if (extBtn) {
+        openExternalUrlSafe(extBtn.getAttribute("data-external-url"));
+        return;
+      }
       const ticketBtn = e.target.closest("[data-platform]");
       if (ticketBtn) {
         const bar = document.querySelector("#detailContent [data-ticket-title]");
@@ -3879,8 +4297,40 @@
       if (!m) return;
 
       activeDetailMovieId = m.id;
+      radarErrorMessage = "";
       renderDetailHtml(m);
       document.getElementById("detailOverlay").classList.add("open");
+
+      const ratingKey = m.tmdbId ? `tmdb_${m.tmdbId}` : `title_${normalizeKey(m.title)}`;
+      const cachedRating = ratingsCache[ratingKey];
+      const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
+      const apiBase = getRadarApiBase();
+      if (
+        apiBase !== null &&
+        (!cachedRating || (Date.now() - (cachedRating.fetchedAt || 0)) > SEVEN_DAYS) &&
+        (radarCapabilities === null || radarCapabilities.omdbConfigured)
+      ) {
+        const yearParam = (m.releaseDate && /^\d{4}/.test(m.releaseDate)) ? `&year=${encodeURIComponent(m.releaseDate.slice(0, 4))}` : "";
+        fetch(`${apiBase}/api/radar/ratings?title=${encodeURIComponent(m.title)}${yearParam}`)
+          .then(res => res.ok ? res.json() : null)
+          .then(data => {
+            if (!data) return;
+            if (data.configured === false) {
+              radarCapabilities = {
+                geminiConfigured: radarCapabilities ? radarCapabilities.geminiConfigured : false,
+                omdbConfigured: false
+              };
+              return;
+            }
+            ratingsCache[ratingKey] = data;
+            ratingsCache = pruneCache(ratingsCache, 120);
+            localStorage.setItem("ct_v43_ratings_cache", JSON.stringify(ratingsCache));
+            if (activeDetailMovieId === m.id && document.getElementById("detailOverlay").classList.contains("open")) {
+              renderDetailHtml(m);
+            }
+          })
+          .catch(() => {});
+      }
 
       const key = localStorage.getItem("ct_tmdb_key") || "";
       if (key) {
@@ -4301,39 +4751,6 @@
       }
     }
 
-    async function enrichPosters(apiKey, movieList) {
-      const missing = movieList.filter(m => !posterCache[m.id] && !posterMissCache[m.id]);
-      if (missing.length === 0) return;
-
-      // Batch in small chunks of 4 to avoid mobile radio/battery spikes
-      for (let i = 0; i < missing.length; i += 4) {
-        const chunk = missing.slice(i, i + 4);
-        await Promise.all(chunk.map(async (m) => {
-          try {
-            const q = encodeURIComponent(m.searchQuery || m.title);
-            const res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${encodeURIComponent(apiKey)}&query=${q}&page=1`);
-            if (!res.ok) return;
-            const data = await res.json();
-            const hit = (data.results || []).find(r => r.poster_path) || (data.results || [])[0];
-            if (hit) {
-              if (hit.id) tmdbIdCache[m.id] = hit.id;
-              if (hit.poster_path) posterCache[m.id] = `https://image.tmdb.org/t/p/w500${hit.poster_path}`;
-              else posterMissCache[m.id] = Date.now();
-            } else {
-              posterMissCache[m.id] = Date.now();
-            }
-          } catch (_) {}
-        }));
-      }
-
-      posterCache = pruneCache(posterCache, 150);
-      tmdbIdCache = pruneCache(tmdbIdCache, 150);
-      posterMissCache = pruneCache(posterMissCache, 100);
-      localStorage.setItem("ct_v37_poster_cache", JSON.stringify(posterCache));
-      localStorage.setItem("ct_v37_tmdbid_cache", JSON.stringify(tmdbIdCache));
-      localStorage.setItem("ct_v39_poster_miss", JSON.stringify(posterMissCache));
-    }
-
     async function syncTmdbLive(showFeedback = true) {
       if (isSyncing) return;
       const key = document.getElementById("tmdbKeyInput").value.trim() || localStorage.getItem("ct_tmdb_key") || "";
@@ -4341,6 +4758,7 @@
       const refreshBtn = document.getElementById("headerRefreshBtn");
 
       if (!key) {
+        await fetchCloudRadarFeed(showFeedback);
         if (showFeedback) {
           fb.textContent = "Masukkan TMDB API Key terlebih dahulu.";
           fb.style.color = "var(--danger-text)";
@@ -4351,18 +4769,19 @@
       isSyncing = true;
       refreshBtn.classList.add("spinning");
       if (showFeedback) {
-        fb.textContent = "Memuat jadwal...";
+        fb.textContent = "Memuat jadwal & Radar ID...";
         fb.style.color = "var(--blue)";
       }
 
       try {
         const todayIso = getLocalTodayIso();
         const { minDate, maxDate } = getCatalogWindow(todayIso);
-        await enrichPosters(key, BASE_CURATED_MOVIES);
+        const radarPromise = fetchCloudRadarFeed(showFeedback);
 
         const tbaKeys = Object.keys(watchlistMap).filter(k => watchlistMap[k].isTba && watchlistMap[k].tmdbId);
-        await Promise.all(tbaKeys.map(async (wKey) => {
+        await mapWithConcurrency(tbaKeys, 4, async (wKey) => {
           const wEntry = watchlistMap[wKey];
+          if (!wEntry) return;
           try {
             const relRes = await fetch(`https://api.themoviedb.org/3/movie/${wEntry.tmdbId}/release_dates?api_key=${encodeURIComponent(key)}`);
             if (!relRes.ok) return;
@@ -4376,6 +4795,7 @@
               if (picked && picked.release_date) {
                 const newDate = picked.release_date.slice(0, 10);
                 wEntry.isTba = false;
+                wEntry.lastKnownReleaseDate = newDate;
                 if (wEntry.movieData) {
                   wEntry.movieData.tba = false;
                   wEntry.movieData.releaseDate = newDate;
@@ -4396,15 +4816,28 @@
               }
             }
           } catch (_) {}
-        }));
+        });
         persistWatchlist();
 
-        const nowUrl = `https://api.themoviedb.org/3/movie/now_playing?api_key=${encodeURIComponent(key)}&region=ID&page=1`;
-        const upcomingUrl = `https://api.themoviedb.org/3/discover/movie?api_key=${encodeURIComponent(key)}&region=ID&with_release_type=2|3&release_date.gte=${todayIso}&sort_by=popularity.desc&page=1`;
-        const localIdUrl = `https://api.themoviedb.org/3/discover/movie?api_key=${encodeURIComponent(key)}&region=ID&with_release_type=2|3&with_original_language=id&release_date.gte=${todayIso}&sort_by=popularity.desc&page=1`;
+        const keyParam = encodeURIComponent(key);
+        const nowUrl1 = `https://api.themoviedb.org/3/movie/now_playing?api_key=${keyParam}&region=ID&page=1`;
+        const nowUrl2 = `https://api.themoviedb.org/3/movie/now_playing?api_key=${keyParam}&region=ID&page=2`;
+        const upcomingUrl1 = `https://api.themoviedb.org/3/discover/movie?api_key=${keyParam}&region=ID&with_release_type=2|3&release_date.gte=${todayIso}&sort_by=popularity.desc&page=1`;
+        const upcomingUrl2 = `https://api.themoviedb.org/3/discover/movie?api_key=${keyParam}&region=ID&with_release_type=2|3&release_date.gte=${todayIso}&sort_by=popularity.desc&page=2`;
+        const officialUpUrl = `https://api.themoviedb.org/3/movie/upcoming?api_key=${keyParam}&region=ID&page=1`;
+        const localIdUrl = `https://api.themoviedb.org/3/discover/movie?api_key=${keyParam}&region=ID&with_release_type=2|3&with_original_language=id&release_date.gte=${todayIso}&sort_by=popularity.desc&page=1`;
+        const trendingUrl = `https://api.themoviedb.org/3/trending/movie/week?api_key=${keyParam}`;
 
-        const [resNow, resUpcoming, resLocalId] = await Promise.all([fetch(nowUrl), fetch(upcomingUrl), fetch(localIdUrl)]);
-        if (resNow.status === 401 || resUpcoming.status === 401) {
+        const [resNow1, resNow2, resUpcoming1, resUpcoming2, resOfficialUp, resLocalId, resTrending] = await Promise.all([
+          fetch(nowUrl1),
+          fetch(nowUrl2),
+          fetch(upcomingUrl1),
+          fetch(upcomingUrl2),
+          fetch(officialUpUrl),
+          fetch(localIdUrl),
+          fetch(trendingUrl)
+        ]);
+        if (resNow1.status === 401 || resUpcoming1.status === 401) {
           updateApiStatusPill(false, false);
           if (showFeedback) {
             fb.textContent = "API Key tidak valid.";
@@ -4412,16 +4845,60 @@
           }
           return;
         }
-        if (!resNow.ok && !resUpcoming.ok) throw new Error("HTTP_" + resNow.status);
+        if (!resNow1.ok && !resUpcoming1.ok) throw new Error("HTTP_" + resNow1.status);
 
-        const dataNow = resNow.ok ? await resNow.json() : { results: [] };
-        const dataUpcoming = resUpcoming.ok ? await resUpcoming.json() : { results: [] };
+        const dataNow1 = resNow1.ok ? await resNow1.json() : { results: [] };
+        const dataNow2 = resNow2.ok ? await resNow2.json() : { results: [] };
+        const dataUpcoming1 = resUpcoming1.ok ? await resUpcoming1.json() : { results: [] };
+        const dataUpcoming2 = resUpcoming2.ok ? await resUpcoming2.json() : { results: [] };
+        const dataOfficialUp = resOfficialUp.ok ? await resOfficialUp.json() : { results: [] };
         const dataLocalId = resLocalId.ok ? await resLocalId.json() : { results: [] };
+        const dataTrending = resTrending.ok ? await resTrending.json() : { results: [] };
+
+        const nowRaw = [...(dataNow1.results || []), ...(dataNow2.results || [])];
+        const upcomingRaw = [
+          ...(dataUpcoming1.results || []),
+          ...(dataUpcoming2.results || []),
+          ...(dataOfficialUp.results || []),
+          ...(dataLocalId.results || [])
+        ];
+
+        const knownIds = new Set([...nowRaw, ...upcomingRaw].map(r => r && r.id).filter(Boolean));
+        const trendingCands = (dataTrending.results || [])
+          .filter(t => t && t.id && !knownIds.has(t.id) && (t.popularity || 0) >= 35 && t.poster_path)
+          .slice(0, 8);
+
+        if (trendingCands.length > 0) {
+          const promoted = await mapWithConcurrency(trendingCands, 4, async (cand) => {
+            try {
+              const rRes = await fetch(`https://api.themoviedb.org/3/movie/${cand.id}/release_dates?api_key=${keyParam}`);
+              if (!rRes.ok) return null;
+              const rData = await rRes.json();
+              const idEntry = (rData.results || []).find(r => r.iso_3166_1 === "ID");
+              if (!idEntry || !idEntry.release_dates) return null;
+              const theatrical = idEntry.release_dates
+                .filter(d => (d.type === 2 || d.type === 3) && d.release_date)
+                .sort((a, b) => a.release_date.localeCompare(b.release_date));
+              const picked = theatrical[0] || idEntry.release_dates.find(d => d.release_date);
+              if (!picked || !picked.release_date) return null;
+              return { ...cand, release_date: picked.release_date.slice(0, 10) };
+            } catch (_) {
+              return null;
+            }
+          });
+          promoted.forEach(item => {
+            if (!item) return;
+            if (item.release_date <= todayIso) nowRaw.push(item);
+            else upcomingRaw.push(item);
+          });
+        }
 
         const junkPattern = /experimental film|student film|short film|tugas akhir|skripsi|film pendek/i;
         const parseItems = (results) => {
+          const seenIds = new Set();
           return (results || [])
             .filter(item => {
+              if (!item || !item.id || seenIds.has(item.id)) return false;
               const rDate = item.release_date || "";
               if (!rDate || rDate < minDate || rDate > maxDate) return false;
               if (!item.poster_path) return false;
@@ -4432,6 +4909,7 @@
               if (gIds.includes(99) && pop < 12.0) return false;
               const rawText = `${item.title || ""} ${item.original_title || ""} ${item.overview || ""}`;
               if (junkPattern.test(rawText)) return false;
+              seenIds.add(item.id);
               return true;
             })
             .map(item => {
@@ -4460,8 +4938,23 @@
             });
         };
 
-        const liveNow = parseItems(dataNow.results);
-        const liveUpcoming = parseItems([...(dataUpcoming.results || []), ...(dataLocalId.results || [])]);
+        const liveNow = parseItems(nowRaw);
+        const liveUpcoming = parseItems(upcomingRaw);
+
+        await radarPromise;
+        const newlyConfirmedRadar = applyRadarToWatchlist(todayIso);
+        if (newlyConfirmedRadar.length > 0 && window.AndroidBridge && typeof window.AndroidBridge.sendCustomNotification === "function") {
+          newlyConfirmedRadar.forEach(wKey => {
+            const wItem = watchlistMap[wKey];
+            if (wItem && wItem.movieData) {
+              window.AndroidBridge.sendCustomNotification(
+                `Rilis ID Terkonfirmasi: ${wItem.movieData.title}`,
+                `Tayang di bioskop mulai ${formatFullDate(wItem.movieData.releaseDate)}`,
+                getEffectivePoster(wItem.movieData)
+              );
+            }
+          });
+        }
 
         localStorage.setItem("ct_v392_live_now", JSON.stringify(liveNow));
         localStorage.setItem("ct_v392_live_upcoming", JSON.stringify(liveUpcoming));
@@ -4478,7 +4971,7 @@
         updateApiStatusPill(true, true);
 
         if (showFeedback) {
-          fb.textContent = "Tersimpan. Jadwal diperbarui.";
+          fb.textContent = "Tersimpan. Jadwal & Radar ID diperbarui.";
           fb.style.color = "var(--emerald)";
           showToast("Jadwal diperbarui");
         }
@@ -4509,7 +5002,9 @@
           minHype: parseInt(localStorage.getItem("ct_min_hype") || "85", 10) || 85,
           syncInterval: parseInt(localStorage.getItem("ct_sync_interval") || "6", 10) || 6,
           launcherIcon: localStorage.getItem("ct_launcher_icon") || "LauncherDefault",
-          tmdbApiKey: (localStorage.getItem("ct_tmdb_key") || "").trim() || undefined
+          tmdbApiKey: (localStorage.getItem("ct_tmdb_key") || "").trim() || undefined,
+          radarFeedUrl: (localStorage.getItem("ct_radar_feed_url") || "").trim() || undefined,
+          radarServerUrl: (localStorage.getItem("ct_radar_server_url") || "").trim() || undefined
         }
       };
     }
@@ -4638,7 +5133,7 @@
       }
       if (typeof prefs.launcherIcon === "string" && prefs.launcherIcon) {
         localStorage.setItem("ct_launcher_icon", prefs.launcherIcon);
-        if (typeof renderLauncherIcons === "function") renderLauncherIcons();
+        if (typeof highlightLauncherOption === "function") highlightLauncherOption(prefs.launcherIcon);
       }
       const existingKey = (localStorage.getItem("ct_tmdb_key") || "").trim();
       if (!existingKey && typeof prefs.tmdbApiKey === "string" && prefs.tmdbApiKey.trim()) {
@@ -4646,6 +5141,20 @@
         localStorage.setItem("ct_tmdb_key", k);
         document.getElementById("tmdbKeyInput").value = k;
         if (typeof updateApiStatusPill === "function") updateApiStatusPill(true, false);
+      }
+      if (!radarFeedUrl && typeof prefs.radarFeedUrl === "string" && prefs.radarFeedUrl.trim()) {
+        radarFeedUrl = prefs.radarFeedUrl.trim();
+        localStorage.setItem("ct_radar_feed_url", radarFeedUrl);
+        document.getElementById("radarFeedInput").value = radarFeedUrl;
+      }
+      if (!radarServerUrl && typeof prefs.radarServerUrl === "string" && prefs.radarServerUrl.trim()) {
+        radarServerUrl = prefs.radarServerUrl.trim();
+        localStorage.setItem("ct_radar_server_url", radarServerUrl);
+        document.getElementById("radarServerInput").value = radarServerUrl;
+      }
+      updateRadarStatusLabel();
+      if (window.AndroidBridge && typeof window.AndroidBridge.saveRadarConfig === "function") {
+        window.AndroidBridge.saveRadarConfig(radarFeedUrl, radarServerUrl);
       }
 
       persistWatchlist();

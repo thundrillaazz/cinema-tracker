@@ -38,6 +38,7 @@ class CinemaCheckWorker(
     override fun doWork(): Result {
         val prefs = appContext.getSharedPreferences(MainActivity.PREFS_NAME, Context.MODE_PRIVATE)
         val apiKey = prefs.getString("tmdb_api_key", "")?.trim() ?: ""
+        val radarFeedUrl = prefs.getString("radar_feed_url", "")?.trim() ?: ""
         val minHype = prefs.getInt("min_hype_threshold", 85)
         val intervalHours = prefs.getLong("sync_interval_hours", 6L).coerceIn(1L, 24L)
         val tbaWatchJson = prefs.getString("tba_watch_list_json", "[]") ?: "[]"
@@ -148,7 +149,7 @@ class CinemaCheckWorker(
                 }
             }
 
-            if (apiKey.isEmpty() || !isNetworkConnected()) {
+            if ((apiKey.isEmpty() && radarFeedUrl.isEmpty()) || !isNetworkConnected()) {
                 maybeSendWeeklyDigest(prefs, weeklyDigestLines)
                 saveNotifiedIds(prefs, notifiedIds)
                 return Result.success()
@@ -164,168 +165,269 @@ class CinemaCheckWorker(
                 return Result.success()
             }
 
-            // 2. Check TBA Watchlist movies for Indonesian theatrical release confirmation
-            val tbaArray = try { JSONArray(tbaWatchJson) } catch (_: Exception) { JSONArray() }
-            val remainingTbaIds = JSONArray()
+            // 1.5 Optional Cloud Radar JSON Feed Check (single compact GET)
+            if (radarFeedUrl.startsWith("http://") || radarFeedUrl.startsWith("https://")) {
+                try {
+                    val radarJson = fetchJson(radarFeedUrl)
+                    val entries = radarJson?.optJSONArray("entries")
+                    if (entries != null && entries.length() > 0) {
+                        val byTmdb = HashMap<Int, JSONObject>()
+                        val byNorm = HashMap<String, JSONObject>()
+                        for (idx in 0 until entries.length()) {
+                            val rObj = entries.optJSONObject(idx) ?: continue
+                            val rTmdb = rObj.optInt("tmdbId", 0)
+                            val rTitleNorm = rObj.optString("title", "")
+                                .lowercase()
+                                .replace(Regex("[^a-z0-9]"), "")
+                            if (rTmdb > 0) byTmdb[rTmdb] = rObj
+                            if (rTitleNorm.isNotEmpty()) byNorm[rTitleNorm] = rObj
+                        }
 
-            for (i in 0 until tbaArray.length()) {
-                val tmdbId = tbaArray.optInt(i, -1)
-                if (tmdbId <= 0) continue
+                        val wlKeys = watchlistObj.keys()
+                        while (wlKeys.hasNext()) {
+                            val wId = wlKeys.next()
+                            val entry = watchlistObj.optJSONObject(wId) ?: continue
+                            val mData = entry.optJSONObject("movieData") ?: continue
+                            val entryTmdb = entry.optInt("tmdbId", 0)
+                            val title = mData.optString("title", "")
+                            val normTitle = title.lowercase().replace(Regex("[^a-z0-9]"), "")
+                            val matchedRadar = (if (entryTmdb > 0) byTmdb[entryTmdb] else null)
+                                ?: (if (normTitle.isNotEmpty()) byNorm[normTitle] else null)
+                                ?: continue
 
-                val idReleaseDate = fetchIndonesianTheatricalDate(tmdbId, apiKey)
-                if (idReleaseDate == null) {
-                    remainingTbaIds.put(tmdbId)
-                    continue
+                            val radarRel = matchedRadar.optString("releaseDateId", "").take(10)
+                            val hasValidRel = Regex("^\\d{4}-\\d{2}-\\d{2}$").matches(radarRel)
+                            val radarChains = matchedRadar.optJSONArray("chains")
+                            val radarImax = matchedRadar.optBoolean("imax", false)
+                            val radarPresale = matchedRadar.optBoolean("presaleActive", false)
+
+                            if (radarChains != null && radarChains.length() > 0) {
+                                mData.put("chains", radarChains)
+                                watchlistMutated = true
+                            }
+                            if (radarImax && !mData.optBoolean("imax", false)) {
+                                mData.put("imax", true)
+                                watchlistMutated = true
+                            }
+                            if (radarPresale && !mData.optBoolean("presale", false)) {
+                                mData.put("presale", true)
+                                watchlistMutated = true
+                                val preKey = "radar_presale_${wId}_$radarRel"
+                                if (entry.optBoolean("presaleAlert", true) && !notifiedIds.contains(preKey) && title.isNotEmpty()) {
+                                    val chosenPoster = customPosters.optString(wId, mData.optString("poster", ""))
+                                    sendMovieNotification(
+                                        notificationId = preKey.hashCode(),
+                                        channelId = MainActivity.CHANNEL_WATCHLIST_URGENT,
+                                        subLabel = "Pre-Sale Terdeteksi • Radar ID",
+                                        movieTitle = title,
+                                        bodyText = "Tiket pre-sale dilaporkan mulai dibuka.",
+                                        posterUrl = chosenPoster,
+                                        movieId = wId,
+                                        priority = NotificationCompat.PRIORITY_HIGH
+                                    )
+                                    notifiedIds.add(preKey)
+                                    sentCount++
+                                }
+                            }
+
+                            if (entry.optBoolean("isTba", false) && hasValidRel) {
+                                val parsedRadarDate = try { LocalDate.parse(radarRel).format(fullDateFmt) } catch (_: Exception) { radarRel }
+                                entry.put("isTba", false)
+                                entry.put("lastKnownReleaseDate", radarRel)
+                                mData.put("tba", false)
+                                mData.put("releaseDate", radarRel)
+                                mData.put("confirmedText", "Terkonfirmasi ID: $parsedRadarDate")
+                                mData.put("sourceBadge", "Radar Bioskop ID")
+                                watchlistMutated = true
+
+                                val radarKey = "radar_tba_${wId}_$radarRel"
+                                if (!notifiedIds.contains(radarKey) && title.isNotEmpty()) {
+                                    val chosenPoster = customPosters.optString(wId, mData.optString("poster", ""))
+                                    sendMovieNotification(
+                                        notificationId = radarKey.hashCode(),
+                                        channelId = MainActivity.CHANNEL_WATCHLIST_URGENT,
+                                        subLabel = "Rilis ID Terkonfirmasi • Radar",
+                                        movieTitle = title,
+                                        bodyText = "Jadwal bioskop: $parsedRadarDate.",
+                                        posterUrl = chosenPoster,
+                                        movieId = wId,
+                                        priority = NotificationCompat.PRIORITY_HIGH
+                                    )
+                                    notifiedIds.add(radarKey)
+                                    sentCount++
+                                }
+                            }
+                        }
+                    }
+                } catch (_: Exception) {
+                    // Optional radar feed failure should not fail TMDB checks
+                }
+            }
+
+            if (apiKey.isNotEmpty()) {
+                // 2. Check TBA Watchlist movies for Indonesian theatrical release confirmation
+                val tbaArray = try { JSONArray(tbaWatchJson) } catch (_: Exception) { JSONArray() }
+
+                for (i in 0 until tbaArray.length()) {
+                    val tmdbId = tbaArray.optInt(i, -1)
+                    if (tmdbId <= 0) continue
+
+                    val searchKeyCheck = "search_$tmdbId"
+                    val tmdbKeyCheck = "tmdb_$tmdbId"
+                    val existingCheck = watchlistObj.optJSONObject(searchKeyCheck) ?: watchlistObj.optJSONObject(tmdbKeyCheck)
+                    if (existingCheck != null && !existingCheck.optBoolean("isTba", true)) {
+                        continue
+                    }
+
+                    val idReleaseDate = fetchIndonesianTheatricalDate(tmdbId, apiKey) ?: continue
+
+                    if (idReleaseDate.isNotEmpty()) {
+                        val searchKey = "search_$tmdbId"
+                        val tmdbKey = "tmdb_$tmdbId"
+                        val resolvedKey = if (watchlistObj.has(searchKey)) searchKey else tmdbKey
+                        val targetEntry = watchlistObj.optJSONObject(resolvedKey)
+                        val parsedDate = try { LocalDate.parse(idReleaseDate).format(fullDateFmt) } catch (_: Exception) { idReleaseDate }
+
+                        if (targetEntry != null) {
+                            targetEntry.put("isTba", false)
+                            targetEntry.put("lastKnownReleaseDate", idReleaseDate)
+                            val mData = targetEntry.optJSONObject("movieData")
+                            if (mData != null) {
+                                mData.put("tba", false)
+                                mData.put("releaseDate", idReleaseDate)
+                                mData.put("confirmedText", "Mulai tayang $parsedDate")
+                                mData.put("sourceBadge", "Bioskop ID")
+                            }
+                            watchlistMutated = true
+                        }
+
+                        val notifyKey = "tba_confirmed_${tmdbId}_$idReleaseDate"
+                        if (!notifiedIds.contains(notifyKey)) {
+                            val dJson = fetchJson("https://api.themoviedb.org/3/movie/$tmdbId?api_key=$apiKey")
+                            val title = dJson?.optString("title", "")?.ifEmpty { null }
+                                ?: targetEntry?.optJSONObject("movieData")?.optString("title", "Film Watchlist")
+                                ?: "Film Watchlist"
+                            val posterPath = dJson?.optString("poster_path", "") ?: ""
+                            val defaultPoster = if (posterPath.isNotEmpty()) "https://image.tmdb.org/t/p/w500$posterPath" else ""
+                            val chosenPoster = customPosters.optString(searchKey, "")
+                                .ifEmpty { customPosters.optString(tmdbKey, defaultPoster) }
+                            sendMovieNotification(
+                                notificationId = notifyKey.hashCode(),
+                                channelId = MainActivity.CHANNEL_WATCHLIST_URGENT,
+                                subLabel = "Rilis ID Terkonfirmasi",
+                                movieTitle = title,
+                                bodyText = "Jadwal bioskop: $parsedDate.",
+                                posterUrl = chosenPoster,
+                                movieId = resolvedKey,
+                                priority = NotificationCompat.PRIORITY_HIGH
+                            )
+                            notifiedIds.add(notifyKey)
+                            sentCount++
+                        }
+                    }
                 }
 
-                if (idReleaseDate.isNotEmpty()) {
-                    val searchKey = "search_$tmdbId"
-                    val tmdbKey = "tmdb_$tmdbId"
-                    val resolvedKey = if (watchlistObj.has(searchKey)) searchKey else tmdbKey
-                    val targetEntry = watchlistObj.optJSONObject(resolvedKey)
-                    val parsedDate = try { LocalDate.parse(idReleaseDate).format(fullDateFmt) } catch (_: Exception) { idReleaseDate }
+                // 3. Detect schedule shifts on active upcoming Watchlist items with TMDB ID (cap at 6 per run)
+                var shiftChecks = 0
+                val wlIter = watchlistObj.keys()
+                while (wlIter.hasNext() && shiftChecks < 6) {
+                    val wId = wlIter.next()
+                    val entry = watchlistObj.optJSONObject(wId) ?: continue
+                    if (entry.optBoolean("isTba", false)) continue
 
-                    if (targetEntry != null) {
-                        targetEntry.put("isTba", false)
-                        targetEntry.put("lastKnownReleaseDate", idReleaseDate)
-                        val mData = targetEntry.optJSONObject("movieData")
-                        if (mData != null) {
-                            mData.put("tba", false)
-                            mData.put("releaseDate", idReleaseDate)
-                            mData.put("confirmedText", "Mulai tayang $parsedDate")
-                            mData.put("sourceBadge", "Bioskop ID")
-                        }
+                    val tmdbId = entry.optInt("tmdbId", 0)
+                    if (tmdbId <= 0) continue
+
+                    val mData = entry.optJSONObject("movieData") ?: continue
+                    val oldDate = mData.optString("releaseDate", "").take(10)
+                    if (oldDate.length != 10 || oldDate < todayStr) continue
+
+                    shiftChecks++
+                    val latestDate = fetchIndonesianTheatricalDate(tmdbId, apiKey)
+                    if (!latestDate.isNullOrEmpty() && latestDate != oldDate) {
+                        val prettyNew = try { LocalDate.parse(latestDate).format(fullDateFmt) } catch (_: Exception) { latestDate }
+                        val prettyOld = try { LocalDate.parse(oldDate).format(fullDateFmt) } catch (_: Exception) { oldDate }
+                        entry.put("lastKnownReleaseDate", latestDate)
+                        mData.put("releaseDate", latestDate)
+                        mData.put("confirmedText", "Jadwal ID terbaru: $prettyNew")
                         watchlistMutated = true
-                    }
 
-                    val notifyKey = "tba_confirmed_${tmdbId}_$idReleaseDate"
-                    if (!notifiedIds.contains(notifyKey)) {
-                        val dJson = fetchJson("https://api.themoviedb.org/3/movie/$tmdbId?api_key=$apiKey")
-                        val title = dJson?.optString("title", "")?.ifEmpty { null }
-                            ?: targetEntry?.optJSONObject("movieData")?.optString("title", "Film Watchlist")
-                            ?: "Film Watchlist"
-                        val posterPath = dJson?.optString("poster_path", "") ?: ""
-                        val defaultPoster = if (posterPath.isNotEmpty()) "https://image.tmdb.org/t/p/w500$posterPath" else ""
-                        val chosenPoster = customPosters.optString(searchKey, "")
-                            .ifEmpty { customPosters.optString(tmdbKey, defaultPoster) }
-                        sendMovieNotification(
-                            notificationId = notifyKey.hashCode(),
-                            channelId = MainActivity.CHANNEL_WATCHLIST_URGENT,
-                            subLabel = "Rilis ID Terkonfirmasi",
-                            movieTitle = title,
-                            bodyText = "Jadwal bioskop: $parsedDate.",
-                            posterUrl = chosenPoster,
-                            movieId = resolvedKey,
-                            priority = NotificationCompat.PRIORITY_HIGH
-                        )
-                        notifiedIds.add(notifyKey)
-                        sentCount++
-                    }
-                } else {
-                    remainingTbaIds.put(tmdbId)
-                }
-            }
-
-            // 3. Detect schedule shifts on active upcoming Watchlist items with TMDB ID (cap at 6 per run)
-            var shiftChecks = 0
-            val wlIter = watchlistObj.keys()
-            while (wlIter.hasNext() && shiftChecks < 6) {
-                val wId = wlIter.next()
-                val entry = watchlistObj.optJSONObject(wId) ?: continue
-                if (entry.optBoolean("isTba", false)) continue
-
-                val tmdbId = entry.optInt("tmdbId", 0)
-                if (tmdbId <= 0) continue
-
-                val mData = entry.optJSONObject("movieData") ?: continue
-                val oldDate = mData.optString("releaseDate", "").take(10)
-                if (oldDate.length != 10 || oldDate < todayStr) continue
-
-                shiftChecks++
-                val latestDate = fetchIndonesianTheatricalDate(tmdbId, apiKey)
-                if (!latestDate.isNullOrEmpty() && latestDate != oldDate) {
-                    val prettyNew = try { LocalDate.parse(latestDate).format(fullDateFmt) } catch (_: Exception) { latestDate }
-                    val prettyOld = try { LocalDate.parse(oldDate).format(fullDateFmt) } catch (_: Exception) { oldDate }
-                    entry.put("lastKnownReleaseDate", latestDate)
-                    mData.put("releaseDate", latestDate)
-                    mData.put("confirmedText", "Jadwal ID terbaru: $prettyNew")
-                    watchlistMutated = true
-
-                    val shiftKey = "wl_shift_${wId}_$latestDate"
-                    if (!notifiedIds.contains(shiftKey)) {
-                        val title = mData.optString("title", "Film Watchlist")
-                        val chosenPoster = customPosters.optString(wId, mData.optString("poster", ""))
-                        sendMovieNotification(
-                            notificationId = shiftKey.hashCode(),
-                            channelId = MainActivity.CHANNEL_WATCHLIST_URGENT,
-                            subLabel = "Perubahan Jadwal ID",
-                            movieTitle = title,
-                            bodyText = "Bergeser dari $prettyOld ke $prettyNew.",
-                            posterUrl = chosenPoster,
-                            movieId = wId,
-                            priority = NotificationCompat.PRIORITY_HIGH
-                        )
-                        notifiedIds.add(shiftKey)
-                        sentCount++
-                    }
-                }
-            }
-
-            // 4. Scan High-Hype Theatrical Indonesian Releases
-            val endpoint = "https://api.themoviedb.org/3/discover/movie?api_key=$apiKey" +
-                "&region=ID&with_release_type=2|3" +
-                "&release_date.gte=$todayStr&sort_by=popularity.desc&page=1"
-            val json = fetchJson(endpoint)
-            val results = json?.optJSONArray("results")
-
-            if (results != null) {
-                for (i in 0 until results.length()) {
-                    val item = results.getJSONObject(i)
-                    val id = item.optInt("id").toString()
-                    val title = item.optString("title", "Film Baru")
-                    val releaseDate = item.optString("release_date", "")
-                    val posterPath = item.optString("poster_path", "")
-
-                    if (releaseDate.isEmpty() || releaseDate < todayStr || posterPath.isEmpty()) continue
-
-                    val popularity = item.optDouble("popularity", 0.0)
-                    if (popularity < 5.0) continue
-
-                    val genreIds = item.optJSONArray("genre_ids")
-                    var isDoc = false
-                    if (genreIds != null) {
-                        for (g in 0 until genreIds.length()) {
-                            if (genreIds.optInt(g) == 99) isDoc = true
+                        val shiftKey = "wl_shift_${wId}_$latestDate"
+                        if (!notifiedIds.contains(shiftKey)) {
+                            val title = mData.optString("title", "Film Watchlist")
+                            val chosenPoster = customPosters.optString(wId, mData.optString("poster", ""))
+                            sendMovieNotification(
+                                notificationId = shiftKey.hashCode(),
+                                channelId = MainActivity.CHANNEL_WATCHLIST_URGENT,
+                                subLabel = "Perubahan Jadwal ID",
+                                movieTitle = title,
+                                bodyText = "Bergeser dari $prettyOld ke $prettyNew.",
+                                posterUrl = chosenPoster,
+                                movieId = wId,
+                                priority = NotificationCompat.PRIORITY_HIGH
+                            )
+                            notifiedIds.add(shiftKey)
+                            sentCount++
                         }
                     }
-                    if (isDoc && popularity < 12.0) continue
+                }
 
-                    val hypeScore = Math.min(98, Math.max(75, Math.round(74 + Math.min(24.0, popularity / 4.0)).toInt()))
+                // 4. Scan High-Hype Theatrical Indonesian Releases
+                val endpoint = "https://api.themoviedb.org/3/discover/movie?api_key=$apiKey" +
+                    "&region=ID&with_release_type=2|3" +
+                    "&release_date.gte=$todayStr&sort_by=popularity.desc&page=1"
+                val json = fetchJson(endpoint)
+                val results = json?.optJSONArray("results")
 
-                    val relParsed = try { LocalDate.parse(releaseDate) } catch (_: Exception) { null }
-                    if (relParsed != null && ChronoUnit.DAYS.between(today, relParsed) in 0L..7L && hypeScore >= 85) {
-                        val line = "${title.uppercase()} (${relParsed.format(shortDateFmt)})"
-                        if (!weeklyDigestLines.any { it.startsWith(title.uppercase()) }) {
-                            weeklyDigestLines.add(line)
+                if (results != null) {
+                    for (i in 0 until results.length()) {
+                        val item = results.getJSONObject(i)
+                        val id = item.optInt("id").toString()
+                        val title = item.optString("title", "Film Baru")
+                        val releaseDate = item.optString("release_date", "")
+                        val posterPath = item.optString("poster_path", "")
+
+                        if (releaseDate.isEmpty() || releaseDate < todayStr || posterPath.isEmpty()) continue
+
+                        val popularity = item.optDouble("popularity", 0.0)
+                        if (popularity < 5.0) continue
+
+                        val genreIds = item.optJSONArray("genre_ids")
+                        var isDoc = false
+                        if (genreIds != null) {
+                            for (g in 0 until genreIds.length()) {
+                                if (genreIds.optInt(g) == 99) isDoc = true
+                            }
                         }
-                    }
+                        if (isDoc && popularity < 12.0) continue
 
-                    if (sentCount < 4 && hypeScore >= minHype && !notifiedIds.contains(id)) {
-                        val defaultPoster = "https://image.tmdb.org/t/p/w500$posterPath"
-                        val chosenPoster = customPosters.optString("tmdb_$id", defaultPoster)
-                        val parsedDate = relParsed?.format(fullDateFmt) ?: releaseDate
-                        sendMovieNotification(
-                            notificationId = id.hashCode(),
-                            channelId = MainActivity.CHANNEL_WEEKLY_DIGEST,
-                            subLabel = "Jadwal Bioskop ID • Hype $hypeScore%",
-                            movieTitle = title,
-                            bodyText = "Mulai $parsedDate di bioskop ID.",
-                            posterUrl = chosenPoster,
-                            movieId = "tmdb_$id",
-                            priority = NotificationCompat.PRIORITY_DEFAULT
-                        )
-                        notifiedIds.add(id)
-                        sentCount++
+                        val hypeScore = Math.min(98, Math.max(75, Math.round(74 + Math.min(24.0, popularity / 4.0)).toInt()))
+
+                        val relParsed = try { LocalDate.parse(releaseDate) } catch (_: Exception) { null }
+                        if (relParsed != null && ChronoUnit.DAYS.between(today, relParsed) in 0L..7L && hypeScore >= 85) {
+                            val line = "${title.uppercase()} (${relParsed.format(shortDateFmt)})"
+                            if (!weeklyDigestLines.any { it.startsWith(title.uppercase()) }) {
+                                weeklyDigestLines.add(line)
+                            }
+                        }
+
+                        if (sentCount < 4 && hypeScore >= minHype && !notifiedIds.contains(id)) {
+                            val defaultPoster = "https://image.tmdb.org/t/p/w500$posterPath"
+                            val chosenPoster = customPosters.optString("tmdb_$id", defaultPoster)
+                            val parsedDate = relParsed?.format(fullDateFmt) ?: releaseDate
+                            sendMovieNotification(
+                                notificationId = id.hashCode(),
+                                channelId = MainActivity.CHANNEL_WEEKLY_DIGEST,
+                                subLabel = "Jadwal Bioskop ID • Hype $hypeScore%",
+                                movieTitle = title,
+                                bodyText = "Mulai $parsedDate di bioskop ID.",
+                                posterUrl = chosenPoster,
+                                movieId = "tmdb_$id",
+                                priority = NotificationCompat.PRIORITY_DEFAULT
+                            )
+                            notifiedIds.add(id)
+                            sentCount++
+                        }
                     }
                 }
             }
@@ -334,8 +436,18 @@ class CinemaCheckWorker(
 
             val editor = prefs.edit().putLong("last_worker_net_sync_ms", nowMs)
             if (watchlistMutated) {
+                val rebuiltTbaIds = JSONArray()
+                val remIter = watchlistObj.keys()
+                while (remIter.hasNext()) {
+                    val rk = remIter.next()
+                    val rEntry = watchlistObj.optJSONObject(rk) ?: continue
+                    if (rEntry.optBoolean("isTba", false)) {
+                        val tid = rEntry.optInt("tmdbId", 0)
+                        if (tid > 0) rebuiltTbaIds.put(tid)
+                    }
+                }
                 editor.putString("watchlist_full_json", watchlistObj.toString())
-                editor.putString("tba_watch_list_json", remainingTbaIds.toString())
+                editor.putString("tba_watch_list_json", rebuiltTbaIds.toString())
             }
             editor.apply()
             saveNotifiedIds(prefs, notifiedIds)

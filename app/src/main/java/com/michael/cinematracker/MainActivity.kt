@@ -442,6 +442,24 @@ class MainActivity : AppCompatActivity() {
         }
 
         @JavascriptInterface
+        fun saveRadarConfig(feedUrl: String, serverUrl: String) {
+            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            prefs.edit()
+                .putString("radar_feed_url", feedUrl.trim())
+                .putString("radar_server_url", serverUrl.trim())
+                .apply()
+        }
+
+        @JavascriptInterface
+        fun getRadarConfigJson(): String {
+            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            return JSONObject().apply {
+                put("feedUrl", prefs.getString("radar_feed_url", "") ?: "")
+                put("serverUrl", prefs.getString("radar_server_url", "") ?: "")
+            }.toString()
+        }
+
+        @JavascriptInterface
         fun changeLauncherIcon(aliasName: String) {
             val aliases = listOf(
                 "com.michael.cinematracker.LauncherDefault",
