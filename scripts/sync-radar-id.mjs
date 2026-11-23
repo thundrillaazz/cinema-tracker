@@ -26,6 +26,26 @@ function normalizeChains(raw) {
   return Array.from(set);
 }
 
+function detectChainsFromText(text) {
+  const s = String(text || '').toLowerCase();
+  const out = [];
+  if (/\b(xxi|cinema\s*21|cinema\s*xxi|21cineplex)\b/i.test(s)) out.push('XXI');
+  if (/\bcgv\b/i.test(s)) out.push('CGV');
+  if (/cin[eé]polis/i.test(s)) out.push('Cinépolis');
+  return out;
+}
+
+function decodeXmlEntities(str) {
+  return String(str || '')
+    .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;|&apos;/g, "'")
+    .trim();
+}
+
 function parseJsonPayload(rawText) {
   if (!rawText) return null;
   const fenced = /```(?:json)?\s*([\s\S]*?)```/i.exec(rawText);
@@ -62,17 +82,31 @@ function extractGroundSources(response) {
   return out;
 }
 
+async function mapConcurrent(items, limit, fn) {
+  const out = new Array(items.length);
+  let idx = 0;
+  async function worker() {
+    while (idx < items.length) {
+      const i = idx++;
+      out[i] = await fn(items[i], i);
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(limit, items.length) }, worker));
+  return out;
+}
+
 async function fetchTmdbSeedTitles(tmdbKey) {
   if (!tmdbKey) return [];
   const today = new Date().toISOString().slice(0, 10);
   const urls = [
-    `https://api.themoviedb.org/3/trending/movie/week?api_key=${encodeURIComponent(tmdbKey)}`,
     `https://api.themoviedb.org/3/movie/upcoming?api_key=${encodeURIComponent(tmdbKey)}&region=ID&page=1`,
+    `https://api.themoviedb.org/3/movie/now_playing?api_key=${encodeURIComponent(tmdbKey)}&region=ID&page=1`,
+    `https://api.themoviedb.org/3/trending/movie/week?api_key=${encodeURIComponent(tmdbKey)}`,
   ];
   const map = new Map();
   for (const u of urls) {
     try {
-      const res = await fetch(u);
+      const res = await fetch(u, { signal: AbortSignal.timeout(8000) });
       if (!res.ok) continue;
       const data = await res.json();
       for (const item of (data.results || []).slice(0, 12)) {
@@ -81,6 +115,7 @@ async function fetchTmdbSeedTitles(tmdbKey) {
           map.set(item.id, {
             tmdbId: item.id,
             title: item.title,
+            originalTitle: item.original_title || item.title,
             releaseDate: item.release_date || today,
           });
         }
@@ -89,16 +124,135 @@ async function fetchTmdbSeedTitles(tmdbKey) {
       // ignore individual upstream timeout
     }
   }
-  return Array.from(map.values()).slice(0, 14);
+  return Array.from(map.values()).slice(0, 18);
 }
 
-async function main() {
-  const geminiKey = (process.env.GEMINI_API_KEY || '').trim();
-  if (!geminiKey) {
-    console.log('GEMINI_API_KEY tidak tersedia; mempertahankan radar-id.json saat ini.');
-    process.exit(0);
+async function fetchTmdbIdReleaseMeta(tmdbId, tmdbKey) {
+  if (!tmdbKey || !tmdbId) return null;
+  try {
+    const res = await fetch(
+      `https://api.themoviedb.org/3/movie/${tmdbId}/release_dates?api_key=${encodeURIComponent(tmdbKey)}`,
+      { signal: AbortSignal.timeout(7000) }
+    );
+    if (!res.ok) return null;
+    const data = await res.json();
+    const idEntry = (data.results || []).find((r) => r.iso_3166_1 === 'ID');
+    if (!idEntry || !Array.isArray(idEntry.release_dates)) return null;
+    const theatrical = idEntry.release_dates
+      .filter((d) => [2, 3].includes(Number(d.type)) && d.release_date)
+      .sort((a, b) => String(a.release_date).localeCompare(String(b.release_date)))[0];
+    const picked = theatrical || idEntry.release_dates[0];
+    if (!picked) return null;
+    return {
+      releaseDateId: sanitizeIso(picked.release_date),
+      certification: String(picked.certification || '').trim().slice(0, 24),
+    };
+  } catch {
+    return null;
   }
+}
 
+async function fetchGoogleNewsIdRss(query) {
+  const url = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=id&gl=ID&ceid=ID:id`;
+  try {
+    const res = await fetch(url, {
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; CinemaTrackerRadar/4.2)' },
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!res.ok) return [];
+    const xml = await res.text();
+    const items = [];
+    const re = /<item>([\s\S]*?)<\/item>/g;
+    let match;
+    while ((match = re.exec(xml)) !== null) {
+      const block = match[1];
+      const titleMatch = /<title>([\s\S]*?)<\/title>/.exec(block);
+      const linkMatch = /<link>([\s\S]*?)<\/link>/.exec(block);
+      const pubMatch = /<pubDate>([\s\S]*?)<\/pubDate>/.exec(block);
+      const sourceMatch = /<source[^>]*>([\s\S]*?)<\/source>/.exec(block);
+      const title = decodeXmlEntities(titleMatch ? titleMatch[1] : '');
+      const link = decodeXmlEntities(linkMatch ? linkMatch[1] : '');
+      const source = decodeXmlEntities(sourceMatch ? sourceMatch[1] : '');
+      const pubDate = pubMatch ? pubMatch[1].trim() : '';
+      if (!title || !/^https?:\/\//i.test(link)) continue;
+      items.push({ title, link, source, pubDate });
+      if (items.length >= 4) break;
+    }
+    return items;
+  } catch {
+    return [];
+  }
+}
+
+function titleMatchesHeadline(movieTitle, headline) {
+  const cleanHead = normalizeKey(headline);
+  const tokens = String(movieTitle || '')
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter((w) => w.length >= 3 && !['the', 'and', 'for', 'with', 'part', 'movie'].includes(w));
+  if (tokens.length === 0) return cleanHead.includes(normalizeKey(movieTitle));
+  const hits = tokens.filter((t) => cleanHead.includes(t));
+  return tokens.length === 1 ? hits.length === 1 : hits.length >= Math.min(2, tokens.length);
+}
+
+async function runFreeRssAndTmdbScan(tmdbCandidates, tmdbKey, nowIso) {
+  const targets = tmdbCandidates.slice(0, 12);
+  const results = await mapConcurrent(targets, 4, async (candidate) => {
+    const [idMeta, newsItems] = await Promise.all([
+      fetchTmdbIdReleaseMeta(candidate.tmdbId, tmdbKey),
+      fetchGoogleNewsIdRss(`"${candidate.title}" (XXI OR CGV OR Cinepolis OR bioskop OR LSF OR "pre-sale" OR IMAX) when:90d`),
+    ]);
+
+    const relevantNews = newsItems.filter((item) => titleMatchesHeadline(candidate.title, item.title));
+    const combinedText = relevantNews.map((n) => n.title).join(' | ');
+    const chains = detectChainsFromText(combinedText);
+    const imax = /\bimax\b/i.test(combinedText);
+    const presaleActive = /\b(pre-?sale|presale|tiket sudah tersedia|buka penjualan)\b/i.test(combinedText);
+    const lsfMention = /\b(lsf|lulus sensor)\b/i.test(combinedText);
+
+    if (!idMeta?.releaseDateId && relevantNews.length === 0) {
+      return null;
+    }
+
+    let status = 'upcoming_global';
+    if (presaleActive) status = 'presale';
+    else if (idMeta?.releaseDateId || chains.length > 0) status = 'confirmed';
+    else if (lsfMention) status = 'lsf_passed';
+
+    const certText = idMeta?.certification ? `Klasifikasi TMDB ID: ${idMeta.certification}` : '';
+    const lsfStatus = certText || (lsfMention ? 'Disebutkan di berita sensor LSF' : '');
+    const headlineSnippet = relevantNews[0]?.title ? `Berita: ${relevantNews[0].title}` : '';
+    const summary = [
+      idMeta?.releaseDateId ? `Jadwal resmi TMDB ID: ${idMeta.releaseDateId}.` : '',
+      headlineSnippet,
+    ]
+      .filter(Boolean)
+      .join(' ')
+      .slice(0, 260);
+
+    return {
+      key: `tmdb_${candidate.tmdbId}`,
+      tmdbId: candidate.tmdbId,
+      title: String(candidate.title).trim().toUpperCase().slice(0, 100),
+      releaseDateId: idMeta?.releaseDateId || undefined,
+      status,
+      chains,
+      imax,
+      presaleActive,
+      lsfStatus,
+      summary: summary || 'Terdeteksi pada radar jadwal/berita bioskop Indonesia.',
+      sources: relevantNews.slice(0, 3).map((n) => ({
+        title: (n.source || 'Google News ID').slice(0, 64),
+        url: n.link,
+      })),
+      checkedAt: nowIso,
+    };
+  });
+
+  return results.filter(Boolean);
+}
+
+async function runGeminiSearchScan(geminiKey, tmdbCandidates, nowIso) {
   const ai = new GoogleGenAI({
     apiKey: geminiKey,
     httpOptions: {
@@ -106,14 +260,14 @@ async function main() {
     },
   });
 
-  const tmdbCandidates = await fetchTmdbSeedTitles((process.env.TMDB_API_KEY || '').trim());
   const hintBlock = tmdbCandidates.length
     ? `Prioritaskan pengecekan untuk daftar film populer berikut jika ada kabar rilis Indonesia:\n${tmdbCandidates
+        .slice(0, 14)
         .map((c) => `- ${c.title} (tmdbId: ${c.tmdbId}, global: ${c.releaseDate})`)
         .join('\n')}`
     : '';
 
-  const todayIso = new Date().toISOString().slice(0, 10);
+  const todayIso = nowIso.slice(0, 10);
   const prompt = [
     `Tanggal hari ini: ${todayIso}.`,
     'Cari pengumuman resmi jadwal rilis bioskop INDONESIA terbaru, film yang baru lulus sensor LSF (lsf.go.id), atau pembukaan tiket pre-sale / IMAX di Cinema XXI, CGV Indonesia, Cinépolis Indonesia, atau TIX ID untuk bulan ini dan 2 bulan ke depan.',
@@ -154,7 +308,6 @@ async function main() {
   const rawEntries = Array.isArray(parsed?.entries) ? parsed.entries : [];
 
   const titleToTmdb = new Map(tmdbCandidates.map((c) => [normalizeKey(c.title), c.tmdbId]));
-  const nowIso = new Date().toISOString();
   const seenKeys = new Set();
   const entries = [];
 
@@ -182,16 +335,42 @@ async function main() {
     });
   }
 
+  return entries;
+}
+
+async function main() {
+  const geminiKey = (process.env.GEMINI_API_KEY || '').trim();
+  const tmdbKey = (process.env.TMDB_API_KEY || '').trim();
+  const nowIso = new Date().toISOString();
+
+  const tmdbCandidates = await fetchTmdbSeedTitles(tmdbKey);
+  let entries = [];
+  let sourceLabel = 'cloud-radar';
+
+  if (geminiKey) {
+    try {
+      entries = await runGeminiSearchScan(geminiKey, tmdbCandidates, nowIso);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.warn(`Gemini grounding fallback triggered (${msg.slice(0, 140)}).`);
+      entries = await runFreeRssAndTmdbScan(tmdbCandidates, tmdbKey, nowIso);
+      sourceLabel = 'cloud-radar-rss-tmdb';
+    }
+  } else {
+    entries = await runFreeRssAndTmdbScan(tmdbCandidates, tmdbKey, nowIso);
+    sourceLabel = 'cloud-radar-rss-tmdb';
+  }
+
   const outPayload = {
     version: 1,
     updatedAt: nowIso,
-    source: 'cloud-radar',
+    source: sourceLabel,
     entries,
   };
 
   fs.mkdirSync(path.dirname(OUT_PATH), { recursive: true });
   fs.writeFileSync(OUT_PATH, JSON.stringify(outPayload, null, 2) + '\n', 'utf8');
-  console.log(`Updated radar-id.json with ${entries.length} entries.`);
+  console.log(`Updated radar-id.json (${sourceLabel}) with ${entries.length} entries.`);
 }
 
 main().catch((err) => {
