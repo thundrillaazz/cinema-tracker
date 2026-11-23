@@ -1,0 +1,304 @@
+{
+  "version": 1,
+  "updatedAt": "2026-11-23T14:48:28.313Z",
+  "source": "cloud-radar-rss-tmdb",
+  "entries": [
+    {
+      "key": "tmdb_1401459",
+      "tmdbId": 1401459,
+      "title": "FJORD",
+      "releaseDateId": "2026-11-25",
+      "status": "confirmed",
+      "chains": [
+        "CGV"
+      ],
+      "imax": false,
+      "presaleActive": false,
+      "lsfStatus": "",
+      "summary": "Jadwal resmi TMDB ID: 2026-11-25. Berita: Fjord Tayang Mulai 25 November di Bioskop Indonesia - CNN Indonesia",
+      "sources": [
+        {
+          "title": "CNN Indonesia",
+          "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxNdTVKcFgwUlhTLXQ4b2JrMm1sYUFLN0VMejBkbUJmejhTT1BsOGdkZ1JaazZuZnN5UGYzUXpDNWJOd2VCZDBTa19GOFpDeUpDTlQ0V3VsT3hfMURXSnN5T3NSV1VzZFFUcDNwbFYwQWJIWmdpeUpfdVpyczlENDNkS2tTSmRxeEw3RU1sM2FScF93Mk5BVWN1aFdkZzRCRTZ1ckJ5d0V0SHZ1dF8tcVM0bkwxRGNoQdIBuwFBVV95cUxPc19heUFWcHExOF9mcHVhbGtUYThSNWM4QkpjLW55bjl4ZTRtWHpiVGN6dUxSZFQ4S0dJSTh6WDFNaHJTdEFDYk1yTWRhcWs1REc0ekxRQk5rZlNVSC1rZkxMZzBvTVp4RHhPZ0lySkVtT2pxVXJydE1WZlJ6YWFzQWkxR2VQWXhRUXVHSUVQZ0dUZjA1bmZvSkdmZVdlRlU3T2RTUGptZWxrS243TFUxdURzQ3AxYV9zck8w?oc=5"
+        },
+        {
+          "title": "Limapagi",
+          "url": "https://news.google.com/rss/articles/CBMibEFVX3lxTE8ta0JvX3NfZ3lFSTRlbUdvVmtmbjY0WFhtMC1yN0NoYTdCd0QtWWxuRmZtTV9WREZSdTJZNm03c0pYZXhLM2I5aDFsQ1IwaWwycUhwVnM3XzJRNE5YNTYtSWc4cUY0UThpcGoyQw?oc=5"
+        },
+        {
+          "title": "Sortir à Paris",
+          "url": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxPQkh4LUtMWFJ1MGlyQW9SbWQ3WEwyd0FqeDBoYUJ0bHB5TFR0ampVeVNSRmNZUDN2alpXZk51Zm9iY3NRVUhNSDdla2RyVDFSVHZKVl9jVDRmTnhOUy1pYjliblBWZ250ZlJUcVAwc3RYZ2lFbWNqejgwZ3NVUGwyLVRNNnRfTXFWdmoxTHdTaDVsY1RzTEx6dUtVd3VQbWhZYmRSekdUbFR4VVBZbHpZS2MxTFowSDNFQlctMGVoWXhva3I5SGF4c0ozYmdyUUpTTENlaQ?oc=5"
+        }
+      ],
+      "checkedAt": "2026-11-23T14:48:28.313Z"
+    },
+    {
+      "key": "tmdb_1457866",
+      "tmdbId": 1457866,
+      "title": "THE FURTHER MIS-ADVENTURES OF CLIFF BOOTH",
+      "releaseDateId": "2026-11-25",
+      "status": "confirmed",
+      "chains": [],
+      "imax": true,
+      "presaleActive": false,
+      "lsfStatus": "",
+      "summary": "Jadwal resmi TMDB ID: 2026-11-25. Berita: Brad Pitt Beri Petunjuk Bersihkan Hollywood dalam Teaser Baru ‘The Further Mis-Adventures of Cliff Booth’ - Hypebeast",
+      "sources": [
+        {
+          "title": "Hypebeast",
+          "url": "https://news.google.com/rss/articles/CBMi5AFBVV95cUxPUnFIWXFtanY3elJxc1BESXRJRGJBUnJOQkpveVR0YmNZcnRnTUUzVUxObTJFemVSLVNFa0xtRFJCZ0l3MU1FT0pXVlBtZHJ5MXZjSE5Xa1AyRDVHZ0RNR3lsWlZnUWZrcHVsemI1QmE4ZzExVUtwdzRPMVFBVW1LeDdoU3RUV1lHM2ljNmlZRGo5UjBoLU4zSjZhbzl5XzFfU2hmS3ItRkV5VDRubW1VM0FweENLNW0tcXhZMTloLUYwdVJZVnJYekZoejVMMElENnE1bG50ZEZ0angyUXNxa1g5M3g?oc=5"
+        },
+        {
+          "title": "KUTIP.co",
+          "url": "https://news.google.com/rss/articles/CBMihwFBVV95cUxONnExSGxlQlBZVzREZDNYSzhVZ2YxMDBRSTZYZFM0NEhnOHBncklDbWhJUEtheFhJTi1sVHpyQk9mbmVhLTVJbHkwMEgxbE5nNURMb0tGUXc1Y1g4R21MSV9KelFEY25zOWxyNnRob0pUNHJCb2REaTQtZ1dQRDlack5PTE9nZjg?oc=5"
+        },
+        {
+          "title": "Hypebeast",
+          "url": "https://news.google.com/rss/articles/CBMimAFBVV95cUxQN0tidnlxT3Y4Szdxd052cGxCb0pUZ1BnMjdEQkVGWWdRV2FhemhjdXE4SnZPc3VXLVNwRUpVRTlZQUJReTk1dTV5bEJHMGVhczdFdEJHMkh3QUdnajhiVjFqU3c0azExaER0OWFUdUt2XzAza3JWVXM1eDMtXzhWWkJLU1ZsTDJ6RkszREY0UW5tX0dLM1ZYVA?oc=5"
+        }
+      ],
+      "checkedAt": "2026-11-23T14:48:28.313Z"
+    },
+    {
+      "key": "tmdb_1078446",
+      "tmdbId": 1078446,
+      "title": "VIOLENT NIGHT 2",
+      "releaseDateId": "2026-12-02",
+      "status": "confirmed",
+      "chains": [],
+      "imax": false,
+      "presaleActive": false,
+      "lsfStatus": "Klasifikasi TMDB ID: 17+",
+      "summary": "Jadwal resmi TMDB ID: 2026-12-02. Berita: Sinopsis Film Violent Night 2, Kisah Santa yang Harus Hadapi Penjahat, Tayang 2 Desember 2026 - Tribunnews.com",
+      "sources": [
+        {
+          "title": "Tribunnews.com",
+          "url": "https://news.google.com/rss/articles/CBMizAFBVV95cUxQeWEtVF9fNGhqNUxxVFU0QnBsWl9rUHhodjVsZXFUbFk3T1NuUEd2WXkwTk9vWU1ESElNMjR1b3dORWlpczJmQ3BkdTNpYWZDWWJEd3ZHQzlRaWVmcmQyOGR6Q01yU3pEWkdqWGdCVzZoYURya2puelhlRFJXbkkzU3RKT0FtcG82TEJ6R3hyRlM4M0VhYm9HYXMtTUNUT3E1YnVoY2ZkOU1YSUhISzFNRVRZVkQxNXBBbG96ZE1OWmctdHdXUmx4UmJjVmk?oc=5"
+        }
+      ],
+      "checkedAt": "2026-11-23T14:48:28.313Z"
+    },
+    {
+      "key": "tmdb_1480276",
+      "tmdbId": 1480276,
+      "title": "INHERIT",
+      "releaseDateId": "2026-11-25",
+      "status": "confirmed",
+      "chains": [],
+      "imax": false,
+      "presaleActive": false,
+      "lsfStatus": "",
+      "summary": "Jadwal resmi TMDB ID: 2026-11-25. Berita: Film Horor Inherit Tayang 25 November di Bioskop Indonesia - CNN Indonesia",
+      "sources": [
+        {
+          "title": "CNN Indonesia",
+          "url": "https://news.google.com/rss/articles/CBMivwFBVV95cUxOLWdveU40T21ZaWVjeEN6TUVIVExNRFR1LW9ZVEVKczBKYXhlZm5CVTN5eHM0bENVMjRaTHloWVhSVlRKR0NvSnYzX09DYVV2bXFpQ01sakdmUW9xUUpUVWtDQ2h6dnd6LXYyZjBaaU9qNmVVNU5DczlqTC1LTmF3SWEybDVXSHNuLWhnZk11X0dkaUdOUm9IY1NrcFJuSkY1SE9fNm1TcGtBTFEyVXVvMGJJTGZfX1p0NkVTTmp0Z9IBxAFBVV95cUxQSndNc1NaV3dTUG8tVXJpOUJkcTkySDd1WTYtLTB6eUpIaXRJOGdjUE9XRG5mNFVnM3lYZjg5RWdQN25VLTBsenhEMThqbU5PanR0ekU2QzNEZ0FXQXV4UXNZUmJhX243WDN2clJoY2pxemlvZ2tmOW5FMzBmUEVlcUJFcURQTVd0aG5QV2o2UUN4UU9hRzd5WnJybk1EYTlfcmhDNGxCaEJreWs2eGExSEFSZHRJeVlDSVNDRVlxT1ZLcHJY?oc=5"
+        },
+        {
+          "title": "radartvnews",
+          "url": "https://news.google.com/rss/articles/CBMiowFBVV95cUxNZm84NVhRejZEQmZRNHNibkk2UWZaU0lPSXJRSzRZb001cy1NNXhSa1g1dk5qMUxJenBRYmdCSzV3Z2VwdFJPWkNJeWcxMGdSSk40M29IamMtQkMxbUloZDJXTE5ra1pCbVFnUlVNWlNQbzd3ZFhXWWF3czA4MVFUbTdySUxzNVA0NkdxYmhJLUFpMDdVM3ZnbzFGVzR2WEVlUnA00gGoAUFVX3lxTFBBYXdvU3dzWi1OVzktNXZCSFNRUElWQkZKaVZpWlA1SzM5M1h6MUFGZnJRMThHVTFOSWhUNnpzMjd6ekRrVGJkQ0d6cWNuWFBaLXg3U0pEWmpUandvenhYcjhMMVdnTTRLRGxJeFhKeVF4dEhxUzQ2MGhLdzFLakVLb1hIV3ZrNzBTaENtSGQ0YUtQZW1MM1JHMGFqTERCblYwMlJIeVA2eQ?oc=5"
+        },
+        {
+          "title": "Yoursay.id",
+          "url": "https://news.google.com/rss/articles/CBMixgFBVV95cUxOOTgwYnJqUEw4dUVmU2pob20tbV9UNDM1c19CeGZqREZfaWF4TjJ5R0ZVb1FYQ3hLVG9BQThBZlF2SnJ3bE5yVGhicVdDQ0pGWV9fSUk5UTk2SnFoMWdTZTdyS0Vja0ppZF80WWRETTh2allGbzlaTFN5NWtSS3N2bVZqd1F2QlJaeTU4bGtyaUpHZFh3OXBaUW1hZDRmc2hKbzBjdEdzN1NCOW5jTkJXaFpyLUM4cUZvTUk0b3NNQnhRN0VNYUHSAcsBQVVfeXFMUDBJV1JzTmppcDN5cTB4d3FuRlpZdzVVWmZUODVqel8tS3NXZElKMlAyLXBEVUtNWWZzRUY1SFhFQm01c1dfZ20zcWgyUUVtSUxCbzIxVTJPY0ZRbUFHcVpjejdqODZnc3BYZE5MX3F2S2R3M0YwRFBEdlJJSTAxeGNFWDZkcnBKbzdSeHRwaDhYVUFvWHM2UDFfTmhtQjMzSFFpVjFsT0EyM1hJd19WNHRuc2JIa1lNYWxkZVhvNEIxR0pJb3B0Vl85ZEE?oc=5"
+        }
+      ],
+      "checkedAt": "2026-11-23T14:48:28.313Z"
+    },
+    {
+      "key": "tmdb_1590933",
+      "tmdbId": 1590933,
+      "title": "YOU, LIKE A STAR",
+      "releaseDateId": "2026-11-27",
+      "status": "confirmed",
+      "chains": [],
+      "imax": false,
+      "presaleActive": false,
+      "lsfStatus": "",
+      "summary": "Jadwal resmi TMDB ID: 2026-11-27. Berita: You, Like a Star | Official Trailer 1 - YouTube",
+      "sources": [
+        {
+          "title": "YouTube",
+          "url": "https://news.google.com/rss/articles/CBMiXEFVX3lxTE4tTERBb1ZVQk1hZVpTSHFVbDZLVVZaRjdvQzN2UkFUMnJVMnA1LUpLclNlTmJOdGpIVExRcXpPQm1wdUQ0NFZfVDh0MkUxUEl3YXRtdXpIWXdJbFUt?oc=5"
+        },
+        {
+          "title": "Kompasiana.com",
+          "url": "https://news.google.com/rss/articles/CBMixAFBVV95cUxNSElfSkN2djBoaFlDZnVmYS1DUTAzMk1zQ3VuTl9NaU9oNmpNU0VMWFN5S3VvS3o2SFFBN1ZPa0FXbzgwM1dyOEtMRzBBRDJWeVQtYjZvTDJkZkZWNmxpMHA4bmdHOFdXVC1WeWpKTzRwSzdrTmt5SVY5MkNUSlpvVWJMTEs0bjFoS0F5elBmVzE5VFR2TTVtOXk3ZzRVNTdwMXYtbXJDQ0s1N2VEaS1CamtnSWNNVWRRVGMycTk2Z0NXVURC?oc=5"
+        },
+        {
+          "title": "RRI.co.id",
+          "url": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxNeFYxTEgwUExLSVc5enNMNVNqU0V6a1kxLXp6Vjdxc2RPNE5ka05tTWN2am1HZm5TRmNkOVphdS1CRnJVbG83a2RKbVBNWHVURVBJRzFGckRyYW1fdkR0Y2szNVpUV1MwN1J0V05WQXNwQlpRdi1fTHJiUVFranA4TEZENzNSWTJZNklzeDQyVjZ5ZFd5cDBWLUdxUnRTTDlaU2pHOWdYb1lnQk15bm1XTE9zM1JYN0R1NkV6NDFZVmlPOGc?oc=5"
+        }
+      ],
+      "checkedAt": "2026-11-23T14:48:28.313Z"
+    },
+    {
+      "key": "tmdb_1732866",
+      "tmdbId": 1732866,
+      "title": "3726 MDPL",
+      "releaseDateId": "2026-12-03",
+      "status": "confirmed",
+      "chains": [],
+      "imax": false,
+      "presaleActive": false,
+      "lsfStatus": "",
+      "summary": "Jadwal resmi TMDB ID: 2026-12-03. Berita: Berlatar di Kota Malang dan Syuting di Universitas Brawijaya, Film 3726 MDPL Rilis Trailer Resmi - Radar Batu",
+      "sources": [
+        {
+          "title": "Radar Batu",
+          "url": "https://news.google.com/rss/articles/CBMi3wFBVV95cUxQZFpUcTRaRG1FRkp6dDI3d3VfT3RROGFqY2Q4WER2Qk4yYW94bE1wYWxMd1piZTVhcmdwVTB4TjBFTXcyZmc0NTJRd0U2bVhtNFQ1UDlJY2NMRVM0bmxxbjFwbW85eXBybFZTNjl0c3doTC10QzN4dnVSWGxlbENnYzd4bDM2alJTd0hxVmtWZTI5aklLWTVQSEVyUzFnUGVDenJFSDdjWldma3p3Y00xSFc3WFBtU090UFBKY3BjM1NBc2Vxa2hqelJyWWgydGRyV3h6N1pjU1B5aFp5d3NJ?oc=5"
+        },
+        {
+          "title": "Limapagi",
+          "url": "https://news.google.com/rss/articles/CBMiY0FVX3lxTE52N3pyamxBY2MzaTVhV19aQTAyb0FVOHQ4LXFkWG9HUXRaX2Y4dVBrQlJ1OWtTaWNPNkg5WWNzZ2RNZ1p5X2lLWmswUGl0R0E3aDhHVVFZMWxjbWUyUkEyRWdoSQ?oc=5"
+        },
+        {
+          "title": "RRI.co.id",
+          "url": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxQUWFvSXlnakR5VjlFUDRuWkdIV3BESkk5VWRKUkFJa0FTdnlzXzc0VXpicERIYi1mVnFBbjZ2eWhKUHc5SHhqOHVPU3Zoam9oMEdNVXhKYmdkNHI4UlVhSUpqRlY2NGdqS01TRm82dDM2Wk9XOVc1Q05uUkNWVE85VWhuYURhQ1k1emtUOUl2dHl3Yll1bXlYRGZDbzhpREZQcnk4VTFZeVk0Zw?oc=5"
+        }
+      ],
+      "checkedAt": "2026-11-23T14:48:28.313Z"
+    },
+    {
+      "key": "tmdb_1590752",
+      "tmdbId": 1590752,
+      "title": "COMING HOME",
+      "releaseDateId": "2026-11-26",
+      "status": "confirmed",
+      "chains": [],
+      "imax": false,
+      "presaleActive": false,
+      "lsfStatus": "Klasifikasi TMDB ID: SU",
+      "summary": "Jadwal resmi TMDB ID: 2026-11-26. Berita: “Running Man Vietnam 2026: Coming Home” akan ditayangkan di layar lebar. - Vietnam.vn",
+      "sources": [
+        {
+          "title": "Vietnam.vn",
+          "url": "https://news.google.com/rss/articles/CBMiigFBVV95cUxOcFV4a09BazFCcnVjTnJEUUh4c1I1aFBRd3RTSmo1TFU0NE5KSTZYMmhHb1k0X3FPU3FINUYyeGQ2MHZvYXdWeTZmTGg1YjV4dFpNLUl3aXRZX0V4RnZkN1pLZWNLaTVyMjBaVzdXaFo3MnlKM0IxQ0taRW9rbzVkcFFHWEhpYmJBTXc?oc=5"
+        }
+      ],
+      "checkedAt": "2026-11-23T14:48:28.313Z"
+    },
+    {
+      "key": "tmdb_1691495",
+      "tmdbId": 1691495,
+      "title": "HAJATAN SETAN",
+      "releaseDateId": "2026-12-03",
+      "status": "confirmed",
+      "chains": [],
+      "imax": false,
+      "presaleActive": false,
+      "lsfStatus": "Klasifikasi TMDB ID: 17+",
+      "summary": "Jadwal resmi TMDB ID: 2026-12-03. Berita: Hajatan Setan Perluas Pasar Film Horor Indonesia ke Asia - Limapagi",
+      "sources": [
+        {
+          "title": "Limapagi",
+          "url": "https://news.google.com/rss/articles/CBMiY0FVX3lxTE1pa3llWDlsVVYxOFUtWmlhM3FkUVZaTzlOZXYyRE1EVy1KakNBaTlELTFFSGlNWkFHWkRveDBUT1ZIRzl4Z3JuUzVzSDNhUGFSemJ3MXFUamlzWGF5Ynd3djF3QQ?oc=5"
+        },
+        {
+          "title": "Kompas.com",
+          "url": "https://news.google.com/rss/articles/CBMitAFBVV95cUxPbFJYNElCaXcyWjNjZE9sakNLbU5jWEJybVRfQnR4cTI4N1VwN0dyLWNuTmNGNGt6d1lGT21TQXdMQUUzaXpOUkEtZXZZV3VLdUM4dURhVzhzNmRNU2ZrRS1aR1F5ek80M0Vnb1NmV2lLemdZaTlWdEt5aXowdDltOEZDV2MxcVVaT3RmcG55aEdVSVdNYTVQX0loU1JyTWVGNTNtdTVuUmp1Mjc1UkRJdUZWUG4?oc=5"
+        },
+        {
+          "title": "Layar.id",
+          "url": "https://news.google.com/rss/articles/CBMimwFBVV95cUxNbXBOV1d4RG5zUFlnNHliRVNtSWhaNzJ1cnJNbEJNTlFIUGc1V2RlTVZUX3NWT3FtVDFkOGp3OFJHNk8tS2h3dWhiLUlBLTdvVU4ycHF5YUZoY3FFSTRVX19CdWRQZnlJTm1PenhMYmJpajU4dXExS3NCcVFkVlJCQU5nZFhkOVUzdkdKcFRwSzF1c0VsZkMwM2dEOA?oc=5"
+        }
+      ],
+      "checkedAt": "2026-11-23T14:48:28.313Z"
+    },
+    {
+      "key": "tmdb_1398505",
+      "tmdbId": 1398505,
+      "title": "JANI BE GOOD",
+      "releaseDateId": "2026-12-10",
+      "status": "confirmed",
+      "chains": [],
+      "imax": false,
+      "presaleActive": false,
+      "lsfStatus": "Klasifikasi TMDB ID: SU",
+      "summary": "Jadwal resmi TMDB ID: 2026-12-10.",
+      "sources": [],
+      "checkedAt": "2026-11-23T14:48:28.313Z"
+    },
+    {
+      "key": "tmdb_1707669",
+      "tmdbId": 1707669,
+      "title": "HUNGRY GHOST FESTIVAL",
+      "releaseDateId": "2026-11-26",
+      "status": "confirmed",
+      "chains": [],
+      "imax": false,
+      "presaleActive": false,
+      "lsfStatus": "Klasifikasi TMDB ID: 13+",
+      "summary": "Jadwal resmi TMDB ID: 2026-11-26. Berita: Ini cerita para pemain Film Hungry Ghost Festival di balik layar - ANTARA News Jambi",
+      "sources": [
+        {
+          "title": "ANTARA News Jambi",
+          "url": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxNaTFrbjI2aTM4REl5NDc0WjNaTXdYc1V3ZW1ucThLUUloY2Uxd3l4V3ZvRDJjRUdIdDk3WTRHVmhLUVFtVVpHQmloVDhtWTRJYlYyWXFqaE1La0JyYkxaS21xYlNmak9OQWpZdVB5dktjekZ3bzNJZnl5a211XzV6ZjVEdjBFbHBSeGo4RHdmUEFLdGlDSFRxcllZV1FsX2RrSVVCZnByMHl0eFE?oc=5"
+        },
+        {
+          "title": "detikcom",
+          "url": "https://news.google.com/rss/articles/CBMitwFBVV95cUxOcXlJOGtINDZCVXlVTm1RUkJiQXZXWEdmY2I0M2dPNGtKY3dTYlcwTEI3REhsVTJxVnVkMzR2a3ZCaTc1Z2NIaXBxX3pvQ2ZfZHUwU3Vqc3JxVVZXQk1YZ29kY3AxUVdKSDhxM1dJVkJRYmRoYkVnNUZiSkVZTGJONk5zWVFBdFhrdllxeTZIMEJSaHdkVXR4Sll1YXpqS2szRzNUMklKeGR3c3V3eHZoWnBfQWgwY1nSAbwBQVVfeXFMTjNRUU44Qm5abWYyaDFqQzR4UVNhTHNRcXA5TEpldVQ1VS1UUlRIc0xRN2VMSVBmWENCbjJKWnNZbFNJVUo4N2pEajNHYUozaWpIT1hWMlVtSzFwZDFNR2JUbDJ1N2hITGw1WHA0SndlY3RjMWQ5eUpCeDBvU2x3bEZjNC1tdGp2Y3pSOXd3X1R2bTVKSGxoWV9nd3pndWRnSmN3dG95TDJlbk1QVldibGtGYUw0bkxtRnpEdnM?oc=5"
+        },
+        {
+          "title": "Jakartakita.com",
+          "url": "https://news.google.com/rss/articles/CBMimwFBVV95cUxPOUFQczJHNDNWTmxUR25ESnQ3M2JLUkRRYUNWLWtrOU1yeGpqT3VLV3ZDV2d3UnVkem1ocDRubW9scUZ0NGNNVVR5a00xUDctNUlsMkVLN0NadlBhTVJXeHBhT003YW14eDFnbXlWc2YwRFQ0NGM0cGlzT09lNlZ5THZCVDlKekFrX0dRZTR1ZzNUSTBjUGRXSXdQZw?oc=5"
+        }
+      ],
+      "checkedAt": "2026-11-23T14:48:28.313Z"
+    },
+    {
+      "key": "tmdb_1718454",
+      "tmdbId": 1718454,
+      "title": "YANG DATANG DAN YANG PERGI",
+      "releaseDateId": "2026-12-03",
+      "status": "confirmed",
+      "chains": [],
+      "imax": false,
+      "presaleActive": false,
+      "lsfStatus": "Klasifikasi TMDB ID: 13+",
+      "summary": "Jadwal resmi TMDB ID: 2026-12-03. Berita: Dian Sastro Bintangi Film Yang Datang dan Yang Pergi , Ini Sinopsinya - MerahPutih",
+      "sources": [
+        {
+          "title": "MerahPutih",
+          "url": "https://news.google.com/rss/articles/CBMikAFBVV95cUxNZVdDMmVZVGJRRTU5V2pBMldxNUVDUFFiNnI2d1ZQZ3poWU5WYTRVeERhbzdySEJFS2llMjBudlhRUlFUd0hCUDRkTzAzQXE2OXhvTVpqdnhCQ2VtMW90LUxsTG1FbVZVNW9NRkFKVGY4bUgzSGhId1pNQXB2V0dQZ1BKOXV5OHZJUGt4QlUtbDLSAY8BQVVfeXFMTkd0RzdhaWlGdnNYaTlRUDZBTjgwc2loUXAtcGhMazRKanJkNEhQR2ZSRHJGaUNwUGQ5Vi0yTjN5WngwM2dhOU1TdmNFZEdYMi1CaktlS0NkV2Nfdi1aNzNYNVNVVVQ1RzlWUmJWM1E3Q01NcHBGT2lkMmZNdEF3VlV5Q3NfcVEtYWM2RDlKeFE?oc=5"
+        },
+        {
+          "title": "ANTARA Foto",
+          "url": "https://news.google.com/rss/articles/CBMimgFBVV95cUxNajdBYWY4OElUbXBXOF9sNFloUV9jd0J0azZwZzc1SXAzcG03eW42NWY1OWxmcjl0Y2s3cjhZdUdmZTltNlVmcnVrVWlaTXplU1V5bjEyc3FMRnZsSmRYY2pDSlNCMkYyNHRHXzVVeEx3ckxYRDZkUGFib0dETzNMVG8tQzVrT285UkpmTThua1JPU2ZaZ1hncWZ30gGfAUFVX3lxTE91dW9WMkhTR2RhOVdkMTNSVFJ2dUxydDdnc25KNmZSWmluUlBrN3RxTENqVnkwZWNjRXdXcHpqZS05bXNNOEkzbzBPOVBScnZrLV9nQXdPdjhtVUFOTUpMMFJIdzFfZk9MN2U5c3NTbzl3VHcyaVdETlZFUnQwNEUxaXNQMWdPT3gwbnYtTzdHTk9aZHNCT0ZXWlg2SVVFYw?oc=5"
+        },
+        {
+          "title": "Pontianak Post",
+          "url": "https://news.google.com/rss/articles/CBMi0AFBVV95cUxPX3lfNG5UYUI2R0VMYnpWY0dZOTRielNmVVFRZkRFTVktWUpqVm1DeWVJRW9IbDFPdjlRdWhseHMxTnJlbUpqR2Flbks1M3d6UnhSMVdybFppSDVZbnFwd0NpRWh6RjI5Wl9HYXVMaVhHZXNGZUZUMW5mdTJ6VkFDOGlaR2JadDVUalRUTDFjUTUyWl9mYXRZanAyZ2ZkV21TV0wzaHVnX1JUVGRLTE41QTJxZzRnTm5iU2NtVXlfUHpZWXZlekZlX3g2SnU0S1pQ0gHWAUFVX3lxTE9kQ0JUeFhzU1JNUTZoOEMtU2lOaTZzTVhDMEtxQTREa2xIWEZpVXNsLTZpXzhqTm5JbjgyYzlMWk5CUXpsSUtmVUNWX2pPSFFBNXBsYWZPdGx4c1Zjc2dhOWFZSVlmVkE3LXRqNC01ZFdDUzFGOURXU01PQlJnc3dVdWJBVVN6Z3lramZMQ3BjWWpqUnZ5UjloVXRhcWwzWVNUVmJtS3JOLVVZeG1PaURHcWRWU1puZjNMU0d3UXdwT3dSdXJMNmx3bnpFZkJjbXFaRW9wSEE?oc=5"
+        }
+      ],
+      "checkedAt": "2026-11-23T14:48:28.313Z"
+    },
+    {
+      "key": "tmdb_1292784",
+      "tmdbId": 1292784,
+      "title": "SUMPAH DARAH",
+      "releaseDateId": "2026-11-26",
+      "status": "confirmed",
+      "chains": [],
+      "imax": false,
+      "presaleActive": false,
+      "lsfStatus": "Klasifikasi TMDB ID: 17+",
+      "summary": "Jadwal resmi TMDB ID: 2026-11-26. Berita: Sumpah Darah Jadi Ruang Eksplorasi Cornelio Sunny, Tak Ingin Mendikte Penonton soal Moral - Lensa Banten",
+      "sources": [
+        {
+          "title": "Lensa Banten",
+          "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxNdWpHbHkwVmQ0VmhDUXltTzk5T0FBVmpvY3c3Sm82NzZjNlpoaS1uUHJOS0VrVUZLb19FRFNQMWllM2pGNENDa3psTjNEZUFqcVJHTVU1Vm1CdElCaDdGNERWUmdYaVY3eXNtT0RKbXNOcnhEeG9KcmdvT2tTVW5LQ2VkUDVKRWctYzJxN2RlY2E3dmh4Y0d6VmhvaFFxRUxDNXBYV1hWRTFGdlBHOGtjeFBGUGMyZw?oc=5"
+        },
+        {
+          "title": "Kompas.com",
+          "url": "https://news.google.com/rss/articles/CBMinwFBVV95cUxPR21ZU0Y2OFFkZFJZTXZ6Qkl0TGVPMG1LY284c3dVV3ZwRTFXVTN6azJUUmVsU3BLbk40dHYxQ3JtemxRVWpwd1FkcjYtV1VQZVNRYjlDWDBwbWlsbzlRVE9BREZKakRSaFVXTlBUeTFFZTI4OVh2UFVOWmJPSWJHUUFEU2Z6cTd5bWtfcUVseGU4cHpjVlhpMDU1ZFo5Y2s?oc=5"
+        },
+        {
+          "title": "Nusantarapos.co.id",
+          "url": "https://news.google.com/rss/articles/CBMitAFBVV95cUxNM2RCcW1KRzl3YUZrblhHeFloLWJXZ0xhS3Z1V0F6bGh2aVJXMklGODZBa3h6ekduZ25JTDFZWmJXay1SR3Z4UUM5NEdNakd6dGlIdHpVeEQ0dHpnMXJhaW56elQ5dTROR0tqelliUEtZZzdET21JbF82eFpfenl3cFZyMmEwX3JSMncwVzl4ODA2RV9WNzkzSy0tT3BTRlRWM1NveVBjSW1iYzdsOVNkckdiNF8?oc=5"
+        }
+      ],
+      "checkedAt": "2026-11-23T14:48:28.313Z"
+    }
+  ]
+}
