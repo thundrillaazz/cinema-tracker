@@ -24,6 +24,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.provider.Settings
 import android.webkit.JavascriptInterface
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
@@ -343,6 +344,40 @@ class MainActivity : AppCompatActivity() {
                 webView.evaluateJavascript("window.__onAndroidRssResult && window.__onAndroidRssResult($qId, $qPayload)", null)
             }
         }
+    }
+
+    private fun dispatchUpdateCallback(callbackId: String, jsonStr: String) {
+        val qId = JSONObject.quote(callbackId)
+        val qPayload = JSONObject.quote(jsonStr)
+        runOnUiThread {
+            if (::webView.isInitialized) {
+                webView.evaluateJavascript("window.__onAndroidUpdateMeta && window.__onAndroidUpdateMeta($qId, $qPayload)", null)
+            }
+        }
+    }
+
+    private fun openHttpsConnectionFollowingRedirects(startUrl: String, connectMs: Int = 8000, readMs: Int = 20000): HttpURLConnection {
+        var current = startUrl
+        for (hop in 0..5) {
+            val conn = (URL(current).openConnection() as HttpURLConnection).apply {
+                instanceFollowRedirects = false
+                connectTimeout = connectMs
+                readTimeout = readMs
+                setRequestProperty("User-Agent", "CinemaTracker-Android/4.3")
+            }
+            val code = conn.responseCode
+            if (code in listOf(301, 302, 303, 307, 308)) {
+                val loc = conn.getHeaderField("Location")
+                conn.disconnect()
+                if (loc.isNullOrEmpty() || !loc.startsWith("https://")) {
+                    throw IllegalStateException("Invalid redirect")
+                }
+                current = loc
+                continue
+            }
+            return conn
+        }
+        throw IllegalStateException("Too many redirects")
     }
 
     private fun applySystemBarAppearance(isDark: Boolean) {
@@ -798,7 +833,7 @@ class MainActivity : AppCompatActivity() {
                     conn = (URL(rssUrl).openConnection() as HttpURLConnection).apply {
                         connectTimeout = 7000
                         readTimeout = 7000
-                        setRequestProperty("User-Agent", "Mozilla/5.0 (compatible; CinemaTrackerRadar/4.2)")
+                        setRequestProperty("User-Agent", "Mozilla/5.0 (compatible; CinemaTrackerRadar/4.3)")
                     }
                     if (conn.responseCode !in 200..299) {
                         dispatchRssCallback(callbackId, "[]")
@@ -852,6 +887,127 @@ class MainActivity : AppCompatActivity() {
                     dispatchRssCallback(callbackId, items.toString())
                 } catch (_: Exception) {
                     dispatchRssCallback(callbackId, "[]")
+                } finally {
+                    conn?.disconnect()
+                }
+            }
+        }
+
+        @JavascriptInterface
+        fun getAppVersionInfoJson(): String {
+            return try {
+                val pInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    context.packageManager.getPackageInfo(context.packageName, PackageManager.PackageInfoFlags.of(0))
+                } else {
+                    @Suppress("DEPRECATION")
+                    context.packageManager.getPackageInfo(context.packageName, 0)
+                }
+                val code = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    pInfo.longVersionCode
+                } else {
+                    @Suppress("DEPRECATION")
+                    pInfo.versionCode.toLong()
+                }
+                JSONObject().apply {
+                    put("versionCode", code)
+                    put("versionName", pInfo.versionName ?: "4.3")
+                    put("packageName", context.packageName)
+                }.toString()
+            } catch (_: Exception) {
+                "{\"versionCode\":43,\"versionName\":\"4.3\",\"packageName\":\"com.michael.cinematracker\"}"
+            }
+        }
+
+        @JavascriptInterface
+        fun checkForApkUpdate(callbackId: String, metaUrl: String) {
+            val cleanUrl = metaUrl.trim()
+            if (!cleanUrl.startsWith("https://")) {
+                dispatchUpdateCallback(callbackId, "{\"error\":\"URL tidak valid\"}")
+                return
+            }
+            executor.execute {
+                var conn: HttpURLConnection? = null
+                try {
+                    conn = openHttpsConnectionFollowingRedirects(cleanUrl, 7000, 7000)
+                    if (conn.responseCode !in 200..299) {
+                        dispatchUpdateCallback(callbackId, "{\"error\":\"HTTP_${conn.responseCode}\"}")
+                        return@execute
+                    }
+                    val body = conn.inputStream.bufferedReader(StandardCharsets.UTF_8).use { it.readText() }
+                    dispatchUpdateCallback(callbackId, body)
+                } catch (_: Exception) {
+                    dispatchUpdateCallback(callbackId, "{\"error\":\"NETWORK\"}")
+                } finally {
+                    conn?.disconnect()
+                }
+            }
+        }
+
+        @JavascriptInterface
+        fun downloadAndInstallApk(apkUrl: String) {
+            val cleanUrl = apkUrl.trim()
+            if (!cleanUrl.startsWith("https://")) {
+                showJsToast("URL APK tidak valid")
+                return
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !context.packageManager.canRequestPackageInstalls()) {
+                showJsToast("Aktifkan izin install dari aplikasi ini, lalu tekan Update lagi")
+                runOnUiThread {
+                    try {
+                        val permIntent = Intent(
+                            Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
+                            Uri.parse("package:${context.packageName}")
+                        ).apply {
+                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        }
+                        context.startActivity(permIntent)
+                    } catch (_: Exception) {}
+                }
+                return
+            }
+
+            showJsToast("Mengunduh pembaruan APK...")
+            executor.execute {
+                var conn: HttpURLConnection? = null
+                try {
+                    conn = openHttpsConnectionFollowingRedirects(cleanUrl, 10000, 45000)
+                    if (conn.responseCode !in 200..299) {
+                        showJsToast("Gagal mengunduh update (HTTP ${conn.responseCode})")
+                        return@execute
+                    }
+                    val updatesDir = File(context.cacheDir, "updates")
+                    if (!updatesDir.exists()) updatesDir.mkdirs()
+                    updatesDir.listFiles()?.forEach { it.delete() }
+                    val targetApk = File(updatesDir, "CinemaTracker-update.apk")
+                    conn.inputStream.use { input ->
+                        FileOutputStream(targetApk).use { out ->
+                            input.copyTo(out)
+                        }
+                    }
+                    if (!targetApk.exists() || targetApk.length() < 500_000L) {
+                        targetApk.delete()
+                        showJsToast("File update tidak lengkap atau rusak")
+                        return@execute
+                    }
+
+                    val apkUri = FileProvider.getUriForFile(
+                        context,
+                        "${context.packageName}.fileprovider",
+                        targetApk
+                    )
+                    val installIntent = Intent(Intent.ACTION_VIEW).apply {
+                        setDataAndType(apkUri, "application/vnd.android.package-archive")
+                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
+                    }
+                    runOnUiThread {
+                        try {
+                            context.startActivity(installIntent)
+                        } catch (_: Exception) {
+                            showJsToast("Gagal membuka installer Android")
+                        }
+                    }
+                } catch (_: Exception) {
+                    showJsToast("Gagal mengunduh file update APK")
                 } finally {
                     conn?.disconnect()
                 }

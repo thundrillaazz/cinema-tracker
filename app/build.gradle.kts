@@ -11,13 +11,37 @@ android {
         applicationId = "com.michael.cinematracker"
         minSdk = 26
         targetSdk = 35
-        versionCode = 42
-        versionName = "4.2"
+        versionCode = 43
+        versionName = "4.3"
+        val overrideCode = (project.findProperty("APP_VERSION_CODE") as String?)?.toIntOrNull()
+        if (overrideCode != null && overrideCode > 0) {
+            versionCode = overrideCode
+        }
+    }
+
+    val keystoreFile = file("keystore.jks")
+    val storePass = System.getenv("SIGNING_STORE_PASSWORD") ?: ""
+    val keyAliasEnv = System.getenv("SIGNING_KEY_ALIAS") ?: ""
+    val keyPass = System.getenv("SIGNING_KEY_PASSWORD") ?: ""
+    val hasPersistentKeystore = keystoreFile.exists() && storePass.isNotEmpty() && keyAliasEnv.isNotEmpty() && keyPass.isNotEmpty()
+
+    signingConfigs {
+        if (hasPersistentKeystore) {
+            create("persistentRelease") {
+                storeFile = keystoreFile
+                storePassword = storePass
+                keyAlias = keyAliasEnv
+                keyPassword = keyPass
+            }
+        }
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
+            if (hasPersistentKeystore) {
+                signingConfig = signingConfigs.getByName("persistentRelease")
+            }
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

@@ -279,7 +279,7 @@ class CinemaCheckWorker(
                         continue
                     }
 
-                    val idReleaseDate = fetchIndonesianTheatricalDate(tmdbId, apiKey) ?: continue
+                    val idReleaseDate = fetchIndonesianTheatricalDate(tmdbId, apiKey, todayStr) ?: continue
 
                     if (idReleaseDate.isNotEmpty()) {
                         val searchKey = "search_$tmdbId"
@@ -343,7 +343,7 @@ class CinemaCheckWorker(
                     if (oldDate.length != 10 || oldDate < todayStr) continue
 
                     shiftChecks++
-                    val latestDate = fetchIndonesianTheatricalDate(tmdbId, apiKey)
+                    val latestDate = fetchIndonesianTheatricalDate(tmdbId, apiKey, todayStr)
                     if (!latestDate.isNullOrEmpty() && latestDate != oldDate) {
                         val prettyNew = try { LocalDate.parse(latestDate).format(fullDateFmt) } catch (_: Exception) { latestDate }
                         val prettyOld = try { LocalDate.parse(oldDate).format(fullDateFmt) } catch (_: Exception) { oldDate }
@@ -390,7 +390,7 @@ class CinemaCheckWorker(
                         if (releaseDate.isEmpty() || releaseDate < todayStr || posterPath.isEmpty()) continue
 
                         val popularity = item.optDouble("popularity", 0.0)
-                        if (popularity < 5.0) continue
+                        if (popularity < 1.5) continue
 
                         val genreIds = item.optJSONArray("genre_ids")
                         var isDoc = false
@@ -462,7 +462,7 @@ class CinemaCheckWorker(
         return now.hour < 7 || now.hour > 22 || (now.hour == 22 && now.minute >= 30)
     }
 
-    private fun fetchIndonesianTheatricalDate(tmdbId: Int, apiKey: String): String? {
+    private fun fetchIndonesianTheatricalDate(tmdbId: Int, apiKey: String, minDate: String = ""): String? {
         val relJson = fetchJson("https://api.themoviedb.org/3/movie/$tmdbId/release_dates?api_key=$apiKey")
             ?: return null
         val results = relJson.optJSONArray("results") ?: return ""
@@ -486,7 +486,12 @@ class CinemaCheckWorker(
                 }
             }
         }
-        return theatricalDates.minOrNull() ?: fallbackDate
+        val windowMatch = if (minDate.isNotEmpty()) {
+            theatricalDates.filter { it >= minDate }.minOrNull()
+        } else {
+            null
+        }
+        return windowMatch ?: theatricalDates.minOrNull() ?: fallbackDate
     }
 
     private fun maybeSendWeeklyDigest(prefs: android.content.SharedPreferences, lines: List<String>) {

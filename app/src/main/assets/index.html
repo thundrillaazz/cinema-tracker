@@ -1878,8 +1878,20 @@
         <div id="launcherIconGrid" class="launcher-grid"></div>
       </div>
 
+      <div id="apkUpdateCard" class="info-card" style="display:none;">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:4px;">
+          <h3 style="margin:0;">Pembaruan Aplikasi</h3>
+          <span id="apkCurrentVerLabel" style="font-size:11px; font-weight:600; color:var(--muted); font-variant-numeric:tabular-nums;">v4.3</span>
+        </div>
+        <p id="apkUpdateStatus" style="margin-bottom:8px;">Cek rilis APK terbaru langsung tanpa buka browser atau ekstrak ZIP.</p>
+        <div style="display:flex; gap:8px;">
+          <button id="apkCheckUpdateBtn" type="button" class="btn-secondary-full" style="margin-top:0;" onclick="checkApkUpdateManual()">Cek Update APK</button>
+          <button id="apkInstallUpdateBtn" type="button" class="btn-full" style="margin-top:0; display:none;" onclick="installAvailableApkUpdate()">Update Sekarang</button>
+        </div>
+      </div>
+
       <div style="text-align:center; font-size:11px; color:var(--muted); padding:4px 0 12px; line-height:1.5;">
-        <div>Cinema Tracker v4.2 (Stable) · Made by Thundrilla</div>
+        <div>Cinema Tracker v4.3 (Stable) · Made by Thundrilla</div>
         <div style="font-size:10px; opacity:0.75;">Jadwal Bioskop Indonesia</div>
       </div>
     </div>
@@ -2348,6 +2360,7 @@
       highlightLauncherOption(savedIcon);
       probeRadarCapabilities();
       fetchCloudRadarFeed(false);
+      initAndroidApkUpdater();
 
       if (savedKey) {
         document.getElementById("tmdbKeyInput").value = savedKey;
@@ -2379,8 +2392,9 @@
       const lastSync = parseInt(localStorage.getItem("ct_last_sync_ts") || "0", 10);
       const now = Date.now();
       updateLastSyncLabel(lastSync);
-      // 2-hour auto-sync threshold to protect battery and mobile data
-      if (now - lastSync > 2 * 60 * 60 * 1000) {
+      const needsSchemaUpgrade = localStorage.getItem("ct_catalog_schema_ver") !== "4.3";
+      // 2-hour auto-sync threshold to protect battery and mobile data (+ 1-time v4.3 catalog upgrade refresh)
+      if (needsSchemaUpgrade || (now - lastSync > 2 * 60 * 60 * 1000)) {
         syncTmdbLive(false);
       }
     }
@@ -2425,7 +2439,10 @@
         if (!m.releaseDate || m.releaseDate < minDate || m.releaseDate > maxDate) return;
         const isReleased = m.releaseDate <= todayIso;
         m.status = isReleased ? "now" : "upcoming";
-        m.dateLabel = isReleased ? "Sedang Tayang" : formatShortDate(m.releaseDate);
+        const shortD = formatShortDate(m.releaseDate);
+        m.dateLabel = isReleased
+          ? "Sedang Tayang"
+          : (m.sourceBadge === "TMDB Global" ? `Est. ${shortD}` : shortD);
 
         const norm = normalizeKey(m.title);
         if (seenNormalized.has(norm)) {
@@ -3213,7 +3230,8 @@
         const verifiedChains = (m.chains && m.chains.length > 0)
           ? (m.imax ? `${m.chains.join(" · ")} · IMAX` : m.chains.join(" · "))
           : (m.imax ? "Format IMAX" : "");
-        const subLine = verifiedChains || (activeMode === "upcoming" ? (m.genre || "") : "");
+        const isGlobalEst = m.sourceBadge === "TMDB Global" && !(m.radarInfo && m.radarInfo.releaseDateId);
+        const subLine = verifiedChains || (activeMode === "upcoming" ? (isGlobalEst ? `Est. Global · ${m.genre || ""}` : (m.genre || "")) : "");
         const topMetaLine = activeMode === "upcoming"
           ? `${escapeHtml(m.age || "R 13+")} · ${escapeHtml(ratingLabel)} · Hype ${hypePct}%`
           : `${escapeHtml(m.age || "R 13+")} · ${escapeHtml(m.genre)}`;
@@ -3882,9 +3900,14 @@
           formatNote: m.imax ? "Tersedia format IMAX" : ""
         };
       }
+      const isGlobalEst = m.sourceBadge === "TMDB Global" && !(m.radarInfo && m.radarInfo.releaseDateId);
       return {
         confirmed: false,
-        summary: m.tba ? "Jadwal bioskop ID belum terkonfirmasi" : "Cek jadwal jaringan bioskop di bawah",
+        summary: m.tba
+          ? "Jadwal bioskop ID belum terkonfirmasi"
+          : isGlobalEst
+          ? "Jadwal resmi bioskop ID sedang dipantau"
+          : "Cek jadwal jaringan bioskop di bawah",
         formatNote: m.imax ? "Tersedia format IMAX" : ""
       };
     }
@@ -4209,8 +4232,11 @@
 
       const cdPillTone = cd.tone === "now" ? "now" : cd.tone === "soon" ? "soon" : "muted";
       const cdLabelText = cd.label === "Tayang" ? "Sedang Tayang" : cd.label;
+      const isGlobalEst = effectiveMovie.sourceBadge === "TMDB Global" && !(activeRadar && activeRadar.releaseDateId);
       const scheduleHeadline = effectiveMovie.tba
         ? "Jadwal bioskop Indonesia belum diumumkan"
+        : isGlobalEst
+        ? `Estimasi global · ${formatHumanDate(effectiveMovie.releaseDate)}`
         : cd.label === "Tayang"
         ? `Sedang tayang · Sejak ${formatHumanDate(effectiveMovie.releaseDate)}`
         : cd.label === "Hari Ini"
@@ -4962,24 +4988,58 @@
         persistWatchlist();
 
         const keyParam = encodeURIComponent(key);
-        const nowUrl1 = `https://api.themoviedb.org/3/movie/now_playing?api_key=${keyParam}&region=ID&page=1`;
-        const nowUrl2 = `https://api.themoviedb.org/3/movie/now_playing?api_key=${keyParam}&region=ID&page=2`;
-        const upcomingUrl1 = `https://api.themoviedb.org/3/discover/movie?api_key=${keyParam}&region=ID&with_release_type=2|3&release_date.gte=${todayIso}&sort_by=popularity.desc&page=1`;
-        const upcomingUrl2 = `https://api.themoviedb.org/3/discover/movie?api_key=${keyParam}&region=ID&with_release_type=2|3&release_date.gte=${todayIso}&sort_by=popularity.desc&page=2`;
-        const officialUpUrl = `https://api.themoviedb.org/3/movie/upcoming?api_key=${keyParam}&region=ID&page=1`;
-        const localIdUrl = `https://api.themoviedb.org/3/discover/movie?api_key=${keyParam}&region=ID&with_release_type=2|3&with_original_language=id&release_date.gte=${todayIso}&sort_by=popularity.desc&page=1`;
-        const trendingUrl = `https://api.themoviedb.org/3/trending/movie/week?api_key=${keyParam}`;
+        const yearNow = todayIso.slice(0, 4);
+        const yearNum = parseInt(yearNow, 10) || 2026;
+        const fetchWithTimeout = async (url, timeoutMs = 9000) => {
+          const ctrl = new AbortController();
+          const tid = setTimeout(() => ctrl.abort(), timeoutMs);
+          try {
+            return await fetch(url, { signal: ctrl.signal });
+          } finally {
+            clearTimeout(tid);
+          }
+        };
+        const pickIdTheatricalDate = (results, minDateStr) => {
+          const idEntry = (results || []).find(r => r.iso_3166_1 === "ID");
+          if (!idEntry || !idEntry.release_dates || idEntry.release_dates.length === 0) return "";
+          const theatrical = idEntry.release_dates
+            .filter(d => (d.type === 2 || d.type === 3) && d.release_date)
+            .sort((a, b) => a.release_date.localeCompare(b.release_date));
+          const inWindow = minDateStr
+            ? theatrical.find(d => d.release_date.slice(0, 10) >= minDateStr)
+            : null;
+          const picked = inWindow || theatrical[0] || idEntry.release_dates.find(d => d.release_date);
+          return picked && picked.release_date ? picked.release_date.slice(0, 10) : "";
+        };
 
-        const [resNow1, resNow2, resUpcoming1, resUpcoming2, resOfficialUp, resLocalId, resTrending] = await Promise.all([
-          fetch(nowUrl1),
-          fetch(nowUrl2),
-          fetch(upcomingUrl1),
-          fetch(upcomingUrl2),
-          fetch(officialUpUrl),
-          fetch(localIdUrl),
-          fetch(trendingUrl)
-        ]);
-        if (resNow1.status === 401 || resUpcoming1.status === 401) {
+        const endpointSpecs = [
+          { key: "now1", url: `https://api.themoviedb.org/3/movie/now_playing?api_key=${keyParam}&region=ID&page=1` },
+          { key: "now2", url: `https://api.themoviedb.org/3/movie/now_playing?api_key=${keyParam}&region=ID&page=2` },
+          { key: "idUpDate1", url: `https://api.themoviedb.org/3/discover/movie?api_key=${keyParam}&region=ID&with_release_type=2|3&release_date.gte=${todayIso}&release_date.lte=${maxDate}&sort_by=release_date.asc&page=1` },
+          { key: "idUpDate2", url: `https://api.themoviedb.org/3/discover/movie?api_key=${keyParam}&region=ID&with_release_type=2|3&release_date.gte=${todayIso}&release_date.lte=${maxDate}&sort_by=release_date.asc&page=2` },
+          { key: "idUpPop1", url: `https://api.themoviedb.org/3/discover/movie?api_key=${keyParam}&region=ID&with_release_type=2|3&release_date.gte=${todayIso}&release_date.lte=${maxDate}&sort_by=popularity.desc&page=1` },
+          { key: "officialUp1", url: `https://api.themoviedb.org/3/movie/upcoming?api_key=${keyParam}&region=ID&page=1` },
+          { key: "officialUp2", url: `https://api.themoviedb.org/3/movie/upcoming?api_key=${keyParam}&region=ID&page=2` },
+          { key: "localId1", url: `https://api.themoviedb.org/3/discover/movie?api_key=${keyParam}&with_original_language=id&without_genres=10770&primary_release_date.gte=${todayIso}&primary_release_date.lte=${maxDate}&sort_by=primary_release_date.asc&page=1` },
+          { key: "localId2", url: `https://api.themoviedb.org/3/discover/movie?api_key=${keyParam}&with_original_language=id&without_genres=10770&primary_release_date.gte=${todayIso}&primary_release_date.lte=${maxDate}&sort_by=primary_release_date.asc&page=2` },
+          { key: "globalUp1", url: `https://api.themoviedb.org/3/discover/movie?api_key=${keyParam}&with_release_type=2|3&without_genres=99,10770&primary_release_date.gte=${todayIso}&primary_release_date.lte=${maxDate}&sort_by=popularity.desc&page=1` },
+          { key: "globalUp2", url: `https://api.themoviedb.org/3/discover/movie?api_key=${keyParam}&with_release_type=2|3&without_genres=99,10770&primary_release_date.gte=${todayIso}&primary_release_date.lte=${maxDate}&sort_by=popularity.desc&page=2` },
+          { key: "trending", url: `https://api.themoviedb.org/3/trending/movie/week?api_key=${keyParam}` }
+        ];
+
+        const batchResponses = await mapWithConcurrency(endpointSpecs, 4, async (spec) => {
+          try {
+            const res = await fetchWithTimeout(spec.url);
+            if (res.status === 401) return { key: spec.key, status: 401, results: [] };
+            if (!res.ok) return { key: spec.key, status: res.status, results: [] };
+            const data = await res.json();
+            return { key: spec.key, status: 200, results: data.results || [] };
+          } catch (_) {
+            return { key: spec.key, status: 0, results: [] };
+          }
+        });
+
+        if (batchResponses.some(r => r.status === 401)) {
           updateApiStatusPill(false, false);
           if (showFeedback) {
             fb.textContent = "API Key tidak valid.";
@@ -4987,101 +5047,195 @@
           }
           return;
         }
-        if (!resNow1.ok && !resUpcoming1.ok) throw new Error("HTTP_" + resNow1.status);
-
-        const dataNow1 = resNow1.ok ? await resNow1.json() : { results: [] };
-        const dataNow2 = resNow2.ok ? await resNow2.json() : { results: [] };
-        const dataUpcoming1 = resUpcoming1.ok ? await resUpcoming1.json() : { results: [] };
-        const dataUpcoming2 = resUpcoming2.ok ? await resUpcoming2.json() : { results: [] };
-        const dataOfficialUp = resOfficialUp.ok ? await resOfficialUp.json() : { results: [] };
-        const dataLocalId = resLocalId.ok ? await resLocalId.json() : { results: [] };
-        const dataTrending = resTrending.ok ? await resTrending.json() : { results: [] };
-
-        const nowRaw = [...(dataNow1.results || []), ...(dataNow2.results || [])];
-        const upcomingRaw = [
-          ...(dataUpcoming1.results || []),
-          ...(dataUpcoming2.results || []),
-          ...(dataOfficialUp.results || []),
-          ...(dataLocalId.results || [])
-        ];
-
-        const knownIds = new Set([...nowRaw, ...upcomingRaw].map(r => r && r.id).filter(Boolean));
-        const trendingCands = (dataTrending.results || [])
-          .filter(t => t && t.id && !knownIds.has(t.id) && (t.popularity || 0) >= 35 && t.poster_path)
-          .slice(0, 8);
-
-        if (trendingCands.length > 0) {
-          const promoted = await mapWithConcurrency(trendingCands, 4, async (cand) => {
-            try {
-              const rRes = await fetch(`https://api.themoviedb.org/3/movie/${cand.id}/release_dates?api_key=${keyParam}`);
-              if (!rRes.ok) return null;
-              const rData = await rRes.json();
-              const idEntry = (rData.results || []).find(r => r.iso_3166_1 === "ID");
-              if (!idEntry || !idEntry.release_dates) return null;
-              const theatrical = idEntry.release_dates
-                .filter(d => (d.type === 2 || d.type === 3) && d.release_date)
-                .sort((a, b) => a.release_date.localeCompare(b.release_date));
-              const picked = theatrical[0] || idEntry.release_dates.find(d => d.release_date);
-              if (!picked || !picked.release_date) return null;
-              return { ...cand, release_date: picked.release_date.slice(0, 10) };
-            } catch (_) {
-              return null;
-            }
-          });
-          promoted.forEach(item => {
-            if (!item) return;
-            if (item.release_date <= todayIso) nowRaw.push(item);
-            else upcomingRaw.push(item);
-          });
+        const byEp = {};
+        batchResponses.forEach(r => { byEp[r.key] = r; });
+        if (byEp.now1.status !== 200 && byEp.idUpDate1.status !== 200 && byEp.localId1.status !== 200) {
+          throw new Error("HTTP_" + (byEp.now1.status || "NET"));
         }
 
-        const junkPattern = /experimental film|student film|short film|tugas akhir|skripsi|film pendek/i;
-        const parseItems = (results) => {
-          const seenIds = new Set();
-          return (results || [])
-            .filter(item => {
-              if (!item || !item.id || seenIds.has(item.id)) return false;
-              const rDate = item.release_date || "";
-              if (!rDate || rDate < minDate || rDate > maxDate) return false;
-              if (!item.poster_path) return false;
-              const pop = Number(item.popularity || 0);
-              const isLocalId = item.original_language === "id";
-              if (pop < (isLocalId ? 2.2 : 5.0)) return false;
-              const gIds = item.genre_ids || [];
-              if (gIds.includes(99) && pop < 12.0) return false;
-              const rawText = `${item.title || ""} ${item.original_title || ""} ${item.overview || ""}`;
-              if (junkPattern.test(rawText)) return false;
-              seenIds.add(item.id);
-              return true;
-            })
-            .map(item => {
-              const isReleased = item.release_date <= todayIso;
-              const resolvedStatus = isReleased ? "now" : "upcoming";
-              const dateLabel = isReleased ? "Sedang Tayang" : formatShortDate(item.release_date);
-              const hypeScore = Math.min(97, Math.max(76, Math.round(74 + Math.min(23, (item.popularity || 10) / 4))));
-              const genresText = (item.genre_ids || []).slice(0, 2).map(gid => GENRE_MAP[gid]).filter(Boolean).join(", ") || "Theatrical";
+        const nowRaw = [...byEp.now1.results, ...byEp.now2.results];
+        const idUpcomingRaw = [
+          ...byEp.idUpDate1.results,
+          ...byEp.idUpDate2.results,
+          ...byEp.idUpPop1.results,
+          ...byEp.officialUp1.results,
+          ...byEp.officialUp2.results
+        ];
+        const localIdUpcomingRaw = [...byEp.localId1.results, ...byEp.localId2.results];
+        const globalUpcomingRaw = [...byEp.globalUp1.results, ...byEp.globalUp2.results, ...byEp.trending.results];
 
-              const idKey = "tmdb_" + item.id;
-              const cachedCred = creditsCache[idKey] || {};
+        let relCache = {};
+        try {
+          relCache = JSON.parse(localStorage.getItem("ct_v43_id_rel_cache") || "{}") || {};
+        } catch (_) {}
+        const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+        const releaseDateOverrides = {};
 
-              return {
-                id: idKey, tmdbId: item.id, status: resolvedStatus, isIndonesian: item.original_language === "id",
-                isReRelease: Boolean((item.title || "").toLowerCase().includes("re-release")),
-                title: (item.title || item.original_title || "").toUpperCase(), releaseDate: item.release_date,
-                dateLabel, confirmedText: isReleased ? "Sedang tayang di bioskop Indonesia" : `Confirmed ID: ${formatFullDate(item.release_date)}`,
-                presaleText: "Pantau ketersediaan jadwal & tiket di bioskop terdekat.", sourceBadge: "TMDB ID",
-                age: item.adult ? "D 17+" : "R 13+", runtime: cachedCred.runtime || "TBA", genre: genresText,
-                hype: hypeScore, rating: ((item.vote_average || 8.2)).toFixed(1), presale: false,
-                imax: (item.popularity || 0) >= 65, tba: false, chains: [],
-                director: cachedCred.director || "Belum dimuat", cast: cachedCred.cast || "Belum dimuat",
-                synopsis: item.overview || "Tayang di bioskop Indonesia.",
-                poster: `https://image.tmdb.org/t/p/w500${item.poster_path}`
+        const idSeen = new Set([...nowRaw, ...idUpcomingRaw, ...localIdUpcomingRaw].map(r => r && r.id).filter(Boolean));
+        const reReleaseCands = idUpcomingRaw
+          .filter(item => item && item.id && item.poster_path && item.release_date && item.release_date < minDate)
+          .slice(0, 8);
+        const globalProbeCands = globalUpcomingRaw
+          .filter(t => t && t.id && !idSeen.has(t.id) && (t.popularity || 0) >= 12 && t.poster_path)
+          .slice(0, 8);
+
+        const toCheck = [];
+        const queuedProbeIds = new Set();
+        reReleaseCands.forEach(item => {
+          if (!queuedProbeIds.has(item.id)) {
+            queuedProbeIds.add(item.id);
+            toCheck.push(item);
+          }
+        });
+        globalProbeCands.forEach(item => {
+          if (!queuedProbeIds.has(item.id)) {
+            queuedProbeIds.add(item.id);
+            toCheck.push(item);
+          }
+        });
+
+        const uncachedToFetch = toCheck.filter(item => {
+          const cached = relCache[String(item.id)];
+          if (cached && (Date.now() - cached.ts) < ONE_DAY_MS) {
+            if (cached.idDate && cached.idDate >= minDate && cached.idDate <= maxDate) {
+              const primaryYr = parseInt((item.release_date || "").slice(0, 4), 10);
+              releaseDateOverrides[item.id] = {
+                releaseDate: cached.idDate,
+                sourceBadge: "Bioskop ID",
+                isReRelease: Boolean(!isNaN(primaryYr) && primaryYr > 1900 && primaryYr < yearNum - 1)
               };
-            });
+            }
+            return false;
+          }
+          return true;
+        });
+
+        if (uncachedToFetch.length > 0) {
+          await mapWithConcurrency(uncachedToFetch, 4, async (item) => {
+            try {
+              const rRes = await fetchWithTimeout(`https://api.themoviedb.org/3/movie/${item.id}/release_dates?api_key=${keyParam}`, 7000);
+              if (!rRes.ok) return;
+              const rData = await rRes.json();
+              const idDate = pickIdTheatricalDate(rData.results || [], minDate);
+              relCache[String(item.id)] = { idDate: idDate || "", ts: Date.now() };
+              if (idDate && idDate >= minDate && idDate <= maxDate) {
+                const primaryYr = parseInt((item.release_date || "").slice(0, 4), 10);
+                releaseDateOverrides[item.id] = {
+                  releaseDate: idDate,
+                  sourceBadge: "Bioskop ID",
+                  isReRelease: Boolean(!isNaN(primaryYr) && primaryYr > 1900 && primaryYr < yearNum - 1)
+                };
+              }
+            } catch (_) {}
+          });
+          localStorage.setItem("ct_v43_id_rel_cache", JSON.stringify(pruneCache(relCache, 100)));
+        }
+
+        const junkPattern = /experimental film|student film|short film|tugas akhir|skripsi|film pendek|tv special/i;
+        const parseItems = (results, origin = "id") => {
+          const seenIds = new Set();
+          const valid = [];
+          (results || []).forEach(item => {
+            if (!item || !item.id || seenIds.has(item.id)) return;
+            if (!item.poster_path) return;
+            const gIds = item.genre_ids || [];
+            if (gIds.includes(10770)) return;
+            const ov = releaseDateOverrides[item.id];
+            const rDate = ((ov && ov.releaseDate) || item.release_date || "").slice(0, 10);
+            if (!rDate || rDate < minDate || rDate > maxDate) return;
+
+            const effOrigin = ov ? "id" : origin;
+            const pop = Number(item.popularity || 0);
+            const isLocalId = item.original_language === "id";
+            if (effOrigin === "global") {
+              if (pop < 8.0) return;
+              if (gIds.includes(99) && pop < 12.0) return;
+            } else {
+              const minPop = isLocalId ? 0.4 : 0.8;
+              if (pop < minPop) return;
+              if (gIds.includes(99) && pop < (isLocalId ? 2.5 : 5.0)) return;
+            }
+            const rawText = `${item.title || ""} ${item.original_title || ""} ${item.overview || ""}`;
+            if (junkPattern.test(rawText)) return;
+            seenIds.add(item.id);
+            const primaryYr = parseInt((item.release_date || "").slice(0, 4), 10);
+            const isReRelease = Boolean(
+              (ov && ov.isReRelease) ||
+              (item.title || "").toLowerCase().includes("re-release") ||
+              (!isNaN(primaryYr) && primaryYr > 1900 && primaryYr < yearNum - 1 && rDate >= minDate)
+            );
+            valid.push({ item, rDate, effOrigin, ov, isReRelease });
+          });
+
+          return valid.map(({ item, rDate, effOrigin, ov, isReRelease }) => {
+            const isReleased = rDate <= todayIso;
+            const resolvedStatus = isReleased ? "now" : "upcoming";
+            const shortD = formatShortDate(rDate);
+            const isGlobalEst = effOrigin === "global" && !isReleased;
+            const dateLabel = isReleased ? "Sedang Tayang" : (isGlobalEst ? `Est. ${shortD}` : shortD);
+            const hypeScore = Math.min(97, Math.max(76, Math.round(74 + Math.min(23, (item.popularity || 10) / 4))));
+            const genresText = (item.genre_ids || []).slice(0, 2).map(gid => GENRE_MAP[gid]).filter(Boolean).join(", ") || "Theatrical";
+            const idKey = "tmdb_" + item.id;
+            const cachedCred = creditsCache[idKey] || {};
+
+            return {
+              id: idKey, tmdbId: item.id, status: resolvedStatus, isIndonesian: item.original_language === "id",
+              isReRelease,
+              title: (item.title || item.original_title || "").toUpperCase(), releaseDate: rDate,
+              dateLabel,
+              confirmedText: isReleased
+                ? "Sedang tayang di bioskop Indonesia"
+                : isGlobalEst
+                ? `Est. Global ${shortD} · Pantau rilis ID`
+                : `Mulai tayang ${shortD}`,
+              presaleText: isGlobalEst
+                ? "Jadwal resmi bioskop ID sedang dipantau."
+                : "Pantau ketersediaan jadwal & tiket di bioskop terdekat.",
+              sourceBadge: (ov && ov.sourceBadge) || (isGlobalEst ? "TMDB Global" : "Bioskop ID"),
+              age: item.adult ? "D 17+" : "R 13+", runtime: cachedCred.runtime || "TBA", genre: genresText,
+              hype: hypeScore, rating: ((item.vote_average || 8.2)).toFixed(1), presale: false,
+              imax: (item.popularity || 0) >= 65, tba: false, chains: [],
+              director: cachedCred.director || "Belum dimuat", cast: cachedCred.cast || "Belum dimuat",
+              synopsis: item.overview || "Tayang di bioskop Indonesia.",
+              poster: `https://image.tmdb.org/t/p/w500${item.poster_path}`
+            };
+          });
         };
 
-        const liveNow = parseItems(nowRaw);
-        const liveUpcoming = parseItems(upcomingRaw);
+        const liveNow = [];
+        const liveUpcoming = [];
+        const seenTmdbIds = new Set();
+        const seenTitleNorms = new Set();
+        const pushUnique = (m) => {
+          if (m.tmdbId && seenTmdbIds.has(m.tmdbId)) return;
+          const norm = normalizeKey(m.title);
+          if (norm && seenTitleNorms.has(norm)) return;
+          if (m.tmdbId) seenTmdbIds.add(m.tmdbId);
+          if (norm) seenTitleNorms.add(norm);
+          if (m.status === "now") liveNow.push(m);
+          else liveUpcoming.push(m);
+        };
+
+        parseItems(nowRaw, "id").forEach(pushUnique);
+        parseItems([...idUpcomingRaw, ...localIdUpcomingRaw], "id").forEach(pushUnique);
+
+        const globalCandsSorted = [...globalUpcomingRaw]
+          .filter(item => {
+            if (!item || !item.id || seenTmdbIds.has(item.id)) return false;
+            const ov = releaseDateOverrides[item.id];
+            const d = ((ov && ov.releaseDate) || item.release_date || "").slice(0, 10);
+            return Boolean(d && d > todayIso && d <= maxDate);
+          })
+          .sort((a, b) => Number(b.popularity || 0) - Number(a.popularity || 0));
+
+        let addedGlobal = 0;
+        parseItems(globalCandsSorted, "global").forEach(gm => {
+          if (gm.sourceBadge === "TMDB Global") {
+            if (addedGlobal >= 24) return;
+            addedGlobal += 1;
+          }
+          pushUnique(gm);
+        });
 
         await radarPromise;
         const newlyConfirmedRadar = applyRadarToWatchlist(todayIso);
@@ -5100,6 +5254,7 @@
 
         localStorage.setItem("ct_v392_live_now", JSON.stringify(liveNow));
         localStorage.setItem("ct_v392_live_upcoming", JSON.stringify(liveUpcoming));
+        localStorage.setItem("ct_catalog_schema_ver", "4.3");
 
         rebuildMovieCatalog();
         updateCounts();
@@ -5338,6 +5493,153 @@
         showToast("Gagal membaca file backup");
       };
       reader.readAsText(file);
+    }
+
+    const androidUpdatePending = {};
+    let pendingApkUpdateMeta = null;
+
+    window.__onAndroidUpdateMeta = function(cbId, jsonStr) {
+      const resolver = androidUpdatePending[cbId];
+      if (!resolver) return;
+      delete androidUpdatePending[cbId];
+      try {
+        resolver(JSON.parse(jsonStr || "{}"));
+      } catch (_) {
+        resolver({ error: "PARSE" });
+      }
+    };
+
+    function resolveUpdateRepoSlug() {
+      const m = /^https:\/\/raw\.githubusercontent\.com\/([^/]+\/[^/]+)\//i.exec(radarFeedUrl || "");
+      if (m && m[1]) return m[1];
+      return (localStorage.getItem("ct_update_repo") || "thundrillaazz/cinema-tracker").trim();
+    }
+
+    function getInstalledApkMeta() {
+      if (window.AndroidBridge && typeof window.AndroidBridge.getAppVersionInfoJson === "function") {
+        try {
+          return JSON.parse(window.AndroidBridge.getAppVersionInfoJson() || "{}");
+        } catch (_) {}
+      }
+      return { versionCode: 43, versionName: "4.3" };
+    }
+
+    function fetchApkReleaseMeta(metaUrl) {
+      return new Promise(resolve => {
+        if (!window.AndroidBridge || typeof window.AndroidBridge.checkForApkUpdate !== "function") {
+          resolve({ error: "UNSUPPORTED" });
+          return;
+        }
+        const cbId = "upd_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6);
+        const timer = setTimeout(() => {
+          if (androidUpdatePending[cbId]) {
+            delete androidUpdatePending[cbId];
+            resolve({ error: "TIMEOUT" });
+          }
+        }, 9000);
+        androidUpdatePending[cbId] = payload => {
+          clearTimeout(timer);
+          resolve(payload || { error: "EMPTY" });
+        };
+        try {
+          window.AndroidBridge.checkForApkUpdate(cbId, metaUrl);
+        } catch (_) {
+          clearTimeout(timer);
+          delete androidUpdatePending[cbId];
+          resolve({ error: "CALL" });
+        }
+      });
+    }
+
+    async function checkApkUpdateInternal(silent) {
+      const statusEl = document.getElementById("apkUpdateStatus");
+      const checkBtn = document.getElementById("apkCheckUpdateBtn");
+      const installBtn = document.getElementById("apkInstallUpdateBtn");
+      if (!window.AndroidBridge || typeof window.AndroidBridge.checkForApkUpdate !== "function") return;
+
+      const repo = resolveUpdateRepoSlug();
+      const metaUrl = `https://github.com/${repo}/releases/download/latest/release-meta.json`;
+      const local = getInstalledApkMeta();
+      const localCode = Number(local.versionCode || 43);
+
+      if (!silent && statusEl) {
+        statusEl.textContent = "Memeriksa rilis terbaru di GitHub...";
+        statusEl.style.color = "var(--muted)";
+      }
+      if (!silent && checkBtn) checkBtn.disabled = true;
+
+      try {
+        const remote = await fetchApkReleaseMeta(metaUrl);
+        localStorage.setItem("ct_last_update_check_ts", String(Date.now()));
+
+        if (!remote || remote.error || !remote.versionCode) {
+          if (!silent && statusEl) {
+            statusEl.textContent = "Rilis update belum tersedia atau repo belum mempublikasikan GitHub Release.";
+            statusEl.style.color = "var(--muted)";
+          }
+          return;
+        }
+
+        const remoteCode = Number(remote.versionCode || 0);
+        const buildSuffix = remote.buildNumber ? ` (Build #${remote.buildNumber})` : "";
+        if (remoteCode > localCode && remote.apkUrl) {
+          pendingApkUpdateMeta = remote;
+          if (statusEl) {
+            if (remote.signed) {
+              statusEl.textContent = `Versi baru tersedia: v${remote.versionName || "4.3"}${buildSuffix}. Data & Watchlist tetap aman.`;
+              statusEl.style.color = "var(--emerald-text)";
+            } else {
+              statusEl.textContent = `Build #${remote.buildNumber || remoteCode} tersedia (belum pakai Keystore tetap — pasang Keystore dulu agar bisa timpa tanpa uninstall).`;
+              statusEl.style.color = "var(--muted)";
+            }
+          }
+          if (installBtn) {
+            installBtn.style.display = "block";
+            installBtn.textContent = remote.signed ? "Download & Update" : "Buka Rilis APK";
+          }
+          if (silent && remote.signed) {
+            showToast(`Update APK${buildSuffix} tersedia di Settings`);
+          }
+        } else if (!silent && statusEl) {
+          pendingApkUpdateMeta = null;
+          if (installBtn) installBtn.style.display = "none";
+          statusEl.textContent = `Aplikasi sudah paling baru (v${local.versionName || "4.3"} · code ${localCode}).`;
+          statusEl.style.color = "var(--emerald-text)";
+        }
+      } finally {
+        if (!silent && checkBtn) checkBtn.disabled = false;
+      }
+    }
+
+    function checkApkUpdateManual() {
+      checkApkUpdateInternal(false);
+    }
+
+    function installAvailableApkUpdate() {
+      if (!pendingApkUpdateMeta || !pendingApkUpdateMeta.apkUrl) return;
+      if (!pendingApkUpdateMeta.signed) {
+        const repo = resolveUpdateRepoSlug();
+        openExternalUrlSafe(`https://github.com/${repo}/releases/tag/latest`);
+        return;
+      }
+      if (window.AndroidBridge && typeof window.AndroidBridge.downloadAndInstallApk === "function") {
+        window.AndroidBridge.downloadAndInstallApk(pendingApkUpdateMeta.apkUrl);
+      }
+    }
+
+    function initAndroidApkUpdater() {
+      if (!window.AndroidBridge || typeof window.AndroidBridge.checkForApkUpdate !== "function") return;
+      const card = document.getElementById("apkUpdateCard");
+      const verLabel = document.getElementById("apkCurrentVerLabel");
+      if (card) card.style.display = "block";
+      const local = getInstalledApkMeta();
+      if (verLabel) verLabel.textContent = `v${local.versionName || "4.3"} · code ${local.versionCode || 43}`;
+
+      const lastCheck = parseInt(localStorage.getItem("ct_last_update_check_ts") || "0", 10);
+      const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+      if (Date.now() - lastCheck > ONE_DAY_MS) {
+        setTimeout(() => checkApkUpdateInternal(true), 2200);
+      }
     }
 
     init();
