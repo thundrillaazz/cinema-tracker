@@ -1,8 +1,27 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-24T02:08:59.351Z",
+  "updatedAt": "2026-11-24T14:14:53.016Z",
   "source": "cloud-radar-rss-tmdb",
   "entries": [
+    {
+      "key": "tmdb_1195803",
+      "tmdbId": 1195803,
+      "title": "WICKER",
+      "releaseDateId": "2026-12-02",
+      "status": "confirmed",
+      "chains": [],
+      "imax": false,
+      "presaleActive": false,
+      "lsfStatus": "",
+      "summary": "Jadwal resmi TMDB ID: 2026-12-02. Berita: Wicker Alexander Skarsgard Tayang 2 Desember di Bioskop Indonesia - CNN Indonesia",
+      "sources": [
+        {
+          "title": "CNN Indonesia",
+          "url": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxQSjNvQnhpNFowcG9nd2xQWUhCZHRoNUFlb1E2a2ZlYTZKT2NBd0J4bmhmQ053S19lcUN3dGhuRnhwYnRZdWl0MUg2TXBMWE5OQ2Y2MWlQajBLN1pOQ3BvUDlGTjE1emp3X01FcmgwSERJZzdWcHpmLWRUMDQzcFNFTDlUUkVYcVh0S240R3ZGaFJTazU4cDRjRk1XQk1SSjIxdzhXV0FnWHFRNnloZUVtaGliUmdCR2VCS1Y5Y19aNnRLdzhaZ3YzTNIBzgFBVV95cUxNM0VxNDZ4d24wZkJaYVRGRGRLYmRtX3UtOXhkWjYzeU51Y0VuNHVhQjZNcnZfWnUyRVZXLUlpeUo2cUo2VTdQUWd5MEt3QzdkTm42T2NnX2xuR0hGZ0c2ZENaaHdvOF9PTGpfdVNyVF9sTXZOd0s2OTdpcXBqbGUzZWh6YWtHWUdlaEh4aVkzLW52MmRlRVlxdS1xbWowR1hqaGR2cnlrQmVRMHhxVU5lWUwwVFhsY0Z3SEVNOEp3a1ZjeXVnV3FscDFmcnYxdw?oc=5"
+        }
+      ],
+      "checkedAt": "2026-11-24T14:14:53.016Z"
+    },
     {
       "key": "tmdb_1401459",
       "tmdbId": 1401459,
@@ -30,7 +49,7 @@
           "url": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxPQkh4LUtMWFJ1MGlyQW9SbWQ3WEwyd0FqeDBoYUJ0bHB5TFR0ampVeVNSRmNZUDN2alpXZk51Zm9iY3NRVUhNSDdla2RyVDFSVHZKVl9jVDRmTnhOUy1pYjliblBWZ250ZlJUcVAwc3RYZ2lFbWNqejgwZ3NVUGwyLVRNNnRfTXFWdmoxTHdTaDVsY1RzTEx6dUtVd3VQbWhZYmRSekdUbFR4VVBZbHpZS2MxTFowSDNFQlctMGVoWXhva3I5SGF4c0ozYmdyUUpTTENlaQ?oc=5"
         }
       ],
-      "checkedAt": "2026-11-24T02:08:59.351Z"
+      "checkedAt": "2026-11-24T14:14:53.016Z"
     },
     {
       "key": "tmdb_1457866",
@@ -53,11 +72,34 @@
           "url": "https://news.google.com/rss/articles/CBMihwFBVV95cUxONnExSGxlQlBZVzREZDNYSzhVZ2YxMDBRSTZYZFM0NEhnOHBncklDbWhJUEtheFhJTi1sVHpyQk9mbmVhLTVJbHkwMEgxbE5nNURMb0tGUXc1Y1g4R21MSV9KelFEY25zOWxyNnRob0pUNHJCb2REaTQtZ1dQRDlack5PTE9nZjg?oc=5"
         },
         {
-          "title": "Hypebeast",
-          "url": "https://news.google.com/rss/articles/CBMimAFBVV95cUxQN0tidnlxT3Y4Szdxd052cGxCb0pUZ1BnMjdEQkVGWWdRV2FhemhjdXE4SnZPc3VXLVNwRUpVRTlZQUJReTk1dTV5bEJHMGVhczdFdEJHMkh3QUdnajhiVjFqU3c0azExaER0OWFUdUt2XzAza3JWVXM1eDMtXzhWWkJLU1ZsTDJ6RkszREY0UW5tX0dLM1ZYVA?oc=5"
+          "title": "Layar.id",
+          "url": "https://news.google.com/rss/articles/CBMihgFBVV95cUxPYW9sOVdGb1ZkNmFUZXhDcWFvOFBNc2JQbHdPbFd5cVg0dkFKbnJDdkpoNmk3MGVNV1ZPNVV4Vjc2dzF1VHhOOS00M1ByV3NVamprMTlWbWdTQ2JydXdfc0dfMHV3TzFPRmN5ei1kN1dKamhYY2JyMkdGWTV2ZTR0Q0dYb3pydw?oc=5"
         }
       ],
-      "checkedAt": "2026-11-24T02:08:59.351Z"
+      "checkedAt": "2026-11-24T14:14:53.016Z"
+    },
+    {
+      "key": "tmdb_1299329",
+      "tmdbId": 1299329,
+      "title": "JOSEPHINE",
+      "releaseDateId": "2026-12-09",
+      "status": "confirmed",
+      "chains": [],
+      "imax": false,
+      "presaleActive": false,
+      "lsfStatus": "",
+      "summary": "Jadwal resmi TMDB ID: 2026-12-09. Berita: Kejahatan Keji di Golden Gate Park Mengguncang Sebuah Keluarga dalam Trailer Resmi 'Josephine' - Hypebeast",
+      "sources": [
+        {
+          "title": "Hypebeast",
+          "url": "https://news.google.com/rss/articles/CBMitwFBVV95cUxQVVV4cTQtX1M0VVZVbUlQTlhiMzlJQ18xM3RhQ2lOSXAtb21PRjNJN2NESHVXUVBCTmE1bmd1dkVSTlRiVEJtR3RCR1MyRnNFMnVxSmstdjRNeC00M2p0ck5kcWc1VC1WbTlYNGpSRXRfRGJZaExWVHYwenp0TGRkQlRScmlQdmJkdkRIUHBpUEFCS1AtQU9wZjU4Q2ltMG5uejhEZjlBVmNHUGxvUWZSaVBVdE1LOFE?oc=5"
+        },
+        {
+          "title": "Yoursay.id",
+          "url": "https://news.google.com/rss/articles/CBMiygFBVV95cUxOYUNoTEs1clgwMEFER1IyQ01TVFFndTBtd2RxVWxQeEFTWXYwSjVxYXMyNUlKZlB3QjlCM2NNalI4THNHX3BRcXoyUklNb3Bvb09VcHliSnBxSDdWNXA1SUdCY0IzeUMxRk5DS0JZTlVQbDVzMllnNVkzWGNXSmJyVndVWmNyTUdGeEJIbVR6TVd5TWp6UUZRc0hTRDltY3VzQlpBc1FHMUYyVGJCYktucy02YUd1Yk5TVTlmSS1NRlI3NlRDTTBuQ1ln0gHPAUFVX3lxTFBEeW5mMFpwXzlDZEloU0RMS1hSLWMzMDJrVXNGNkZkTjN5OXY5RDVpRXJWLWxMSWJTU3lUMk9wMUdGMnZOY3FXeC1jbUNiMnhpRjY3X0k3bmVwR2p6ZHcxTHY3VE9ja1pwOThxVEtSUU1QbWx5bUkzNjFCVFZ5N1dabS1ucDF0clVPU2owWFgxNGlETlkyUEdiQW5aWmd2Q25zRlFPc0ItM2laZ2dtUmwtaFU4ZlFnY0RNeDZacWJnTzFKbzhBSFpfLUc2RnpZOA?oc=5"
+        }
+      ],
+      "checkedAt": "2026-11-24T14:14:53.016Z"
     },
     {
       "key": "tmdb_1078446",
@@ -76,7 +118,7 @@
           "url": "https://news.google.com/rss/articles/CBMizAFBVV95cUxQeWEtVF9fNGhqNUxxVFU0QnBsWl9rUHhodjVsZXFUbFk3T1NuUEd2WXkwTk9vWU1ESElNMjR1b3dORWlpczJmQ3BkdTNpYWZDWWJEd3ZHQzlRaWVmcmQyOGR6Q01yU3pEWkdqWGdCVzZoYURya2puelhlRFJXbkkzU3RKT0FtcG82TEJ6R3hyRlM4M0VhYm9HYXMtTUNUT3E1YnVoY2ZkOU1YSUhISzFNRVRZVkQxNXBBbG96ZE1OWmctdHdXUmx4UmJjVmk?oc=5"
         }
       ],
-      "checkedAt": "2026-11-24T02:08:59.351Z"
+      "checkedAt": "2026-11-24T14:14:53.016Z"
     },
     {
       "key": "tmdb_1480276",
@@ -99,11 +141,11 @@
           "url": "https://news.google.com/rss/articles/CBMiowFBVV95cUxNZm84NVhRejZEQmZRNHNibkk2UWZaU0lPSXJRSzRZb001cy1NNXhSa1g1dk5qMUxJenBRYmdCSzV3Z2VwdFJPWkNJeWcxMGdSSk40M29IamMtQkMxbUloZDJXTE5ra1pCbVFnUlVNWlNQbzd3ZFhXWWF3czA4MVFUbTdySUxzNVA0NkdxYmhJLUFpMDdVM3ZnbzFGVzR2WEVlUnA00gGoAUFVX3lxTFBBYXdvU3dzWi1OVzktNXZCSFNRUElWQkZKaVZpWlA1SzM5M1h6MUFGZnJRMThHVTFOSWhUNnpzMjd6ekRrVGJkQ0d6cWNuWFBaLXg3U0pEWmpUandvenhYcjhMMVdnTTRLRGxJeFhKeVF4dEhxUzQ2MGhLdzFLakVLb1hIV3ZrNzBTaENtSGQ0YUtQZW1MM1JHMGFqTERCblYwMlJIeVA2eQ?oc=5"
         },
         {
-          "title": "Yoursay.id",
-          "url": "https://news.google.com/rss/articles/CBMixgFBVV95cUxOOTgwYnJqUEw4dUVmU2pob20tbV9UNDM1c19CeGZqREZfaWF4TjJ5R0ZVb1FYQ3hLVG9BQThBZlF2SnJ3bE5yVGhicVdDQ0pGWV9fSUk5UTk2SnFoMWdTZTdyS0Vja0ppZF80WWRETTh2allGbzlaTFN5NWtSS3N2bVZqd1F2QlJaeTU4bGtyaUpHZFh3OXBaUW1hZDRmc2hKbzBjdEdzN1NCOW5jTkJXaFpyLUM4cUZvTUk0b3NNQnhRN0VNYUHSAcsBQVVfeXFMUDBJV1JzTmppcDN5cTB4d3FuRlpZdzVVWmZUODVqel8tS3NXZElKMlAyLXBEVUtNWWZzRUY1SFhFQm01c1dfZ20zcWgyUUVtSUxCbzIxVTJPY0ZRbUFHcVpjejdqODZnc3BYZE5MX3F2S2R3M0YwRFBEdlJJSTAxeGNFWDZkcnBKbzdSeHRwaDhYVUFvWHM2UDFfTmhtQjMzSFFpVjFsT0EyM1hJd19WNHRuc2JIa1lNYWxkZVhvNEIxR0pJb3B0Vl85ZEE?oc=5"
+          "title": "Elshinta",
+          "url": "https://news.google.com/rss/articles/CBMinwFBVV95cUxPWUVVRjhWZmJMUl9hdmdwNzYxTXhwZlFoLWRCMmVTRjBudnBKSnpWSkdoQ2dKdU5oWEo2V1U3SkN3Y1Y4dGdoeTZZaEFLTFhtUTRRSDV2WXBWWjVFTzlNcG1IYUtSa2NmYlJZdHVlaThUVjVNZmd1UDRQdzZZRzhETVJoMnRQam15TXBhNzhrOWFZbmFuaHVnWXBsb0NiRWc?oc=5"
         }
       ],
-      "checkedAt": "2026-11-24T02:08:59.351Z"
+      "checkedAt": "2026-11-24T14:14:53.016Z"
     },
     {
       "key": "tmdb_1590933",
@@ -126,7 +168,7 @@
           "url": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxNeFYxTEgwUExLSVc5enNMNVNqU0V6a1kxLXp6Vjdxc2RPNE5ka05tTWN2am1HZm5TRmNkOVphdS1CRnJVbG83a2RKbVBNWHVURVBJRzFGckRyYW1fdkR0Y2szNVpUV1MwN1J0V05WQXNwQlpRdi1fTHJiUVFranA4TEZENzNSWTJZNklzeDQyVjZ5ZFd5cDBWLUdxUnRTTDlaU2pHOWdYb1lnQk15bm1XTE9zM1JYN0R1NkV6NDFZVmlPOGc?oc=5"
         }
       ],
-      "checkedAt": "2026-11-24T02:08:59.351Z"
+      "checkedAt": "2026-11-24T14:14:53.016Z"
     },
     {
       "key": "tmdb_1732866",
@@ -149,11 +191,11 @@
           "url": "https://news.google.com/rss/articles/CBMiY0FVX3lxTE52N3pyamxBY2MzaTVhV19aQTAyb0FVOHQ4LXFkWG9HUXRaX2Y4dVBrQlJ1OWtTaWNPNkg5WWNzZ2RNZ1p5X2lLWmswUGl0R0E3aDhHVVFZMWxjbWUyUkEyRWdoSQ?oc=5"
         },
         {
-          "title": "Limapagi",
-          "url": "https://news.google.com/rss/articles/CBMiZEFVX3lxTE1kdVFQV2VMekdjcExjSUZ3OTFNMEl0ZTE0Y0xVV3RDQ2VxazZ3cktrTzhWdjl6dnBfSUJjY09SeUc3aVl4TE1yTThfN1RFemxibkc3VmFrZm1FRVEtblRsaTdWd2I?oc=5"
+          "title": "RRI.co.id",
+          "url": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxQUWFvSXlnakR5VjlFUDRuWkdIV3BESkk5VWRKUkFJa0FTdnlzXzc0VXpicERIYi1mVnFBbjZ2eWhKUHc5SHhqOHVPU3Zoam9oMEdNVXhKYmdkNHI4UlVhSUpqRlY2NGdqS01TRm82dDM2Wk9XOVc1Q05uUkNWVE85VWhuYURhQ1k1emtUOUl2dHl3Yll1bXlYRGZDbzhpREZQcnk4VTFZeVk0Zw?oc=5"
         }
       ],
-      "checkedAt": "2026-11-24T02:08:59.351Z"
+      "checkedAt": "2026-11-24T14:14:53.016Z"
     },
     {
       "key": "tmdb_1707669",
@@ -180,7 +222,7 @@
           "url": "https://news.google.com/rss/articles/CBMimwFBVV95cUxPOUFQczJHNDNWTmxUR25ESnQ3M2JLUkRRYUNWLWtrOU1yeGpqT3VLV3ZDV2d3UnVkem1ocDRubW9scUZ0NGNNVVR5a00xUDctNUlsMkVLN0NadlBhTVJXeHBhT003YW14eDFnbXlWc2YwRFQ0NGM0cGlzT09lNlZ5THZCVDlKekFrX0dRZTR1ZzNUSTBjUGRXSXdQZw?oc=5"
         }
       ],
-      "checkedAt": "2026-11-24T02:08:59.351Z"
+      "checkedAt": "2026-11-24T14:14:53.016Z"
     },
     {
       "key": "tmdb_1292784",
@@ -207,7 +249,7 @@
           "url": "https://news.google.com/rss/articles/CBMitAFBVV95cUxNM2RCcW1KRzl3YUZrblhHeFloLWJXZ0xhS3Z1V0F6bGh2aVJXMklGODZBa3h6ekduZ25JTDFZWmJXay1SR3Z4UUM5NEdNakd6dGlIdHpVeEQ0dHpnMXJhaW56elQ5dTROR0tqelliUEtZZzdET21JbF82eFpfenl3cFZyMmEwX3JSMncwVzl4ODA2RV9WNzkzSy0tT3BTRlRWM1NveVBjSW1iYzdsOVNkckdiNF8?oc=5"
         }
       ],
-      "checkedAt": "2026-11-24T02:08:59.351Z"
+      "checkedAt": "2026-11-24T14:14:53.016Z"
     },
     {
       "key": "tmdb_1590752",
@@ -226,7 +268,7 @@
           "url": "https://news.google.com/rss/articles/CBMiigFBVV95cUxOcFV4a09BazFCcnVjTnJEUUh4c1I1aFBRd3RTSmo1TFU0NE5KSTZYMmhHb1k0X3FPU3FINUYyeGQ2MHZvYXdWeTZmTGg1YjV4dFpNLUl3aXRZX0V4RnZkN1pLZWNLaTVyMjBaVzdXaFo3MnlKM0IxQ0taRW9rbzVkcFFHWEhpYmJBTXc?oc=5"
         }
       ],
-      "checkedAt": "2026-11-24T02:08:59.351Z"
+      "checkedAt": "2026-11-24T14:14:53.016Z"
     },
     {
       "key": "tmdb_1398505",
@@ -240,48 +282,7 @@
       "lsfStatus": "Klasifikasi TMDB ID: SU",
       "summary": "Jadwal resmi TMDB ID: 2026-12-10.",
       "sources": [],
-      "checkedAt": "2026-11-24T02:08:59.351Z"
-    },
-    {
-      "key": "tmdb_1691495",
-      "tmdbId": 1691495,
-      "title": "HAJATAN SETAN",
-      "releaseDateId": "2026-12-03",
-      "status": "confirmed",
-      "chains": [],
-      "imax": false,
-      "presaleActive": false,
-      "lsfStatus": "Klasifikasi TMDB ID: 17+",
-      "summary": "Jadwal resmi TMDB ID: 2026-12-03. Berita: Hajatan Setan Perluas Pasar Film Horor Indonesia ke Asia - Limapagi",
-      "sources": [
-        {
-          "title": "Limapagi",
-          "url": "https://news.google.com/rss/articles/CBMiY0FVX3lxTE1pa3llWDlsVVYxOFUtWmlhM3FkUVZaTzlOZXYyRE1EVy1KakNBaTlELTFFSGlNWkFHWkRveDBUT1ZIRzl4Z3JuUzVzSDNhUGFSemJ3MXFUamlzWGF5Ynd3djF3QQ?oc=5"
-        },
-        {
-          "title": "Kompas.com",
-          "url": "https://news.google.com/rss/articles/CBMitAFBVV95cUxPbFJYNElCaXcyWjNjZE9sakNLbU5jWEJybVRfQnR4cTI4N1VwN0dyLWNuTmNGNGt6d1lGT21TQXdMQUUzaXpOUkEtZXZZV3VLdUM4dURhVzhzNmRNU2ZrRS1aR1F5ek80M0Vnb1NmV2lLemdZaTlWdEt5aXowdDltOEZDV2MxcVVaT3RmcG55aEdVSVdNYTVQX0loU1JyTWVGNTNtdTVuUmp1Mjc1UkRJdUZWUG4?oc=5"
-        },
-        {
-          "title": "RRI.co.id",
-          "url": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxPN0M3bF91aExBd0l0OGoyb29nVkRoRVZoQzFUeW5WSThKN2VGWHRJM3NLWUdMM3c0RF9TcmhCSThERVYwelJHSEdsb1d4Y01HWUV0RllUV3h5Uk1wWEdDeDZHeEZvUDh0MTZoVEdNRzVYWUJsdXFBZGRnTHFxNXQ0LUN4Ni1mekJ0a0dOZGpmSmdCV2N3bGxSRGR3OGhTLU1Ld1FmS2dHMjQ5eVRMWFFBTE5VZm51YldTVi1YcU1XXzVBaEk?oc=5"
-        }
-      ],
-      "checkedAt": "2026-11-24T02:08:59.351Z"
-    },
-    {
-      "key": "tmdb_1718454",
-      "tmdbId": 1718454,
-      "title": "THE ONES WHO COME AND GO",
-      "releaseDateId": "2026-12-03",
-      "status": "confirmed",
-      "chains": [],
-      "imax": false,
-      "presaleActive": false,
-      "lsfStatus": "Klasifikasi TMDB ID: 13+",
-      "summary": "Jadwal resmi TMDB ID: 2026-12-03.",
-      "sources": [],
-      "checkedAt": "2026-11-24T02:08:59.351Z"
+      "checkedAt": "2026-11-24T14:14:53.016Z"
     }
   ]
 }
