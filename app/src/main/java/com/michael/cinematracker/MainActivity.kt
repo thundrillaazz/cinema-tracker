@@ -61,6 +61,8 @@ import java.io.StringReader
 import java.net.HttpURLConnection
 import java.net.URL
 import java.nio.charset.StandardCharsets
+import java.text.SimpleDateFormat
+import java.util.Locale
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
@@ -363,7 +365,7 @@ class MainActivity : AppCompatActivity() {
                 instanceFollowRedirects = false
                 connectTimeout = connectMs
                 readTimeout = readMs
-                setRequestProperty("User-Agent", "CinemaTracker-Android/4.3")
+                setRequestProperty("User-Agent", "CinemaTracker-Android/4.3.1")
             }
             val code = conn.responseCode
             if (code in listOf(301, 302, 303, 307, 308)) {
@@ -820,75 +822,248 @@ class MainActivity : AppCompatActivity() {
 
         @JavascriptInterface
         fun fetchGoogleNewsRss(callbackId: String, movieTitle: String) {
-            val cleanTitle = movieTitle.trim().take(100)
+            val cleanTitle = movieTitle.trim()
+                .replace(Regex("[:\\-–—'\"‘’“”.,!?()\\[\\]]+"), " ")
+                .replace(Regex("\\s+"), " ")
+                .trim()
+                .take(100)
             if (cleanTitle.length < 2) {
                 dispatchRssCallback(callbackId, "[]")
                 return
             }
             executor.execute {
-                var conn: HttpURLConnection? = null
-                try {
-                    val query = "\"$cleanTitle\" (XXI OR CGV OR Cinepolis OR bioskop OR LSF OR \"pre-sale\" OR IMAX) when:90d"
-                    val rssUrl = "https://news.google.com/rss/search?q=${Uri.encode(query)}&hl=id&gl=ID&ceid=ID:id"
-                    conn = (URL(rssUrl).openConnection() as HttpURLConnection).apply {
-                        connectTimeout = 7000
-                        readTimeout = 7000
-                        setRequestProperty("User-Agent", "Mozilla/5.0 (compatible; CinemaTrackerRadar/4.3)")
-                    }
-                    if (conn.responseCode !in 200..299) {
-                        dispatchRssCallback(callbackId, "[]")
-                        return@execute
-                    }
-                    val xml = conn.inputStream.bufferedReader(StandardCharsets.UTF_8).use { it.readText() }
-                    val factory = XmlPullParserFactory.newInstance()
-                    val parser = factory.newPullParser()
-                    parser.setInput(StringReader(xml))
+                val streamingOnlyRe = Regex(
+                    "\\b(disney\\s*\\+?|netflix|prime\\s*video|amazon|apple\\s*tv|hbo|max|vidio|viu|wetv|iqiyi|catchplay|hotstar)\\b",
+                    RegexOption.IGNORE_CASE
+                )
+                val seenLinks = HashSet<String>()
+                val items = JSONArray()
 
-                    val items = JSONArray()
-                    var inItem = false
-                    var currentTag = ""
-                    var curTitle = ""
-                    var curLink = ""
-                    var curSource = ""
-                    var eventType = parser.eventType
-                    while (eventType != XmlPullParser.END_DOCUMENT && items.length() < 6) {
-                        when (eventType) {
-                            XmlPullParser.START_TAG -> {
-                                currentTag = parser.name ?: ""
-                                if (currentTag == "item") {
-                                    inItem = true
-                                    curTitle = ""
-                                    curLink = ""
-                                    curSource = ""
-                                } else if (inItem && currentTag in listOf("title", "link", "source")) {
-                                    val txt = parser.nextText().trim()
-                                    when (currentTag) {
-                                        "title" -> curTitle = txt
-                                        "link" -> curLink = txt
-                                        "source" -> curSource = txt
-                                    }
-                                }
-                            }
-                            XmlPullParser.END_TAG -> {
-                                if (parser.name == "item" && inItem) {
-                                    if (curTitle.isNotEmpty() && curLink.startsWith("http")) {
-                                        items.put(JSONObject().apply {
-                                            put("title", curTitle)
-                                            put("link", curLink)
-                                            put("source", curSource)
-                                        })
-                                    }
-                                    inItem = false
-                                }
-                            }
+                fun parseFeed(rssUrl: String, maxPerFeed: Int) {
+                    var conn: HttpURLConnection? = null
+                    try {
+                        conn = (URL(rssUrl).openConnection() as HttpURLConnection).apply {
+                            connectTimeout = 7000
+                            readTimeout = 7000
+                            setRequestProperty("User-Agent", "Mozilla/5.0 (compatible; CinemaTrackerRadar/4.3.1)")
                         }
-                        eventType = parser.next()
+                        if (conn.responseCode !in 200..299) return
+                        val xml = conn.inputStream.bufferedReader(StandardCharsets.UTF_8).use { it.readText() }
+                        val factory = XmlPullParserFactory.newInstance()
+                        val parser = factory.newPullParser()
+                        parser.setInput(StringReader(xml))
+
+                        var inItem = false
+                        var curTitle = ""
+                        var curLink = ""
+                        var curSource = ""
+                        var curPubDate = ""
+                        var curSnippet = ""
+                        var added = 0
+                        var eventType = parser.eventType
+                        while (eventType != XmlPullParser.END_DOCUMENT && added < maxPerFeed && items.length() < 10) {
+                            when (eventType) {
+                                XmlPullParser.START_TAG -> {
+                                    val tag = parser.name ?: ""
+                                    if (tag == "item") {
+                                        inItem = true
+                                        curTitle = ""
+                                        curLink = ""
+                                        curSource = ""
+                                        curPubDate = ""
+                                        curSnippet = ""
+                                    } else if (inItem) {
+                                        when (tag) {
+                                            "title" -> curTitle = parser.nextText().trim()
+                                            "link" -> curLink = parser.nextText().trim()
+                                            "source", "news:Source", "Source" -> curSource = parser.nextText().trim()
+                                            "pubDate" -> curPubDate = parser.nextText().trim()
+                                            "description" -> {
+                                                val rawDesc = parser.nextText()
+                                                curSnippet = rawDesc
+                                                    .replace(Regex("<[^>]+>"), " ")
+                                                    .replace("&amp;", "&")
+                                                    .replace("&quot;", "\"")
+                                                    .replace("&#39;", "'")
+                                                    .replace("&apos;", "'")
+                                                    .replace("&nbsp;", " ")
+                                                    .replace(Regex("\\s+"), " ")
+                                                    .trim()
+                                                    .take(360)
+                                            }
+                                        }
+                                    }
+                                }
+                                XmlPullParser.END_TAG -> {
+                                    if (parser.name == "item" && inItem) {
+                                        if (curTitle.isNotEmpty() && curLink.startsWith("http") && !seenLinks.contains(curLink)) {
+                                            val fallbackHost = try {
+                                                URL(curLink).host.removePrefix("www.")
+                                            } catch (_: Exception) {
+                                                ""
+                                            }
+                                            val resolvedSource = curSource.ifEmpty { fallbackHost }
+                                            if (!streamingOnlyRe.containsMatchIn(resolvedSource) && !streamingOnlyRe.containsMatchIn(curLink)) {
+                                                seenLinks.add(curLink)
+                                                items.put(JSONObject().apply {
+                                                    put("title", curTitle)
+                                                    put("snippet", curSnippet)
+                                                    put("link", curLink)
+                                                    put("source", resolvedSource)
+                                                    put("pubDate", curPubDate)
+                                                })
+                                                added++
+                                            }
+                                        }
+                                        inItem = false
+                                    }
+                                }
+                            }
+                            eventType = parser.next()
+                        }
+                    } catch (_: Exception) {
+                        // best-effort single feed
+                    } finally {
+                        conn?.disconnect()
                     }
+                }
+
+                try {
+                    val bingQuery = "\"$cleanTitle\" jadwal tayang bioskop Indonesia XXI CGV"
+                    val googleQuery = "\"$cleanTitle\" (XXI OR CGV OR Cinepolis OR bioskop OR LSF OR \"pre-sale\" OR IMAX OR tayang) when:120d"
+                    parseFeed("https://www.bing.com/news/search?q=${Uri.encode(bingQuery)}&cc=ID&setlang=id&format=rss", 6)
+                    parseFeed("https://news.google.com/rss/search?q=${Uri.encode(googleQuery)}&hl=id&gl=ID&ceid=ID:id", 6)
                     dispatchRssCallback(callbackId, items.toString())
                 } catch (_: Exception) {
                     dispatchRssCallback(callbackId, "[]")
-                } finally {
-                    conn?.disconnect()
+                }
+            }
+        }
+
+        @JavascriptInterface
+        fun fetchIndonesianReissueNewsRss(callbackId: String) {
+            executor.execute {
+                val noiseRe = Regex(
+                    "\\b(disney\\s*\\+?|netflix|prime\\s*video|amazon|apple\\s*tv|hbo|max|vidio|viu|wetv|iqiyi|catchplay|hotstar|bioskop\\s+trans\\s*tv|trans\\s*tv|lk21|indoxxi|link\\s+nonton|sub\\s+indo|episode\\s+\\d+|sortir\\s*[aà]\\s*paris)\\b",
+                    RegexOption.IGNORE_CASE
+                )
+                val seenLinks = HashSet<String>()
+                val items = JSONArray()
+                val nowMs = System.currentTimeMillis()
+                val maxAgeMs = 45L * 24L * 60L * 60L * 1000L
+                val rfcFmt = SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z", Locale.US)
+
+                fun isRecentEnough(pubStr: String): Boolean {
+                    val s = pubStr.trim()
+                    if (s.isEmpty()) return true
+                    return try {
+                        val parsed = rfcFmt.parse(s) ?: return true
+                        (nowMs - parsed.time) <= maxAgeMs
+                    } catch (_: Exception) {
+                        true
+                    }
+                }
+
+                fun parseReissueFeed(rssUrl: String, maxPerFeed: Int) {
+                    var conn: HttpURLConnection? = null
+                    try {
+                        conn = (URL(rssUrl).openConnection() as HttpURLConnection).apply {
+                            connectTimeout = 7000
+                            readTimeout = 7000
+                            setRequestProperty("User-Agent", "Mozilla/5.0 (compatible; CinemaTrackerRadar/4.3.1)")
+                        }
+                        if (conn.responseCode !in 200..299) return
+                        val xml = conn.inputStream.bufferedReader(StandardCharsets.UTF_8).use { it.readText() }
+                        val factory = XmlPullParserFactory.newInstance()
+                        val parser = factory.newPullParser()
+                        parser.setInput(StringReader(xml))
+
+                        var inItem = false
+                        var curTitle = ""
+                        var curLink = ""
+                        var curSource = ""
+                        var curPubDate = ""
+                        var curSnippet = ""
+                        var added = 0
+                        var eventType = parser.eventType
+                        while (eventType != XmlPullParser.END_DOCUMENT && added < maxPerFeed && items.length() < 24) {
+                            when (eventType) {
+                                XmlPullParser.START_TAG -> {
+                                    val tag = parser.name ?: ""
+                                    if (tag == "item") {
+                                        inItem = true
+                                        curTitle = ""
+                                        curLink = ""
+                                        curSource = ""
+                                        curPubDate = ""
+                                        curSnippet = ""
+                                    } else if (inItem) {
+                                        when (tag) {
+                                            "title" -> curTitle = parser.nextText().trim()
+                                            "link" -> curLink = parser.nextText().trim()
+                                            "source", "news:Source", "Source" -> curSource = parser.nextText().trim()
+                                            "pubDate" -> curPubDate = parser.nextText().trim()
+                                            "description" -> {
+                                                val rawDesc = parser.nextText()
+                                                curSnippet = rawDesc
+                                                    .replace(Regex("<[^>]+>"), " ")
+                                                    .replace("&amp;", "&")
+                                                    .replace("&quot;", "\"")
+                                                    .replace("&#39;", "'")
+                                                    .replace("&apos;", "'")
+                                                    .replace("&nbsp;", " ")
+                                                    .replace(Regex("\\s+"), " ")
+                                                    .trim()
+                                                    .take(360)
+                                            }
+                                        }
+                                    }
+                                }
+                                XmlPullParser.END_TAG -> {
+                                    if (parser.name == "item" && inItem) {
+                                        if (curTitle.isNotEmpty() && curLink.startsWith("http") && !seenLinks.contains(curLink) && isRecentEnough(curPubDate)) {
+                                            val fallbackHost = try {
+                                                URL(curLink).host.removePrefix("www.")
+                                            } catch (_: Exception) {
+                                                ""
+                                            }
+                                            val resolvedSource = curSource.ifEmpty { fallbackHost }
+                                            val combinedText = "$curTitle $curSnippet $resolvedSource"
+                                            if (!noiseRe.containsMatchIn(combinedText) && !noiseRe.containsMatchIn(curLink)) {
+                                                seenLinks.add(curLink)
+                                                items.put(JSONObject().apply {
+                                                    put("title", curTitle)
+                                                    put("snippet", curSnippet)
+                                                    put("link", curLink)
+                                                    put("source", resolvedSource)
+                                                    put("pubDate", curPubDate)
+                                                })
+                                                added++
+                                            }
+                                        }
+                                        inItem = false
+                                    }
+                                }
+                            }
+                            eventType = parser.next()
+                        }
+                    } catch (_: Exception) {
+                        // best-effort single feed
+                    } finally {
+                        conn?.disconnect()
+                    }
+                }
+
+                try {
+                    val q1 = "(\"tayang kembali\" OR \"kembali tayang\" OR \"tayang ulang\" OR \"re-release\" OR \"reissue\" OR \"remastered\") (XXI OR CGV OR Cinepolis OR \"bioskop Indonesia\" OR IMAX)"
+                    val q2 = "(\"kembali ke bioskop\" OR \"tayang lagi di bioskop\") (XXI OR CGV OR Cinepolis OR IMAX)"
+                    parseReissueFeed("https://news.google.com/rss/search?q=${Uri.encode("$q1 when:45d")}&hl=id&gl=ID&ceid=ID:id", 10)
+                    parseReissueFeed("https://news.google.com/rss/search?q=${Uri.encode("$q2 when:45d")}&hl=id&gl=ID&ceid=ID:id", 8)
+                    parseReissueFeed("https://www.bing.com/news/search?q=${Uri.encode(q1)}&cc=ID&setlang=id&format=rss", 6)
+                    parseReissueFeed("https://www.bing.com/news/search?q=${Uri.encode(q2)}&cc=ID&setlang=id&format=rss", 6)
+                    dispatchRssCallback(callbackId, items.toString())
+                } catch (_: Exception) {
+                    dispatchRssCallback(callbackId, "[]")
                 }
             }
         }
@@ -910,11 +1085,11 @@ class MainActivity : AppCompatActivity() {
                 }
                 JSONObject().apply {
                     put("versionCode", code)
-                    put("versionName", pInfo.versionName ?: "4.3")
+                    put("versionName", pInfo.versionName ?: "4.3.1")
                     put("packageName", context.packageName)
                 }.toString()
             } catch (_: Exception) {
-                "{\"versionCode\":43,\"versionName\":\"4.3\",\"packageName\":\"com.michael.cinematracker\"}"
+                "{\"versionCode\":44,\"versionName\":\"4.3.1\",\"packageName\":\"com.michael.cinematracker\"}"
             }
         }
 
