@@ -986,7 +986,7 @@ class MainActivity : AppCompatActivity() {
                         var curSnippet = ""
                         var added = 0
                         var eventType = parser.eventType
-                        while (eventType != XmlPullParser.END_DOCUMENT && added < maxPerFeed && items.length() < 24) {
+                        while (eventType != XmlPullParser.END_DOCUMENT && added < maxPerFeed && items.length() < 36) {
                             when (eventType) {
                                 XmlPullParser.START_TAG -> {
                                     val tag = parser.name ?: ""
@@ -1057,10 +1057,13 @@ class MainActivity : AppCompatActivity() {
                 try {
                     val q1 = "(\"tayang kembali\" OR \"kembali tayang\" OR \"tayang ulang\" OR \"re-release\" OR \"reissue\" OR \"remastered\") (XXI OR CGV OR Cinepolis OR \"bioskop Indonesia\" OR IMAX)"
                     val q2 = "(\"kembali ke bioskop\" OR \"tayang lagi di bioskop\") (XXI OR CGV OR Cinepolis OR IMAX)"
+                    val q3 = "(\"jadwal film bioskop\" OR \"film tayang di bioskop\") (\"reissue\" OR \"tayang ulang\" OR \"tayang kembali\")"
                     parseReissueFeed("https://news.google.com/rss/search?q=${Uri.encode("$q1 when:45d")}&hl=id&gl=ID&ceid=ID:id", 10)
                     parseReissueFeed("https://news.google.com/rss/search?q=${Uri.encode("$q2 when:45d")}&hl=id&gl=ID&ceid=ID:id", 8)
+                    parseReissueFeed("https://news.google.com/rss/search?q=${Uri.encode("$q3 when:45d")}&hl=id&gl=ID&ceid=ID:id", 8)
                     parseReissueFeed("https://www.bing.com/news/search?q=${Uri.encode(q1)}&cc=ID&setlang=id&format=rss", 6)
                     parseReissueFeed("https://www.bing.com/news/search?q=${Uri.encode(q2)}&cc=ID&setlang=id&format=rss", 6)
+                    parseReissueFeed("https://www.bing.com/news/search?q=${Uri.encode(q3)}&cc=ID&setlang=id&format=rss", 6)
                     dispatchRssCallback(callbackId, items.toString())
                 } catch (_: Exception) {
                     dispatchRssCallback(callbackId, "[]")
