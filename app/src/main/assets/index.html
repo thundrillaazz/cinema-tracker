@@ -1881,7 +1881,7 @@
       <div id="apkUpdateCard" class="info-card" style="display:none;">
         <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:4px;">
           <h3 style="margin:0;">Pembaruan Aplikasi</h3>
-          <span id="apkCurrentVerLabel" style="font-size:11px; font-weight:600; color:var(--muted); font-variant-numeric:tabular-nums;">v4.3.1</span>
+          <span id="apkCurrentVerLabel" style="font-size:11px; font-weight:600; color:var(--muted); font-variant-numeric:tabular-nums;">v4.4.0</span>
         </div>
         <p id="apkUpdateStatus" style="margin-bottom:8px;">Cek rilis APK terbaru langsung tanpa buka browser atau ekstrak ZIP.</p>
         <div style="display:flex; gap:8px;">
@@ -1891,7 +1891,7 @@
       </div>
 
       <div style="text-align:center; font-size:11px; color:var(--muted); padding:4px 0 12px; line-height:1.5;">
-        <div>Cinema Tracker v4.3.1 (Stable) · Made by Thundrilla</div>
+        <div>Cinema Tracker v4.4.0 (Stable) · Made by Thundrilla</div>
         <div style="font-size:10px; opacity:0.75;">Jadwal Bioskop Indonesia</div>
       </div>
     </div>
@@ -2068,8 +2068,14 @@
     };
     const SEQUEL_PREFIX_WORDS = new Set(["part", "pt", "vol", "volume", "chapter", "bagian", "episode", "bab"]);
 
+    const CINEMA_FORMAT_SUFFIX_RE = /\s*[\[(]\s*(?:re-?release|reissue|tayang\s+(?:ulang|kembali)|remaster(?:ed)?|imax\s*2d|imax\s*3d|imax|2d|3d|atmos|dolby\s*atmos|screenx|4dx|starium|reald\s*3d)\s*[\])]/gi;
+
+    function stripCinemaFormatSuffixes(str) {
+      return String(str || "").replace(CINEMA_FORMAT_SUFFIX_RE, " ").replace(/\s+/g, " ").trim();
+    }
+
     function tokenizeNormalizedTitle(str) {
-      let cleaned = String(str || "");
+      let cleaned = stripCinemaFormatSuffixes(str);
       try {
         cleaned = cleaned.normalize("NFKD").replace(/[\u0300-\u036f]/g, "");
       } catch (_) {}
@@ -2382,11 +2388,11 @@
       return mInfo.numbers.every(n => tInfo.numbers.includes(n));
     }
 
-    function tmdbCandidateMatchesReissueTitle(queryTitle, candidate) {
+    function tmdbCandidateMatchesReissueTitle(queryTitle, candidate, extraNames = []) {
       const qNorm = normalizeTitleForMatch(queryTitle);
       if (!qNorm || !candidate) return false;
       const qSeq = extractSequelInfo(queryTitle).numbers;
-      const candNames = [candidate.title, candidate.original_title].map(s => String(s || "").trim()).filter(Boolean);
+      const candNames = [candidate.title, candidate.original_title, ...(extraNames || [])].map(s => String(s || "").trim()).filter(Boolean);
       for (let i = 0; i < candNames.length; i++) {
         const candName = candNames[i];
         const cSeq = extractSequelInfo(candName).numbers;
@@ -2398,22 +2404,87 @@
       return false;
     }
 
-    function pickBestReissueTmdbCandidate(queryTitle, candidates, refDate) {
+    function pickBestReissueTmdbCandidate(queryTitle, candidates, refDate, options = {}) {
       const qNorm = normalizeTitleForMatch(queryTitle);
-      const matched = (candidates || []).filter(cand =>
-        Boolean(cand && cand.id && cand.poster_path) &&
-        isValidReReleasePair(cand.release_date, refDate) &&
-        tmdbCandidateMatchesReissueTitle(queryTitle, cand)
-      );
+      const altById = (options && options.alternateTitlesById) || {};
+      const expectedYear = options && options.expectedYear ? Number(options.expectedYear) : 0;
+      const refYear = parseInt(String(refDate || "").slice(0, 4), 10) || new Date().getFullYear();
+
+      if (expectedYear && expectedYear >= refYear - 1) return null;
+
+      const allTitleMatched = (candidates || []).filter(cand => {
+        if (!cand || !cand.id || !cand.poster_path) return false;
+        const extra = altById[cand.id] || [];
+        return tmdbCandidateMatchesReissueTitle(queryTitle, cand, extra);
+      });
+
+      const hasActiveModernHomonym = allTitleMatched.some(cand => {
+        const rel = String(cand.release_date || "").slice(0, 10);
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(rel)) return false;
+        const candYr = parseInt(rel.slice(0, 4), 10);
+        return !isValidReReleasePair(rel, refDate) && candYr >= refYear - 1;
+      });
+
+      const matched = allTitleMatched.filter(cand => {
+        if (!isValidReReleasePair(cand.release_date, refDate)) return false;
+        const candYr = parseInt(String(cand.release_date || "").slice(0, 4), 10);
+        if (expectedYear && !isNaN(candYr)) {
+          return Math.abs(candYr - expectedYear) <= 2;
+        }
+        return true;
+      });
       if (matched.length === 0) return null;
+
+      if (hasActiveModernHomonym && !expectedYear) {
+        const refMs = Date.parse(`${String(refDate || "").slice(0, 10)}T00:00:00Z`);
+        const hasVeryPopularTrueClassic = matched.some(cand => {
+          const pop = Number(cand.popularity || 0);
+          const relMs = Date.parse(`${String(cand.release_date || "").slice(0, 10)}T00:00:00Z`);
+          const yearsAgo = isNaN(refMs) || isNaN(relMs) ? 0 : (refMs - relMs) / (365 * 86400000);
+          return pop >= 25 && yearsAgo >= 2;
+        });
+        if (!hasVeryPopularTrueClassic) return null;
+      }
+
       return [...matched].sort((a, b) => {
-        const aExact = (normalizeTitleForMatch(a.title || "") === qNorm || normalizeTitleForMatch(a.original_title || "") === qNorm) ? 1 : 0;
-        const bExact = (normalizeTitleForMatch(b.title || "") === qNorm || normalizeTitleForMatch(b.original_title || "") === qNorm) ? 1 : 0;
+        if (expectedYear) {
+          const aYrDiff = Math.abs((parseInt(String(a.release_date || "").slice(0, 4), 10) || 0) - expectedYear);
+          const bYrDiff = Math.abs((parseInt(String(b.release_date || "").slice(0, 4), 10) || 0) - expectedYear);
+          if (aYrDiff !== bYrDiff) return aYrDiff - bYrDiff;
+        }
+        const aExtra = (a.id && altById[a.id]) || [];
+        const bExtra = (b.id && altById[b.id]) || [];
+        const aExact = [a.title, a.original_title, ...aExtra].some(n => normalizeTitleForMatch(n || "") === qNorm) ? 1 : 0;
+        const bExact = [b.title, b.original_title, ...bExtra].some(n => normalizeTitleForMatch(n || "") === qNorm) ? 1 : 0;
         if (aExact !== bExact) return bExact - aExact;
         const popDiff = Number(b.popularity || 0) - Number(a.popularity || 0);
         if (Math.abs(popDiff) > 1) return popDiff;
         return String(b.release_date || "").localeCompare(String(a.release_date || ""));
       })[0];
+    }
+
+    const EXPLICIT_INDONESIA_VENUE_RE = /\b(xxi|cinema\s*21|cinema\s*xxi|21cineplex|cgv|cin[eé]polis|tix\s*id|\blsf\b|lulus\s+sensor|bioskop\s+(?:di\s+)?indonesia|di\s+bioskop\s+indonesia|seluruh\s+bioskop\s+indonesia|jaringan\s+bioskop\s+indonesia|tanah\s+air|di\s+indonesia)\b/i;
+    const FOREIGN_WIRE_RE = /\b(imax\s*70\s*mm|70\s*mm\s+imax|melansir\s+(?:variety|deadline|hollywood\s+reporter|collider|screenrant|indiewire|thewrap)|dilansir\s+dari\s+(?:variety|deadline|hollywood\s+reporter|collider|screenrant|indiewire|thewrap)|via\s+(?:variety|deadline|hollywood\s+reporter)|amerika\s+serikat|bioskop\s+(?:as|amerika|global|inggris|jepang|korea))\b/i;
+
+    function isRssSourcedRadar(radar) {
+      if (!radar) return false;
+      if (radar.dateSource === "rss") return true;
+      if (radar.dateSource === "tmdb_id" || radar.dateSource === "cinema_chain" || radar.dateSource === "gemini") return false;
+      const summary = String(radar.summary || "").trim();
+      if (/^(?:Jadwal Berita ID|Berita ID):/i.test(summary)) return true;
+      if ((!radar.chains || radar.chains.length === 0) && !/\b(?:Terdaftar tayang di|Terdaftar di|Jadwal resmi ID)\b/i.test(summary) && Array.isArray(radar.sources) && radar.sources.length > 0) {
+        return true;
+      }
+      return false;
+    }
+
+    function hasOfficialTmdbIdBadge(m, minDate) {
+      if (!m || m.tba) return false;
+      const rel = String(m.releaseDate || "").slice(0, 10);
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(rel) || isPlaceholderDate(rel)) return false;
+      if (minDate && rel < minDate) return false;
+      const badge = String(m.sourceBadge || "");
+      return badge === "Bioskop ID" || badge === "TMDB ID • Confirmed" || badge.startsWith("TMDB ID");
     }
 
     function sanitizeRadarCacheMap(radarMap) {
@@ -2431,22 +2502,48 @@
           removedKeys.push(key);
           return;
         }
+        const hasChains = Boolean(entry.chains && entry.chains.length > 0);
+        const hasExplicitIdInSummary = EXPLICIT_INDONESIA_VENUE_RE.test(summary) || Boolean(entry.lsfStatus);
+        const isForeignWirePollution = FOREIGN_WIRE_RE.test(summary) && !hasChains && !hasExplicitIdInSummary;
+        const isUnconfirmedReissuePollution = Boolean((entry.isReRelease || REISSUE_SIGNAL_RE.test(summary)) && !entry.releaseDateId && !hasChains && !hasExplicitIdInSummary);
+        if (isForeignWirePollution || isUnconfirmedReissuePollution) {
+          removedKeys.push(key);
+          return;
+        }
         nextMap[key] = entry;
       });
       return { nextMap, removedKeys };
     }
 
+    function purgeRssEntriesFromRadarMap(radarMap) {
+      const sanitized = sanitizeRadarCacheMap(radarMap || {}).nextMap;
+      const cleaned = {};
+      Object.entries(sanitized).forEach(([k, entry]) => {
+        if (isRssSourcedRadar(entry)) return;
+        cleaned[k] = entry;
+      });
+      return cleaned;
+    }
+
     const ID_DATE_LOCAL_CTX_RE = /\b(di\s+indonesia|bioskop\s+indonesia|tanah\s+air|lebih\s+awal|xxi|cinema\s*21|cinema\s*xxi|cgv|cinepolis|cinépolis|imax|tix\s*id|resmi)\b/gi;
     const GLOBAL_DATE_LOCAL_CTX_RE = /\b((?:di\s+)?(?:amerika(?:\s+serikat)?|usa|us|as|global|internasional|dunia|luar\s+negeri|barat))\b/gi;
+    const SCREENING_VERB_RE = /\b(tayang|rilis|dirilis|mulai|resmi|pre-?sale|buka|hadir)\b/i;
 
-    function extractAllScoredIndonesianDatesFromClause(clause, defaultYear) {
+    function extractAllScoredIndonesianDatesFromClause(clause, defaultYear, refDateIso) {
       if (!clause || isRumorOrSpeculativeHeadline(clause)) return [];
-      if (!/\b(tayang|rilis|dirilis|mulai|bioskop|xxi|cgv|cinepolis|cinépolis|tix\s*id|resmi|pre-?sale|imax|reissue|re-?release)\b/i.test(clause)) {
-        return [];
-      }
+      if (!SCREENING_VERB_RE.test(clause)) return [];
+
+      const refClean = refDateIso && /^\d{4}-\d{2}-\d{2}$/.test(String(refDateIso).slice(0, 10)) ? String(refDateIso).slice(0, 10) : "";
+      const refYear = refClean ? parseInt(refClean.slice(0, 4), 10) : (defaultYear || new Date().getFullYear());
+      const refMonth = refClean ? parseInt(refClean.slice(5, 7), 10) : 0;
+
       const matches = [];
-      const pushValid = (day, month, year, start, end) => {
+      const pushValid = (day, month, year, hasExplicitYear, start, end) => {
         if (!month || day < 1 || day > 31 || year < 2000 || year > 2099) return;
+        if (!hasExplicitYear && refClean && refMonth > 0) {
+          const monthDiff = (year - refYear) * 12 + (month - refMonth);
+          if (monthDiff < -2 || monthDiff > 8) return;
+        }
         const iso = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
         if (isPlaceholderDate(iso)) return;
         const check = new Date(`${iso}T00:00:00Z`);
@@ -2459,13 +2556,14 @@
       while ((nm = namedRe.exec(clause)) !== null) {
         const day = parseInt(nm[1], 10);
         const month = ID_MONTH_TOKEN_MAP[nm[2].toLowerCase()] || 0;
-        const year = nm[3] ? parseInt(nm[3], 10) : (defaultYear || new Date().getFullYear());
-        pushValid(day, month, year, nm.index, nm.index + nm[0].length);
+        const hasExplicitYear = Boolean(nm[3]);
+        const year = nm[3] ? parseInt(nm[3], 10) : (defaultYear || refYear);
+        pushValid(day, month, year, hasExplicitYear, nm.index, nm.index + nm[0].length);
       }
       const numRe = /\b([0]?[1-9]|[12]\d|3[01])[\/\-]([0]?[1-9]|1[0-2])[\/\-](20\d{2})\b/g;
       let dm;
       while ((dm = numRe.exec(clause)) !== null) {
-        pushValid(parseInt(dm[1], 10), parseInt(dm[2], 10), parseInt(dm[3], 10), dm.index, dm.index + dm[0].length);
+        pushValid(parseInt(dm[1], 10), parseInt(dm[2], 10), parseInt(dm[3], 10), true, dm.index, dm.index + dm[0].length);
       }
       if (matches.length === 0) return [];
 
@@ -2516,30 +2614,37 @@
         const isListicle = LISTICLE_HEADLINE_RE.test(headline);
         if (isListicle && !(it && it.allowListicle)) continue;
         const isVsClash = !movieHasVs && /\bvs\b/i.test(headline);
-        const headlineMatches = titleMatchesHeadlineAndroid(movieTitle, headline);
         let pubYear = new Date().getFullYear();
+        let refDateIso = (it && it.refDateIso) || "";
         if (it && it.pubDate) {
           const dObj = new Date(it.pubDate);
-          if (!isNaN(dObj.getTime())) pubYear = dObj.getFullYear();
+          if (!isNaN(dObj.getTime())) {
+            pubYear = dObj.getFullYear();
+            if (!refDateIso) refDateIso = dObj.toISOString().slice(0, 10);
+          }
         }
+        const headlineMatchesTitle = titleMatchesHeadlineAndroid(movieTitle, headline);
         const clauses = `${headline}. ${snippet}`.split(/[\n\r]+|(?<=[.!?])\s+/).map(s => s.trim()).filter(Boolean);
         for (let c = 0; c < clauses.length; c++) {
           const clause = clauses[c];
           const clauseMatchesTitle = titleMatchesHeadlineAndroid(movieTitle, clause);
-          if (!clauseMatchesTitle && !headlineMatches) continue;
+          const isLeadPronounClause =
+            !clauseMatchesTitle &&
+            headlineMatchesTitle &&
+            !isListicle &&
+            !isVsClash &&
+            clauses.length <= 5 &&
+            /\b(?:film|sekuel|prekuel|tayangan)\s+(?:ini|tersebut)\b/i.test(clause) &&
+            sequelMarkersCompatible(movieTitle, clause);
+          if (!clauseMatchesTitle && !isLeadPronounClause) continue;
           if (isRumorOrSpeculativeHeadline(clause)) continue;
-          if (!clauseMatchesTitle && /\b(kapan|apakah|benarkah|kenapa)\b|\?/i.test(clause)) continue;
           const hasExplicitIdContext = /\b(di\s+indonesia|bioskop\s+indonesia|tanah\s+air|lebih\s+awal|xxi|cinema\s*21|cinema\s*xxi|cgv|cinepolis|cinépolis|tix\s*id|resmi)\b/i.test(clause);
-          const hasCinemaReleaseContext = /\b(tayang|mulai|bioskop|xxi|cgv|cinepolis|cinépolis|imax|rilis|dirilis)\b/i.test(clause);
-          if (isVsClash && (!clauseMatchesTitle || !hasExplicitIdContext)) continue;
-          let tierBase = 0;
-          if (clauseMatchesTitle && hasExplicitIdContext) tierBase = 300;
-          else if (clauseMatchesTitle) tierBase = 200;
-          else if (headlineMatches && hasCinemaReleaseContext && !isListicle) tierBase = 100;
-          else continue;
+          if (isVsClash && !hasExplicitIdContext) continue;
+          let tierBase = hasExplicitIdContext ? 300 : 200;
+          if (!clauseMatchesTitle) tierBase -= 80;
           if (isVsClash) tierBase -= 120;
           const isEnumerationClause = isListicle || /\b(?:yakni|yaitu|seperti|adalah|meliputi|antara\s+lain)\b/i.test(clause);
-          const candidates = extractAllScoredIndonesianDatesFromClause(clause, pubYear);
+          const candidates = extractAllScoredIndonesianDatesFromClause(clause, pubYear, refDateIso);
           for (let ci = 0; ci < candidates.length; ci++) {
             const cand = candidates[ci];
             if (isEnumerationClause && !titleMatchesHeadlineAndroid(movieTitle, cand.seg)) continue;
@@ -2571,11 +2676,16 @@
       return (rMs - pMs) / 86400000 > 180;
     }
 
+    function extractYearHintFromChunk(raw) {
+      const m = /\(\s*((?:19|20)\d{2})\s*\)/.exec(String(raw || ""));
+      return m ? parseInt(m[1], 10) : undefined;
+    }
+
     function cleanReissueCandidateTitleText(raw) {
-      let candidate = String(raw || "")
+      let candidate = stripCinemaFormatSuffixes(String(raw || ""))
         .replace(/\s+atau\s+.+$/i, "")
         .replace(
-          /\s*\(\s*(?:reissue|re-?release|tayang\s+(?:ulang|kembali)|remaster(?:ed)?|imax|4k|(?:\d{1,2}\s*(?:[-–—]|s\/d|hingga|sampai)?\s*(?:\d{1,2}\s+)?)?(?:januari|jan|februari|feb|maret|mar|april|apr|mei|may|juni|jun|juli|jul|agustus|agu|ags|aug|september|sept|sep|oktober|okt|oct|november|nov|desember|des|dec)(?:\s*,?\s*20\d{2})?|\d{4})\s*\)\s*/gi,
+          /\s*\(\s*(?:reissue|re-?release|tayang\s+(?:ulang|kembali)|remaster(?:ed)?|imax|4k|(?:\d{1,2}\s*(?:[-–—]|s\/d|hingga|sampai)?\s*(?:\d{1,2}\s+)?)?(?:januari|jan|februari|feb|maret|mar|april|apr|mei|may|juni|jun|juli|jul|agustus|agu|ags|aug|september|sept|sep|oktober|okt|oct|november|nov|desember|des|dec)(?:\s*,?\s*20\d{2})?|(?:19|20)\d{2})\s*\)\s*/gi,
           " "
         )
         .replace(
@@ -2583,7 +2693,7 @@
           ""
         )
         .replace(REISSUE_TRAILING_DATE_RE, "")
-        .replace(/\b(?:karya|garapan|sutradara|versi)\s+[a-z0-9\s.'-]+$/i, "")
+        .replace(/\b(?:karya|garapan|sutradara|besutan|arahan|disutradarai|versi)\s+[a-z0-9\s.'-]+$/i, "")
         .replace(/^(?:sinopsis|jadwal\s+tayang|jadwal\s+bioskop|review|resmi|info|menjelang\s+sekuel|selain\s+itu|seperti|yakni|yaitu|adalah|ada\s+juga|ada|termasuk|meliputi|antara\s+lain|di\s+antaranya),?\s+/i, "")
         .replace(/^(?:dua\s+film|tiga\s+film|daftar\s+film|deretan\s+film|trilogi|film\s+animasi\s+legendaris|film\s+animasi|film\s+horor|film\s+klasik|film\s+legend(?:\s+tahun\s+\d{4})?|film|anime|dokumenter)\s+/i, "")
         .replace(/^(?:yang|akan|resmi|siap|sudah)\s+/i, "")
@@ -2599,7 +2709,8 @@
     function extractReissueEntriesFromTexts(headline, snippet = "") {
       const results = [];
       const seen = new Set();
-      const pushTitle = (rawTitle, inlineDateText) => {
+      const pushTitle = (rawTitle, inlineDateText, expectedYear) => {
+        const yr = expectedYear || extractYearHintFromChunk(rawTitle);
         const cleaned = cleanReissueCandidateTitleText(rawTitle);
         if (!cleaned) return;
         const splitSubs = /\s+(?:dan|serta)\s+/i.test(cleaned)
@@ -2609,7 +2720,7 @@
           const k = normalizeTitleForMatch(sub);
           if (!k || seen.has(k)) return;
           seen.add(k);
-          results.push({ title: sub, inlineDateText });
+          results.push({ title: sub, inlineDateText, expectedYear: yr });
         });
       };
 
@@ -2678,17 +2789,22 @@
         const combined = `${headline}. ${snippet}`;
         if (REISSUE_NOISE_RE.test(`${combined} ${source} ${link}`)) return;
         if (isRumorOrSpeculativeHeadline(combined)) return;
+        const hasExplicitIdVenue = EXPLICIT_INDONESIA_VENUE_RE.test(`${combined} ${source}`);
+        if (FOREIGN_WIRE_RE.test(combined) && !hasExplicitIdVenue) return;
         const hasExplicitReissue = REISSUE_SIGNAL_RE.test(combined);
         const hasIdCinema = REISSUE_CINEMA_ID_RE.test(`${combined} ${source}`);
-        if (!hasExplicitReissue || !hasIdCinema) return;
+        if (!hasExplicitReissue || !hasIdCinema || !hasExplicitIdVenue) return;
         if (isListicle && !(/\(\s*(?:reissue|re-?release|tayang\s+(?:ulang|kembali)|remaster(?:ed)?)\s*\)|\b(?:tayang\s+(?:ulang|kembali)|kembali\s+tayang|dirilis\s+ulang|re-?release|reissue|remaster(?:ed)?)\b/i.test(combined))) return;
 
         let pubYear;
+        let pubIso;
         if (item && item.pubDate) {
           const pubMs = Date.parse(item.pubDate);
           if (!isNaN(pubMs)) {
             if (!isNaN(todayMs) && (todayMs - pubMs) > maxAgeMs) return;
-            pubYear = new Date(pubMs).getUTCFullYear();
+            const dPub = new Date(pubMs);
+            pubYear = dPub.getUTCFullYear();
+            pubIso = dPub.toISOString().slice(0, 10);
           }
         }
         const candEntries = extractReissueEntriesFromTexts(headline, snippet);
@@ -2703,12 +2819,12 @@
 
         candEntries.forEach(cand => {
           const k = normalizeTitleForMatch(cand.title);
-          if (!k || byKey.has(k)) return;
+          if (!k) return;
           let rawDate = cand.inlineDateText
             ? (extractIndonesianDateFromHeadline(`tayang ${cand.inlineDateText}`, pubYear) || "")
             : "";
           if (!rawDate) {
-            rawDate = extractDateForMovieFromTexts(cand.title, [{ title: headline, snippet, pubDate: item && item.pubDate, allowListicle: isListicle }]) || "";
+            rawDate = extractDateForMovieFromTexts(cand.title, [{ title: headline, snippet, pubDate: item && item.pubDate, refDateIso: pubIso || refToday, allowListicle: isListicle }]) || "";
           }
           const hasValidWindowDate = Boolean(rawDate && !isPlaceholderDate(rawDate) && rawDate >= minDate && rawDate <= maxDate);
           if (rawDate && !hasValidWindowDate) return;
@@ -2716,14 +2832,26 @@
           const hasIdConfirmation = Boolean(
             hasValidWindowDate ||
             chains.length > 0 ||
-            (imax && /\b(indonesia|bioskop)\b/i.test(combined)) ||
-            (hasExplicitReissue && /\b(bioskop\s+indonesia|seluruh\s+bioskop|jaringan\s+bioskop|resmi\s+tayang)\b/i.test(combined))
+            (hasExplicitReissue && /\b(bioskop\s+(?:di\s+)?indonesia|seluruh\s+bioskop|jaringan\s+bioskop|tanah\s+air|tix\s*id|\blsf\b|lulus\s+sensor|resmi\s+tayang)\b/i.test(combined))
           );
           if (!hasIdConfirmation) return;
+
+          const prev = byKey.get(k);
+          if (prev) {
+            if (!prev.releaseDateId && hasValidWindowDate) prev.releaseDateId = rawDate;
+            if (!prev.expectedYear && cand.expectedYear) prev.expectedYear = cand.expectedYear;
+            prev.chains = Array.from(new Set([...prev.chains, ...chains]));
+            prev.imax = Boolean(prev.imax || imax);
+            if (link && /^https?:\/\//i.test(link) && !prev.sources.some(s => s.url === link)) {
+              prev.sources = [...prev.sources, { title: (source || "Berita Bioskop ID").slice(0, 64), url: link }].slice(0, 3);
+            }
+            return;
+          }
 
           byKey.set(k, {
             title: cand.title,
             releaseDateId: hasValidWindowDate ? rawDate : "",
+            expectedYear: cand.expectedYear,
             status: "confirmed",
             chains,
             imax,
@@ -2733,6 +2861,103 @@
         });
       });
       return Array.from(byKey.values());
+    }
+
+    function parseIndonesiaCinemaFeedPayload(raw) {
+      if (!raw || typeof raw !== "object" || Array.isArray(raw)) return { updatedAt: "", entries: [] };
+      const entries = [];
+      (Array.isArray(raw.entries) ? raw.entries : []).forEach(e => {
+        if (!e || typeof e !== "object") return;
+        const rawTitle = String(e.title || "").trim();
+        const title = stripCinemaFormatSuffixes(rawTitle);
+        if (!title) return;
+        const chains = Array.isArray(e.chains) ? e.chains.filter(c => c === "XXI" || c === "CGV" || c === "Cinépolis") : [];
+        const relRaw = typeof e.releaseDateId === "string" ? e.releaseDateId.trim().slice(0, 10) : "";
+        const releaseDateId = /^\d{4}-\d{2}-\d{2}$/.test(relRaw) && !isPlaceholderDate(relRaw) ? relRaw : "";
+        const tahunNum = Number(e.tahunProduksi || 0) || 0;
+        const suffixHasImax = /\bimax\b/i.test(rawTitle);
+        const suffixHasReissue = /\b(re-?release|reissue|tayang\s+(?:ulang|kembali)|remaster(?:ed)?)\b/i.test(rawTitle);
+        entries.push({
+          title,
+          releaseDateId,
+          status: e.status === "now" ? "now" : "upcoming",
+          chains,
+          imax: Boolean(e.imax || suffixHasImax),
+          presaleActive: Boolean(e.presaleActive),
+          isReRelease: Boolean(e.isReRelease || suffixHasReissue),
+          tahunProduksi: tahunNum || undefined,
+          lsfStatus: typeof e.lsfStatus === "string" ? e.lsfStatus : undefined,
+          ageRating: typeof e.ageRating === "string" ? e.ageRating : undefined,
+          source: typeof e.source === "string" ? e.source : "Bioskop ID",
+          sourceUrl: typeof e.sourceUrl === "string" ? e.sourceUrl : undefined
+        });
+      });
+      return { updatedAt: typeof raw.updatedAt === "string" ? raw.updatedAt : "", entries };
+    }
+
+    function findBestFeedMatchForTitle(movieTitle, feedEntries) {
+      const norm = normalizeTitleForMatch(movieTitle);
+      if (!norm || !feedEntries || feedEntries.length === 0) return null;
+      for (let i = 0; i < feedEntries.length; i++) {
+        const entry = feedEntries[i];
+        if (!sequelMarkersCompatible(movieTitle, entry.title)) continue;
+        if (normalizeTitleForMatch(entry.title) === norm) return entry;
+      }
+      for (let i = 0; i < feedEntries.length; i++) {
+        const entry = feedEntries[i];
+        if (!sequelMarkersCompatible(movieTitle, entry.title)) continue;
+        if (titleMatchesHeadlineAndroid(movieTitle, entry.title) && titleMatchesHeadlineAndroid(entry.title, movieTitle)) {
+          return entry;
+        }
+      }
+      return null;
+    }
+
+    function mergeFeedEntryIntoMovie(m, feedEntry, todayIso) {
+      const { minDate, maxDate } = getCatalogWindow(todayIso);
+      const next = { ...m };
+      const mergedChains = Array.from(new Set([...(m.chains || []), ...(feedEntry.chains || [])]));
+      if (mergedChains.length > 0) {
+        next.chains = mergedChains;
+        next.releaseChannel = "theatrical";
+      }
+      if (feedEntry.imax) next.imax = true;
+      if (feedEntry.presaleActive) {
+        next.presale = true;
+        next.presaleText = "Tiket pre-sale tersedia di jaringan bioskop ID.";
+      }
+      if (feedEntry.lsfStatus) next.lsfStatus = feedEntry.lsfStatus;
+      if (feedEntry.ageRating && (!next.age || next.age === "R 13+")) next.age = feedEntry.ageRating;
+      if (feedEntry.isReRelease) next.isReRelease = true;
+
+      const feedDate = feedEntry.releaseDateId && !isPlaceholderDate(feedEntry.releaseDateId) ? feedEntry.releaseDateId : "";
+      const inWin = Boolean(feedDate && feedDate >= minDate && feedDate <= maxDate);
+      const prevRel = String(m.releaseDate || "").slice(0, 10);
+      const isPrevArchival = Boolean(prevRel && /^\d{4}-\d{2}-\d{2}$/.test(prevRel) && prevRel < minDate);
+      const wasUnconfirmed = Boolean(m.tba || m.sourceBadge === "TMDB Global" || m.sourceBadge === "Jadwal Global" || m.sourceBadge === "Estimasi / TBA");
+
+      if (inWin && feedDate) {
+        if (wasUnconfirmed) next.newlyConfirmedId = true;
+        else if (prevRel && !isPrevArchival && !isPlaceholderDate(prevRel) && prevRel !== feedDate) {
+          next.previousReleaseDate = prevRel;
+        }
+        const isRel = feedDate <= todayIso || feedEntry.status === "now";
+        next.tba = false;
+        next.releaseChannel = "theatrical";
+        next.releaseDate = feedDate;
+        next.status = isRel ? "now" : "upcoming";
+        next.dateLabel = isRel ? "Sedang Tayang" : formatShortDate(feedDate);
+        next.confirmedText = isRel
+          ? `Sedang tayang di bioskop Indonesia (${feedEntry.source})`
+          : `Resmi tayang ${formatShortDate(feedDate)} (${feedEntry.source})`;
+        next.sourceBadge = "Bioskop ID";
+      } else if (feedEntry.status === "now") {
+        next.tba = false;
+        next.status = "now";
+        next.dateLabel = "Sedang Tayang";
+        next.sourceBadge = "Bioskop ID";
+      }
+      return next;
     }
 
     function notifyWatchlistScheduleShift(wKey, title, oldDate, newDate, posterUrl) {
@@ -3052,11 +3277,15 @@
         radarByKey = radarClean.nextMap;
         localStorage.setItem("ct_v43_radar_cache", JSON.stringify(radarByKey));
       }
-      if (localStorage.getItem("ct_reissue_mig_ver") !== "4.3.1_r4") {
+      if (localStorage.getItem("ct_reissue_mig_ver") !== "4.4.0_r1") {
+        radarByKey = purgeRssEntriesFromRadarMap(radarByKey);
+        localStorage.setItem("ct_v43_radar_cache", JSON.stringify(radarByKey));
         localStorage.removeItem("ct_v43_reissue_sync_ts");
         localStorage.removeItem("ct_v43_reissue_items");
         localStorage.removeItem("ct_v43_autoverify_ts");
-        localStorage.setItem("ct_reissue_mig_ver", "4.3.1_r4");
+        localStorage.removeItem("ct_v43_cinema_id_ts");
+        localStorage.removeItem("ct_last_sync_ts");
+        localStorage.setItem("ct_reissue_mig_ver", "4.4.0_r1");
       }
       rebuildMovieCatalog();
 
@@ -3124,8 +3353,8 @@
       const lastSync = parseInt(localStorage.getItem("ct_last_sync_ts") || "0", 10);
       const now = Date.now();
       updateLastSyncLabel(lastSync);
-      const needsSchemaUpgrade = localStorage.getItem("ct_catalog_schema_ver") !== "4.3.1_r4";
-      // 2-hour auto-sync threshold to protect battery and mobile data (+ 1-time v4.3.1_r4 catalog upgrade refresh)
+      const needsSchemaUpgrade = localStorage.getItem("ct_catalog_schema_ver") !== "4.4.0_r1";
+      // 2-hour auto-sync threshold to protect battery and mobile data (+ 1-time v4.4.0_r1 catalog upgrade refresh)
       if (needsSchemaUpgrade || (now - lastSync > 2 * 60 * 60 * 1000)) {
         syncTmdbLive(false);
       }
@@ -3463,16 +3692,21 @@
           : [];
         const rawRel = typeof e.releaseDateId === "string" ? e.releaseDateId.trim().slice(0, 10) : "";
         const releaseDateId = /^\d{4}-\d{2}-\d{2}$/.test(rawRel) ? rawRel : undefined;
+        const rawDs = String(e.dateSource || "");
+        const validDs = new Set(["tmdb_id", "cinema_chain", "rss", "gemini"]);
+        const dateSource = validDs.has(rawDs) ? rawDs : undefined;
         const statusStr = String(e.status || "unconfirmed");
         entries.push({
           key,
           tmdbId,
           title,
           releaseDateId,
+          dateSource,
           status: validStatuses.has(statusStr) ? statusStr : "unconfirmed",
           chains,
           imax: Boolean(e.imax),
           presaleActive: Boolean(e.presaleActive),
+          isReRelease: Boolean(e.isReRelease),
           lsfStatus: typeof e.lsfStatus === "string" ? e.lsfStatus : "",
           summary: typeof e.summary === "string" ? e.summary : "",
           sources,
@@ -3517,7 +3751,10 @@
       const radarConfirmed = hasWindowRadarDate && isConfirmedStatus;
       const prevRel = String(m.releaseDate || "").slice(0, 10);
       const isPrevArchival = Boolean(prevRel && /^\d{4}-\d{2}-\d{2}$/.test(prevRel) && prevRel < minDate);
-      const shouldOverrideDate = hasWindowRadarDate && (
+      const wasUnconfirmed = Boolean(m.tba || m.sourceBadge === "TMDB Global" || m.sourceBadge === "Jadwal Global" || m.sourceBadge === "Estimasi / TBA");
+      const rssBlockedByOfficialTmdb = isRssSourcedRadar(radar) && hasOfficialTmdbIdBadge(m, minDate);
+
+      const shouldOverrideDate = !rssBlockedByOfficialTmdb && hasWindowRadarDate && (
         m.tba ||
         !m.releaseDate ||
         m.releaseDate === "TBA" ||
@@ -3530,7 +3767,11 @@
       );
       if (shouldOverrideDate) {
         const isRel = radar.releaseDateId <= todayIso;
-        if (isValidReReleasePair(prevRel, radar.releaseDateId)) next.isReRelease = true;
+        if (isValidReReleasePair(prevRel, radar.releaseDateId) || radar.isReRelease) next.isReRelease = true;
+        if (wasUnconfirmed) next.newlyConfirmedId = true;
+        else if (prevRel && /^\d{4}-\d{2}-\d{2}$/.test(prevRel) && !isPrevArchival && !isPlaceholderDate(prevRel) && prevRel !== radar.releaseDateId) {
+          next.previousReleaseDate = prevRel;
+        }
         next.tba = false;
         next.releaseChannel = "theatrical";
         next.releaseDate = radar.releaseDateId;
@@ -3539,11 +3780,13 @@
         next.confirmedText = isRel ? "Sedang tayang di bioskop Indonesia" : `Terkonfirmasi ID · ${formatShortDate(radar.releaseDateId)}`;
         next.sourceBadge = "Radar Bioskop ID";
       } else if (
+        !rssBlockedByOfficialTmdb &&
         isConfirmedStatus &&
         !hasWindowRadarDate &&
         (m.tba || isPrevArchival || !m.releaseDate || isPlaceholderDate(m.releaseDate) || m.sourceBadge === "TMDB Global")
       ) {
-        if (isPrevArchival && isValidReReleasePair(prevRel, todayIso)) next.isReRelease = true;
+        if ((isPrevArchival && isValidReReleasePair(prevRel, todayIso)) || radar.isReRelease) next.isReRelease = true;
+        next.newlyConfirmedId = true;
         next.tba = true;
         next.releaseChannel = "theatrical";
         next.releaseDate = "TBA";
@@ -3551,11 +3794,14 @@
         next.dateLabel = "Tanggal Menyusul";
         next.confirmedText = "Terkonfirmasi ID · Tanggal Menyusul";
         next.sourceBadge = "Radar Bioskop ID";
+      } else if (radar.isReRelease) {
+        next.isReRelease = true;
       }
       if (radar.chains && radar.chains.length > 0) {
-        next.chains = radar.chains;
+        next.chains = Array.from(new Set([...(m.chains || []), ...radar.chains]));
         next.releaseChannel = "theatrical";
       }
+      if (radar.lsfStatus && !next.lsfStatus) next.lsfStatus = radar.lsfStatus;
       if (radar.imax) next.imax = true;
       if (radar.presaleActive) {
         next.presale = true;
@@ -3586,17 +3832,19 @@
         const radarConfirmed = hasWindowRadarDate && isConfirmedStatus;
         const isPrevArchival = Boolean(prevDate && /^\d{4}-\d{2}-\d{2}$/.test(prevDate) && prevDate < minDate);
         const isGlobalOrTba = Boolean(entry.isTba) || isPrevArchival || isPlaceholderDate(prevDate) || prevM.sourceBadge === "TMDB Global" || prevM.sourceBadge === "Jadwal Global" || prevM.sourceBadge === "Estimasi / TBA";
-        const shouldOverrideRelease = Boolean(hasWindowRadarDate && (isGlobalOrTba || (radarConfirmed && prevDate !== radar.releaseDateId)));
-        const shouldConfirmUndated = Boolean(!hasWindowRadarDate && isConfirmedStatus && (entry.isTba || isPrevArchival || !prevM.releaseDate || isPlaceholderDate(prevDate)));
+        const rssBlockedByOfficialTmdb = isRssSourcedRadar(radar) && !entry.isTba && hasOfficialTmdbIdBadge(prevM, minDate);
+        const shouldOverrideRelease = Boolean(!rssBlockedByOfficialTmdb && hasWindowRadarDate && (isGlobalOrTba || (radarConfirmed && prevDate !== radar.releaseDateId)));
+        const shouldConfirmUndated = Boolean(!rssBlockedByOfficialTmdb && !hasWindowRadarDate && isConfirmedStatus && (entry.isTba || isPrevArchival || !prevM.releaseDate || isPlaceholderDate(prevDate)));
         const promotedFromTba = Boolean(entry.isTba && shouldOverrideRelease);
         const shiftedNonTba = Boolean(!entry.isTba && shouldOverrideRelease && !isPrevArchival && !isPlaceholderDate(prevDate) && prevDate !== radar.releaseDateId);
         const nextRelease = shouldOverrideRelease ? radar.releaseDateId : (shouldConfirmUndated ? "TBA" : prevM.releaseDate);
         const nextTba = shouldOverrideRelease ? false : (shouldConfirmUndated ? true : Boolean(entry.isTba));
-        const nextChains = (radar.chains && radar.chains.length > 0) ? radar.chains : (prevM.chains || []);
+        const nextChains = (radar.chains && radar.chains.length > 0) ? Array.from(new Set([...(prevM.chains || []), ...radar.chains])) : (prevM.chains || []);
         const nextImax = Boolean(prevM.imax || radar.imax);
         const nextPresale = Boolean(prevM.presale || radar.presaleActive);
         const nextIsReRelease = Boolean(
           prevM.isReRelease ||
+          radar.isReRelease ||
           (shouldOverrideRelease && isValidReReleasePair(prevDate, nextRelease)) ||
           (shouldConfirmUndated && isPrevArchival && isValidReReleasePair(prevDate, todayIso))
         );
@@ -3636,6 +3884,7 @@
               chains: nextChains,
               imax: nextImax,
               presale: nextPresale,
+              lsfStatus: radar.lsfStatus || prevM.lsfStatus,
               radarInfo: radar
             }
           };
@@ -3932,8 +4181,13 @@
     }
 
     function forceQuickSync() {
+      if (isSyncing) {
+        showToast("Sedang menyinkronkan jadwal...");
+        return;
+      }
       const key = localStorage.getItem("ct_tmdb_key") || document.getElementById("tmdbKeyInput").value.trim();
       if (!key) {
+        fetchCloudRadarFeed(true);
         switchBottomTab("settings");
         showToast("Isi TMDB API Key di Settings");
         return;
@@ -4904,6 +5158,8 @@
     }
 
     const androidRssPending = {};
+    const androidCinemaFeedPending = {};
+    const androidArticleTextPending = {};
     window.__onAndroidRssResult = function(cbId, jsonStr) {
       const resolver = androidRssPending[cbId];
       if (!resolver) return;
@@ -4912,6 +5168,26 @@
         resolver(JSON.parse(jsonStr || "[]"));
       } catch (_) {
         resolver([]);
+      }
+    };
+    window.__onAndroidCinemaFeedResult = function(cbId, jsonStr) {
+      const resolver = androidCinemaFeedPending[cbId];
+      if (!resolver) return;
+      delete androidCinemaFeedPending[cbId];
+      try {
+        resolver(JSON.parse(jsonStr || '{"entries":[]}'));
+      } catch (_) {
+        resolver({ entries: [] });
+      }
+    };
+    window.__onAndroidArticleTextResult = function(cbId, jsonStr) {
+      const resolver = androidArticleTextPending[cbId];
+      if (!resolver) return;
+      delete androidArticleTextPending[cbId];
+      try {
+        resolver(JSON.parse(jsonStr || '{"url":"","text":""}'));
+      } catch (_) {
+        resolver({ url: "", text: "" });
       }
     };
 
@@ -4967,6 +5243,80 @@
           resolve([]);
         }
       });
+    }
+
+    function fetchNativeCinemaFeed(force = false) {
+      return new Promise(resolve => {
+        if (!window.AndroidBridge || typeof window.AndroidBridge.fetchIndonesianCinemaFeeds !== "function") {
+          resolve({ entries: [] });
+          return;
+        }
+        const cbId = "feed_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7);
+        const timer = setTimeout(() => {
+          if (androidCinemaFeedPending[cbId]) {
+            delete androidCinemaFeedPending[cbId];
+            resolve({ entries: [] });
+          }
+        }, 14000);
+        androidCinemaFeedPending[cbId] = payload => {
+          clearTimeout(timer);
+          resolve(payload && typeof payload === "object" ? payload : { entries: [] });
+        };
+        try {
+          window.AndroidBridge.fetchIndonesianCinemaFeeds(cbId, Boolean(force));
+        } catch (_) {
+          clearTimeout(timer);
+          delete androidCinemaFeedPending[cbId];
+          resolve({ entries: [] });
+        }
+      });
+    }
+
+    function fetchNativeArticleScheduleText(articleUrl) {
+      return new Promise(resolve => {
+        if (!articleUrl || !window.AndroidBridge || typeof window.AndroidBridge.fetchArticleScheduleText !== "function") {
+          resolve({ url: "", text: "" });
+          return;
+        }
+        const cbId = "art_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7);
+        const timer = setTimeout(() => {
+          if (androidArticleTextPending[cbId]) {
+            delete androidArticleTextPending[cbId];
+            resolve({ url: "", text: "" });
+          }
+        }, 9000);
+        androidArticleTextPending[cbId] = payload => {
+          clearTimeout(timer);
+          resolve(payload && typeof payload === "object" ? payload : { url: "", text: "" });
+        };
+        try {
+          window.AndroidBridge.fetchArticleScheduleText(cbId, articleUrl);
+        } catch (_) {
+          clearTimeout(timer);
+          delete androidArticleTextPending[cbId];
+          resolve({ url: "", text: "" });
+        }
+      });
+    }
+
+    async function fetchCinemaIdFeedEntries(force = false) {
+      const apiBase = getRadarApiBase();
+      if (apiBase !== null) {
+        try {
+          const res = await fetch(`${apiBase}/api/radar/cinema-id${force ? "?force=1" : ""}`);
+          if (res.ok) {
+            const parsed = parseIndonesiaCinemaFeedPayload(await res.json());
+            if (parsed.entries.length > 0) return parsed.entries;
+          }
+        } catch (_) {}
+      }
+      if (window.AndroidBridge && typeof window.AndroidBridge.fetchIndonesianCinemaFeeds === "function") {
+        try {
+          const rawNative = await fetchNativeCinemaFeed(force);
+          return parseIndonesiaCinemaFeedPayload(rawNative).entries;
+        } catch (_) {}
+      }
+      return [];
     }
 
     function titleMatchesHeadlineAndroid(movieTitle, headline) {
@@ -5108,58 +5458,74 @@
       }
 
       const { minDate } = getCatalogWindow(getLocalTodayIso());
-      const [rssItems, idMeta] = await Promise.all([
+      const [rssItems, idMeta, cinemaFeedEntries] = await Promise.all([
         fetchNativeAndroidRss(m.title),
-        fetchTmdbIdMetaDirect(resolvedId, tmdbKey, minDate)
+        fetchTmdbIdMetaDirect(resolvedId, tmdbKey, minDate),
+        fetchCinemaIdFeedEntries(false)
       ]);
+      const feedMatch = findBestFeedMatchForTitle(m.title, cinemaFeedEntries);
       const matched = (rssItems || []).filter(it => {
         if (!it || !it.title) return false;
         const srcStr = `${it.source || ""} ${it.link || ""}`;
+        const combinedIt = `${it.title} ${it.snippet || ""} ${srcStr}`;
         if (STREAMING_ONLY_SOURCE_RE.test(srcStr)) return false;
+        const hasIdVenue = EXPLICIT_INDONESIA_VENUE_RE.test(combinedIt);
+        if (FOREIGN_WIRE_RE.test(combinedIt) && !hasIdVenue) return false;
         return !isRumorOrSpeculativeHeadline(it.title) && titleMatchesHeadlineAndroid(m.title, it.title);
       });
       const parsedRssDate = extractDateForMovieFromTexts(m.title, matched);
-      const effectiveIdDate = parsedRssDate || (idMeta && idMeta.releaseDateId) || "";
-      if (matched.length === 0 && !effectiveIdDate) {
+      const feedDate = (feedMatch && feedMatch.releaseDateId && !isPlaceholderDate(feedMatch.releaseDateId) && feedMatch.releaseDateId >= minDate) ? feedMatch.releaseDateId : "";
+      const officialTmdbDate = (idMeta && idMeta.releaseDateId) || "";
+      const effectiveIdDate = officialTmdbDate || feedDate || parsedRssDate || "";
+      const dateSource = officialTmdbDate ? "tmdb_id" : (feedDate ? "cinema_chain" : (parsedRssDate ? "rss" : undefined));
+      if (matched.length === 0 && !effectiveIdDate && !feedMatch) {
         return false;
       }
 
       const joined = matched.map(x => `${x.title} ${x.snippet || ""}`).join(" | ");
-      const chains = [];
-      if (/\b(xxi|cinema\s*21|cinema\s*xxi|21cineplex)\b/i.test(joined)) chains.push("XXI");
-      if (/\bcgv\b/i.test(joined)) chains.push("CGV");
-      if (/cin[eé]polis/i.test(joined)) chains.push("Cinépolis");
-      const imax = /\bimax\b/i.test(joined);
-      const presaleActive = matched.some(x => isAffirmativePresaleHeadline(`${x.title} ${x.snippet || ""}`));
+      const chains = Array.from(new Set([...((feedMatch && feedMatch.chains) || [])]));
+      if (/\b(xxi|cinema\s*21|cinema\s*xxi|21cineplex)\b/i.test(joined) && !chains.includes("XXI")) chains.push("XXI");
+      if (/\bcgv\b/i.test(joined) && !chains.includes("CGV")) chains.push("CGV");
+      if (/cin[eé]polis/i.test(joined) && !chains.includes("Cinépolis")) chains.push("Cinépolis");
+      const imax = Boolean(/\bimax\b/i.test(joined) || (feedMatch && feedMatch.imax));
+      const presaleActive = Boolean((feedMatch && feedMatch.presaleActive) || matched.some(x => isAffirmativePresaleHeadline(`${x.title} ${x.snippet || ""}`)));
       const lsfMention = /\b(lsf|lulus sensor)\b/i.test(joined);
       const hasIdImaxConfirm = imax && /\b(indonesia|bioskop)\b/i.test(joined);
 
       let status = "upcoming_global";
       if (presaleActive) status = "presale";
-      else if (effectiveIdDate || chains.length > 0 || hasIdImaxConfirm) status = "confirmed";
+      else if (effectiveIdDate || chains.length > 0 || hasIdImaxConfirm || (feedMatch && (feedMatch.status === "now" || feedMatch.lsfStatus))) status = "confirmed";
       else if (lsfMention) status = "lsf_passed";
 
-      const lsfStatus = (idMeta && idMeta.certification)
-        ? `Klasifikasi TMDB ID: ${idMeta.certification}`
-        : (lsfMention ? "Disebutkan pada berita sensor LSF" : "");
+      const lsfStatus = (feedMatch && feedMatch.lsfStatus)
+        || ((idMeta && idMeta.certification) ? `Klasifikasi TMDB ID: ${idMeta.certification}` : (lsfMention ? "Disebutkan pada berita sensor LSF" : ""));
 
       const summaryParts = [];
-      if (parsedRssDate) summaryParts.push(`Jadwal Berita ID: ${formatShortDate(parsedRssDate)}.`);
-      else if (idMeta && idMeta.releaseDateId) summaryParts.push(`Jadwal TMDB ID: ${formatShortDate(idMeta.releaseDateId)}.`);
+      if (officialTmdbDate) summaryParts.push(`Jadwal resmi TMDB ID: ${formatShortDate(officialTmdbDate)}.`);
+      else if (feedDate && feedMatch) summaryParts.push(`Terdaftar di ${feedMatch.source}: ${formatShortDate(feedDate)}.`);
+      else if (parsedRssDate) summaryParts.push(`Jadwal Berita ID: ${formatShortDate(parsedRssDate)}.`);
+      else if (feedMatch) summaryParts.push(`Terdaftar tayang di ${feedMatch.source}.`);
       if (matched[0] && matched[0].title) summaryParts.push(`Kabar ID: ${matched[0].title}`);
+
+      const srcList = matched.slice(0, 3).map(x => ({ title: (x.source || "Berita ID").slice(0, 64), url: x.link }));
+      if (feedMatch && feedMatch.sourceUrl && !srcList.some(s => s.url === feedMatch.sourceUrl)) {
+        srcList.unshift({ title: (feedMatch.source || "Bioskop ID").slice(0, 64), url: feedMatch.sourceUrl });
+      }
 
       const rawEntry = {
         key: cacheKey,
         tmdbId: resolvedId || undefined,
         title: m.title,
         releaseDateId: effectiveIdDate || undefined,
+        dateSource,
         status,
         chains,
         imax,
         presaleActive,
+        isReRelease: Boolean(m.isReRelease || (feedMatch && feedMatch.isReRelease)),
         lsfStatus,
         summary: summaryParts.join(" ").slice(0, 280) || "Terdeteksi di sumber bioskop Indonesia.",
-        sources: matched.slice(0, 3).map(x => ({ title: (x.source || "Berita ID").slice(0, 64), url: x.link })),
+        sources: srcList.slice(0, 4),
         checkedAt: new Date().toISOString()
       };
       const parsed = parseRadarFeedPayload({ entries: [rawEntry] });
@@ -5357,6 +5723,11 @@
           </div>
           <div class="verify-date">${escapeHtml(scheduleHeadline)}</div>
           <div style="font-size:11px; color:var(--muted); margin-top:4px;">${escapeHtml(scheduleSub)}</div>
+          ${(effectiveMovie.previousReleaseDate && effectiveMovie.previousReleaseDate !== effectiveMovie.releaseDate)
+            ? `<div style="font-size:10.5px; font-weight:600; color:var(--amber); margin-top:4px;">Jadwal bergeser dari ${escapeHtml(formatShortDate(effectiveMovie.previousReleaseDate))}</div>`
+            : ((!effectiveMovie.previousReleaseDate && effectiveMovie.newlyConfirmedId && !isDigital)
+                ? `<div style="font-size:10.5px; font-weight:600; color:var(--emerald); margin-top:4px;">Baru terkonfirmasi masuk bioskop Indonesia</div>`
+                : "")}
 
           <div class="radar-divider">
             <div class="radar-head">
@@ -5367,8 +5738,8 @@
               ${radarStatusText ? `<span class="radar-status">${escapeHtml(radarStatusText)}</span>` : ""}
             </div>
             ${activeRadar
-              ? `<div class="radar-summary">${activeRadar.lsfStatus ? `${escapeHtml(activeRadar.lsfStatus)} — ` : ""}${escapeHtml(activeRadar.summary)}</div>${radarSourcesHtml}`
-              : `<div style="font-size:11px; color:var(--muted); line-height:1.4; margin-bottom:8px;">Cek pengumuman terbaru XXI, CGV, Cinépolis, LSF, atau pre-sale langsung dari web resmi.</div>`}
+              ? `<div class="radar-summary">${(activeRadar.lsfStatus || effectiveMovie.lsfStatus) ? `${escapeHtml(activeRadar.lsfStatus || effectiveMovie.lsfStatus)} — ` : ""}${escapeHtml(activeRadar.summary)}</div>${radarSourcesHtml}`
+              : `<div style="font-size:11px; color:var(--muted); line-height:1.4; margin-bottom:8px;">${effectiveMovie.lsfStatus ? `${escapeHtml(effectiveMovie.lsfStatus)}. Ketuk verifikasi untuk kabar rilis &amp; artikel terbaru.` : "Cek pengumuman terbaru XXI, CGV, Cinépolis, LSF, atau pre-sale langsung dari web resmi."}</div>`}
             ${radarErrorMessage ? `<div style="font-size:11px; color:var(--amber); font-weight:600; margin-bottom:8px;">${escapeHtml(radarErrorMessage)}</div>` : ""}
             <button type="button" class="radar-verify-btn" ${isVerifyingNow ? "disabled" : ""} onclick="verifyRadarMovie('${safeId}', ${Boolean(activeRadar)})">
               <span>${isVerifyingNow ? "Memeriksa kabar bioskop ID..." : (activeRadar ? "Perbarui Kabar Bioskop ID" : "Verifikasi Kabar Bioskop ID")}</span>
@@ -5815,7 +6186,7 @@
           const cfg = watchlistMap[id];
           if (!cfg) return null;
           const liveM = allMovies.find(item => item.id === id) || {};
-          const mergedM = { ...(cfg.movieData || {}), ...liveM, id };
+          const mergedM = mergeRadarIntoMovie({ ...(cfg.movieData || {}), ...liveM, id }, todayIso);
           if (!mergedM.title) return null;
           return { id, cfg, m: mergedM };
         })
@@ -6018,6 +6389,7 @@
         const todayIso = getLocalTodayIso();
         const { minDate, maxDate } = getCatalogWindow(todayIso);
         const radarPromise = fetchCloudRadarFeed(showFeedback);
+        const cinemaFeedPromise = fetchCinemaIdFeedEntries(Boolean(showFeedback));
 
         const pickIdTheatricalDate = (results, minDateStr) => {
           const idEntry = (results || []).find(r => r.iso_3166_1 === "ID");
@@ -6026,14 +6398,12 @@
           return picked && picked.release_date ? picked.release_date.slice(0, 10) : "";
         };
 
-        // Probe ALL Watchlist items with tmdbId (TBA, Global-stuck, Digital, and Confirmed shifts)
+        // Probe ALL Watchlist items with tmdbId (TBA, Global-stuck, archival < minDate, Digital, and Confirmed shifts)
         const wlCheckKeys = Object.keys(watchlistMap).filter(k => {
           const e = watchlistMap[k];
           if (!e) return false;
           const tid = e.tmdbId || (e.movieData && e.movieData.tmdbId) || 0;
-          if (!tid) return false;
-          const rel = String((e.movieData && e.movieData.releaseDate) || "").slice(0, 10);
-          return Boolean(e.isTba || isPlaceholderDate(rel) || rel >= minDate);
+          return Boolean(tid);
         });
         await mapWithConcurrency(wlCheckKeys, 4, async (wKey) => {
           const wEntry = watchlistMap[wKey];
@@ -6084,8 +6454,43 @@
                       mPoster
                     );
                   }
-                } else if (!isDig && oldDate !== newDate) {
+                } else if (!isDig && oldDate && oldDate >= minDate && oldDate !== newDate) {
                   notifyWatchlistScheduleShift(wKey, mTitle, oldDate, newDate, mPoster);
+                }
+              }
+            } else {
+              // No valid future/current ID release found (>= minDate): reset archival (< minDate) or outdated dates cleanly back to TMDB Global / TBA
+              const prevM = wEntry.movieData || {};
+              const oldDate = String(prevM.releaseDate || "").slice(0, 10);
+              const oldBadge = String(prevM.sourceBadge || "");
+              const isPrevArchival = Boolean(oldDate && /^\d{4}-\d{2}-\d{2}$/.test(oldDate) && oldDate < minDate);
+              const globalFutureDates = (relData.results || [])
+                .flatMap(r => (r && r.release_dates) || [])
+                .filter(d => (Number(d.type) === 3 || Number(d.type) === 2) && d.release_date && !isPlaceholderDate(d.release_date) && d.release_date.slice(0, 10) >= minDate && d.release_date.slice(0, 10) <= maxDate)
+                .map(d => String(d.release_date).slice(0, 10))
+                .sort();
+              const fallbackGlobalDate = globalFutureDates[0] || "";
+              const shouldResetWatchlistDate = Boolean(
+                isPrevArchival ||
+                (!wEntry.isTba && (oldBadge === "Bioskop ID" || oldBadge === "Radar Bioskop ID" || !oldBadge))
+              );
+              if (shouldResetWatchlistDate) {
+                const nextRel = fallbackGlobalDate || "TBA";
+                const shortGlobal = fallbackGlobalDate ? formatShortDate(fallbackGlobalDate) : "";
+                wEntry.isTba = true;
+                wEntry.tmdbId = resolvedTmdb;
+                wEntry.lastKnownReleaseDate = nextRel;
+                if (wEntry.movieData) {
+                  wEntry.movieData.tba = true;
+                  wEntry.movieData.tmdbId = resolvedTmdb;
+                  wEntry.movieData.releaseChannel = "theatrical";
+                  wEntry.movieData.releaseDate = nextRel;
+                  wEntry.movieData.dateLabel = "TBA ID";
+                  wEntry.movieData.status = "upcoming";
+                  wEntry.movieData.confirmedText = fallbackGlobalDate
+                    ? `Est. Global ${shortGlobal} · Pantau rilis ID`
+                    : "Jadwal bioskop ID belum terkonfirmasi";
+                  wEntry.movieData.sourceBadge = fallbackGlobalDate ? "TMDB Global" : "Estimasi / TBA";
                 }
               }
             }
@@ -6172,7 +6577,7 @@
         const SIX_HOURS_MS = 6 * 60 * 60 * 1000;
         const ONE_DAY_MS = 24 * 60 * 60 * 1000;
         const releaseDateOverrides = {};
-        const bypassCache = Boolean(showFeedback) || localStorage.getItem("ct_catalog_schema_ver") !== "4.3.1_r4";
+        const bypassCache = Boolean(showFeedback) || localStorage.getItem("ct_catalog_schema_ver") !== "4.4.0_r1";
 
         const reReleaseCands = [...nowRaw, ...idUpcomingRaw]
           .filter(item => item && item.id && item.poster_path && item.release_date && item.release_date < minDate)
@@ -6260,8 +6665,9 @@
         }
 
         await radarPromise;
+        const cinemaFeedEntries = await cinemaFeedPromise;
 
-        // Discover Indonesian cinema reissues/re-releases dynamically (standalone native Android RSS or Radar server, 6h cached)
+        // Discover Indonesian cinema reissues/re-releases dynamically (standalone native Android RSS + article body extraction or Radar server, 6h cached)
         const radarBase = getRadarApiBase();
         try {
           const lastReissueSync = parseInt(localStorage.getItem("ct_v43_reissue_sync_ts") || "0", 10) || 0;
@@ -6272,26 +6678,47 @@
               reissueItems = JSON.parse(localStorage.getItem("ct_v43_reissue_items") || "[]") || [];
             } catch (_) { reissueItems = []; }
           } else {
-            if (hasNativeReissueBridge) {
+            if (radarBase !== null) {
+              try {
+                const reissueRes = await fetchWithTimeout(`${radarBase}/api/radar/reissues`, 7500);
+                if (reissueRes.ok) {
+                  const reissueJson = await reissueRes.json();
+                  reissueItems = Array.isArray(reissueJson.items) ? reissueJson.items : [];
+                }
+              } catch (_) {}
+            }
+            if (reissueItems.length === 0 && hasNativeReissueBridge) {
               const rssItems = await fetchNativeReissueRss();
               reissueItems = extractReissueCandidatesFromRss(rssItems, todayIso);
-            }
-            if (reissueItems.length === 0 && radarBase !== null) {
-              const reissueRes = await fetchWithTimeout(`${radarBase}/api/radar/reissues`, 7500);
-              if (reissueRes.ok) {
-                const reissueJson = await reissueRes.json();
-                reissueItems = Array.isArray(reissueJson.items) ? reissueJson.items : [];
+              // Enrich undated reissue items via bounded native Android article schedule extraction (table/listicle support)
+              const undatedForArticle = reissueItems.filter(ri => !ri.releaseDateId && ri.sources && ri.sources[0] && ri.sources[0].url).slice(0, 4);
+              if (undatedForArticle.length > 0 && window.AndroidBridge && typeof window.AndroidBridge.fetchArticleScheduleText === "function") {
+                await mapWithConcurrency(undatedForArticle, 2, async (ri) => {
+                  const art = await fetchNativeArticleScheduleText(ri.sources[0].url);
+                  if (art && art.text) {
+                    const artDate = extractDateForMovieFromTexts(ri.title, [{ title: ri.title, snippet: art.text, refDateIso: todayIso, allowListicle: true }]);
+                    if (artDate && !isPlaceholderDate(artDate) && artDate >= minDate && artDate <= maxDate) {
+                      ri.releaseDateId = artDate;
+                      ri.dateSource = "rss";
+                    }
+                    if (art.url && /^https?:\/\//i.test(art.url)) {
+                      ri.sources[0].url = art.url;
+                    }
+                  }
+                });
               }
             }
             if (hasNativeReissueBridge || radarBase !== null) {
               localStorage.setItem("ct_v43_reissue_sync_ts", String(Date.now()));
-              localStorage.setItem("ct_v43_reissue_items", JSON.stringify(reissueItems.slice(0, 10)));
+              localStorage.setItem("ct_v43_reissue_items", JSON.stringify(reissueItems.slice(0, 12)));
             }
           }
 
           if (reissueItems.length > 0) {
             const existingNorms = new Set([...nowRaw, ...idUpcomingRaw].map(m => normalizeKey((m && (m.title || m.original_title)) || "")));
-            const targets = reissueItems.slice(0, 8);
+            const targets = [...reissueItems]
+              .sort((a, b) => Number(Boolean(b && b.releaseDateId)) - Number(Boolean(a && a.releaseDateId)))
+              .slice(0, 10);
             await mapWithConcurrency(targets, 2, async (ri) => {
               const rTitle = String((ri && ri.title) || "").trim();
               const rDate = String((ri && ri.releaseDateId) || "").slice(0, 10);
@@ -6304,7 +6731,21 @@
               if (!sRes.ok) return;
               const sData = await sRes.json();
               const candidates = (sData.results || []).filter(cand => Boolean(cand && cand.poster_path));
-              const hit = pickBestReissueTmdbCandidate(rTitle, candidates, refDateForReissue);
+              let hit = pickBestReissueTmdbCandidate(rTitle, candidates, refDateForReissue, { expectedYear: ri.expectedYear });
+              if (!hit && candidates.length > 0) {
+                const altMap = {};
+                for (let ci = 0; ci < Math.min(3, candidates.length); ci++) {
+                  const cand = candidates[ci];
+                  try {
+                    const altRes = await fetchWithTimeout(`https://api.themoviedb.org/3/movie/${cand.id}/alternative_titles?api_key=${keyParam}`, 4500);
+                    if (altRes.ok) {
+                      const altJson = await altRes.json();
+                      altMap[cand.id] = (altJson.titles || []).map(t => String((t && t.title) || "").trim()).filter(Boolean);
+                    }
+                  } catch (_) {}
+                }
+                hit = pickBestReissueTmdbCandidate(rTitle, candidates, refDateForReissue, { expectedYear: ri.expectedYear, alternateTitlesById: altMap });
+              }
               if (!hit || !hit.id || !hit.poster_path) return;
               const normTitle = normalizeKey(hit.title || hit.original_title || rTitle);
               if (!existingNorms.has(normTitle)) {
@@ -6312,23 +6753,34 @@
                 else idUpcomingRaw.push(hit);
                 existingNorms.add(normTitle);
               }
+              const prevOv = releaseDateOverrides[hit.id];
+              const mergedRelDate = hasWindowDate ? rDate : ((prevOv && prevOv.releaseDate) || "");
               releaseDateOverrides[hit.id] = {
-                releaseDate: hasWindowDate ? rDate : "",
+                releaseDate: mergedRelDate,
                 sourceBadge: "Radar Bioskop ID",
                 releaseChannel: "theatrical",
                 isReRelease: true,
                 idConfirmed: true,
-                imax: Boolean(ri.imax)
+                imax: Boolean((prevOv && prevOv.imax) || ri.imax)
               };
               const rKey = `tmdb_${hit.id}`;
+              const prevRadar = radarByKey[rKey];
+              const mergedChains = Array.from(new Set([...((prevRadar && prevRadar.chains) || []), ...(ri.chains || [])]));
+              const mergedSources = [...((prevRadar && prevRadar.sources) || [])];
+              (ri.sources || []).forEach(src => {
+                if (src && src.url && !mergedSources.some(s => s.url === src.url)) mergedSources.push(src);
+              });
+              const bestDateForRadar = mergedRelDate || (prevRadar && prevRadar.releaseDateId) || undefined;
               const parsedR = parseRadarFeedPayload({
                 entries: [{
                   key: rKey, tmdbId: hit.id, title: hit.title || rTitle,
-                  releaseDateId: hasWindowDate ? rDate : undefined,
-                  status: "confirmed", chains: ri.chains || [], imax: Boolean(ri.imax), presaleActive: false,
-                  lsfStatus: "",
-                  summary: ri.summary || (hasWindowDate ? `Penayangan ulang (reissue) di bioskop ID mulai ${rDate}.` : "Terkonfirmasi tayang ulang di bioskop Indonesia · Tanggal menyusul."),
-                  sources: ri.sources || [], checkedAt: new Date().toISOString()
+                  releaseDateId: bestDateForRadar,
+                  dateSource: hasWindowDate ? (ri.dateSource || "rss") : (prevRadar && prevRadar.dateSource),
+                  status: "confirmed", chains: mergedChains, imax: Boolean((prevRadar && prevRadar.imax) || ri.imax),
+                  presaleActive: Boolean(prevRadar && prevRadar.presaleActive), isReRelease: true,
+                  lsfStatus: ri.lsfStatus || (prevRadar && prevRadar.lsfStatus) || "",
+                  summary: ri.summary || (bestDateForRadar ? `Penayangan ulang (reissue) di bioskop ID mulai ${bestDateForRadar}.` : "Terkonfirmasi tayang ulang di bioskop Indonesia · Tanggal menyusul."),
+                  sources: mergedSources.slice(0, 4), checkedAt: new Date().toISOString()
                 }]
               }).entries[0];
               if (parsedR) {
@@ -6337,6 +6789,71 @@
             });
           }
         } catch (_) {}
+
+        // Inject high-confidence Indonesian commercial cinema feed entries (XXI / CGV / TIX ID / LSF) missing from TMDB lists
+        if (cinemaFeedEntries.length > 0) {
+          try {
+            const rawKnownNorms = new Set([...nowRaw, ...idUpcomingRaw, ...localIdUpcomingRaw].map(m => normalizeKey((m && (m.title || m.original_title)) || "")));
+            const missingFeedTargets = cinemaFeedEntries
+              .filter(fe => {
+                const k = normalizeKey(fe.title);
+                if (!k || rawKnownNorms.has(k)) return false;
+                const hasWindow = Boolean(fe.releaseDateId && fe.releaseDateId >= minDate && fe.releaseDateId <= maxDate);
+                return Boolean(fe.status === "now" || hasWindow || fe.isReRelease);
+              })
+              .sort((a, b) => Number(Boolean(b.releaseDateId)) - Number(Boolean(a.releaseDateId)))
+              .slice(0, 10);
+
+            if (missingFeedTargets.length > 0) {
+              await mapWithConcurrency(missingFeedTargets, 2, async (fe) => {
+                try {
+                  const sRes = await fetchWithTimeout(`https://api.themoviedb.org/3/search/movie?api_key=${keyParam}&query=${encodeURIComponent(fe.title)}&page=1`, 6000);
+                  if (!sRes.ok) return;
+                  const sData = await sRes.json();
+                  const candidates = (sData.results || []).filter(cand => Boolean(cand && cand.poster_path));
+                  if (candidates.length === 0) return;
+
+                  let hit = null;
+                  if (fe.isReRelease) {
+                    hit = pickBestReissueTmdbCandidate(fe.title, candidates, fe.releaseDateId || todayIso, { expectedYear: fe.tahunProduksi });
+                  } else {
+                    const matchedCands = candidates.filter(cand => {
+                      const cTitle = String(cand.title || cand.original_title || "").trim();
+                      if (!cTitle || !sequelMarkersCompatible(fe.title, cTitle)) return false;
+                      if (fe.tahunProduksi && cand.release_date && /^\d{4}/.test(cand.release_date)) {
+                        const cYr = parseInt(cand.release_date.slice(0, 4), 10);
+                        if (Math.abs(cYr - fe.tahunProduksi) > 2) return false;
+                      }
+                      return normalizeKey(cTitle) === normalizeKey(fe.title) || (titleMatchesHeadlineAndroid(fe.title, cTitle) && titleMatchesHeadlineAndroid(cTitle, fe.title));
+                    });
+                    hit = matchedCands.sort((a, b) => Number(b.popularity || 0) - Number(a.popularity || 0))[0] || null;
+                  }
+                  if (!hit || !hit.id || !hit.poster_path) return;
+
+                  const normHit = normalizeKey(hit.title || hit.original_title || fe.title);
+                  if (!rawKnownNorms.has(normHit)) {
+                    if (fe.status === "now" || (fe.releaseDateId && fe.releaseDateId <= todayIso)) nowRaw.push(hit);
+                    else idUpcomingRaw.push(hit);
+                    rawKnownNorms.add(normHit);
+                  }
+                  const hasValidFeDate = Boolean(fe.releaseDateId && !isPlaceholderDate(fe.releaseDateId) && fe.releaseDateId >= minDate && fe.releaseDateId <= maxDate);
+                  const effFeDate = hasValidFeDate ? fe.releaseDateId : (fe.status === "now" ? todayIso : "");
+                  const prevOv = releaseDateOverrides[hit.id];
+                  if (effFeDate || fe.isReRelease) {
+                    releaseDateOverrides[hit.id] = {
+                      releaseDate: effFeDate || (prevOv && prevOv.releaseDate) || "",
+                      sourceBadge: "Bioskop ID",
+                      releaseChannel: "theatrical",
+                      isReRelease: Boolean((prevOv && prevOv.isReRelease) || fe.isReRelease || isValidReReleasePair(hit.release_date, effFeDate || todayIso)),
+                      idConfirmed: true,
+                      imax: Boolean((prevOv && prevOv.imax) || fe.imax)
+                    };
+                  }
+                } catch (_) {}
+              });
+            }
+          } catch (_) {}
+        }
 
         // Auto-verify top high-hype upcoming releases + upcoming watchlist (24h cached, lightweight for mobile)
         try {
@@ -6421,11 +6938,25 @@
           if (rEntry.releaseDateId < minDate || rEntry.releaseDateId > maxDate) return;
           if (rEntry.tmdbId && rEntry.tmdbId > 0) {
             const prevOv = releaseDateOverrides[rEntry.tmdbId];
+            const prevIsOfficialTmdbId = Boolean(
+              prevOv &&
+              prevOv.releaseDate &&
+              prevOv.releaseDate >= minDate &&
+              (prevOv.sourceBadge === "Bioskop ID" || (prevOv.sourceBadge && prevOv.sourceBadge.startsWith("TMDB ID")))
+            );
+            if (isRssSourcedRadar(rEntry) && prevIsOfficialTmdbId) {
+              releaseDateOverrides[rEntry.tmdbId] = {
+                ...prevOv,
+                isReRelease: Boolean((prevOv && prevOv.isReRelease) || rEntry.isReRelease),
+                imax: Boolean((prevOv && prevOv.imax) || rEntry.imax)
+              };
+              return;
+            }
             releaseDateOverrides[rEntry.tmdbId] = {
               releaseDate: rEntry.releaseDateId,
               sourceBadge: "Radar Bioskop ID",
               releaseChannel: "theatrical",
-              isReRelease: Boolean(prevOv && prevOv.isReRelease),
+              isReRelease: Boolean((prevOv && prevOv.isReRelease) || rEntry.isReRelease),
               idConfirmed: true,
               imax: Boolean((prevOv && prevOv.imax) || rEntry.imax)
             };
@@ -6445,17 +6976,25 @@
             let ov = releaseDateOverrides[item.id];
             const rHit = findMatchingRadarEntry({ id: `tmdb_${item.id}`, tmdbId: item.id, title: item.title || item.original_title || "" });
             if (rHit && hasConfirmedRadarStatus({ radarInfo: rHit })) {
-              if (rHit.releaseDateId && !isPlaceholderDate(rHit.releaseDateId) && rHit.releaseDateId >= minDate && rHit.releaseDateId <= maxDate) {
+              const ovHasOfficialTmdbId = Boolean(
+                ov &&
+                ov.releaseDate &&
+                ov.releaseDate >= minDate &&
+                (ov.sourceBadge === "Bioskop ID" || (ov.sourceBadge && ov.sourceBadge.startsWith("TMDB ID")))
+              );
+              const rBlockedByOfficialTmdb = isRssSourcedRadar(rHit) && ovHasOfficialTmdbId;
+              if (!rBlockedByOfficialTmdb && rHit.releaseDateId && !isPlaceholderDate(rHit.releaseDateId) && rHit.releaseDateId >= minDate && rHit.releaseDateId <= maxDate) {
                 ov = {
                   releaseDate: rHit.releaseDateId,
                   sourceBadge: "Radar Bioskop ID",
                   releaseChannel: "theatrical",
-                  isReRelease: Boolean((ov && ov.isReRelease) || isValidReReleasePair(item.release_date, rHit.releaseDateId)),
+                  isReRelease: Boolean((ov && ov.isReRelease) || rHit.isReRelease || isValidReReleasePair(item.release_date, rHit.releaseDateId)),
                   idConfirmed: true,
                   imax: Boolean((ov && ov.imax) || rHit.imax)
                 };
               } else if (
-                ((ov && ov.isReRelease) || isValidReReleasePair(item.release_date, todayIso)) &&
+                !rBlockedByOfficialTmdb &&
+                ((ov && ov.isReRelease) || rHit.isReRelease || isValidReReleasePair(item.release_date, todayIso)) &&
                 (!(ov && ov.releaseDate) || (ov && ov.noIdTheatrical) || !item.release_date || item.release_date < minDate || isPlaceholderDate(item.release_date))
               ) {
                 ov = {
@@ -6602,6 +7141,17 @@
 
         parseItems(globalCandsSorted, "global").forEach(pushUnique);
 
+        const enrichWithCinemaFeed = (list) => {
+          if (!cinemaFeedEntries || cinemaFeedEntries.length === 0) return list;
+          return list.map(m => {
+            if (m.releaseChannel === "digital") return m;
+            const match = findBestFeedMatchForTitle(m.title, cinemaFeedEntries);
+            return match ? mergeFeedEntryIntoMovie(m, match, todayIso) : m;
+          });
+        };
+        const enrichedNow = enrichWithCinemaFeed(liveNow);
+        const enrichedUpcoming = enrichWithCinemaFeed(liveUpcoming);
+
         const newlyConfirmedRadar = applyRadarToWatchlist(todayIso);
         if (newlyConfirmedRadar.length > 0 && window.AndroidBridge && typeof window.AndroidBridge.sendCustomNotification === "function") {
           newlyConfirmedRadar.forEach(wKey => {
@@ -6616,10 +7166,10 @@
           });
         }
 
-        localStorage.setItem("ct_v392_live_now", JSON.stringify(liveNow));
-        localStorage.setItem("ct_v392_live_upcoming", JSON.stringify(liveUpcoming));
+        localStorage.setItem("ct_v392_live_now", JSON.stringify(enrichedNow));
+        localStorage.setItem("ct_v392_live_upcoming", JSON.stringify(enrichedUpcoming));
         localStorage.setItem("ct_v431_global_est", JSON.stringify(globalEstOnly));
-        localStorage.setItem("ct_catalog_schema_ver", "4.3.1_r4");
+        localStorage.setItem("ct_catalog_schema_ver", "4.4.0_r1");
 
         rebuildMovieCatalog();
         updateCounts();
@@ -6886,7 +7436,7 @@
           return JSON.parse(window.AndroidBridge.getAppVersionInfoJson() || "{}");
         } catch (_) {}
       }
-      return { versionCode: 44, versionName: "4.3.1" };
+      return { versionCode: 46, versionName: "4.4.0" };
     }
 
     function fetchApkReleaseMeta(metaUrl) {
@@ -6925,7 +7475,7 @@
       const repo = resolveUpdateRepoSlug();
       const metaUrl = `https://github.com/${repo}/releases/download/latest/release-meta.json`;
       const local = getInstalledApkMeta();
-      const localCode = Number(local.versionCode || 44);
+      const localCode = Number(local.versionCode || 46);
 
       if (!silent && statusEl) {
         statusEl.textContent = "Memeriksa rilis terbaru di GitHub...";
@@ -6951,7 +7501,7 @@
           pendingApkUpdateMeta = remote;
           if (statusEl) {
             if (remote.signed) {
-              statusEl.textContent = `Versi baru tersedia: v${remote.versionName || "4.3.1"}${buildSuffix}. Data & Watchlist tetap aman.`;
+              statusEl.textContent = `Versi baru tersedia: v${remote.versionName || "4.4.0"}${buildSuffix}. Data & Watchlist tetap aman.`;
               statusEl.style.color = "var(--emerald-text)";
             } else {
               statusEl.textContent = `Build #${remote.buildNumber || remoteCode} tersedia (belum pakai Keystore tetap — pasang Keystore dulu agar bisa timpa tanpa uninstall).`;
@@ -6968,7 +7518,7 @@
         } else if (!silent && statusEl) {
           pendingApkUpdateMeta = null;
           if (installBtn) installBtn.style.display = "none";
-          statusEl.textContent = `Aplikasi sudah paling baru (v${local.versionName || "4.3.1"} · code ${localCode}).`;
+          statusEl.textContent = `Aplikasi sudah paling baru (v${local.versionName || "4.4.0"} · code ${localCode}).`;
           statusEl.style.color = "var(--emerald-text)";
         }
       } finally {
@@ -6998,7 +7548,7 @@
       const verLabel = document.getElementById("apkCurrentVerLabel");
       if (card) card.style.display = "block";
       const local = getInstalledApkMeta();
-      if (verLabel) verLabel.textContent = `v${local.versionName || "4.3.1"} · code ${local.versionCode || 44}`;
+      if (verLabel) verLabel.textContent = `v${local.versionName || "4.4.0"} · code ${local.versionCode || 46}`;
 
       const lastCheck = parseInt(localStorage.getItem("ct_last_update_check_ts") || "0", 10);
       const ONE_DAY_MS = 24 * 60 * 60 * 1000;
