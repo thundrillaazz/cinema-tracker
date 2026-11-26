@@ -1881,7 +1881,7 @@
       <div id="apkUpdateCard" class="info-card" style="display:none;">
         <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:4px;">
           <h3 style="margin:0;">Pembaruan Aplikasi</h3>
-          <span id="apkCurrentVerLabel" style="font-size:11px; font-weight:600; color:var(--muted); font-variant-numeric:tabular-nums;">v4.4.0</span>
+          <span id="apkCurrentVerLabel" style="font-size:11px; font-weight:600; color:var(--muted); font-variant-numeric:tabular-nums;">v4.3.1</span>
         </div>
         <p id="apkUpdateStatus" style="margin-bottom:8px;">Cek rilis APK terbaru langsung tanpa buka browser atau ekstrak ZIP.</p>
         <div style="display:flex; gap:8px;">
@@ -1891,7 +1891,7 @@
       </div>
 
       <div style="text-align:center; font-size:11px; color:var(--muted); padding:4px 0 12px; line-height:1.5;">
-        <div>Cinema Tracker v4.4.0 (Stable) · Made by Thundrilla</div>
+        <div>Cinema Tracker v4.3.1 (Stable) · Made by Thundrilla</div>
         <div style="font-size:10px; opacity:0.75;">Jadwal Bioskop Indonesia</div>
       </div>
     </div>
@@ -3277,7 +3277,7 @@
         radarByKey = radarClean.nextMap;
         localStorage.setItem("ct_v43_radar_cache", JSON.stringify(radarByKey));
       }
-      if (localStorage.getItem("ct_reissue_mig_ver") !== "4.4.0_r1") {
+      if (localStorage.getItem("ct_reissue_mig_ver") !== "4.3.1_r5") {
         radarByKey = purgeRssEntriesFromRadarMap(radarByKey);
         localStorage.setItem("ct_v43_radar_cache", JSON.stringify(radarByKey));
         localStorage.removeItem("ct_v43_reissue_sync_ts");
@@ -3285,7 +3285,7 @@
         localStorage.removeItem("ct_v43_autoverify_ts");
         localStorage.removeItem("ct_v43_cinema_id_ts");
         localStorage.removeItem("ct_last_sync_ts");
-        localStorage.setItem("ct_reissue_mig_ver", "4.4.0_r1");
+        localStorage.setItem("ct_reissue_mig_ver", "4.3.1_r5");
       }
       rebuildMovieCatalog();
 
@@ -3353,8 +3353,8 @@
       const lastSync = parseInt(localStorage.getItem("ct_last_sync_ts") || "0", 10);
       const now = Date.now();
       updateLastSyncLabel(lastSync);
-      const needsSchemaUpgrade = localStorage.getItem("ct_catalog_schema_ver") !== "4.4.0_r1";
-      // 2-hour auto-sync threshold to protect battery and mobile data (+ 1-time v4.4.0_r1 catalog upgrade refresh)
+      const needsSchemaUpgrade = localStorage.getItem("ct_catalog_schema_ver") !== "4.3.1_r5";
+      // 2-hour auto-sync threshold to protect battery and mobile data (+ 1-time v4.3.1_r5 catalog upgrade refresh)
       if (needsSchemaUpgrade || (now - lastSync > 2 * 60 * 60 * 1000)) {
         syncTmdbLive(false);
       }
@@ -4181,13 +4181,8 @@
     }
 
     function forceQuickSync() {
-      if (isSyncing) {
-        showToast("Sedang menyinkronkan jadwal...");
-        return;
-      }
       const key = localStorage.getItem("ct_tmdb_key") || document.getElementById("tmdbKeyInput").value.trim();
       if (!key) {
-        fetchCloudRadarFeed(true);
         switchBottomTab("settings");
         showToast("Isi TMDB API Key di Settings");
         return;
@@ -6186,7 +6181,7 @@
           const cfg = watchlistMap[id];
           if (!cfg) return null;
           const liveM = allMovies.find(item => item.id === id) || {};
-          const mergedM = mergeRadarIntoMovie({ ...(cfg.movieData || {}), ...liveM, id }, todayIso);
+          const mergedM = { ...(cfg.movieData || {}), ...liveM, id };
           if (!mergedM.title) return null;
           return { id, cfg, m: mergedM };
         })
@@ -6577,7 +6572,7 @@
         const SIX_HOURS_MS = 6 * 60 * 60 * 1000;
         const ONE_DAY_MS = 24 * 60 * 60 * 1000;
         const releaseDateOverrides = {};
-        const bypassCache = Boolean(showFeedback) || localStorage.getItem("ct_catalog_schema_ver") !== "4.4.0_r1";
+        const bypassCache = Boolean(showFeedback) || localStorage.getItem("ct_catalog_schema_ver") !== "4.3.1_r5";
 
         const reReleaseCands = [...nowRaw, ...idUpcomingRaw]
           .filter(item => item && item.id && item.poster_path && item.release_date && item.release_date < minDate)
@@ -7169,7 +7164,7 @@
         localStorage.setItem("ct_v392_live_now", JSON.stringify(enrichedNow));
         localStorage.setItem("ct_v392_live_upcoming", JSON.stringify(enrichedUpcoming));
         localStorage.setItem("ct_v431_global_est", JSON.stringify(globalEstOnly));
-        localStorage.setItem("ct_catalog_schema_ver", "4.4.0_r1");
+        localStorage.setItem("ct_catalog_schema_ver", "4.3.1_r5");
 
         rebuildMovieCatalog();
         updateCounts();
@@ -7436,7 +7431,7 @@
           return JSON.parse(window.AndroidBridge.getAppVersionInfoJson() || "{}");
         } catch (_) {}
       }
-      return { versionCode: 46, versionName: "4.4.0" };
+      return { versionCode: 45, versionName: "4.3.1" };
     }
 
     function fetchApkReleaseMeta(metaUrl) {
@@ -7475,7 +7470,7 @@
       const repo = resolveUpdateRepoSlug();
       const metaUrl = `https://github.com/${repo}/releases/download/latest/release-meta.json`;
       const local = getInstalledApkMeta();
-      const localCode = Number(local.versionCode || 46);
+      const localCode = Number(local.versionCode || 45);
 
       if (!silent && statusEl) {
         statusEl.textContent = "Memeriksa rilis terbaru di GitHub...";
@@ -7501,7 +7496,7 @@
           pendingApkUpdateMeta = remote;
           if (statusEl) {
             if (remote.signed) {
-              statusEl.textContent = `Versi baru tersedia: v${remote.versionName || "4.4.0"}${buildSuffix}. Data & Watchlist tetap aman.`;
+              statusEl.textContent = `Versi baru tersedia: v${remote.versionName || "4.3.1"}${buildSuffix}. Data & Watchlist tetap aman.`;
               statusEl.style.color = "var(--emerald-text)";
             } else {
               statusEl.textContent = `Build #${remote.buildNumber || remoteCode} tersedia (belum pakai Keystore tetap — pasang Keystore dulu agar bisa timpa tanpa uninstall).`;
@@ -7518,7 +7513,7 @@
         } else if (!silent && statusEl) {
           pendingApkUpdateMeta = null;
           if (installBtn) installBtn.style.display = "none";
-          statusEl.textContent = `Aplikasi sudah paling baru (v${local.versionName || "4.4.0"} · code ${localCode}).`;
+          statusEl.textContent = `Aplikasi sudah paling baru (v${local.versionName || "4.3.1"} · code ${localCode}).`;
           statusEl.style.color = "var(--emerald-text)";
         }
       } finally {
@@ -7548,7 +7543,7 @@
       const verLabel = document.getElementById("apkCurrentVerLabel");
       if (card) card.style.display = "block";
       const local = getInstalledApkMeta();
-      if (verLabel) verLabel.textContent = `v${local.versionName || "4.4.0"} · code ${local.versionCode || 46}`;
+      if (verLabel) verLabel.textContent = `v${local.versionName || "4.3.1"} · code ${local.versionCode || 45}`;
 
       const lastCheck = parseInt(localStorage.getItem("ct_last_update_check_ts") || "0", 10);
       const ONE_DAY_MS = 24 * 60 * 60 * 1000;

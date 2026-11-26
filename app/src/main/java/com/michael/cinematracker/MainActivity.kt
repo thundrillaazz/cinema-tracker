@@ -383,7 +383,7 @@ class MainActivity : AppCompatActivity() {
                 instanceFollowRedirects = false
                 connectTimeout = connectMs
                 readTimeout = readMs
-                setRequestProperty("User-Agent", "CinemaTracker-Android/4.4.0")
+                setRequestProperty("User-Agent", "CinemaTracker-Android/4.3.1")
             }
             val code = conn.responseCode
             if (code in listOf(301, 302, 303, 307, 308)) {

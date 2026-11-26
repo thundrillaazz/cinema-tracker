@@ -823,7 +823,7 @@ object CinemaScraperHelper {
         // 3. TIX ID (tix.id)
         val tixHtml = pageMap["https://www.tix.id/"] ?: ""
         if (tixHtml.isNotEmpty()) {
-            val tixRe = Regex("href=[\"'](https?://(?:app\\.)?tix\\.id/movies/([a-z0-9-]+)-\\d+/(\\d{4}-\\d{2}-\\d{2}))[\"'][^>]*>([\\s\\S]*?)</a>", RegexOption.IGNORE_CASE)
+            val tixRe = Regex("href=[\"'](https://app\\.tix\\.id/movies/([a-z0-9-]+)-\\d+/(\\d{4}-\\d{2}-\\d{2}))[\"'][^>]*>([\\s\\S]*?)</a>", RegexOption.IGNORE_CASE)
             var tixCount = 0
             for (m in tixRe.findAll(tixHtml)) {
                 val url = m.groupValues[1]
@@ -843,7 +843,7 @@ object CinemaScraperHelper {
                     rawTitle = rawTitle,
                     releaseDateId = relIso,
                     status = if (relIso.isNotEmpty() && relIso > todayIso) "upcoming" else "now",
-                    chainsList = listOf("TIX ID"),
+                    chainsList = emptyList(),
                     presaleActive = isPre,
                     source = "TIX ID",
                     sourceUrl = url

@@ -1010,10 +1010,8 @@ class CinemaCheckWorker(
         val manager = appContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         manager.notify(notificationId, builder.build())
 
-        try {
-            if (rawBitmap != null && !rawBitmap.isRecycled) rawBitmap.recycle()
-            if (bannerBitmap != null && !bannerBitmap.isRecycled) bannerBitmap.recycle()
-        } catch (_: Exception) {}
+        rawBitmap?.recycle()
+        bannerBitmap?.recycle()
     }
 
     companion object {
