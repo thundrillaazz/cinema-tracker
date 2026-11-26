@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-26T02:14:49.106Z",
+  "updatedAt": "2026-11-26T14:12:59.667Z",
   "source": "cloud-radar-rss-tmdb",
   "entries": [
     {
@@ -28,7 +28,7 @@
           "url": "https://news.google.com/rss/articles/CBMisAFBVV95cUxNNmJ5VF9ORS1yTVRoX2swdG5KRU1mVlVrZzNtanpBZ3BIWVFnZEdJN1lVeloxeW1iMVZpT2xUdlo5bDFLZV94WTdOMUZRRHBva0N5SnNtZ3ItbDFMWW1nZjFOb2RvczllUzVwY3p2TV9SSlhDVnIyUGt2UllsSm50QnV0M0lsZjZVbXpENnBfNWpBVWJ2ZVM4ZE5maVRnWUltUW5sZXZkS0Nsb3VGeHB4eQ?oc=5"
         }
       ],
-      "checkedAt": "2026-11-26T02:14:49.106Z"
+      "checkedAt": "2026-11-26T14:12:59.667Z"
     },
     {
       "key": "tmdb_1195803",
@@ -45,9 +45,13 @@
         {
           "title": "CNN Indonesia",
           "url": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxQSjNvQnhpNFowcG9nd2xQWUhCZHRoNUFlb1E2a2ZlYTZKT2NBd0J4bmhmQ053S19lcUN3dGhuRnhwYnRZdWl0MUg2TXBMWE5OQ2Y2MWlQajBLN1pOQ3BvUDlGTjE1emp3X01FcmgwSERJZzdWcHpmLWRUMDQzcFNFTDlUUkVYcVh0S240R3ZGaFJTazU4cDRjRk1XQk1SSjIxdzhXV0FnWHFRNnloZUVtaGliUmdCR2VCS1Y5Y19aNnRLdzhaZ3YzTNIBzgFBVV95cUxNM0VxNDZ4d24wZkJaYVRGRGRLYmRtX3UtOXhkWjYzeU51Y0VuNHVhQjZNcnZfWnUyRVZXLUlpeUo2cUo2VTdQUWd5MEt3QzdkTm42T2NnX2xuR0hGZ0c2ZENaaHdvOF9PTGpfdVNyVF9sTXZOd0s2OTdpcXBqbGUzZWh6YWtHWUdlaEh4aVkzLW52MmRlRVlxdS1xbWowR1hqaGR2cnlrQmVRMHhxVU5lWUwwVFhsY0Z3SEVNOEp3a1ZjeXVnV3FscDFmcnYxdw?oc=5"
+        },
+        {
+          "title": "JournalArta",
+          "url": "https://news.google.com/rss/articles/CBMiggFBVV95cUxOVkNhSFRsakVIcl9sbGZHeF82bnhjZ3Q5ODAwaExmSDVpT0gwNU9aQml0SGY4S3Jza1ZhM0tWcEZtNkNtb0pMVUd3UmNpNW1nUHd1Y0MtSzE2UkV6YTBpakdTZWx3bGpGNGgzWU1tUS1neThpYTlORHdyMWptS0hmMklR?oc=5"
         }
       ],
-      "checkedAt": "2026-11-26T02:14:49.106Z"
+      "checkedAt": "2026-11-26T14:12:59.667Z"
     },
     {
       "key": "tmdb_1299329",
@@ -64,13 +68,9 @@
         {
           "title": "Hypebeast",
           "url": "https://news.google.com/rss/articles/CBMitwFBVV95cUxQVVV4cTQtX1M0VVZVbUlQTlhiMzlJQ18xM3RhQ2lOSXAtb21PRjNJN2NESHVXUVBCTmE1bmd1dkVSTlRiVEJtR3RCR1MyRnNFMnVxSmstdjRNeC00M2p0ck5kcWc1VC1WbTlYNGpSRXRfRGJZaExWVHYwenp0TGRkQlRScmlQdmJkdkRIUHBpUEFCS1AtQU9wZjU4Q2ltMG5uejhEZjlBVmNHUGxvUWZSaVBVdE1LOFE?oc=5"
-        },
-        {
-          "title": "Yoursay.id",
-          "url": "https://news.google.com/rss/articles/CBMiygFBVV95cUxOYUNoTEs1clgwMEFER1IyQ01TVFFndTBtd2RxVWxQeEFTWXYwSjVxYXMyNUlKZlB3QjlCM2NNalI4THNHX3BRcXoyUklNb3Bvb09VcHliSnBxSDdWNXA1SUdCY0IzeUMxRk5DS0JZTlVQbDVzMllnNVkzWGNXSmJyVndVWmNyTUdGeEJIbVR6TVd5TWp6UUZRc0hTRDltY3VzQlpBc1FHMUYyVGJCYktucy02YUd1Yk5TVTlmSS1NRlI3NlRDTTBuQ1ln0gHPAUFVX3lxTFBEeW5mMFpwXzlDZEloU0RMS1hSLWMzMDJrVXNGNkZkTjN5OXY5RDVpRXJWLWxMSWJTU3lUMk9wMUdGMnZOY3FXeC1jbUNiMnhpRjY3X0k3bmVwR2p6ZHcxTHY3VE9ja1pwOThxVEtSUU1QbWx5bUkzNjFCVFZ5N1dabS1ucDF0clVPU2owWFgxNGlETlkyUEdiQW5aWmd2Q25zRlFPc0ItM2laZ2dtUmwtaFU4ZlFnY0RNeDZacWJnTzFKbzhBSFpfLUc2RnpZOA?oc=5"
         }
       ],
-      "checkedAt": "2026-11-26T02:14:49.106Z"
+      "checkedAt": "2026-11-26T14:12:59.667Z"
     },
     {
       "key": "tmdb_1078446",
@@ -82,14 +82,9 @@
       "imax": false,
       "presaleActive": false,
       "lsfStatus": "Klasifikasi TMDB ID: 17+",
-      "summary": "Jadwal resmi TMDB ID: 2026-12-02. Berita: Violent Night 2: Sinterklas David Harbour kembali ke bioskop - Sortir à Paris",
-      "sources": [
-        {
-          "title": "Sortir à Paris",
-          "url": "https://news.google.com/rss/articles/CBMizwFBVV95cUxNcUVYd2g1RUNBS2FieUlfZ0pSdW82WlRxSGgxQS1MYnUtTjIzdERqR19xbWt4Y0lGZXdsVE1SMVBLNGVnQ2hfZF9vWTJ5YU1Qd0loN1R5SElWTmxxZnRNTVF2YklLUGRZcGhJcGpfcDhrQnNTVEt2cnJEM0M4a2Y0dW01eVNTN2ZqbFNsLXhfei1Fa3ZUVUNBZ3VxMkxJME9wUlIxb0JwS0NHZFBlVWd5bFhUWVprc0M3RnVZaVdXR29yYjFTWmdyS3BNdlgtZHM?oc=5"
-        }
-      ],
-      "checkedAt": "2026-11-26T02:14:49.106Z"
+      "summary": "Jadwal resmi TMDB ID: 2026-12-02.",
+      "sources": [],
+      "checkedAt": "2026-11-26T14:12:59.667Z"
     },
     {
       "key": "tmdb_1300926",
@@ -116,7 +111,7 @@
           "url": "https://news.google.com/rss/articles/CBMib0FVX3lxTE04WWhPOVZubkdOSzJMZEZ1RzRnYWRUZUpPa0wzWGZ2YjJrS2ZEYUpBYnlEdWdOUGhzM00xMENZbmtBZnJYZ3c4MDl6S0YyNzYzMFpqTXdMdS1kODd6S3R5cElJVXowRmhHTVk2ZGxyOA?oc=5"
         }
       ],
-      "checkedAt": "2026-11-26T02:14:49.106Z"
+      "checkedAt": "2026-11-26T14:12:59.667Z"
     },
     {
       "key": "tmdb_1732866",
@@ -143,7 +138,7 @@
           "url": "https://news.google.com/rss/articles/CBMiZEFVX3lxTE1kdVFQV2VMekdjcExjSUZ3OTFNMEl0ZTE0Y0xVV3RDQ2VxazZ3cktrTzhWdjl6dnBfSUJjY09SeUc3aVl4TE1yTThfN1RFemxibkc3VmFrZm1FRVEtblRsaTdWd2I?oc=5"
         }
       ],
-      "checkedAt": "2026-11-26T02:14:49.106Z"
+      "checkedAt": "2026-11-26T14:12:59.667Z"
     },
     {
       "key": "tmdb_1691495",
@@ -170,7 +165,7 @@
           "url": "https://news.google.com/rss/articles/CBMitAFBVV95cUxPbFJYNElCaXcyWjNjZE9sakNLbU5jWEJybVRfQnR4cTI4N1VwN0dyLWNuTmNGNGt6d1lGT21TQXdMQUUzaXpOUkEtZXZZV3VLdUM4dURhVzhzNmRNU2ZrRS1aR1F5ek80M0Vnb1NmV2lLemdZaTlWdEt5aXowdDltOEZDV2MxcVVaT3RmcG55aEdVSVdNYTVQX0loU1JyTWVGNTNtdTVuUmp1Mjc1UkRJdUZWUG4?oc=5"
         }
       ],
-      "checkedAt": "2026-11-26T02:14:49.106Z"
+      "checkedAt": "2026-11-26T14:12:59.667Z"
     },
     {
       "key": "tmdb_1586748",
@@ -197,7 +192,7 @@
           "url": "https://news.google.com/rss/articles/CBMiowFBVV95cUxQOVltX2JKOFNDdW5PNFpOUV9ZUWtjcUJZYzRpd3EwTmFRWVdKa0M3Vi1qWnRtVzRqTHRlMkxtbmZIcGR6Sk5jdHd6NWR3Y1h5N295R2wxdXpTQXRmQlFPMm5PUklIY25udUJ0M2dkRjB6Yy1LNk9YanM1S2JScUhqSnFQMkR4WDU2dW1GQU1qLWphWkpDcXB4ZlFRRjJRaER4WkVN?oc=5"
         }
       ],
-      "checkedAt": "2026-11-26T02:14:49.106Z"
+      "checkedAt": "2026-11-26T14:12:59.667Z"
     },
     {
       "key": "tmdb_1718454",
@@ -211,7 +206,7 @@
       "lsfStatus": "Klasifikasi TMDB ID: 13+",
       "summary": "Jadwal resmi TMDB ID: 2026-12-03.",
       "sources": [],
-      "checkedAt": "2026-11-26T02:14:49.106Z"
+      "checkedAt": "2026-11-26T14:12:59.667Z"
     },
     {
       "key": "tmdb_1398505",
@@ -225,7 +220,7 @@
       "lsfStatus": "Klasifikasi TMDB ID: SU",
       "summary": "Jadwal resmi TMDB ID: 2026-12-10.",
       "sources": [],
-      "checkedAt": "2026-11-26T02:14:49.106Z"
+      "checkedAt": "2026-11-26T14:12:59.667Z"
     },
     {
       "key": "tmdb_1168320",
@@ -248,7 +243,7 @@
           "url": "https://news.google.com/rss/articles/CBMipAFBVV95cUxQR1dPNUtpZlktaXREZGJZRXRoVWZCSVRTZVZKTXRDVzN1RHBMMHJMWDdNWmFQQXh3RGdUakh1Y0VlR1AxaHdRWkRWS1RYSE9uXzNsZXF6ZzhrNHlIWHl4SmJDMUZCT1BVU2pNejEtb1VHdDlrcnJuQ1h4UVM2Uzg5UnRZVy1GRDRadU1IT1g0RE5qcW1uOUlMbzJ0S3I0STcyc3pfYtIBqgFBVV95cUxOUng1dWZpV1hmMUoyY2xKM2VTUjEwenpyMG1DLXI3TDViTzAzazZiclZ6ejV3V3M4Ymp2UUJtNW1vS3p6ZHF5RVRqcklaYmItQXNlbG1YMTNmWUZjeFRwQUZnTUVmQXdWRlhVY0dXMm5RSzdjbUloaVRuaE9VZk1BU3A5WndEdEdSN2Fmak1iVXN4cEtyZUE2bjZWQ2doMFIwV2Y3bmdua3hCUQ?oc=5"
         }
       ],
-      "checkedAt": "2026-11-26T02:14:49.106Z"
+      "checkedAt": "2026-11-26T14:12:59.667Z"
     },
     {
       "key": "tmdb_1289720",
@@ -275,7 +270,7 @@
           "url": "https://news.google.com/rss/articles/CBMisgFBVV95cUxNZkh1N0lMUFh4TWZnVHowRWFVMkpMMDl3OGdBNmE4NGhVMElXRlRpX3Y2dXl0dDVmNUl3aHE4OXNheUNYbzBqejF6QVo1UUUzLUxDYTk2bnFNYjBSTmp1VS1BQm5QWHNsN1JTUjUzY1M5VDFBZzlTUmlwcjIxSTZ3aWFleklnS3drdEJ4LUlZaHdWNm56R05EQUlhY2VYdm1Tc184RTZ5UXEtaGt6OVBaWnBR?oc=5"
         }
       ],
-      "checkedAt": "2026-11-26T02:14:49.106Z"
+      "checkedAt": "2026-11-26T14:12:59.667Z"
     }
   ]
 }
