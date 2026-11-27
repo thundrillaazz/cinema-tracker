@@ -11,6 +11,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.nio.charset.StandardCharsets
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Locale
 import java.util.concurrent.Callable
 import java.util.concurrent.Executors
@@ -208,10 +209,31 @@ object CinemaScraperHelper {
         return PRESALE_AFFIRMATIVE_RE.containsMatchIn(txt) && PRESALE_ACTIVE_VERB_RE.containsMatchIn(txt)
     }
 
+    private val CONTEXTUAL_MOVIE_PRONOUN_RE = Regex(
+        "\\b(?:film(?:\\s+[a-z0-9-]+){0,10}|animasi(?:\\s+[a-z0-9-]+){0,5}|sekuel(?:\\s+[a-z0-9-]+){0,4}|prekuel(?:\\s+[a-z0-9-]+){0,4}|tayangan(?:\\s+[a-z0-9-]+){0,3}|karya(?:\\s+[a-z0-9-]+){0,3})\\s+(?:ini|tersebut)\\b",
+        RegexOption.IGNORE_CASE
+    )
+    private val ID_FULL_MONTH_NAMES = arrayOf(
+        "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+        "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+    )
+    private val LISTICLE_HEADLINE_RE = Regex(
+        "\\b(\\d+\\s+film|daftar\\s+film|deretan\\s+film|rekomendasi\\s+film|fenomena\\s+\\w+\\s+\\d{1,2})\\b",
+        RegexOption.IGNORE_CASE
+    )
+    private val DECODABLE_LISTICLE_OR_REISSUE_RE = Regex(
+        "(\\b\\d+\\s+film|daftar\\s+film|deretan\\s+film|rekomendasi\\s+film|jadwal\\s+tayang|tayang\\s+(?:kembali|ulang|lagi)|kembali\\s+(?:tayang|hadir|ke\\s+bioskop)|dirilis\\s+ulang|re-?release|reissue|remaster(?:ed)?)",
+        RegexOption.IGNORE_CASE
+    )
+    private val CINEMA_CONTEXT_HINT_RE = Regex(
+        "\\b(bioskop|layar\\s+lebar|xxi|cinema\\s*21|cinema\\s*xxi|21cineplex|cgv|cin[eé]polis|imax|tix\\s*id|indonesia)\\b",
+        RegexOption.IGNORE_CASE
+    )
+
     fun extractIndonesianDateFromText(movieTitle: String, text: String, defaultYear: Int): String {
         val clean = text.trim()
-        if (clean.isEmpty() || RUMOR_RE.containsMatchIn(clean)) return ""
-        val clauses = clean.split(Regex("[.!?\\n|•]+")).map { it.trim() }.filter { it.length >= 4 }
+        if (clean.isEmpty()) return ""
+        val clauses = clean.split(Regex("[\\n\\r]+|(?<=[.!?])\\s+")).map { it.trim() }.filter { it.length >= 4 }
         val dateTextRe = Regex(
             "\\b([1-9]|[12]\\d|3[01])(?:\\s*(?:-|–|—|s/d|s\\.d\\.|hingga|sampai)\\s*(?:[1-9]|[12]\\d|3[01]))?\\s+(januari|jan|februari|feb|maret|mar|april|apr|mei|may|juni|jun|juli|jul|agustus|agu|ags|aug|september|sept|sep|oktober|okt|oct|november|nov|desember|des|dec)(?:\\s*,?\\s*(20\\d{2}))?\\b",
             RegexOption.IGNORE_CASE
@@ -221,15 +243,38 @@ object CinemaScraperHelper {
             "\\b(tayang|rilis|dirilis|mulai|bioskop|xxi|cinema\\s*21|cgv|cin[eé]polis|tix\\s*id|resmi|pre-?sale|imax|hadir)\\b",
             RegexOption.IGNORE_CASE
         )
+        val reissueTagRe = Regex(
+            "\\(\\s*(?:reissue|re-?release|tayang\\s+(?:ulang|kembali)|remaster(?:ed)?)\\s*\\)",
+            RegexOption.IGNORE_CASE
+        )
+        val scheduleRowPrefixRe = Regex(
+            "^\\s*(?:\\d{1,2}[.)]\\s+|(?:[1-9]|[12]\\d|3[01])\\s+(?:jan|feb|mar|apr|mei|may|jun|jul|agu|ags|aug|sep|sept|okt|oct|nov|des|dec)[a-z]*\\s*[·|:\\-–—])",
+            RegexOption.IGNORE_CASE
+        )
 
         var bestScore = -1
         var bestIso = ""
-        for (clause in clauses) {
+        for (c in clauses.indices) {
+            val clause = clauses[c]
             if (RUMOR_RE.containsMatchIn(clause)) continue
+            val hasIdVenueInClause = EXPLICIT_ID_VENUE_RE.containsMatchIn(clause)
+            if (FOREIGN_WIRE_RE.containsMatchIn(clause) && !hasIdVenueInClause) continue
+
             val matchesTitle = movieTitle.isEmpty() || titleMatchesHeadline(movieTitle, clause)
-            val hasContext = releaseContextRe.containsMatchIn(clause)
-            if (!matchesTitle && !hasContext) continue
-            val baseTier = (if (matchesTitle) 200 else 100) + (if (EXPLICIT_ID_VENUE_RE.containsMatchIn(clause)) 100 else 0)
+            val prevClauseMatched = movieTitle.isNotEmpty() && c > 0 && titleMatchesHeadline(movieTitle, clauses[c - 1])
+            val isLeadPronounClause = !matchesTitle &&
+                prevClauseMatched &&
+                CONTEXTUAL_MOVIE_PRONOUN_RE.containsMatchIn(clause) &&
+                sequelMarkersCompatible(movieTitle, clause)
+            if (!matchesTitle && !isLeadPronounClause) continue
+
+            val hasScheduleSignal = releaseContextRe.containsMatchIn(clause) ||
+                reissueTagRe.containsMatchIn(clause) ||
+                scheduleRowPrefixRe.containsMatchIn(clause)
+            if (movieTitle.isEmpty() && !hasScheduleSignal) continue
+            if (!hasScheduleSignal) continue
+
+            val baseTier = (if (matchesTitle) 200 else 120) + (if (hasIdVenueInClause) 100 else 0)
 
             for (m in dateTextRe.findAll(clause)) {
                 val day = m.groupValues[1].toIntOrNull() ?: continue
@@ -238,7 +283,7 @@ object CinemaScraperHelper {
                 if (day !in 1..31 || month !in 1..12) continue
                 val iso = validIso(String.format(Locale.US, "%04d-%02d-%02d", yr, month, day))
                 if (iso.isEmpty()) continue
-                val score = baseTier + (if (hasContext) 30 else 0)
+                val score = baseTier + 30
                 if (score > bestScore) {
                     bestScore = score
                     bestIso = iso
@@ -251,7 +296,7 @@ object CinemaScraperHelper {
                 if (day !in 1..31 || month !in 1..12) continue
                 val iso = validIso(String.format(Locale.US, "%04d-%02d-%02d", yr, month, day))
                 if (iso.isEmpty()) continue
-                val score = baseTier + (if (hasContext) 20 else 0)
+                val score = baseTier + 20
                 if (score > bestScore) {
                     bestScore = score
                     bestIso = iso
@@ -273,6 +318,52 @@ object CinemaScraperHelper {
             .replace(Regex("<[^>]+>"), " ")
             .replace(Regex("\\s+"), " ")
             .trim()
+    }
+
+    fun hasMovieSpecificImaxContext(movieTitle: String, headline: String, bodyText: String = ""): Boolean {
+        if (movieTitle.isBlank()) return false
+        val head = headline.trim()
+        val body = bodyText.trim()
+        if (head.isEmpty() && body.isEmpty()) return false
+        val full = "$head\n$body"
+        if (!IMAX_RE.containsMatchIn(full)) return false
+
+        val isMulti = LISTICLE_HEADLINE_RE.containsMatchIn(head) || body.length > 400
+        if (!isMulti) {
+            val matched = (head.isNotEmpty() && sequelMarkersCompatible(movieTitle, head) && titleMatchesHeadline(movieTitle, head)) ||
+                (body.isNotEmpty() && sequelMarkersCompatible(movieTitle, body) && titleMatchesHeadline(movieTitle, body))
+            if (!matched) return false
+            return !FOREIGN_WIRE_RE.containsMatchIn(full) || EXPLICIT_ID_VENUE_RE.containsMatchIn(full)
+        }
+        if (!LISTICLE_HEADLINE_RE.containsMatchIn(head) &&
+            titleMatchesHeadline(movieTitle, head) &&
+            sequelMarkersCompatible(movieTitle, head) &&
+            IMAX_RE.containsMatchIn(head)
+        ) {
+            return true
+        }
+        val clauses = full.split(Regex("[\\n\\r]+|(?<=[.!?])\\s+")).map { it.trim() }.filter { it.isNotEmpty() }
+        for (i in clauses.indices) {
+            val cl = clauses[i]
+            if (titleMatchesHeadline(movieTitle, cl) && sequelMarkersCompatible(movieTitle, cl) && IMAX_RE.containsMatchIn(cl)) {
+                if (FOREIGN_WIRE_RE.containsMatchIn(cl) && !EXPLICIT_ID_VENUE_RE.containsMatchIn(cl)) continue
+                val parts = cl.split(Regex("\\s*[;]\\s*")).filter { it.isNotEmpty() }
+                if (parts.size > 1) {
+                    if (parts.any { p -> titleMatchesHeadline(movieTitle, p) && sequelMarkersCompatible(movieTitle, p) && IMAX_RE.containsMatchIn(p) }) {
+                        return true
+                    }
+                    continue
+                }
+                return true
+            }
+            val prevMatched = i > 0 && titleMatchesHeadline(movieTitle, clauses[i - 1]) && sequelMarkersCompatible(movieTitle, clauses[i - 1])
+            if (prevMatched && CONTEXTUAL_MOVIE_PRONOUN_RE.containsMatchIn(cl) && IMAX_RE.containsMatchIn(cl) &&
+                (!FOREIGN_WIRE_RE.containsMatchIn(cl) || EXPLICIT_ID_VENUE_RE.containsMatchIn(cl))
+            ) {
+                return true
+            }
+        }
+        return false
     }
 
     fun fetchTextBounded(
@@ -316,43 +407,65 @@ object CinemaScraperHelper {
             .take(100)
         if (cleanTitle.length < 2) return JSONArray()
 
-        val bingQuery = "\"$cleanTitle\" jadwal tayang bioskop Indonesia XXI CGV"
+        val curYear = Calendar.getInstance().get(Calendar.YEAR)
+        val bingQuery = "$cleanTitle bioskop Indonesia $curYear"
+        val reissueBingQuery = "$cleanTitle kembali tayang bioskop Indonesia"
         val googleQuery = "\"$cleanTitle\" (XXI OR CGV OR Cinepolis OR bioskop OR LSF OR \"pre-sale\" OR IMAX OR tayang) when:120d"
+        val reissueGoogleQuery =
+            "\"$cleanTitle\" (\"tayang kembali\" OR \"kembali hadir\" OR \"kembali ke bioskop\" OR \"tayang ulang\" OR reissue OR \"re-release\") (Indonesia OR bioskop OR XXI OR CGV OR Cinepolis OR IMAX) when:120d"
         val urls = listOf(
             "https://www.bing.com/news/search?q=${Uri.encode(bingQuery)}&cc=ID&setlang=id&format=rss",
-            "https://news.google.com/rss/search?q=${Uri.encode(googleQuery)}&hl=id&gl=ID&ceid=ID:id"
+            "https://www.bing.com/news/search?q=${Uri.encode(reissueBingQuery)}&cc=ID&setlang=id&format=rss",
+            "https://news.google.com/rss/search?q=${Uri.encode(googleQuery)}&hl=id&gl=ID&ceid=ID:id",
+            "https://news.google.com/rss/search?q=${Uri.encode(reissueGoogleQuery)}&hl=id&gl=ID&ceid=ID:id"
         )
-        val xmlBodies = fetchUrlsConcurrently(urls, UA_RADAR, maxBytes = 262144)
+        val xmlBodies = fetchUrlsConcurrently(urls, UA_MOBILE, maxBytes = 262144)
 
         val seenLinks = HashSet<String>()
         val items = JSONArray()
         for (xml in xmlBodies) {
             if (xml.isEmpty()) continue
-            parseXmlRssItems(xml, maxPerFeed = 6, maxTotal = 10, items = items, seenLinks = seenLinks, requireIdVenue = false)
+            parseXmlRssItems(xml, maxPerFeed = 8, maxTotal = 18, items = items, seenLinks = seenLinks, requireIdVenue = false)
         }
         return items
     }
 
     fun fetchIndonesianReissueNewsRss(): JSONArray {
-        val q1 =
+        val cal = Calendar.getInstance()
+        val curYear = cal.get(Calendar.YEAR)
+        val curMonthIdx = cal.get(Calendar.MONTH)
+        val curDay = cal.get(Calendar.DAY_OF_MONTH)
+        val nextMonthIdx = (curMonthIdx + 1) % 12
+        val nextMonthYear = if (nextMonthIdx == 0) curYear + 1 else curYear
+        val targetMonthText = if (curDay >= 20) {
+            "${ID_FULL_MONTH_NAMES[nextMonthIdx]} $nextMonthYear"
+        } else {
+            "${ID_FULL_MONTH_NAMES[curMonthIdx]} $curYear"
+        }
+
+        // Clean plain-phrase Bing News RSS queries + structured Google News RSS queries
+        val bq1 = "tayang ulang bioskop Indonesia $curYear"
+        val bq2 = "reissue kembali tayang bioskop Indonesia"
+        val bq3 = "film bioskop $targetMonthText jadwal tayang Indonesia"
+        val gq1 =
             "(\"tayang kembali\" OR \"kembali tayang\" OR \"tayang ulang\" OR \"re-release\" OR \"reissue\" OR \"remastered\") (XXI OR CGV OR Cinepolis OR \"bioskop Indonesia\" OR IMAX)"
-        val q2 = "(\"kembali ke bioskop\" OR \"tayang lagi di bioskop\") (XXI OR CGV OR Cinepolis OR IMAX)"
-        val q3 = "(\"jadwal film bioskop\" OR \"film tayang di bioskop\") (\"reissue\" OR \"tayang ulang\" OR \"tayang kembali\")"
+        val gq2 = "(\"kembali ke bioskop\" OR \"kembali hadir di bioskop\" OR \"tayang lagi di bioskop\") (Indonesia OR bioskop OR XXI OR CGV OR Cinepolis OR IMAX)"
+        val gq3 = "(\"jadwal film bioskop\" OR \"film tayang di bioskop\") (\"reissue\" OR \"tayang ulang\" OR \"tayang kembali\")"
         val urls = listOf(
-            "https://news.google.com/rss/search?q=${Uri.encode("$q1 when:45d")}&hl=id&gl=ID&ceid=ID:id",
-            "https://news.google.com/rss/search?q=${Uri.encode("$q2 when:45d")}&hl=id&gl=ID&ceid=ID:id",
-            "https://news.google.com/rss/search?q=${Uri.encode("$q3 when:45d")}&hl=id&gl=ID&ceid=ID:id",
-            "https://www.bing.com/news/search?q=${Uri.encode(q1)}&cc=ID&setlang=id&format=rss",
-            "https://www.bing.com/news/search?q=${Uri.encode(q2)}&cc=ID&setlang=id&format=rss",
-            "https://www.bing.com/news/search?q=${Uri.encode(q3)}&cc=ID&setlang=id&format=rss"
+            "https://www.bing.com/news/search?q=${Uri.encode(bq1)}&cc=ID&setlang=id&format=rss",
+            "https://www.bing.com/news/search?q=${Uri.encode(bq2)}&cc=ID&setlang=id&format=rss",
+            "https://www.bing.com/news/search?q=${Uri.encode(bq3)}&cc=ID&setlang=id&format=rss",
+            "https://news.google.com/rss/search?q=${Uri.encode("$gq1 when:45d")}&hl=id&gl=ID&ceid=ID:id",
+            "https://news.google.com/rss/search?q=${Uri.encode("$gq2 when:45d")}&hl=id&gl=ID&ceid=ID:id",
+            "https://news.google.com/rss/search?q=${Uri.encode("$gq3 when:45d")}&hl=id&gl=ID&ceid=ID:id"
         )
-        val xmlBodies = fetchUrlsConcurrently(urls, UA_RADAR, maxBytes = 262144)
+        val xmlBodies = fetchUrlsConcurrently(urls, UA_MOBILE, maxBytes = 262144)
 
         val seenLinks = HashSet<String>()
         val items = JSONArray()
         for (xml in xmlBodies) {
             if (xml.isEmpty()) continue
-            parseXmlRssItems(xml, maxPerFeed = 10, maxTotal = 36, items = items, seenLinks = seenLinks, requireIdVenue = true)
+            parseXmlRssItems(xml, maxPerFeed = 10, maxTotal = 40, items = items, seenLinks = seenLinks, requireIdVenue = true)
         }
         return items
     }
@@ -422,7 +535,11 @@ object CinemaScraperHelper {
                                 val passVenueFilter = if (requireIdVenue) {
                                     val hasIdVenue = EXPLICIT_ID_VENUE_RE.containsMatchIn(combinedText)
                                     val isForeignOnly = FOREIGN_WIRE_RE.containsMatchIn(combinedText) && !hasIdVenue
-                                    hasIdVenue && !isForeignOnly && !NOISE_RE.containsMatchIn(combinedText) && !NOISE_RE.containsMatchIn(curLink)
+                                    val isDecodableCandidate =
+                                        (curLink.contains("bing.com/news/apiclick.aspx") || curLink.contains("news.google.com/")) &&
+                                            DECODABLE_LISTICLE_OR_REISSUE_RE.containsMatchIn(combinedText) &&
+                                            CINEMA_CONTEXT_HINT_RE.containsMatchIn(combinedText)
+                                    (hasIdVenue || isDecodableCandidate) && !isForeignOnly && !NOISE_RE.containsMatchIn(combinedText) && !NOISE_RE.containsMatchIn(curLink)
                                 } else {
                                     !STREAMING_ONLY_RE.containsMatchIn(resolvedSource) && !STREAMING_ONLY_RE.containsMatchIn(curLink)
                                 }
@@ -457,13 +574,27 @@ object CinemaScraperHelper {
         val cleanUrl = articleUrl.trim()
         if (!cleanUrl.startsWith("http://") && !cleanUrl.startsWith("https://")) return empty
 
-        val targetUrl = resolveGoogleNewsUrl(cleanUrl)
+        val directBingTarget = if (cleanUrl.contains("bing.com/news/apiclick.aspx")) {
+            try {
+                Uri.parse(cleanUrl).getQueryParameter("url")?.trim() ?: ""
+            } catch (_: Exception) {
+                ""
+            }
+        } else ""
+        val targetUrl = if (directBingTarget.startsWith("http://") || directBingTarget.startsWith("https://")) {
+            directBingTarget
+        } else {
+            resolveGoogleNewsUrl(cleanUrl)
+        }
         if (targetUrl.isEmpty() || targetUrl.contains("news.google.com/")) return empty
-        val html = fetchTextBounded(targetUrl, UA_MOBILE, HTTP_TIMEOUT_MS, maxBytes = 131072)
+        val html = fetchTextBounded(targetUrl, UA_MOBILE, HTTP_TIMEOUT_MS, maxBytes = 393216)
         if (html.isEmpty()) return empty
         val structured = html
             .replace(Regex("<script[\\s\\S]*?</script>", RegexOption.IGNORE_CASE), " ")
             .replace(Regex("<style[\\s\\S]*?</style>", RegexOption.IGNORE_CASE), " ")
+            .replace(Regex("<svg[\\s\\S]*?</svg>", RegexOption.IGNORE_CASE), " ")
+            .replace(Regex("<noscript[\\s\\S]*?</noscript>", RegexOption.IGNORE_CASE), " ")
+            .replace(Regex("<!--[\\s\\S]*?-->"), " ")
             .replace(Regex("</(?:t[dh]|td|th)>", RegexOption.IGNORE_CASE), " · ")
             .replace(Regex("</(?:tr|li|h[1-6]|p|div|section|article|blockquote)>", RegexOption.IGNORE_CASE), "\n")
             .replace(Regex("<br\\s*/?>", RegexOption.IGNORE_CASE), "\n")
@@ -476,7 +607,7 @@ object CinemaScraperHelper {
             .replace(Regex("\\n[ \\t]+"), "\n")
             .replace(Regex("\\n{2,}"), "\n")
             .trim()
-            .take(14000)
+            .take(28000)
 
         return JSONObject().apply {
             put("url", targetUrl)
@@ -901,31 +1032,58 @@ object CinemaScraperHelper {
 
         // 5. LSF RI (lsf.go.id/film) with persistent cache & max-3 concurrent detail fetches
         val lsfPages = listOf(pageMap["https://lsf.go.id/film"] ?: "", pageMap["https://lsf.go.id/film?page=2"] ?: "")
-        val lsfCardRe = Regex("href=[\"'](https?://lsf\\.go\\.id/film/[^\"'/]+/(\\d+))[\"'][^>]*>([\\s\\S]*?)</a>", RegexOption.IGNORE_CASE)
+        val lsfCardRe = Regex("href=[\"'](https?://lsf\\.go\\.id/film/([^\"'/]+)/(\\d+))[\"'][^>]*>([\\s\\S]*?)</a>", RegexOption.IGNORE_CASE)
+        val lsfPosterAltRe1 = Regex("<img[^>]*class=[\"'][^\"']*poster[^\"']*[\"'][^>]*alt=[\"']([^\"']{2,90})[\"']", RegexOption.IGNORE_CASE)
+        val lsfPosterAltRe2 = Regex("<img[^>]*alt=[\"']([^\"']{2,90})[\"'][^>]*class=[\"'][^\"']*poster[^\"']*[\"']", RegexOption.IGNORE_CASE)
+        val lsfAnyAltRe = Regex("<img[^>]*alt=[\"']([^\"']{2,90})[\"']", RegexOption.IGNORE_CASE)
         val seenLsfIds = HashSet<String>()
         val lsfCacheObj = try {
             JSONObject(prefs.getString("ct_lsf_detail_cache_json", "{}") ?: "{}")
         } catch (_: Exception) {
             JSONObject()
         }
-        data class LsfCard(val id: String, val title: String, val url: String)
+        data class LsfCard(val id: String, val title: String, val url: String, val ageRating: String)
         val lsfCards = ArrayList<LsfCard>()
         for (pageHtml in lsfPages) {
             if (pageHtml.isEmpty()) continue
             for (cm in lsfCardRe.findAll(pageHtml)) {
                 if (lsfCards.size >= 24) break
                 val url = cm.groupValues[1]
-                val lsfId = cm.groupValues[2]
+                val slug = cm.groupValues[2]
+                val lsfId = cm.groupValues[3]
+                val innerHtml = cm.groupValues[4]
                 if (seenLsfIds.contains(lsfId)) continue
-                val txt = decodeEntities(cm.groupValues[3])
-                if (txt.length < 2) continue
-                val cleanLsfTitle = txt
+
+                val blockStart = pageHtml.lastIndexOf("movie-item", cm.range.first).let { idx -> if (idx >= 0) idx else cm.range.first }
+                val cardHtml = (if (cm.range.first - blockStart in 0..900) pageHtml.substring(blockStart, cm.range.first) else "") + innerHtml
+
+                val posterAltMatch = lsfPosterAltRe1.find(cardHtml) ?: lsfPosterAltRe2.find(cardHtml) ?: lsfAnyAltRe.find(cardHtml)
+                val anchorText = decodeEntities(innerHtml)
+                val rawLsfTitle = when {
+                    posterAltMatch != null -> decodeEntities(posterAltMatch.groupValues[1])
+                    anchorText.length >= 2 -> anchorText
+                    else -> slug.replace('-', ' ')
+                }
+                val cleanLsfTitle = rawLsfTitle
                     .replace(Regex("\\b(SU|R\\s*13\\+|D\\s*17\\+|D\\s*21\\+|Bioskop|TV|Streaming|IKLAN)\\b", RegexOption.IGNORE_CASE), " ")
                     .replace(Regex("\\s+"), " ")
                     .trim()
                 if (cleanLsfTitle.length < 2) continue
+
+                val logoAgeMatch = Regex("logo_(SU|R13|D17|D21)\\.", RegexOption.IGNORE_CASE).find(cardHtml)
+                val textAgeMatch = Regex("\\b(SU|R\\s*13\\+|D\\s*17\\+|D\\s*21\\+)\\b", RegexOption.IGNORE_CASE).find("$cardHtml $anchorText")
+                val rawAge = (logoAgeMatch?.groupValues?.get(1) ?: textAgeMatch?.groupValues?.get(1) ?: "")
+                    .uppercase(Locale.US).replace(Regex("\\s+"), "")
+                val mappedAge = when {
+                    rawAge == "SU" -> "SU"
+                    rawAge.contains("13") -> "R 13+"
+                    rawAge.contains("17") -> "D 17+"
+                    rawAge.contains("21") -> "D 21+"
+                    else -> ""
+                }
+
                 seenLsfIds.add(lsfId)
-                lsfCards.add(LsfCard(lsfId, cleanLsfTitle, url))
+                lsfCards.add(LsfCard(lsfId, cleanLsfTitle.take(90), url, mappedAge))
             }
         }
 
@@ -957,7 +1115,7 @@ object CinemaScraperHelper {
                     val dIso = if (dtM != null) {
                         validIso("${dtM.groupValues[3]}-${dtM.groupValues[2].padStart(2, '0')}-${dtM.groupValues[1].padStart(2, '0')}")
                     } else ""
-                    val ageR = (clsM?.groupValues?.get(1) ?: "").replace(Regex("\\s+"), " ").trim()
+                    val ageR = (clsM?.groupValues?.get(1) ?: card.ageRating).replace(Regex("\\s+"), " ").trim()
                     if (prodYr > 0) newDet.put("tahunProduksi", prodYr)
                     if (dIso.isNotEmpty()) newDet.put("releaseDateId", dIso)
                     if (ageR.isNotEmpty()) newDet.put("ageRating", ageR)
@@ -974,7 +1132,7 @@ object CinemaScraperHelper {
             val dIso = validIso(det.optString("releaseDateId", ""))
             val prodYr = det.optInt("tahunProduksi", 0)
             val lsfStatus = det.optString("lsfStatus", "")
-            val ageRating = det.optString("ageRating", "")
+            val ageRating = det.optString("ageRating", "").ifEmpty { card.ageRating }
             if (dIso.isNotEmpty() || lsfStatus.isNotEmpty()) {
                 val isRe = prodYr in 1901 until (currentYear - 1)
                 upsertFeedEntry(
