@@ -5,6 +5,9 @@ import { GoogleGenAI } from '@google/genai';
 const ROOT_DIR = process.cwd();
 const OUT_PATH = path.join(ROOT_DIR, 'public', 'radar-id.json');
 
+const ZERO_LEAK_ABSENCE_RE = /\b(rumor|rumours?|rumors?|kabarnya|diduga|prediksi|bocoran|diperkirakan|konon|spekulasi|hoaks?|hoax|fan[- ]?made|estimasi|belum\s+(?:ada\s+(?:informasi|kabar|jadwal|kepastian)|pasti|diumumkan|dapat\s+dipastikan|dipastikan|tayang\s+di\s+indonesia)|tidak\s+(?:akan\s+)?tayang\s+di\s+indonesia|batal\s+tayang)\b/i;
+const PRESALE_ACTIVE_RE = /\b(?:pre-?sale|presale|penjualan\s+tiket)\b[\s\S]{0,40}\b(?:sudah\s+|telah\s+|resmi\s+)?(?:dibuka|tersedia|dijual|bisa\s+(?:dibeli|dipesan)|dimulai|aktif)|(?:open\s+pre-?sale|buka\s+penjualan\s+tiket)/i;
+
 function normalizeKey(str) {
   return String(str || '').toLowerCase().replace(/[^a-z0-9]/g, '');
 }
@@ -60,6 +63,13 @@ function parseJsonPayload(rawText) {
   }
 }
 
+function getSourceTierScore(url) {
+  const u = String(url || '').toLowerCase();
+  if (/(21cineplex\.com|cgv\.id|cinepolis\.co\.id|tix\.id|lsf\.go\.id|jadwalnonton\.com)/.test(u)) return 3;
+  if (/(kompas\.com|detik\.com|kumparan\.com|tirto\.id|idntimes\.com|tempo\.co|kapanlagi\.com|antaranews\.com|merdeka\.com|liputan6\.com|cnnindonesia\.com|cnbcindonesia\.com)/.test(u)) return 2;
+  return 1;
+}
+
 function extractGroundSources(response) {
   const chunks = response?.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
   const seen = new Set();
@@ -76,10 +86,10 @@ function extractGroundSources(response) {
         label = 'Sumber Web';
       }
     }
-    out.push({ title: label.slice(0, 64), url: uri });
-    if (out.length >= 4) break;
+    out.push({ title: label.slice(0, 64), url: uri, tier: getSourceTierScore(uri) });
   }
-  return out;
+  out.sort((a, b) => b.tier - a.tier);
+  return out.slice(0, 4).map(({ title, url }) => ({ title, url }));
 }
 
 async function mapConcurrent(items, limit, fn) {
@@ -204,10 +214,12 @@ async function fetchGoogleNewsIdRss(query) {
       const source = decodeXmlEntities(sourceMatch ? sourceMatch[1] : '');
       const pubDate = pubMatch ? pubMatch[1].trim() : '';
       if (!title || !/^https?:\/\//i.test(link)) continue;
-      items.push({ title, link, source, pubDate });
-      if (items.length >= 4) break;
+      if (ZERO_LEAK_ABSENCE_RE.test(title)) continue;
+      items.push({ title, link, source, pubDate, tier: getSourceTierScore(`${source} ${link}`) });
+      if (items.length >= 6) break;
     }
-    return items;
+    items.sort((a, b) => b.tier - a.tier);
+    return items.slice(0, 4);
   } catch {
     return [];
   }
@@ -229,14 +241,14 @@ async function runFreeRssAndTmdbScan(tmdbCandidates, tmdbKey, nowIso) {
   const results = await mapConcurrent(targets, 4, async (candidate) => {
     const [idMeta, newsItems] = await Promise.all([
       fetchTmdbIdReleaseMeta(candidate.tmdbId, tmdbKey),
-      fetchGoogleNewsIdRss(`"${candidate.title}" (XXI OR CGV OR Cinepolis OR bioskop OR LSF OR "pre-sale" OR IMAX) when:90d`),
+      fetchGoogleNewsIdRss(`"${candidate.title}" (XXI OR CGV OR Cinepolis OR TIX OR Jadwalnonton OR LSF OR "pre-sale" OR IMAX) when:90d`),
     ]);
 
     const relevantNews = newsItems.filter((item) => titleMatchesHeadline(candidate.title, item.title));
     const combinedText = relevantNews.map((n) => n.title).join(' | ');
     const chains = detectChainsFromText(combinedText);
     const imax = /\bimax\b/i.test(combinedText);
-    const presaleActive = /\b(pre-?sale|presale|tiket sudah tersedia|buka penjualan)\b/i.test(combinedText);
+    const presaleActive = PRESALE_ACTIVE_RE.test(combinedText);
     const lsfMention = /\b(lsf|lulus sensor)\b/i.test(combinedText);
 
     if (!idMeta?.releaseDateId && relevantNews.length === 0) {
@@ -314,7 +326,7 @@ async function runGeminiSearchScan(geminiKey, tmdbKey, tmdbCandidates, nowIso) {
   });
 
   const hintBlock = tmdbCandidates.length
-    ? `Periksa jadwal tayang Indonesia untuk daftar film TMDB berikut bila sudah diumumkan (sertakan tmdbId yang tercantum):\n${tmdbCandidates
+    ? `Periksa jadwal tayang Indonesia untuk daftar film TMDB berikut HANYA jika sudah ada konfirmasi rilis resmi di Indonesia (sertakan tmdbId yang tercantum):\n${tmdbCandidates
         .slice(0, 24)
         .map((c) => `- ${c.title} (tmdbId: ${c.tmdbId}, global: ${c.releaseDate})`)
         .join('\n')}`
@@ -322,14 +334,18 @@ async function runGeminiSearchScan(geminiKey, tmdbKey, tmdbCandidates, nowIso) {
 
   const todayIso = nowIso.slice(0, 10);
   const prompt = [
-    'Anda adalah aggregator jadwal bioskop Indonesia (Cinema XXI, CGV Indonesia, Cinépolis Indonesia, IMAX, TIX ID, dan LSF RI).',
+    'Anda adalah aggregator jadwal bioskop komersial Indonesia.',
     `Tanggal hari ini: ${todayIso}.`,
-    'Lakukan pencarian Google Search untuk mengumpulkan daftar lengkap jadwal rilis bioskop INDONESIA mencakup:',
-    '1. Film yang sedang tayang, pre-sale, lulus sensor LSF (lsf.go.id), atau akan tayang bulan ini hingga 3 bulan ke depan di bioskop Indonesia.',
-    '2. Film TAYANG ULANG / REISSUE / RE-RELEASE / IMAX Special Screening yang diumumkan kembali tayang di bioskop Indonesia (set isReRelease: true).',
-    '3. Film blockbuster / tentpole internasional maupun lokal yang tanggal rilis bioskop Indonesianya sudah diumumkan media atau distributor resmi (ingat di Indonesia film Hollywood sering rilis hari Rabu, 2 hari lebih awal dari tanggal Jumat AS).',
+    'Lakukan pencarian Google Search secara menyeluruh dengan TRUST HIERARCHY BERIKUT (urutkan dari yang paling resmi):',
+    '1. PRIORITAS UTAMA (TIER 1): Sumber resmi jaringan bioskop & lembaga sensor Indonesia (Cinema XXI / 21cineplex.com, CGV Indonesia / cgv.id, Cinépolis Indonesia / cinepolis.co.id, TIX ID / tix.id, LSF RI / lsf.go.id, dan Jadwalnonton / jadwalnonton.com).',
+    '2. PRIORITAS KEDUA (TIER 2): Media nasional Indonesia terpercaya (Kompas, Detik, Kumparan, Tirto, IDN Times, Tempo, KapanLagi, Antara, Merdeka, Liputan6) yang mengutip pengumuman resmi distributor atau jaringan bioskop Indonesia.',
+    '3. ZERO-LEAK ABSENCE GUARD (PENYARINGAN MUTLAK): Diskualifikasi dan JANGAN masukkan film apa pun jika sumbernya memuat ketidakpastian seperti "belum ada informasi di Indonesia", "belum dipastikan", "belum diumumkan", rumor, prediksi, atau baru memiliki tanggal rilis luar negeri/AS tanpa konfirmasi bioskop Indonesia.',
+    'CAKUPAN PENCARIAN:',
+    '- Film yang sedang tayang, pre-sale aktif, lulus sensor LSF, atau akan tayang bulan ini hingga 3 bulan ke depan di bioskop Indonesia.',
+    '- Film TAYANG ULANG / REISSUE / RE-RELEASE / IMAX Special Screening yang resmi diumumkan kembali tayang di bioskop Indonesia (set isReRelease: true).',
+    '- Film blockbuster / tentpole internasional maupun lokal yang tanggal rilis bioskop Indonesianya sudah diumumkan resmi (ingat di Indonesia film Hollywood sering rilis hari Rabu, 2 hari lebih awal dari tanggal Jumat AS).',
+    '- Set "presaleActive": true HANYA jika tiket pre-sale benar-benar sudah resmi dibuka/dijual oleh XXI, CGV, Cinépolis, atau TIX ID.',
     hintBlock,
-    'ATURAN KETAT: Hanya masukkan film dan tanggal rilis Indonesia yang benar-benar terverifikasi oleh hasil Google Search. Jangan mengarang tanggal.',
     'Balas HANYA 1 JSON valid tanpa teks pembuka/penutup:',
     '{',
     '  "entries": [',
@@ -343,7 +359,7 @@ async function runGeminiSearchScan(geminiKey, tmdbKey, tmdbCandidates, nowIso) {
     '      "presaleActive": false,',
     '      "isReRelease": false,',
     '      "lsfStatus": "opsional",',
-    '      "summary": "1 kalimat ringkas fakta jadwal ID."',
+    '      "summary": "1 kalimat ringkas fakta jadwal ID beserta sumber resminya."',
     '    }',
     '  ]',
     '}',
@@ -370,12 +386,15 @@ async function runGeminiSearchScan(geminiKey, tmdbKey, tmdbCandidates, nowIso) {
   const resolvedList = await mapConcurrent(rawEntries, 4, async (raw) => {
     const title = String(raw?.title || '').trim().toUpperCase().slice(0, 100);
     if (!title) return null;
+    const summaryText = String(raw?.summary || '').trim();
+    if (ZERO_LEAK_ABSENCE_RE.test(summaryText)) return null;
+
     const isReRelease = Boolean(raw?.isReRelease);
     let tmdbNum = Number(raw?.tmdbId || 0) || titleToTmdb.get(normalizeKey(title)) || 0;
     if (!tmdbNum && tmdbKey) {
       tmdbNum = await resolveTmdbIdByTitle(title, tmdbKey, isReRelease);
     }
-    return { raw, title, tmdbNum, isReRelease };
+    return { raw, title, tmdbNum, isReRelease, summaryText };
   });
 
   const seenKeys = new Set();
@@ -383,25 +402,32 @@ async function runGeminiSearchScan(geminiKey, tmdbKey, tmdbCandidates, nowIso) {
 
   for (const item of resolvedList) {
     if (!item) continue;
-    const { raw, title, tmdbNum, isReRelease } = item;
+    const { raw, title, tmdbNum, isReRelease, summaryText } = item;
     const key = tmdbNum > 0 ? `tmdb_${tmdbNum}` : `title_${normalizeKey(title)}`;
     if (seenKeys.has(key)) continue;
     seenKeys.add(key);
 
     const relId = sanitizeIso(raw?.releaseDateId);
+    const verifiedPresale = Boolean(raw?.presaleActive) && (raw?.status === 'presale' || PRESALE_ACTIVE_RE.test(summaryText));
+    const status = verifiedPresale
+      ? 'presale'
+      : ['confirmed', 'lsf_passed'].includes(raw?.status)
+      ? raw.status
+      : 'confirmed';
+
     entries.push({
       key,
       tmdbId: tmdbNum > 0 ? tmdbNum : undefined,
       title,
       releaseDateId: relId || undefined,
       dateSource: relId ? 'gemini' : undefined,
-      status: ['confirmed', 'presale', 'lsf_passed'].includes(raw?.status) ? raw.status : 'confirmed',
+      status,
       chains: normalizeChains(raw?.chains),
       imax: Boolean(raw?.imax),
-      presaleActive: Boolean(raw?.presaleActive),
+      presaleActive: verifiedPresale,
       isReRelease,
       lsfStatus: String(raw?.lsfStatus || '').trim().slice(0, 80),
-      summary: String(raw?.summary || '').trim().slice(0, 260) || 'Terkonfirmasi masuk radar rilis Indonesia.',
+      summary: summaryText.slice(0, 260) || 'Terkonfirmasi masuk radar rilis Indonesia.',
       sources: sharedSources,
       checkedAt: nowIso,
     });
