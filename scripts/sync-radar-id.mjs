@@ -5,51 +5,26 @@ import { GoogleGenAI } from '@google/genai';
 const ROOT_DIR = process.cwd();
 const OUT_PATH = path.join(ROOT_DIR, 'public', 'radar-id.json');
 
-const ZERO_LEAK_ABSENCE_RE = /\b(rumor|rumours?|rumors?|kabarnya|diduga|prediksi|bocoran|diperkirakan|konon|spekulasi|hoaks?|hoax|fan[- ]?made|estimasi|belum\s+(?:ada\s+(?:informasi|kabar|jadwal|kepastian)|pasti|diumumkan|dapat\s+dipastikan|dipastikan|tayang\s+di\s+indonesia)|tidak\s+(?:akan\s+)?tayang\s+di\s+indonesia|batal\s+tayang)\b/i;
-const PRESALE_ACTIVE_RE = /\b(?:pre-?sale|presale|penjualan\s+tiket)\b[\s\S]{0,40}\b(?:sudah\s+|telah\s+|resmi\s+)?(?:dibuka|tersedia|dijual|bisa\s+(?:dibeli|dipesan)|dimulai|aktif)|(?:open\s+pre-?sale|buka\s+penjualan\s+tiket)/i;
-
-const MONTH_MAP = {
-  januari: '01', january: '01', jan: '01',
-  februari: '02', february: '02', feb: '02',
-  maret: '03', march: '03', mar: '03',
-  april: '04', apr: '04',
-  mei: '05', may: '05',
-  juni: '06', june: '06', jun: '06',
-  juli: '07', july: '07', jul: '07',
-  agustus: '08', august: '08', agu: '08', agt: '08', aug: '08',
-  september: '09', sep: '09', sept: '09',
-  oktober: '10', october: '10', okt: '10', oct: '10',
-  november: '11', nov: '11',
-  desember: '12', december: '12', des: '12', dec: '12',
-};
+const HARD_RUMOR_RE = /\b(rumor|rumours?|rumors?|kabarnya|diduga|prediksi|bocoran|diperkirakan|konon|spekulasi|hoaks?|hoax|fan[- ]?made|estimasi|tidak\s+(?:akan\s+)?tayang\s+di\s+indonesia|batal\s+tayang)\b/i;
+const UNCONFIRMED_ID_RE = /\b(belum\s+(?:ada\s+(?:informasi|kabar|jadwal|kepastian)|pasti|diumumkan|dapat\s+dipastikan|dipastikan|tayang\s+di\s+indonesia))\b/i;
+const CONFIRMED_SIGNAL_RE = /\b(tayang\s+(?:di\s+bioskop|mulai|tanggal)|jadwal\s+tayang|tiket\s+(?:pre-?sale|presale|sudah|tersedia)|lulus\s+sensor|lsf|xxi|cgv|cin[eé]polis|tix\s*id|reissue|tayang\s+ulang)\b/i;
+const PRESALE_ACTIVE_RE = /\b(?:pre-?sale|presale|penjualan\s+tiket)\b[\s\S]{0,45}\b(?:sudah\s+|telah\s+|resmi\s+)?(?:dibuka|tersedia|dijual|bisa\s+(?:dibeli|dipesan)|dimulai|aktif)|(?:open\s+pre-?sale|buka\s+penjualan\s+tiket)/i;
 
 function normalizeKey(str) {
   return String(str || '').toLowerCase().replace(/[^a-z0-9]/g, '');
 }
 
-function sanitizeIso(raw) {
-  const str = String(raw || '').trim();
-  const isoMatch = /^(\d{4}-\d{2}-\d{2})/.exec(str);
-  if (isoMatch) return isoMatch[1];
-
-  const textMatch = /\b(\d{1,2})\s+([a-zA-Z]+)\s+(20\d{2})\b/.exec(str);
-  if (textMatch) {
-    const day = textMatch[1].padStart(2, '0');
-    const month = MONTH_MAP[textMatch[2].toLowerCase()];
-    if (month && Number(day) >= 1 && Number(day) <= 31) {
-      return `${textMatch[3]}-${month}-${day}`;
-    }
-  }
-  return '';
+function stripFormatSuffix(title) {
+  return String(title || '')
+    .replace(/\s*[\[(]\s*(?:re-?release|reissue|tayang\s+(?:ulang|kembali)|remaster(?:ed)?|imax(?:\s*(?:2d|3d))?|2d|3d|4dx|screenx|dolby\s*atmos)\s*[\])]\s*/gi, ' ')
+    .trim();
 }
 
-function sanitizeLsfStatus(raw) {
-  const clean = String(raw || '').trim().slice(0, 80);
-  if (!clean) return '';
-  if (/^(passed|confirmed|presale|lsf_passed|yes|no|true|false|none|null|n\/a|opsional)$/i.test(clean)) {
-    return '';
-  }
-  return clean;
+function sanitizeIso(raw) {
+  const clean = String(raw || '').trim().slice(0, 10);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(clean)) return '';
+  const dt = new Date(`${clean}T00:00:00Z`);
+  return Number.isNaN(dt.getTime()) ? '' : clean;
 }
 
 function normalizeChains(raw) {
@@ -82,6 +57,27 @@ function decodeXmlEntities(str) {
     .replace(/&quot;/g, '"')
     .replace(/&#39;|&apos;/g, "'")
     .trim();
+}
+
+function stripHtmlToText(html) {
+  return decodeXmlEntities(
+    String(html || '')
+      .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+      .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/\s+/g, ' ')
+  );
+}
+
+function isDisqualifiedByAbsenceGuard(text, hasConfirmedIdDate = false) {
+  const s = String(text || '').trim();
+  if (!s) return false;
+  if (HARD_RUMOR_RE.test(s)) return true;
+  if (UNCONFIRMED_ID_RE.test(s)) {
+    if (hasConfirmedIdDate && CONFIRMED_SIGNAL_RE.test(s)) return false;
+    return true;
+  }
+  return false;
 }
 
 function parseJsonPayload(rawText) {
@@ -176,15 +172,16 @@ async function fetchTmdbSeedTitles(tmdbKey) {
 
 async function resolveTmdbIdByTitle(title, tmdbKey, isReRelease = false) {
   if (!tmdbKey || !title) return 0;
+  const cleaned = stripFormatSuffix(title) || title;
   try {
-    const url = `https://api.themoviedb.org/3/search/movie?api_key=${encodeURIComponent(tmdbKey)}&query=${encodeURIComponent(title)}&include_adult=false&page=1`;
+    const url = `https://api.themoviedb.org/3/search/movie?api_key=${encodeURIComponent(tmdbKey)}&query=${encodeURIComponent(cleaned)}&include_adult=false&page=1`;
     const res = await fetch(url, { signal: AbortSignal.timeout(6000) });
     if (!res.ok) return 0;
     const data = await res.json();
     const results = Array.isArray(data.results) ? data.results : [];
     if (!results.length) return 0;
 
-    const targetNorm = normalizeKey(title);
+    const targetNorm = normalizeKey(cleaned);
     const exactMatches = results.filter(
       (r) => normalizeKey(r.title) === targetNorm || normalizeKey(r.original_title) === targetNorm
     );
@@ -226,6 +223,20 @@ async function fetchTmdbIdReleaseMeta(tmdbId, tmdbKey) {
   }
 }
 
+async function fetchJadwalNontonComingSoonSnapshot() {
+  try {
+    const res = await fetch('https://jadwalnonton.com/comingsoon/', {
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; CinemaTrackerRadar/4.4)' },
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!res.ok) return '';
+    const html = await res.text();
+    return stripHtmlToText(html).slice(0, 12000);
+  } catch {
+    return '';
+  }
+}
+
 async function fetchGoogleNewsIdRss(query) {
   const url = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=id&gl=ID&ceid=ID:id`;
   try {
@@ -249,7 +260,7 @@ async function fetchGoogleNewsIdRss(query) {
       const source = decodeXmlEntities(sourceMatch ? sourceMatch[1] : '');
       const pubDate = pubMatch ? pubMatch[1].trim() : '';
       if (!title || !/^https?:\/\//i.test(link)) continue;
-      if (ZERO_LEAK_ABSENCE_RE.test(title)) continue;
+      if (isDisqualifiedByAbsenceGuard(title, false)) continue;
       items.push({ title, link, source, pubDate, tier: getSourceTierScore(`${source} ${link}`) });
       if (items.length >= 6) break;
     }
@@ -261,12 +272,13 @@ async function fetchGoogleNewsIdRss(query) {
 }
 
 function titleMatchesHeadline(movieTitle, headline) {
+  const baseTitle = stripFormatSuffix(movieTitle) || movieTitle;
   const cleanHead = normalizeKey(headline);
-  const tokens = String(movieTitle || '')
+  const tokens = String(baseTitle)
     .toLowerCase()
     .split(/[^a-z0-9]+/)
-    .filter((w) => w.length >= 3 && !['the', 'and', 'for', 'with', 'part', 'movie'].includes(w));
-  if (tokens.length === 0) return cleanHead.includes(normalizeKey(movieTitle));
+    .filter((w) => w.length >= 3 && !['the', 'and', 'for', 'with', 'part', 'movie', 'reissue'].includes(w));
+  if (tokens.length === 0) return cleanHead.includes(normalizeKey(baseTitle));
   const hits = tokens.filter((t) => cleanHead.includes(t));
   return tokens.length === 1 ? hits.length === 1 : hits.length >= Math.min(2, tokens.length);
 }
@@ -276,7 +288,7 @@ async function runFreeRssAndTmdbScan(tmdbCandidates, tmdbKey, nowIso) {
   const results = await mapConcurrent(targets, 4, async (candidate) => {
     const [idMeta, newsItems] = await Promise.all([
       fetchTmdbIdReleaseMeta(candidate.tmdbId, tmdbKey),
-      fetchGoogleNewsIdRss(`"${candidate.title}" (XXI OR CGV OR Cinepolis OR TIX OR Jadwalnonton OR LSF OR "pre-sale" OR IMAX) when:90d`),
+      fetchGoogleNewsIdRss(`"${candidate.title}" (site:tix.id OR site:jadwalnonton.com OR XXI OR CGV OR Cinepolis OR bioskop OR LSF OR reissue OR "tayang ulang") when:90d`),
     ]);
 
     const relevantNews = newsItems.filter((item) => titleMatchesHeadline(candidate.title, item.title));
@@ -331,9 +343,11 @@ async function runFreeRssAndTmdbScan(tmdbCandidates, tmdbKey, nowIso) {
 
 async function generateWithSearchFallback(ai, prompt) {
   const models = [
+    'gemini-3.5-flash-lite',
+    'gemini-3.8-flash',
+    'gemini-flash-latest',
     'gemini-2.5-flash-lite',
     'gemini-2.5-flash',
-    'gemini-flash-latest',
   ];
   let lastErr = null;
   for (const model of models) {
@@ -360,6 +374,8 @@ async function runGeminiSearchScan(geminiKey, tmdbKey, tmdbCandidates, nowIso) {
     httpOptions: { apiVersion: 'v1beta' },
   });
 
+  const jadwalSnapshot = await fetchJadwalNontonComingSoonSnapshot();
+
   const hintBlock = tmdbCandidates.length
     ? `Periksa jadwal tayang Indonesia untuk daftar film TMDB berikut HANYA jika sudah ada konfirmasi rilis resmi di Indonesia (sertakan tmdbId yang tercantum):\n${tmdbCandidates
         .slice(0, 24)
@@ -367,23 +383,25 @@ async function runGeminiSearchScan(geminiKey, tmdbKey, tmdbCandidates, nowIso) {
         .join('\n')}`
     : '';
 
+  const snapshotBlock = jadwalSnapshot
+    ? `Cuplikan teks katalog jadwal bioskop Indonesia (gunakan sebagai referensi tambahan jika cocok):\n${jadwalSnapshot.slice(0, 3500)}`
+    : '';
+
   const todayIso = nowIso.slice(0, 10);
   const prompt = [
     'Anda adalah aggregator jadwal bioskop komersial Indonesia.',
     `Tanggal hari ini: ${todayIso}.`,
     'Lakukan pencarian Google Search secara menyeluruh dengan TRUST HIERARCHY BERIKUT (urutkan dari yang paling resmi):',
-    '1. PRIORITAS UTAMA (TIER 1): Sumber resmi jaringan bioskop & lembaga sensor Indonesia (Cinema XXI / 21cineplex.com, CGV Indonesia / cgv.id, Cinépolis Indonesia / cinepolis.co.id, TIX ID / tix.id, LSF RI / lsf.go.id, dan Jadwalnonton / jadwalnonton.com).',
+    '1. PRIORITAS UTAMA (TIER 1): Sumber resmi jaringan bioskop, tiket, & lembaga sensor Indonesia (Cinema XXI / 21cineplex.com, CGV Indonesia / cgv.id, Cinépolis Indonesia / cinepolis.co.id, TIX ID / tix.id, LSF RI / lsf.go.id, dan Jadwalnonton / jadwalnonton.com). Cari juga istilah seperti site:tix.id, "Akan Datang", "Coming Soon", REISSUE, dan "tayang ulang".',
     '2. PRIORITAS KEDUA (TIER 2): Media nasional Indonesia terpercaya (Kompas, Detik, Kumparan, Tirto, IDN Times, Tempo, KapanLagi, Antara, Merdeka, Liputan6) yang mengutip pengumuman resmi distributor atau jaringan bioskop Indonesia.',
-    '3. ZERO-LEAK ABSENCE GUARD (PENYARINGAN MUTLAK): Diskualifikasi dan JANGAN masukkan film apa pun jika sumbernya memuat ketidakpastian seperti "belum ada informasi di Indonesia", "belum dipastikan", "belum diumumkan", rumor, prediksi, atau baru memiliki tanggal rilis luar negeri/AS tanpa konfirmasi bioskop Indonesia.',
+    '3. ZERO-LEAK ABSENCE GUARD (PENYARINGAN MUTLAK): Diskualifikasi dan JANGAN masukkan film jika sumbernya murni rumor, spekulasi, batal tayang, tidak tayang di Indonesia, atau menyatakan jadwal bioskop Indonesia belum ada/belum diumumkan tanpa tanggal resmi.',
     'CAKUPAN PENCARIAN:',
-    '- Film yang sedang tayang, pre-sale aktif, lulus sensor LSF, atau akan tayang bulan ini hingga 3 bulan ke depan di bioskop Indonesia.',
-    '- Film TAYANG ULANG / REISSUE / RE-RELEASE / IMAX Special Screening yang resmi diumumkan kembali tayang di bioskop Indonesia (set isReRelease: true).',
-    '- Film blockbuster / tentpole internasional maupun lokal yang tanggal rilis bioskop Indonesianya sudah diumumkan resmi (ingat di Indonesia film Hollywood sering rilis hari Rabu, 2 hari lebih awal dari tanggal Jumat AS).',
-    'ATURAN PENGISIAN JSON:',
-    '- Jika Anda menulis tanggal rilis Indonesia di dalam "summary", WAJIB isi juga "releaseDateId" dengan format "YYYY-MM-DD" yang sama persis. Jangan biarkan "releaseDateId" kosong jika tanggalnya sudah diketahui.',
+    '- Film yang sedang tayang, pre-sale aktif, lulus sensor LSF, atau akan tayang bulan ini hingga 3 bulan ke depan di bioskop Indonesia (termasuk jadwal TIX ID / XXI / CGV / Cinépolis).',
+    '- Film TAYANG ULANG / REISSUE / RE-RELEASE / IMAX Special Screening yang resmi diumumkan kembali tayang di bioskop Indonesia (set isReRelease: true dan gunakan tanggal rilis ulang Indonesia-nya).',
+    '- Film blockbuster / tentpole internasional maupun lokal yang tanggal rilis bioskop Indonesianya sudah diumumkan resmi (ingat di Indonesia film Hollywood sering rilis hari Rabu atau sesuai jadwal resmi bioskop/TIX ID setempat).',
     '- Set "presaleActive": true HANYA jika tiket pre-sale benar-benar sudah resmi dibuka/dijual oleh XXI, CGV, Cinépolis, atau TIX ID.',
-    '- Kosongkan "lsfStatus" ("") kecuali ada keterangan klasifikasi usia resmi dari LSF (misal: "Lulus Sensor LSF 13+"). Jangan isi dengan kata "passed".',
     hintBlock,
+    snapshotBlock,
     'Balas HANYA 1 JSON valid tanpa teks pembuka/penutup:',
     '{',
     '  "entries": [',
@@ -396,7 +414,7 @@ async function runGeminiSearchScan(geminiKey, tmdbKey, tmdbCandidates, nowIso) {
     '      "imax": false,',
     '      "presaleActive": false,',
     '      "isReRelease": false,',
-    '      "lsfStatus": "",',
+    '      "lsfStatus": "opsional",',
     '      "summary": "1 kalimat ringkas fakta jadwal ID beserta sumber resminya."',
     '    }',
     '  ]',
@@ -418,6 +436,7 @@ async function runGeminiSearchScan(geminiKey, tmdbKey, tmdbCandidates, nowIso) {
   const titleToTmdb = new Map();
   for (const c of tmdbCandidates) {
     titleToTmdb.set(normalizeKey(c.title), c.tmdbId);
+    titleToTmdb.set(normalizeKey(stripFormatSuffix(c.title)), c.tmdbId);
     titleToTmdb.set(normalizeKey(c.originalTitle), c.tmdbId);
   }
 
@@ -425,14 +444,22 @@ async function runGeminiSearchScan(geminiKey, tmdbKey, tmdbCandidates, nowIso) {
     const title = String(raw?.title || '').trim().toUpperCase().slice(0, 100);
     if (!title) return null;
     const summaryText = String(raw?.summary || '').trim();
-    if (ZERO_LEAK_ABSENCE_RE.test(summaryText)) return null;
+    const relId = sanitizeIso(raw?.releaseDateId);
+    const isReRelease = Boolean(raw?.isReRelease) || /\b(reissue|tayang\s+ulang|re-?release)\b/i.test(title);
 
-    const isReRelease = Boolean(raw?.isReRelease);
-    let tmdbNum = Number(raw?.tmdbId || 0) || titleToTmdb.get(normalizeKey(title)) || 0;
+    if (isDisqualifiedByAbsenceGuard(summaryText, Boolean(relId))) return null;
+
+    const cleanTitleNorm = normalizeKey(stripFormatSuffix(title));
+    let tmdbNum =
+      Number(raw?.tmdbId || 0) ||
+      titleToTmdb.get(normalizeKey(title)) ||
+      titleToTmdb.get(cleanTitleNorm) ||
+      0;
+
     if (!tmdbNum && tmdbKey) {
       tmdbNum = await resolveTmdbIdByTitle(title, tmdbKey, isReRelease);
     }
-    return { raw, title, tmdbNum, isReRelease, summaryText };
+    return { raw, title, relId, tmdbNum, isReRelease, summaryText };
   });
 
   const seenKeys = new Set();
@@ -440,12 +467,13 @@ async function runGeminiSearchScan(geminiKey, tmdbKey, tmdbCandidates, nowIso) {
 
   for (const item of resolvedList) {
     if (!item) continue;
-    const { raw, title, tmdbNum, isReRelease, summaryText } = item;
-    const key = tmdbNum > 0 ? `tmdb_${tmdbNum}` : `title_${normalizeKey(title)}`;
+    const { raw, title, relId, tmdbNum, isReRelease, summaryText } = item;
+    const key = tmdbNum > 0
+      ? (isReRelease ? `tmdb_${tmdbNum}_reissue` : `tmdb_${tmdbNum}`)
+      : `title_${normalizeKey(title)}`;
     if (seenKeys.has(key)) continue;
     seenKeys.add(key);
 
-    const relId = sanitizeIso(raw?.releaseDateId) || sanitizeIso(summaryText);
     const verifiedPresale = Boolean(raw?.presaleActive) && (raw?.status === 'presale' || PRESALE_ACTIVE_RE.test(summaryText));
     const status = verifiedPresale
       ? 'presale'
@@ -464,7 +492,7 @@ async function runGeminiSearchScan(geminiKey, tmdbKey, tmdbCandidates, nowIso) {
       imax: Boolean(raw?.imax),
       presaleActive: verifiedPresale,
       isReRelease,
-      lsfStatus: sanitizeLsfStatus(raw?.lsfStatus),
+      lsfStatus: String(raw?.lsfStatus || '').trim().slice(0, 80),
       summary: summaryText.slice(0, 260) || 'Terkonfirmasi masuk radar rilis Indonesia.',
       sources: sharedSources,
       checkedAt: nowIso,
