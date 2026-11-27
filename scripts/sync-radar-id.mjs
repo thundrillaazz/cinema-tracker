@@ -109,7 +109,7 @@ async function fetchTmdbSeedTitles(tmdbKey) {
       const res = await fetch(u, { signal: AbortSignal.timeout(8000) });
       if (!res.ok) continue;
       const data = await res.json();
-      for (const item of (data.results || []).slice(0, 12)) {
+      for (const item of (data.results || []).slice(0, 15)) {
         if (!item?.id || !item?.title) continue;
         if (!map.has(item.id)) {
           map.set(item.id, {
@@ -124,7 +124,7 @@ async function fetchTmdbSeedTitles(tmdbKey) {
       // ignore individual upstream timeout
     }
   }
-  return Array.from(map.values()).slice(0, 18);
+  return Array.from(map.values()).slice(0, 24);
 }
 
 async function fetchTmdbIdReleaseMeta(tmdbId, tmdbKey) {
@@ -156,7 +156,7 @@ async function fetchGoogleNewsIdRss(query) {
   const url = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=id&gl=ID&ceid=ID:id`;
   try {
     const res = await fetch(url, {
-      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; CinemaTrackerRadar/4.2)' },
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; CinemaTrackerRadar/4.4)' },
       signal: AbortSignal.timeout(8000),
     });
     if (!res.ok) return [];
@@ -235,6 +235,7 @@ async function runFreeRssAndTmdbScan(tmdbCandidates, tmdbKey, nowIso) {
       tmdbId: candidate.tmdbId,
       title: String(candidate.title).trim().toUpperCase().slice(0, 100),
       releaseDateId: idMeta?.releaseDateId || undefined,
+      dateSource: idMeta?.releaseDateId ? 'tmdb_id' : 'rss',
       status,
       chains,
       imax,
@@ -252,17 +253,39 @@ async function runFreeRssAndTmdbScan(tmdbCandidates, tmdbKey, nowIso) {
   return results.filter(Boolean);
 }
 
+async function generateWithSearchFallback(ai, prompt, systemInstruction) {
+  const models = [
+    'gemini-2.5-flash-lite',
+    'gemini-2.5-flash',
+    'gemini-3.8-flash',
+    'gemini-flash-latest',
+  ];
+  let lastErr = null;
+  for (const model of models) {
+    try {
+      return await ai.models.generateContent({
+        model,
+        contents: prompt,
+        config: {
+          systemInstruction,
+          tools: [{ googleSearch: {} }],
+        },
+      });
+    } catch (err) {
+      lastErr = err;
+      const msg = err instanceof Error ? err.message : String(err);
+      console.warn(`Model ${model} failed: ${msg.slice(0, 160)}`);
+    }
+  }
+  throw lastErr || new Error('All Gemini search models failed');
+}
+
 async function runGeminiSearchScan(geminiKey, tmdbCandidates, nowIso) {
-  const ai = new GoogleGenAI({
-    apiKey: geminiKey,
-    httpOptions: {
-      headers: { 'User-Agent': 'aistudio-build' },
-    },
-  });
+  const ai = new GoogleGenAI({ apiKey: geminiKey });
 
   const hintBlock = tmdbCandidates.length
-    ? `Prioritaskan pengecekan untuk daftar film populer berikut jika ada kabar rilis Indonesia:\n${tmdbCandidates
-        .slice(0, 14)
+    ? `Periksa juga jadwal tayang Indonesia untuk daftar film TMDB berikut bila sudah diumumkan:\n${tmdbCandidates
+        .slice(0, 18)
         .map((c) => `- ${c.title} (tmdbId: ${c.tmdbId}, global: ${c.releaseDate})`)
         .join('\n')}`
     : '';
@@ -270,20 +293,24 @@ async function runGeminiSearchScan(geminiKey, tmdbCandidates, nowIso) {
   const todayIso = nowIso.slice(0, 10);
   const prompt = [
     `Tanggal hari ini: ${todayIso}.`,
-    'Cari pengumuman resmi jadwal rilis bioskop INDONESIA terbaru, film yang baru lulus sensor LSF (lsf.go.id), atau pembukaan tiket pre-sale / IMAX di Cinema XXI, CGV Indonesia, Cinépolis Indonesia, atau TIX ID untuk bulan ini dan 2 bulan ke depan.',
+    'Lakukan pencarian Google Search untuk mengumpulkan daftar lengkap jadwal rilis bioskop INDONESIA (Cinema XXI, CGV Indonesia, Cinépolis Indonesia, TIX ID, dan LSF RI lsf.go.id) mencakup:',
+    '1. Film yang sedang tayang, pre-sale, lulus sensor LSF, atau akan tayang bulan ini hingga 3 bulan ke depan di bioskop Indonesia.',
+    '2. Film TAYANG ULANG / REISSUE / RE-RELEASE / IMAX Special Screening yang diumumkan kembali tayang di bioskop Indonesia (set isReRelease: true).',
+    '3. Film blockbuster / tentpole besar (seperti Marvel / Avengers, Dune, Christopher Nolan, DC, dll.) yang tanggal rilis bioskop Indonesianya sudah diumumkan media atau distributor resmi (ingat di Indonesia film Hollywood sering rilis hari Rabu, 2 hari lebih awal dari tanggal Jumat AS).',
     hintBlock,
-    'ATURAN KETAT: Hanya masukkan film yang BENAR-BENAR memiliki kabar/pengumuman rilis di Indonesia dari hasil Google Search. Jangan mengarang tanggal atau jaringan bioskop.',
-    'Balas HANYA 1 JSON valid:',
+    'ATURAN KETAT: Hanya masukkan film yang benar-benar memiliki kabar/jadwal rilis di Indonesia dari hasil Google Search. Jangan mengarang tanggal.',
+    'Balas HANYA 1 JSON valid tanpa teks pembuka/penutup:',
     '{',
     '  "entries": [',
     '    {',
     '      "tmdbId": 0,',
     '      "title": "JUDUL FILM",',
-    '      "releaseDateId": "YYYY-MM-DD atau kosong",',
+    '      "releaseDateId": "YYYY-MM-DD",',
     '      "status": "confirmed" | "presale" | "lsf_passed",',
     '      "chains": ["XXI", "CGV", "Cinépolis"],',
     '      "imax": false,',
     '      "presaleActive": false,',
+    '      "isReRelease": false,',
     '      "lsfStatus": "opsional",',
     '      "summary": "1 kalimat ringkas fakta jadwal ID."',
     '    }',
@@ -293,19 +320,19 @@ async function runGeminiSearchScan(geminiKey, tmdbCandidates, nowIso) {
     .filter(Boolean)
     .join('\n\n');
 
-  const response = await ai.models.generateContent({
-    model: 'gemini-4-hydrogen',
-    contents: prompt,
-    config: {
-      systemInstruction:
-        'Anda aggregator jadwal bioskop Indonesia (XXI, CGV, Cinépolis, IMAX, LSF). Keluarkan hanya entri yang terverifikasi oleh hasil Google Search.',
-      tools: [{ googleSearch: {} }],
-    },
-  });
+  const response = await generateWithSearchFallback(
+    ai,
+    prompt,
+    'Anda aggregator jadwal bioskop Indonesia (XXI, CGV, Cinépolis, IMAX, LSF). Keluarkan hanya entri dan tanggal rilis Indonesia yang terverifikasi oleh hasil Google Search.'
+  );
 
   const parsed = parseJsonPayload(response.text || '');
   const sharedSources = extractGroundSources(response);
   const rawEntries = Array.isArray(parsed?.entries) ? parsed.entries : [];
+
+  if (rawEntries.length === 0) {
+    throw new Error('Gemini returned 0 entries');
+  }
 
   const titleToTmdb = new Map(tmdbCandidates.map((c) => [normalizeKey(c.title), c.tmdbId]));
   const seenKeys = new Set();
@@ -319,15 +346,18 @@ async function runGeminiSearchScan(geminiKey, tmdbCandidates, nowIso) {
     if (seenKeys.has(key)) continue;
     seenKeys.add(key);
 
+    const relId = sanitizeIso(raw?.releaseDateId);
     entries.push({
       key,
       tmdbId: tmdbNum > 0 ? tmdbNum : undefined,
       title,
-      releaseDateId: sanitizeIso(raw?.releaseDateId) || undefined,
+      releaseDateId: relId || undefined,
+      dateSource: relId ? 'gemini' : undefined,
       status: ['confirmed', 'presale', 'lsf_passed'].includes(raw?.status) ? raw.status : 'confirmed',
       chains: normalizeChains(raw?.chains),
       imax: Boolean(raw?.imax),
       presaleActive: Boolean(raw?.presaleActive),
+      isReRelease: Boolean(raw?.isReRelease),
       lsfStatus: String(raw?.lsfStatus || '').trim().slice(0, 80),
       summary: String(raw?.summary || '').trim().slice(0, 260) || 'Terkonfirmasi masuk radar rilis Indonesia.',
       sources: sharedSources,
@@ -345,14 +375,14 @@ async function main() {
 
   const tmdbCandidates = await fetchTmdbSeedTitles(tmdbKey);
   let entries = [];
-  let sourceLabel = 'cloud-radar';
+  let sourceLabel = 'cloud-radar-gemini';
 
   if (geminiKey) {
     try {
       entries = await runGeminiSearchScan(geminiKey, tmdbCandidates, nowIso);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-      console.warn(`Gemini grounding fallback triggered (${msg.slice(0, 140)}).`);
+      console.warn(`Gemini grounding fallback triggered: ${msg}`);
       entries = await runFreeRssAndTmdbScan(tmdbCandidates, tmdbKey, nowIso);
       sourceLabel = 'cloud-radar-rss-tmdb';
     }
