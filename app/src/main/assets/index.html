@@ -3194,6 +3194,12 @@
           chains: nextChains,
           poster: entry.movieData.poster || (canonicalMovie ? canonicalMovie.poster : "") || ""
         };
+        const hasIdConfirm = mergedMovie.sourceBadge === "Bioskop ID" || mergedMovie.sourceBadge === "Radar Bioskop ID" || mergedMovie.sourceBadge === "Rilis Digital" || (mergedMovie.sourceBadge && mergedMovie.sourceBadge.startsWith("TMDB ID")) || (mergedMovie.chains && mergedMovie.chains.length > 0) || mergedMovie.lsfStatus || mergedMovie.isReRelease || mergedMovie.releaseChannel === "digital";
+        const todayIsoStr = getLocalTodayIso();
+        if (!hasIdConfirm && mergedMovie.releaseDate && mergedMovie.releaseDate !== "TBA" && mergedMovie.releaseDate <= todayIsoStr) {
+          mergedMovie.status = "upcoming";
+          mergedMovie.dateLabel = `Est. ${formatShortDate(mergedMovie.releaseDate)}`;
+        }
         if (!next[targetKey]) {
           next[targetKey] = {
             presaleAlert: Boolean(entry.presaleAlert),
@@ -3640,11 +3646,12 @@
           savedM.confirmedText = "Terkonfirmasi ID · Tanggal Menyusul";
         } else if (!savedM.tba && savedM.releaseDate && savedM.releaseDate !== "TBA") {
           if (savedM.releaseDate < minDate || savedM.releaseDate > maxDate) return;
-          const isRel = savedM.releaseDate <= todayIso;
+          const hasIdConfirm = savedM.sourceBadge === "Bioskop ID" || savedM.sourceBadge === "Radar Bioskop ID" || savedM.sourceBadge === "Rilis Digital" || (savedM.sourceBadge && savedM.sourceBadge.startsWith("TMDB ID")) || (savedM.chains && savedM.chains.length > 0) || savedM.lsfStatus || savedM.isReRelease || savedM.releaseChannel === "digital";
+          const isRel = savedM.releaseDate <= todayIso && hasIdConfirm;
           const isDig = savedM.releaseChannel === "digital" || savedM.sourceBadge === "Rilis Digital";
           if (isRel && hasLiveNow) return;
           savedM.status = isRel ? "now" : "upcoming";
-          savedM.dateLabel = isRel ? (isDig ? "Rilis Digital" : "Sedang Tayang") : (isDig ? `Digital ${formatShortDate(savedM.releaseDate)}` : formatShortDate(savedM.releaseDate));
+          savedM.dateLabel = isRel ? (isDig ? "Rilis Digital" : "Sedang Tayang") : (isDig ? `Digital ${formatShortDate(savedM.releaseDate)}` : (savedM.sourceBadge === "TMDB Global" ? `Est. ${formatShortDate(savedM.releaseDate)}` : formatShortDate(savedM.releaseDate)));
           if (savedM.confirmedText) savedM.confirmedText = normalizeIsoDatesInText(savedM.confirmedText);
         } else {
           return;
