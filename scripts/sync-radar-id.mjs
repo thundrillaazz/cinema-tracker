@@ -343,11 +343,9 @@ async function runFreeRssAndTmdbScan(tmdbCandidates, tmdbKey, nowIso) {
 
 async function generateWithSearchFallback(ai, prompt) {
   const models = [
-    'gemini-3.5-flash-lite',
-    'gemini-3.8-flash',
-    'gemini-flash-latest',
     'gemini-2.5-flash-lite',
     'gemini-2.5-flash',
+    'gemini-flash-latest',
   ];
   let lastErr = null;
   for (const model of models) {
@@ -517,12 +515,12 @@ async function main() {
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       console.warn(`Gemini grounding fallback triggered: ${msg}`);
-      entries = await runFreeRssAndTmdbScan(tmdbCandidates, tmdbKey, nowIso);
       sourceLabel = 'cloud-radar-rss-tmdb';
+      entries = await runFreeRssAndTmdbScan(tmdbCandidates, tmdbKey, nowIso);
     }
   } else {
-    entries = await runFreeRssAndTmdbScan(tmdbCandidates, tmdbKey, nowIso);
     sourceLabel = 'cloud-radar-rss-tmdb';
+    entries = await runFreeRssAndTmdbScan(tmdbCandidates, tmdbKey, nowIso);
   }
 
   const outPayload = {
