@@ -8,13 +8,48 @@ const OUT_PATH = path.join(ROOT_DIR, 'public', 'radar-id.json');
 const ZERO_LEAK_ABSENCE_RE = /\b(rumor|rumours?|rumors?|kabarnya|diduga|prediksi|bocoran|diperkirakan|konon|spekulasi|hoaks?|hoax|fan[- ]?made|estimasi|belum\s+(?:ada\s+(?:informasi|kabar|jadwal|kepastian)|pasti|diumumkan|dapat\s+dipastikan|dipastikan|tayang\s+di\s+indonesia)|tidak\s+(?:akan\s+)?tayang\s+di\s+indonesia|batal\s+tayang)\b/i;
 const PRESALE_ACTIVE_RE = /\b(?:pre-?sale|presale|penjualan\s+tiket)\b[\s\S]{0,40}\b(?:sudah\s+|telah\s+|resmi\s+)?(?:dibuka|tersedia|dijual|bisa\s+(?:dibeli|dipesan)|dimulai|aktif)|(?:open\s+pre-?sale|buka\s+penjualan\s+tiket)/i;
 
+const MONTH_MAP = {
+  januari: '01', january: '01', jan: '01',
+  februari: '02', february: '02', feb: '02',
+  maret: '03', march: '03', mar: '03',
+  april: '04', apr: '04',
+  mei: '05', may: '05',
+  juni: '06', june: '06', jun: '06',
+  juli: '07', july: '07', jul: '07',
+  agustus: '08', august: '08', agu: '08', agt: '08', aug: '08',
+  september: '09', sep: '09', sept: '09',
+  oktober: '10', october: '10', okt: '10', oct: '10',
+  november: '11', nov: '11',
+  desember: '12', december: '12', des: '12', dec: '12',
+};
+
 function normalizeKey(str) {
   return String(str || '').toLowerCase().replace(/[^a-z0-9]/g, '');
 }
 
 function sanitizeIso(raw) {
-  const clean = String(raw || '').trim().slice(0, 10);
-  return /^\d{4}-\d{2}-\d{2}$/.test(clean) ? clean : '';
+  const str = String(raw || '').trim();
+  const isoMatch = /^(\d{4}-\d{2}-\d{2})/.exec(str);
+  if (isoMatch) return isoMatch[1];
+
+  const textMatch = /\b(\d{1,2})\s+([a-zA-Z]+)\s+(20\d{2})\b/.exec(str);
+  if (textMatch) {
+    const day = textMatch[1].padStart(2, '0');
+    const month = MONTH_MAP[textMatch[2].toLowerCase()];
+    if (month && Number(day) >= 1 && Number(day) <= 31) {
+      return `${textMatch[3]}-${month}-${day}`;
+    }
+  }
+  return '';
+}
+
+function sanitizeLsfStatus(raw) {
+  const clean = String(raw || '').trim().slice(0, 80);
+  if (!clean) return '';
+  if (/^(passed|confirmed|presale|lsf_passed|yes|no|true|false|none|null|n\/a|opsional)$/i.test(clean)) {
+    return '';
+  }
+  return clean;
 }
 
 function normalizeChains(raw) {
@@ -344,7 +379,10 @@ async function runGeminiSearchScan(geminiKey, tmdbKey, tmdbCandidates, nowIso) {
     '- Film yang sedang tayang, pre-sale aktif, lulus sensor LSF, atau akan tayang bulan ini hingga 3 bulan ke depan di bioskop Indonesia.',
     '- Film TAYANG ULANG / REISSUE / RE-RELEASE / IMAX Special Screening yang resmi diumumkan kembali tayang di bioskop Indonesia (set isReRelease: true).',
     '- Film blockbuster / tentpole internasional maupun lokal yang tanggal rilis bioskop Indonesianya sudah diumumkan resmi (ingat di Indonesia film Hollywood sering rilis hari Rabu, 2 hari lebih awal dari tanggal Jumat AS).',
+    'ATURAN PENGISIAN JSON:',
+    '- Jika Anda menulis tanggal rilis Indonesia di dalam "summary", WAJIB isi juga "releaseDateId" dengan format "YYYY-MM-DD" yang sama persis. Jangan biarkan "releaseDateId" kosong jika tanggalnya sudah diketahui.',
     '- Set "presaleActive": true HANYA jika tiket pre-sale benar-benar sudah resmi dibuka/dijual oleh XXI, CGV, Cinépolis, atau TIX ID.',
+    '- Kosongkan "lsfStatus" ("") kecuali ada keterangan klasifikasi usia resmi dari LSF (misal: "Lulus Sensor LSF 13+"). Jangan isi dengan kata "passed".',
     hintBlock,
     'Balas HANYA 1 JSON valid tanpa teks pembuka/penutup:',
     '{',
@@ -358,7 +396,7 @@ async function runGeminiSearchScan(geminiKey, tmdbKey, tmdbCandidates, nowIso) {
     '      "imax": false,',
     '      "presaleActive": false,',
     '      "isReRelease": false,',
-    '      "lsfStatus": "opsional",',
+    '      "lsfStatus": "",',
     '      "summary": "1 kalimat ringkas fakta jadwal ID beserta sumber resminya."',
     '    }',
     '  ]',
@@ -407,7 +445,7 @@ async function runGeminiSearchScan(geminiKey, tmdbKey, tmdbCandidates, nowIso) {
     if (seenKeys.has(key)) continue;
     seenKeys.add(key);
 
-    const relId = sanitizeIso(raw?.releaseDateId);
+    const relId = sanitizeIso(raw?.releaseDateId) || sanitizeIso(summaryText);
     const verifiedPresale = Boolean(raw?.presaleActive) && (raw?.status === 'presale' || PRESALE_ACTIVE_RE.test(summaryText));
     const status = verifiedPresale
       ? 'presale'
@@ -426,7 +464,7 @@ async function runGeminiSearchScan(geminiKey, tmdbKey, tmdbCandidates, nowIso) {
       imax: Boolean(raw?.imax),
       presaleActive: verifiedPresale,
       isReRelease,
-      lsfStatus: String(raw?.lsfStatus || '').trim().slice(0, 80),
+      lsfStatus: sanitizeLsfStatus(raw?.lsfStatus),
       summary: summaryText.slice(0, 260) || 'Terkonfirmasi masuk radar rilis Indonesia.',
       sources: sharedSources,
       checkedAt: nowIso,
