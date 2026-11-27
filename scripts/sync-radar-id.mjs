@@ -83,6 +83,7 @@ function extractGroundSources(response) {
 }
 
 async function mapConcurrent(items, limit, fn) {
+  if (!items.length) return [];
   const out = new Array(items.length);
   let idx = 0;
   async function worker() {
@@ -101,6 +102,7 @@ async function fetchTmdbSeedTitles(tmdbKey) {
   const urls = [
     `https://api.themoviedb.org/3/movie/upcoming?api_key=${encodeURIComponent(tmdbKey)}&region=ID&page=1`,
     `https://api.themoviedb.org/3/movie/now_playing?api_key=${encodeURIComponent(tmdbKey)}&region=ID&page=1`,
+    `https://api.themoviedb.org/3/discover/movie?api_key=${encodeURIComponent(tmdbKey)}&without_genres=10770&primary_release_date.gte=${today}&sort_by=popularity.desc&page=1`,
     `https://api.themoviedb.org/3/trending/movie/week?api_key=${encodeURIComponent(tmdbKey)}`,
   ];
   const map = new Map();
@@ -124,7 +126,34 @@ async function fetchTmdbSeedTitles(tmdbKey) {
       // ignore individual upstream timeout
     }
   }
-  return Array.from(map.values()).slice(0, 24);
+  return Array.from(map.values()).slice(0, 32);
+}
+
+async function resolveTmdbIdByTitle(title, tmdbKey, isReRelease = false) {
+  if (!tmdbKey || !title) return 0;
+  try {
+    const url = `https://api.themoviedb.org/3/search/movie?api_key=${encodeURIComponent(tmdbKey)}&query=${encodeURIComponent(title)}&include_adult=false&page=1`;
+    const res = await fetch(url, { signal: AbortSignal.timeout(6000) });
+    if (!res.ok) return 0;
+    const data = await res.json();
+    const results = Array.isArray(data.results) ? data.results : [];
+    if (!results.length) return 0;
+
+    const targetNorm = normalizeKey(title);
+    const exactMatches = results.filter(
+      (r) => normalizeKey(r.title) === targetNorm || normalizeKey(r.original_title) === targetNorm
+    );
+    const pool = exactMatches.length ? exactMatches : results.slice(0, 3);
+
+    if (!isReRelease) {
+      const modern = pool.find((r) => String(r.release_date || '') >= '2025-01-01');
+      if (modern?.id) return Number(modern.id) || 0;
+    }
+    pool.sort((a, b) => Number(b.popularity || 0) - Number(a.popularity || 0));
+    return Number(pool[0]?.id || 0) || 0;
+  } catch {
+    return 0;
+  }
 }
 
 async function fetchTmdbIdReleaseMeta(tmdbId, tmdbKey) {
@@ -278,15 +307,15 @@ async function generateWithSearchFallback(ai, prompt) {
   throw lastErr || new Error('All Gemini search models failed');
 }
 
-async function runGeminiSearchScan(geminiKey, tmdbCandidates, nowIso) {
+async function runGeminiSearchScan(geminiKey, tmdbKey, tmdbCandidates, nowIso) {
   const ai = new GoogleGenAI({
     apiKey: geminiKey,
     httpOptions: { apiVersion: 'v1beta' },
   });
 
   const hintBlock = tmdbCandidates.length
-    ? `Periksa juga jadwal tayang Indonesia untuk daftar film TMDB berikut bila sudah diumumkan:\n${tmdbCandidates
-        .slice(0, 18)
+    ? `Periksa jadwal tayang Indonesia untuk daftar film TMDB berikut bila sudah diumumkan (sertakan tmdbId yang tercantum):\n${tmdbCandidates
+        .slice(0, 24)
         .map((c) => `- ${c.title} (tmdbId: ${c.tmdbId}, global: ${c.releaseDate})`)
         .join('\n')}`
     : '';
@@ -297,8 +326,8 @@ async function runGeminiSearchScan(geminiKey, tmdbCandidates, nowIso) {
     `Tanggal hari ini: ${todayIso}.`,
     'Lakukan pencarian Google Search untuk mengumpulkan daftar lengkap jadwal rilis bioskop INDONESIA mencakup:',
     '1. Film yang sedang tayang, pre-sale, lulus sensor LSF (lsf.go.id), atau akan tayang bulan ini hingga 3 bulan ke depan di bioskop Indonesia.',
-    '2. Film TAYANG ULANG / REISSUE / RE-RELEASE / IMAX Special Screening yang diumumkan kembali tayang di bioskop Indonesia (set isReRelease: true), termasuk film seperti Dune, Dune: Part Two, atau film spesial lainnya jika ada jadwal tayang ulang di Indonesia.',
-    '3. Film blockbuster / tentpole besar (seperti Avengers: Doomsday, Dune, Christopher Nolan, DC, dll.) yang tanggal rilis bioskop Indonesianya sudah diumumkan media atau distributor resmi (ingat di Indonesia film Hollywood sering rilis hari Rabu, 2 hari lebih awal dari tanggal Jumat AS).',
+    '2. Film TAYANG ULANG / REISSUE / RE-RELEASE / IMAX Special Screening yang diumumkan kembali tayang di bioskop Indonesia (set isReRelease: true).',
+    '3. Film blockbuster / tentpole internasional maupun lokal yang tanggal rilis bioskop Indonesianya sudah diumumkan media atau distributor resmi (ingat di Indonesia film Hollywood sering rilis hari Rabu, 2 hari lebih awal dari tanggal Jumat AS).',
     hintBlock,
     'ATURAN KETAT: Hanya masukkan film dan tanggal rilis Indonesia yang benar-benar terverifikasi oleh hasil Google Search. Jangan mengarang tanggal.',
     'Balas HANYA 1 JSON valid tanpa teks pembuka/penutup:',
@@ -332,14 +361,29 @@ async function runGeminiSearchScan(geminiKey, tmdbCandidates, nowIso) {
     throw new Error('Gemini returned 0 entries');
   }
 
-  const titleToTmdb = new Map(tmdbCandidates.map((c) => [normalizeKey(c.title), c.tmdbId]));
+  const titleToTmdb = new Map();
+  for (const c of tmdbCandidates) {
+    titleToTmdb.set(normalizeKey(c.title), c.tmdbId);
+    titleToTmdb.set(normalizeKey(c.originalTitle), c.tmdbId);
+  }
+
+  const resolvedList = await mapConcurrent(rawEntries, 4, async (raw) => {
+    const title = String(raw?.title || '').trim().toUpperCase().slice(0, 100);
+    if (!title) return null;
+    const isReRelease = Boolean(raw?.isReRelease);
+    let tmdbNum = Number(raw?.tmdbId || 0) || titleToTmdb.get(normalizeKey(title)) || 0;
+    if (!tmdbNum && tmdbKey) {
+      tmdbNum = await resolveTmdbIdByTitle(title, tmdbKey, isReRelease);
+    }
+    return { raw, title, tmdbNum, isReRelease };
+  });
+
   const seenKeys = new Set();
   const entries = [];
 
-  for (const raw of rawEntries) {
-    const title = String(raw?.title || '').trim().toUpperCase().slice(0, 100);
-    if (!title) continue;
-    const tmdbNum = Number(raw?.tmdbId || 0) || titleToTmdb.get(normalizeKey(title)) || 0;
+  for (const item of resolvedList) {
+    if (!item) continue;
+    const { raw, title, tmdbNum, isReRelease } = item;
     const key = tmdbNum > 0 ? `tmdb_${tmdbNum}` : `title_${normalizeKey(title)}`;
     if (seenKeys.has(key)) continue;
     seenKeys.add(key);
@@ -355,7 +399,7 @@ async function runGeminiSearchScan(geminiKey, tmdbCandidates, nowIso) {
       chains: normalizeChains(raw?.chains),
       imax: Boolean(raw?.imax),
       presaleActive: Boolean(raw?.presaleActive),
-      isReRelease: Boolean(raw?.isReRelease),
+      isReRelease,
       lsfStatus: String(raw?.lsfStatus || '').trim().slice(0, 80),
       summary: String(raw?.summary || '').trim().slice(0, 260) || 'Terkonfirmasi masuk radar rilis Indonesia.',
       sources: sharedSources,
@@ -377,7 +421,7 @@ async function main() {
 
   if (geminiKey) {
     try {
-      entries = await runGeminiSearchScan(geminiKey, tmdbCandidates, nowIso);
+      entries = await runGeminiSearchScan(geminiKey, tmdbKey, tmdbCandidates, nowIso);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       console.warn(`Gemini grounding fallback triggered: ${msg}`);
