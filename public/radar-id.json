@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-27T02:16:53.949Z",
+  "updatedAt": "2026-11-27T14:15:27.840Z",
   "source": "cloud-radar-rss-tmdb",
   "entries": [
     {
@@ -8,10 +8,10 @@
       "tmdbId": 1003596,
       "title": "AVENGERS: DOOMSDAY",
       "releaseDateId": "2026-12-18",
-      "status": "presale",
+      "status": "confirmed",
       "chains": [],
       "imax": false,
-      "presaleActive": true,
+      "presaleActive": false,
       "lsfStatus": "",
       "summary": "Jadwal resmi TMDB ID: 2026-12-18. Berita: Kapan Film Avengers: Doomsday Tayang di Indonesia? - Kompas.com",
       "sources": [
@@ -20,15 +20,15 @@
           "url": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxOcGtfUWFoOWg4LTVpbXFVeVc1NzNscGVZTE1tTVVDeFNfRjZXNFI5ZmFpLWhVbkNNODlHbTVuaDZqa0FqQ1p6aERfY1FsRDlidEo0b3F4NnpvaDFWOWNoeGtqd201RnFFdGZsOWlXakppSm1uM01nekQzOG81ZWRrRzZUSXRjYkNCR2MwbU04QlhjdmFnaVhqR2staVIwN1Y0Q2RmN3dPdWRtN3M?oc=5"
         },
         {
-          "title": "detikcom",
-          "url": "https://news.google.com/rss/articles/CBMioAFBVV95cUxQM2xla0w5Z2ZHNkVVNUZiRW1ZV0FWRzZLRk1WYUV6S0FHU2NWX1ZpY2FfWmFMZ0VEQWZGUEUwR1Q2XzJCMUZ2QjFWSmZDU1p0V2ZqRkczZEMwdzc2UkQtUzJtQjZZVWMyS1FyWWl2TjFDZ0pQeEl5aDJiWkl2MkVPanctZzFtZUMtODlkN3lSQ1BUZk1vYS1ERmkyU1JnTngz0gGmAUFVX3lxTE5qelgwQUlGa0drTlZHLWE1Z1JkUzBsckw3T1FiZlRTMjV1Z1hUM3FRUjRPMTRhTHB3ZlZTbHA5MzB0djRnWlRrX0ZxbVpVa0dhaTBxdE9vZDZlS3dsWW5SX0w4YVBPUU1MZXpFT1AwWnJaNlNvWlBzcUQyVWc3M29nUFMzLV9OQ3Rqa1NnbXdsVm1FR2t3VTlFVTh4SWY5YWROZElfNGc?oc=5"
+          "title": "Disney Plus",
+          "url": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxOSHpsSFVaa1lTVHVyYTVrWVhDYjlVeEpTRGU1eTNRcWFNcDJ0ZVBNaGRrUUNMcGp6dC1hVlJFbUx6Y2ZQaG1IUXJMdXFvOURWdldlaW91bEFVUnQ1UmJuRmc4Y285R2RJbjhKaDYxRVFxUjMzNjd0WjFZSExnOE56UHFKZlFBOFllT2FZ?oc=5"
         },
         {
-          "title": "Hypebeast",
-          "url": "https://news.google.com/rss/articles/CBMisAFBVV95cUxNNmJ5VF9ORS1yTVRoX2swdG5KRU1mVlVrZzNtanpBZ3BIWVFnZEdJN1lVeloxeW1iMVZpT2xUdlo5bDFLZV94WTdOMUZRRHBva0N5SnNtZ3ItbDFMWW1nZjFOb2RvczllUzVwY3p2TV9SSlhDVnIyUGt2UllsSm50QnV0M0lsZjZVbXpENnBfNWpBVWJ2ZVM4ZE5maVRnWUltUW5sZXZkS0Nsb3VGeHB4eQ?oc=5"
+          "title": "CNN Indonesia",
+          "url": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxPVDEzckxjWkFLdUs2WlljdXRpT0ExU2dkNzBBcDI5d3JPXzJkMWhSV0dZYnd2TmJGLUg0NVRXaml3Y1d2aXZCcUdIMkFhVEN6R1NMZXljVTMtdGtvbTB5Mm05cE5YNElsZTBuLW5mRE1iZjFmQ3FaRlBpNXMwT0RPdFlNRUttR0g4d1lVRWE2UnJ2Q0dYeHQ5eWxxMl9EN3ZFajZnbzNhelhFREVNTTdOV2E1SkUzRmpL0gG-AUFVX3lxTFB4aW1yZE1jekFzNnFNRkE3X1MwckQxWXdEdmp1aEk4Q0NYd0hZeGE1UHFBRWJZRkU3WGVuaEMyZDRWTTZGZGdLdGY0TnlyYi1UVDl5QVVMNnhuZko3V0FOd3E0U3hmR21yR3BMRjdQUDNCcEVpWHUwNnFjTXZpR0w0cGNabTRLTXdOaTNYczE2NnhsMUw3TzNHNkNRU25kZXRneWxIS0NGWnR2bERzaE9idzdpMmw0cTZmc25VYVE?oc=5"
         }
       ],
-      "checkedAt": "2026-11-27T02:16:53.949Z"
+      "checkedAt": "2026-11-27T14:15:27.840Z"
     },
     {
       "key": "tmdb_1195803",
@@ -45,13 +45,9 @@
         {
           "title": "CNN Indonesia",
           "url": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxQSjNvQnhpNFowcG9nd2xQWUhCZHRoNUFlb1E2a2ZlYTZKT2NBd0J4bmhmQ053S19lcUN3dGhuRnhwYnRZdWl0MUg2TXBMWE5OQ2Y2MWlQajBLN1pOQ3BvUDlGTjE1emp3X01FcmgwSERJZzdWcHpmLWRUMDQzcFNFTDlUUkVYcVh0S240R3ZGaFJTazU4cDRjRk1XQk1SSjIxdzhXV0FnWHFRNnloZUVtaGliUmdCR2VCS1Y5Y19aNnRLdzhaZ3YzTNIBzgFBVV95cUxNM0VxNDZ4d24wZkJaYVRGRGRLYmRtX3UtOXhkWjYzeU51Y0VuNHVhQjZNcnZfWnUyRVZXLUlpeUo2cUo2VTdQUWd5MEt3QzdkTm42T2NnX2xuR0hGZ0c2ZENaaHdvOF9PTGpfdVNyVF9sTXZOd0s2OTdpcXBqbGUzZWh6YWtHWUdlaEh4aVkzLW52MmRlRVlxdS1xbWowR1hqaGR2cnlrQmVRMHhxVU5lWUwwVFhsY0Z3SEVNOEp3a1ZjeXVnV3FscDFmcnYxdw?oc=5"
-        },
-        {
-          "title": "JournalArta",
-          "url": "https://news.google.com/rss/articles/CBMiggFBVV95cUxOVkNhSFRsakVIcl9sbGZHeF82bnhjZ3Q5ODAwaExmSDVpT0gwNU9aQml0SGY4S3Jza1ZhM0tWcEZtNkNtb0pMVUd3UmNpNW1nUHd1Y0MtSzE2UkV6YTBpakdTZWx3bGpGNGgzWU1tUS1neThpYTlORHdyMWptS0hmMklR?oc=5"
         }
       ],
-      "checkedAt": "2026-11-27T02:16:53.949Z"
+      "checkedAt": "2026-11-27T14:15:27.840Z"
     },
     {
       "key": "tmdb_1078446",
@@ -65,7 +61,7 @@
       "lsfStatus": "Klasifikasi TMDB ID: 17+",
       "summary": "Jadwal resmi TMDB ID: 2026-12-02.",
       "sources": [],
-      "checkedAt": "2026-11-27T02:16:53.949Z"
+      "checkedAt": "2026-11-27T14:15:27.840Z"
     },
     {
       "key": "tmdb_1299329",
@@ -88,7 +84,7 @@
           "url": "https://news.google.com/rss/articles/CBMingFBVV95cUxQRDYtNUNpX2dpQ1o2eVhqSXo3Sk8yV0RhbFM3Yjk2bWVpUDR1Wmk1REZHdVFhV29GMjJDTkZGV2otVTFXcU9qa25wLW9hZGhVSzJFRkU0QVNvZl9yZHhMRGZ2a0Z0blFoRlpIRV9tajVQcU5PT2VyOXJpUFA0WEpubWZiVGVtNGRCSXVKQ0xuSEpBaGYySGZDdDZXSmdUQQ?oc=5"
         }
       ],
-      "checkedAt": "2026-11-27T02:16:53.949Z"
+      "checkedAt": "2026-11-27T14:15:27.840Z"
     },
     {
       "key": "tmdb_1300926",
@@ -115,7 +111,7 @@
           "url": "https://news.google.com/rss/articles/CBMib0FVX3lxTE04WWhPOVZubkdOSzJMZEZ1RzRnYWRUZUpPa0wzWGZ2YjJrS2ZEYUpBYnlEdWdOUGhzM00xMENZbmtBZnJYZ3c4MDl6S0YyNzYzMFpqTXdMdS1kODd6S3R5cElJVXowRmhHTVk2ZGxyOA?oc=5"
         }
       ],
-      "checkedAt": "2026-11-27T02:16:53.949Z"
+      "checkedAt": "2026-11-27T14:15:27.840Z"
     },
     {
       "key": "tmdb_1732866",
@@ -142,7 +138,7 @@
           "url": "https://news.google.com/rss/articles/CBMiZEFVX3lxTE1kdVFQV2VMekdjcExjSUZ3OTFNMEl0ZTE0Y0xVV3RDQ2VxazZ3cktrTzhWdjl6dnBfSUJjY09SeUc3aVl4TE1yTThfN1RFemxibkc3VmFrZm1FRVEtblRsaTdWd2I?oc=5"
         }
       ],
-      "checkedAt": "2026-11-27T02:16:53.949Z"
+      "checkedAt": "2026-11-27T14:15:27.840Z"
     },
     {
       "key": "tmdb_1586748",
@@ -169,7 +165,7 @@
           "url": "https://news.google.com/rss/articles/CBMiowFBVV95cUxQOVltX2JKOFNDdW5PNFpOUV9ZUWtjcUJZYzRpd3EwTmFRWVdKa0M3Vi1qWnRtVzRqTHRlMkxtbmZIcGR6Sk5jdHd6NWR3Y1h5N295R2wxdXpTQXRmQlFPMm5PUklIY25udUJ0M2dkRjB6Yy1LNk9YanM1S2JScUhqSnFQMkR4WDU2dW1GQU1qLWphWkpDcXB4ZlFRRjJRaER4WkVN?oc=5"
         }
       ],
-      "checkedAt": "2026-11-27T02:16:53.949Z"
+      "checkedAt": "2026-11-27T14:15:27.840Z"
     },
     {
       "key": "tmdb_1718454",
@@ -183,7 +179,7 @@
       "lsfStatus": "Klasifikasi TMDB ID: 13+",
       "summary": "Jadwal resmi TMDB ID: 2026-12-03.",
       "sources": [],
-      "checkedAt": "2026-11-27T02:16:53.949Z"
+      "checkedAt": "2026-11-27T14:15:27.840Z"
     },
     {
       "key": "tmdb_1691495",
@@ -195,8 +191,12 @@
       "imax": false,
       "presaleActive": false,
       "lsfStatus": "Klasifikasi TMDB ID: 17+",
-      "summary": "Jadwal resmi TMDB ID: 2026-12-03. Berita: Hajatan Setan Perluas Pasar Film Horor Indonesia ke Asia - Limapagi",
+      "summary": "Jadwal resmi TMDB ID: 2026-12-03. Berita: Teror Gaib di Film Hajatan Setan Segera Dimulai! - detikcom",
       "sources": [
+        {
+          "title": "detikcom",
+          "url": "https://news.google.com/rss/articles/CBMikwFBVV95cUxOa3BZcHRYRlVlNmJVMndrRWxIbUdnazNxNUNwaXdWSExDckttMXBIMjZFOXRkUWNFbFViY1BkY0F5dFJRdUZDOXhTN0J2TVdPWVppNWs2WThTc05NQUNkc0U2MnotSXQ0al9xc2NrNzFuSDQ0VThuVFF0dWtpSkZVYXI0TlJUVjV1WnZpT0VWcUVJTFnSAZgBQVVfeXFMT3ctQU9PaVJHRFZMR3E1Xy1BQWFIekw0bjFTWDhFMlZJQVprdm5FSjlHYTlXVDByT0xmZGR3MW1xZnVVVHNCVmlreHE0NWx3cWtSZ09VVElRQzZsdVBNZW4yZTNlMjNnZ2tDQnhRcWhfN1AyUDVISUZwUjBsZWo3ZGRVaTFpamczSjJvNzlkeEhGOHg4SlpUQ3c?oc=5"
+        },
         {
           "title": "Limapagi",
           "url": "https://news.google.com/rss/articles/CBMiY0FVX3lxTE1pa3llWDlsVVYxOFUtWmlhM3FkUVZaTzlOZXYyRE1EVy1KakNBaTlELTFFSGlNWkFHWkRveDBUT1ZIRzl4Z3JuUzVzSDNhUGFSemJ3MXFUamlzWGF5Ynd3djF3QQ?oc=5"
@@ -204,13 +204,9 @@
         {
           "title": "Kompas.com",
           "url": "https://news.google.com/rss/articles/CBMitAFBVV95cUxPbFJYNElCaXcyWjNjZE9sakNLbU5jWEJybVRfQnR4cTI4N1VwN0dyLWNuTmNGNGt6d1lGT21TQXdMQUUzaXpOUkEtZXZZV3VLdUM4dURhVzhzNmRNU2ZrRS1aR1F5ek80M0Vnb1NmV2lLemdZaTlWdEt5aXowdDltOEZDV2MxcVVaT3RmcG55aEdVSVdNYTVQX0loU1JyTWVGNTNtdTVuUmp1Mjc1UkRJdUZWUG4?oc=5"
-        },
-        {
-          "title": "RRI.co.id",
-          "url": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxPN0M3bF91aExBd0l0OGoyb29nVkRoRVZoQzFUeW5WSThKN2VGWHRJM3NLWUdMM3c0RF9TcmhCSThERVYwelJHSEdsb1d4Y01HWUV0RllUV3h5Uk1wWEdDeDZHeEZvUDh0MTZoVEdNRzVYWUJsdXFBZGRnTHFxNXQ0LUN4Ni1mekJ0a0dOZGpmSmdCV2N3bGxSRGR3OGhTLU1Ld1FmS2dHMjQ5eVRMWFFBTE5VZm51YldTVi1YcU1XXzVBaEk?oc=5"
         }
       ],
-      "checkedAt": "2026-11-27T02:16:53.949Z"
+      "checkedAt": "2026-11-27T14:15:27.840Z"
     },
     {
       "key": "tmdb_1398505",
@@ -224,7 +220,21 @@
       "lsfStatus": "Klasifikasi TMDB ID: SU",
       "summary": "Jadwal resmi TMDB ID: 2026-12-10.",
       "sources": [],
-      "checkedAt": "2026-11-27T02:16:53.949Z"
+      "checkedAt": "2026-11-27T14:15:27.840Z"
+    },
+    {
+      "key": "tmdb_1791250",
+      "tmdbId": 1791250,
+      "title": "BABY SHARK CHRISTMAS SPECIAL: THE SANTA CONTEST",
+      "releaseDateId": "2026-12-04",
+      "status": "confirmed",
+      "chains": [],
+      "imax": false,
+      "presaleActive": false,
+      "lsfStatus": "Klasifikasi TMDB ID: SU",
+      "summary": "Jadwal resmi TMDB ID: 2026-12-04.",
+      "sources": [],
+      "checkedAt": "2026-11-27T14:15:27.840Z"
     },
     {
       "key": "tmdb_1168320",
@@ -233,48 +243,25 @@
       "releaseDateId": "2026-12-10",
       "status": "confirmed",
       "chains": [],
-      "imax": false,
+      "imax": true,
       "presaleActive": false,
       "lsfStatus": "",
-      "summary": "Jadwal resmi TMDB ID: 2026-12-10. Berita: Sara Wijayanto Ungkap Sisi Baru Bu Laras di The Doll Ghawiah - detikcom",
+      "summary": "Jadwal resmi TMDB ID: 2026-12-10. Berita: Film Sara Tayang 10 Desember, Christine Hakim Jadi Muryem - KUTIP.co",
       "sources": [
+        {
+          "title": "KUTIP.co",
+          "url": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxNRklIWEJ3SFdzVmRZTXNmYTVXem5DZ2RpbEVPV3otVTI5TWNVYWg2RUxNNHU2eEgwLXdobFlRNWowREJEUzNCUmE3UHR4WHZBWTBvUnJRMjVPbmljMmFKUG5kWUp1M2txOWZXcllWaEJtdnNfQnNGVkp1VWZOLTkxdHBveWlvOTBmMUs0?oc=5"
+        },
         {
           "title": "detikcom",
           "url": "https://news.google.com/rss/articles/CBMipAFBVV95cUxQR1dPNUtpZlktaXREZGJZRXRoVWZCSVRTZVZKTXRDVzN1RHBMMHJMWDdNWmFQQXh3RGdUakh1Y0VlR1AxaHdRWkRWS1RYSE9uXzNsZXF6ZzhrNHlIWHl4SmJDMUZCT1BVU2pNejEtb1VHdDlrcnJuQ1h4UVM2Uzg5UnRZVy1GRDRadU1IT1g0RE5qcW1uOUlMbzJ0S3I0STcyc3pfYtIBqgFBVV95cUxOUng1dWZpV1hmMUoyY2xKM2VTUjEwenpyMG1DLXI3TDViTzAzazZiclZ6ejV3V3M4Ymp2UUJtNW1vS3p6ZHF5RVRqcklaYmItQXNlbG1YMTNmWUZjeFRwQUZnTUVmQXdWRlhVY0dXMm5RSzdjbUloaVRuaE9VZk1BU3A5WndEdEdSN2Fmak1iVXN4cEtyZUE2bjZWQ2doMFIwV2Y3bmdua3hCUQ?oc=5"
         },
         {
-          "title": "Kompas.com",
-          "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxOb252YUZSRDcwSFhqTUoyalQxcm5TTmx5bEdGd2FMSEJUMHFwS2VIdUNsODB4aFY5S2lLaFI4dkd5M2NEVDdfUDMza3NuazNQSnJISHBQTk8wX2VCU1BJZVdBR1NfMzZJQ1N6WWJlMUNzbHRLQTQwbDV2NS1vS3RNb24ySVRHWWJ4Qy1oWTE3M01rRjREWE1aSzdJTUxibmNxTFE?oc=5"
+          "title": "IDN Times",
+          "url": "https://news.google.com/rss/articles/CBMixgFBVV95cUxNUzhTekJ0ZWY0Y3BENUV5blUxUWM0dFk5NVA3RmpzZnQtOHdhX2dvMWw3TUpGWDFUc1hYdkpjZ0pxb3lRd25zakV6elluY0RueWlLN3E2V0VaZWhuQUhOT1VNUzVkanFZcnZodmcwNjduYVNRVW10alFTNWFIRFVtMU5tX3NuTjNWbW1aTXFUZ3RCTzJTcjF0QmZ4VXRkcHhmNUdLZzRhVVBlU08xSmxLeFZibS1nRHlZbG5YbWRxSUVSNXJQOHfSAcsBQVVfeXFMTWxIM3dEMnNqSWN2TTZnbmZNQXQ2ZnZqWEViZUk4TEpRZWs4LVBYS1BCLUliSTB3Uk4ySm9xbGU4TE5MRVVFd1dKQ2d0S0ttVlJPZkJBcm5wRXJBSVZsRDZ0T1FScFh3RVJlVTJJSEFxTzZHQlBoQ2M0ZkZXYzhpZFdzNlcyazNpUDNkVWh2QXJOdk5scXh2a2hYZV9uOXpkYkd3bUdJNGpVVGU1NWE2dG13d0pMRU96Qm9nWjFSd1lJSTliS1MyOGhPbm8?oc=5"
         }
       ],
-      "checkedAt": "2026-11-27T02:16:53.949Z"
-    },
-    {
-      "key": "tmdb_1289720",
-      "tmdbId": 1289720,
-      "title": "POK AME AME",
-      "releaseDateId": "2026-12-10",
-      "status": "confirmed",
-      "chains": [],
-      "imax": false,
-      "presaleActive": false,
-      "lsfStatus": "",
-      "summary": "Jadwal resmi TMDB ID: 2026-12-10. Berita: Zikri Daulay Blak-blakan Plot Twist Film Horor Pok Ame Ame - detikcom",
-      "sources": [
-        {
-          "title": "detikcom",
-          "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxNbTZnVkd4ZjE0NXREVkhOUjlZandheG9mTS1xY3FaTVpOb1Zxb21lc19kenRxNl9uS2MzVWZPYUZtZU5ZSFk3QUkzRnlOX0wydVdab1NVWkZuRVFXWElpY0dFeUxHOE5BdjlUOW9nU091MTZaaTh3RmVTS0RuX3BJOWhfTWt6bEtTR1ZDbHpGSktGUDVLbWZkanZFODRId2NCYlHSAacBQVVfeXFMTzlaTHcxN21oQS1GLTlGdV9LSmxsR08ySEtiQVp1QzMwa20yS3dlX0Y2STRNY1d4WWQ2aExVcTZ0Z2o5QzlUcVZjN0E1eFV2VVhZS1JDbVRxeDBid0FmRk1LaHYyRjMwTEJ2bXlkN1l0cWR6bVJHRi1xcEloa2FuNUtzNEVDYUR1T0RJc3hlZ1BaTGhmaU1ZSHpYblNONUU4ckM2SGFma2M?oc=5"
-        },
-        {
-          "title": "Radar Batu",
-          "url": "https://news.google.com/rss/articles/CBMi1gFBVV95cUxOSHF0bUwtVzRvNWkxMGcwczRRV2VfQ09jM2paSWx0d0ZZRi1XMi1jRVpXX1Z5Q2pzVzdrSnJOeVFNT09Qa3pzMDVua0VDV2pOV1NoY1pKNkZTUG5CS2Vod2gwVVZtUk9nOHpZOVNLZ216cXNET1FPeDVnU2dxeS1maDNjT3h0eUtjVzdPcWtreWhQQmJhWGJraGFNMFRKMWF0cVJUbEY4R0tncDNoWExQMDRyd2ZUYlBpOFpvQlIxdFo5Q2Fra1JncGpRS0I0QWlQSXFMVXhB0gHbAUFVX3lxTE9kd2JhbUxQamZyTHpoMGJzb3VqM3BQYUZyWFRONmRJRmQ1aS1yMWVwUHo3WlI5bkpTWkhNem5lZXpiTV9USi1qb1R2UFJqOUp0Um92OFo1QnBmWDBmSnJ0UXJmNzRHaUd0N09kRkJNSDBlWDlORjRsRlZJSHYyWUl1LXFfcm5pWE1TbFVEWEJ4ZWtuOVhlQjVsWlAxdTE0Um1tNFlHM0F1cGtZdjdLcW1MN0xLMlE5TDJaOWRmcUduVUZUOW9FNWNvSkVOYlhMMGJVYnJJREFJbVVpaw?oc=5"
-        },
-        {
-          "title": "Lensa Banten",
-          "url": "https://news.google.com/rss/articles/CBMisgFBVV95cUxNZkh1N0lMUFh4TWZnVHowRWFVMkpMMDl3OGdBNmE4NGhVMElXRlRpX3Y2dXl0dDVmNUl3aHE4OXNheUNYbzBqejF6QVo1UUUzLUxDYTk2bnFNYjBSTmp1VS1BQm5QWHNsN1JTUjUzY1M5VDFBZzlTUmlwcjIxSTZ3aWFleklnS3drdEJ4LUlZaHdWNm56R05EQUlhY2VYdm1Tc184RTZ5UXEtaGt6OVBaWnBR?oc=5"
-        }
-      ],
-      "checkedAt": "2026-11-27T02:16:53.949Z"
+      "checkedAt": "2026-11-27T14:15:27.840Z"
     }
   ]
 }
