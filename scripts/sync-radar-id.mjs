@@ -253,11 +253,10 @@ async function runFreeRssAndTmdbScan(tmdbCandidates, tmdbKey, nowIso) {
   return results.filter(Boolean);
 }
 
-async function generateWithSearchFallback(ai, prompt, systemInstruction) {
+async function generateWithSearchFallback(ai, prompt) {
   const models = [
     'gemini-2.5-flash-lite',
     'gemini-2.5-flash',
-    'gemini-3.8-flash',
     'gemini-flash-latest',
   ];
   let lastErr = null;
@@ -267,21 +266,23 @@ async function generateWithSearchFallback(ai, prompt, systemInstruction) {
         model,
         contents: prompt,
         config: {
-          systemInstruction,
           tools: [{ googleSearch: {} }],
         },
       });
     } catch (err) {
       lastErr = err;
       const msg = err instanceof Error ? err.message : String(err);
-      console.warn(`Model ${model} failed: ${msg.slice(0, 160)}`);
+      console.warn(`Model ${model} failed: ${msg.slice(0, 180)}`);
     }
   }
   throw lastErr || new Error('All Gemini search models failed');
 }
 
 async function runGeminiSearchScan(geminiKey, tmdbCandidates, nowIso) {
-  const ai = new GoogleGenAI({ apiKey: geminiKey });
+  const ai = new GoogleGenAI({
+    apiKey: geminiKey,
+    httpOptions: { apiVersion: 'v1beta' },
+  });
 
   const hintBlock = tmdbCandidates.length
     ? `Periksa juga jadwal tayang Indonesia untuk daftar film TMDB berikut bila sudah diumumkan:\n${tmdbCandidates
@@ -292,13 +293,14 @@ async function runGeminiSearchScan(geminiKey, tmdbCandidates, nowIso) {
 
   const todayIso = nowIso.slice(0, 10);
   const prompt = [
+    'Anda adalah aggregator jadwal bioskop Indonesia (Cinema XXI, CGV Indonesia, Cinépolis Indonesia, IMAX, TIX ID, dan LSF RI).',
     `Tanggal hari ini: ${todayIso}.`,
-    'Lakukan pencarian Google Search untuk mengumpulkan daftar lengkap jadwal rilis bioskop INDONESIA (Cinema XXI, CGV Indonesia, Cinépolis Indonesia, TIX ID, dan LSF RI lsf.go.id) mencakup:',
-    '1. Film yang sedang tayang, pre-sale, lulus sensor LSF, atau akan tayang bulan ini hingga 3 bulan ke depan di bioskop Indonesia.',
-    '2. Film TAYANG ULANG / REISSUE / RE-RELEASE / IMAX Special Screening yang diumumkan kembali tayang di bioskop Indonesia (set isReRelease: true).',
-    '3. Film blockbuster / tentpole besar (seperti Marvel / Avengers, Dune, Christopher Nolan, DC, dll.) yang tanggal rilis bioskop Indonesianya sudah diumumkan media atau distributor resmi (ingat di Indonesia film Hollywood sering rilis hari Rabu, 2 hari lebih awal dari tanggal Jumat AS).',
+    'Lakukan pencarian Google Search untuk mengumpulkan daftar lengkap jadwal rilis bioskop INDONESIA mencakup:',
+    '1. Film yang sedang tayang, pre-sale, lulus sensor LSF (lsf.go.id), atau akan tayang bulan ini hingga 3 bulan ke depan di bioskop Indonesia.',
+    '2. Film TAYANG ULANG / REISSUE / RE-RELEASE / IMAX Special Screening yang diumumkan kembali tayang di bioskop Indonesia (set isReRelease: true), termasuk film seperti Dune, Dune: Part Two, atau film spesial lainnya jika ada jadwal tayang ulang di Indonesia.',
+    '3. Film blockbuster / tentpole besar (seperti Avengers: Doomsday, Dune, Christopher Nolan, DC, dll.) yang tanggal rilis bioskop Indonesianya sudah diumumkan media atau distributor resmi (ingat di Indonesia film Hollywood sering rilis hari Rabu, 2 hari lebih awal dari tanggal Jumat AS).',
     hintBlock,
-    'ATURAN KETAT: Hanya masukkan film yang benar-benar memiliki kabar/jadwal rilis di Indonesia dari hasil Google Search. Jangan mengarang tanggal.',
+    'ATURAN KETAT: Hanya masukkan film dan tanggal rilis Indonesia yang benar-benar terverifikasi oleh hasil Google Search. Jangan mengarang tanggal.',
     'Balas HANYA 1 JSON valid tanpa teks pembuka/penutup:',
     '{',
     '  "entries": [',
@@ -320,11 +322,7 @@ async function runGeminiSearchScan(geminiKey, tmdbCandidates, nowIso) {
     .filter(Boolean)
     .join('\n\n');
 
-  const response = await generateWithSearchFallback(
-    ai,
-    prompt,
-    'Anda aggregator jadwal bioskop Indonesia (XXI, CGV, Cinépolis, IMAX, LSF). Keluarkan hanya entri dan tanggal rilis Indonesia yang terverifikasi oleh hasil Google Search.'
-  );
+  const response = await generateWithSearchFallback(ai, prompt);
 
   const parsed = parseJsonPayload(response.text || '');
   const sharedSources = extractGroundSources(response);
