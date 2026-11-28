@@ -1,50 +1,55 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-28T13:56:33.986Z",
-  "source": "cloud-radar-rss-tmdb",
+  "updatedAt": "2026-11-28T14:08:32.945Z",
+  "source": "cloud-radar-gemini+rss",
   "entries": [
     {
       "key": "tmdb_1195803",
       "tmdbId": 1195803,
       "title": "WICKER",
       "releaseDateId": "2026-12-02",
-      "dateSource": "tmdb_id",
+      "dateSource": "gemini",
       "status": "confirmed",
       "chains": [],
       "imax": false,
       "presaleActive": false,
       "lsfStatus": "",
-      "summary": "Jadwal resmi ID: 2026-12-02. Berita ID: Wicker Alexander Skarsgard Tayang 2 Desember di Bioskop Indonesia",
+      "summary": "Film Wicker, yang dibintangi Olivia Colman dan Alexander Skarsgård, dipastikan tayang di bioskop Indonesia mulai 2 Desember 2026.",
       "sources": [
         {
-          "title": "bing.com",
-          "url": "https://www.cnnindonesia.com/hiburan/20261124082234-220-1430657/wicker-alexander-skarsgard-tayang-2-desember-di-bioskop-indonesia"
+          "title": "MerahPutih",
+          "url": "https://news.google.com/rss/articles/CBMipgFBVV95cUxPekw3WVZwQXJ0SEJTNEd4Z1FGSWN4emk0RHZNdXk2ZVdPQlpGbEdnSS1yZVpqbVBaRXY1eENjcS1DTHVFcnZoT0hfVFFKQ1k4STBXczFRNllVYjg2NmY4RFd1VVZCaVdVU3cwMG9HNnpMdjdROFJFSV9lWDNWWEdlcEpCeXFUX0VNdVJWaGRmWmxfdHV6aGV6RUhKVUtKTHpKLTBaSk9B0gGkAUFVX3lxTE8zRnZieGl6RnEycjVhRTEwUGRheEtVS3BfR0Y1RUpKcVFlU3JjYU5rUXBTMFdaX2taOE84TDU4cUY1bnc4ODlQTGZ3OG14dmFVbXg0NWQyVjNBeXVCU0NVeWFycngwTFVBWEx2WWJ6am5TV1JPR25MNTRqTDFNV1hteDd3clZJbkFBY0hDVGwtYTVfdXBoSl9xNFU3RUhqdjBSRlFn?oc=5"
         },
         {
           "title": "CNN Indonesia",
           "url": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxQSjNvQnhpNFowcG9nd2xQWUhCZHRoNUFlb1E2a2ZlYTZKT2NBd0J4bmhmQ053S19lcUN3dGhuRnhwYnRZdWl0MUg2TXBMWE5OQ2Y2MWlQajBLN1pOQ3BvUDlGTjE1emp3X01FcmgwSERJZzdWcHpmLWRUMDQzcFNFTDlUUkVYcVh0S240R3ZGaFJTazU4cDRjRk1XQk1SSjIxdzhXV0FnWHFRNnloZUVtaGliUmdCR2VCS1Y5Y19aNnRLdzhaZ3YzTNIBzgFBVV95cUxNM0VxNDZ4d24wZkJaYVRGRGRLYmRtX3UtOXhkWjYzeU51Y0VuNHVhQjZNcnZfWnUyRVZXLUlpeUo2cUo2VTdQUWd5MEt3QzdkTm42T2NnX2xuR0hGZ0c2ZENaaHdvOF9PTGpfdVNyVF9sTXZOd0s2OTdpcXBqbGUzZWh6YWtHWUdlaEh4aVkzLW52MmRlRVlxdS1xbWowR1hqaGR2cnlrQmVRMHhxVU5lWUwwVFhsY0Z3SEVNOEp3a1ZjeXVnV3FscDFmcnYxdw?oc=5"
         },
         {
-          "title": "MerahPutih",
-          "url": "https://news.google.com/rss/articles/CBMipgFBVV95cUxPekw3WVZwQXJ0SEJTNEd4Z1FGSWN4emk0RHZNdXk2ZVdPQlpGbEdnSS1yZVpqbVBaRXY1eENjcS1DTHVFcnZoT0hfVFFKQ1k4STBXczFRNllVYjg2NmY4RFd1VVZCaVdVU3cwMG9HNnpMdjdROFJFSV9lWDNWWEdlcEpCeXFUX0VNdVJWaGRmWmxfdHV6aGV6RUhKVUtKTHpKLTBaSk9B0gGkAUFVX3lxTE8zRnZieGl6RnEycjVhRTEwUGRheEtVS3BfR0Y1RUpKcVFlU3JjYU5rUXBTMFdaX2taOE84TDU4cUY1bnc4ODlQTGZ3OG14dmFVbXg0NWQyVjNBeXVCU0NVeWFycngwTFVBWEx2WWJ6am5TV1JPR25MNTRqTDFNV1hteDd3clZJbkFBY0hDVGwtYTVfdXBoSl9xNFU3RUhqdjBSRlFn?oc=5"
+          "title": "JournalArta",
+          "url": "https://news.google.com/rss/articles/CBMiggFBVV95cUxOVkNhSFRsakVIcl9sbGZHeF82bnhjZ3Q5ODAwaExmSDVpT0gwNU9aQml0SGY4S3Jza1ZhM0tWcEZtNkNtb0pMVUd3UmNpNW1nUHd1Y0MtSzE2UkV6YTBpakdTZWx3bGpGNGgzWU1tUS1neThpYTlORHdyMWptS0hmMklR?oc=5"
+        },
+        {
+          "title": "cgv.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGwf2eV8GnGwOrS1yXY6y5-pP5_KapP5W-WSDv-5xw1SYjmGf6FnJyIN0zg2clQPZVxd0mOW2NZnmiOTLS-SNqr0rdQNgybs8xKwXRq6KlLyoOnjyAx-tB9N0nQwvQtxoDFlsbcluZKnNcLWBLupnyakj8srSC0BCg="
         }
       ],
-      "checkedAt": "2026-11-28T13:56:33.986Z"
+      "checkedAt": "2026-11-28T14:08:32.945Z"
     },
     {
       "key": "tmdb_1078446",
       "tmdbId": 1078446,
       "title": "VIOLENT NIGHT 2",
       "releaseDateId": "2026-12-02",
-      "dateSource": "cinema_chain",
+      "dateSource": "gemini",
       "status": "confirmed",
       "chains": [
-        "CGV"
+        "CGV",
+        "Cinépolis"
       ],
       "imax": false,
       "presaleActive": false,
       "lsfStatus": "Klasifikasi TMDB ID: 17+",
-      "summary": "Jadwal resmi ID: 2026-12-02. Terdaftar di CGV Indonesia. Berita ID: Violent Night 2: Sinterklas David Harbour kembali ke bioskop - Sortir à Paris",
+      "summary": "Film aksi komedi Violent Night 2 dijadwalkan tayang di bioskop Indonesia, termasuk CGV dan Cinépolis, pada 2 Desember 2026.",
       "sources": [
         {
           "title": "CGV Indonesia",
@@ -53,46 +58,60 @@
         {
           "title": "Sortir à Paris",
           "url": "https://news.google.com/rss/articles/CBMizwFBVV95cUxNcUVYd2g1RUNBS2FieUlfZ0pSdW82WlRxSGgxQS1MYnUtTjIzdERqR19xbWt4Y0lGZXdsVE1SMVBLNGVnQ2hfZF9vWTJ5YU1Qd0loN1R5SElWTmxxZnRNTVF2YklLUGRZcGhJcGpfcDhrQnNTVEt2cnJEM0M4a2Y0dW01eVNTN2ZqbFNsLXhfei1Fa3ZUVUNBZ3VxMkxJME9wUlIxb0JwS0NHZFBlVWd5bFhUWVprc0M3RnVZaVdXR29yYjFTWmdyS3BNdlgtZHM?oc=5"
+        },
+        {
+          "title": "cgv.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGwf2eV8GnGwOrS1yXY6y5-pP5_KapP5W-WSDv-5xw1SYjmGf6FnJyIN0zg2clQPZVxd0mOW2NZnmiOTLS-SNqr0rdQNgybs8xKwXRq6KlLyoOnjyAx-tB9N0nQwvQtxoDFlsbcluZKnNcLWBLupnyakj8srSC0BCg="
+        },
+        {
+          "title": "jadwalnonton.com",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFLErSIJuGkOz4IWNKnixfsqDpjswXiAhc50NVWg4DBh8GwY-13t0Z4CdZ8bSJ57FR2rdLpdyQqv22J5z28cPR02oymD9hHSAMiPUzBc_CPNbLYIOM1Mt24yjY9vkg6yQeClBVRWtWuPh-QuUQh0w=="
         }
       ],
-      "checkedAt": "2026-11-28T13:56:33.986Z"
+      "checkedAt": "2026-11-28T14:08:32.945Z"
     },
     {
       "key": "tmdb_372058",
       "tmdbId": 372058,
       "title": "YOUR NAME.",
       "releaseDateId": "2026-12-02",
-      "dateSource": "cinema_chain",
-      "status": "confirmed",
+      "dateSource": "gemini",
+      "status": "lsf_passed",
       "chains": [
-        "CGV"
+        "CGV",
+        "XXI",
+        "Cinépolis"
       ],
       "imax": false,
       "presaleActive": false,
-      "lsfStatus": "Klasifikasi TMDB ID: 13+",
-      "summary": "Jadwal resmi ID: 2026-12-02. Terdaftar di CGV Indonesia. Berita ID: Your Name Tayang Ulang Versi 4K di Bioskop Indonesia - Limapagi",
+      "lsfStatus": "R13, 106 menit, terbit 13 November 2026",
+      "summary": "Anime populer Your Name. akan tayang ulang di bioskop Indonesia dalam versi 4K remastered mulai 2 Desember 2026, telah lulus sensor LSF dengan klasifikasi R13.",
       "sources": [
         {
           "title": "CGV Indonesia",
           "url": "https://www.cgv.id/en/movies/now_playing"
         },
         {
-          "title": "Limapagi",
-          "url": "https://news.google.com/rss/articles/CBMiZkFVX3lxTE9UR2FsQndVWW1fYzdaUHlYWV9GemRBQ1ExSDY2SjhyUEJWQm51NUdQTlRoc21yaUFwWjVMU2JiMTFZUEd2UkxXTnFmV241bS0yTTU2aW5oZF9vLU1LTVp2bjI0ZjdEdw?oc=5"
+          "title": "Medcom.id",
+          "url": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxPRWlZMFd0RkZCSjJPT09IcEFRSGs3ajBfbnJVWlRBbUk2UjZEV1Vpb0FXXzBLdU9yNUVmOFVzLXhLeWxRR0FUa0tTVXFpelFUUDdhQVEySndvdE42WUJYekVHc1p6dmJGc2lxemdnQjhKX3Fvanc1dTdHcVJHTXNudmtSX0tPVHZJRjFjUnRNaGRhVnkxWHRXWTVvZld0UFAwUFFKOVhWTjVVUWVnWFB5N0RJZlN0YWotTEp6UlRkR2lodw?oc=5"
         },
         {
-          "title": "CNN Indonesia",
-          "url": "https://news.google.com/rss/articles/CBMivwFBVV95cUxQdC11c1ZWaWEtcmhFbk1LYTFoNUs4SnNuOXZDY3JRRnI5TWozUU03Y3hHUHBqU3Y4endBeTZ1S0pPS1k2dXhpODdiRl9qb3NWay1VVjRQOWdyTURvZVM2QVEzQ3hjc1JaRjBOM0puOXJNSmdXcTcxXzRVcllXSHVkR2hrUUhOc01KTWhhYVcwM0k5b21KSm5EZmlfX1hMUDZYR21WWEtqSUZOdnN4RUdaekQweHhyZWNfczN3Q0xia9IBxAFBVV95cUxOYkdiQWM2WDhJTmZkNnlTREVOdzZVR2UyWVhXNEJGekxjd19LUjc2LXFnN0RpYmE2YmV2dWdFTWJnaUYyaTJPY1B3dWlteEJXZGRWUDRsSjM4Z0E4TWpRbDNMMDVvZS0xTjRGNGtTdV82SEVFOWZ6ZTV5MHNwMVJaVzJJNm9vZVQ0OFp4emREb0k5dWVYTGlYRnFpNDVNS2lDMVVCN1NCSE0za055eDltNHFkWjdXZEw4VlZpZGdYU0NyQVJD?oc=5"
+          "title": "RRI.co.id",
+          "url": "https://news.google.com/rss/articles/CBMirwFBVV95cUxQZGg2c01ZRVhNWjRWcEd1MGZ6YVllTVZDemZhcGNFT1BQdVFfcTI0NUNhX054NUF1WFBMbU5raExMLXhBbWlfSUJMNjFjVDdkT3dpdDNvdzZLM1RPcFk5bDJkdEg5emEzVnpEaUQwR2oyRGJJcE4xd1RRbF9MZl9hRzNXLUZuaUp0OFgwR3E4OFJlRzdFSG1MNFJ6V3Fla3ZsWXpkY280ak0yOW9PTEVn?oc=5"
+        },
+        {
+          "title": "cgv.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGwf2eV8GnGwOrS1yXY6y5-pP5_KapP5W-WSDv-5xw1SYjmGf6FnJyIN0zg2clQPZVxd0mOW2NZnmiOTLS-SNqr0rdQNgybs8xKwXRq6KlLyoOnjyAx-tB9N0nQwvQtxoDFlsbcluZKnNcLWBLupnyakj8srSC0BCg="
         }
       ],
-      "checkedAt": "2026-11-28T13:56:33.986Z"
+      "checkedAt": "2026-11-28T14:08:32.945Z"
     },
     {
       "key": "tmdb_1732866",
       "tmdbId": 1732866,
       "title": "3726 MDPL",
       "releaseDateId": "2026-12-03",
-      "dateSource": "cinema_chain",
+      "dateSource": "gemini",
       "status": "confirmed",
       "chains": [
         "CGV"
@@ -100,7 +119,7 @@
       "imax": false,
       "presaleActive": false,
       "lsfStatus": "",
-      "summary": "Jadwal resmi ID: 2026-12-03. Terdaftar di CGV Indonesia. Berita ID: Film 3726 MDPL Tayang di Bioskop 3 Desember, Angkat Kisah Cinta di Gunung Rinjani",
+      "summary": "Film romantis '3726 MDPL' produksi Falcon Pictures, yang diadaptasi dari novel, akan tayang di bioskop Indonesia pada 3 Desember 2026.",
       "sources": [
         {
           "title": "CGV Indonesia",
@@ -108,41 +127,57 @@
         },
         {
           "title": "bing.com",
-          "url": "http://www.bing.com/news/apiclick.aspx?ref=FexRss&aid=&tid=6b0add9b45da4394876612d7b45f0e68&url=https%3a%2f%2fwww.topik.id%2ffilm-3726-mdpl-tayang-di-bioskop-3-desember-angkat-kisah-cinta-di-gunung-rinjani&c=7571314993164898442&mkt=en-id"
+          "url": "http://www.bing.com/news/apiclick.aspx?ref=FexRss&aid=&tid=6b0ae068561e4a87afa80df0ce58790e&url=https%3a%2f%2fwww.topik.id%2fsinopsis-film-3726-mdpl-perjuangan-cinta-rangga-dan-andini-di-puncak-rinjani&c=7263311818679725571&mkt=en-id"
         },
         {
           "title": "bing.com",
-          "url": "http://www.bing.com/news/apiclick.aspx?ref=FexRss&aid=&tid=6b0add9b45da4394876612d7b45f0e68&url=https%3a%2f%2fwww.topik.id%2fsinopsis-film-3726-mdpl-perjuangan-cinta-rangga-dan-andini-di-puncak-rinjani&c=7263311818679725571&mkt=en-id"
+          "url": "http://www.bing.com/news/apiclick.aspx?ref=FexRss&aid=&tid=6b0ae068561e4a87afa80df0ce58790e&url=https%3a%2f%2fwww.topik.id%2ffilm-3726-mdpl-tayang-di-bioskop-3-desember-angkat-kisah-cinta-di-gunung-rinjani&c=7571314993164898442&mkt=en-id"
+        },
+        {
+          "title": "cgv.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGwf2eV8GnGwOrS1yXY6y5-pP5_KapP5W-WSDv-5xw1SYjmGf6FnJyIN0zg2clQPZVxd0mOW2NZnmiOTLS-SNqr0rdQNgybs8xKwXRq6KlLyoOnjyAx-tB9N0nQwvQtxoDFlsbcluZKnNcLWBLupnyakj8srSC0BCg="
         }
       ],
-      "checkedAt": "2026-11-28T13:56:33.986Z"
+      "checkedAt": "2026-11-28T14:08:32.945Z"
     },
     {
       "key": "tmdb_1718454",
       "tmdbId": 1718454,
       "title": "THE ONES WHO COME AND GO",
       "releaseDateId": "2026-12-03",
-      "dateSource": "tmdb_id",
+      "dateSource": "gemini",
       "status": "confirmed",
       "chains": [],
       "imax": false,
       "presaleActive": false,
       "lsfStatus": "Klasifikasi TMDB ID: 13+",
-      "summary": "Jadwal resmi ID: 2026-12-03. Terdaftar di Jadwalnonton.",
+      "summary": "Film drama 'Yang Datang dan Yang Pergi' dijadwalkan tayang di bioskop Indonesia pada 3 Desember 2026.",
       "sources": [
         {
           "title": "Jadwalnonton",
           "url": "https://jadwalnonton.com/film/2026/yang-datang-dan-yang-pergi/"
+        },
+        {
+          "title": "cgv.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGwf2eV8GnGwOrS1yXY6y5-pP5_KapP5W-WSDv-5xw1SYjmGf6FnJyIN0zg2clQPZVxd0mOW2NZnmiOTLS-SNqr0rdQNgybs8xKwXRq6KlLyoOnjyAx-tB9N0nQwvQtxoDFlsbcluZKnNcLWBLupnyakj8srSC0BCg="
+        },
+        {
+          "title": "jadwalnonton.com",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFLErSIJuGkOz4IWNKnixfsqDpjswXiAhc50NVWg4DBh8GwY-13t0Z4CdZ8bSJ57FR2rdLpdyQqv22J5z28cPR02oymD9hHSAMiPUzBc_CPNbLYIOM1Mt24yjY9vkg6yQeClBVRWtWuPh-QuUQh0w=="
+        },
+        {
+          "title": "cnnindonesia.com",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFPdhmCHuJQm0-3ULABaZ0oxGdqPjUaIweWvTMHZvdtn8R-k79x4CjjqN_qKICu5SpKXIklVRtr8pm5VLhFKFk1wKrQL94FWYQ2gI4rBK2eiutpOJAn9hv1iTv_uN1xHcjDNpB9zupNCNkXD77wjCkJxzPcikOGW-evkCPcVO6wgSi_1bANW9pE2w6zJuwY_-l6kQtnkvPxLUnAyUS3CZGvJ-P4R8r-RRAcfMODZScBHULIINwOoFwwfDtpk94="
         }
       ],
-      "checkedAt": "2026-11-28T13:56:33.986Z"
+      "checkedAt": "2026-11-28T14:08:32.945Z"
     },
     {
       "key": "tmdb_1691495",
       "tmdbId": 1691495,
       "title": "HAJATAN SETAN",
       "releaseDateId": "2026-12-03",
-      "dateSource": "cinema_chain",
+      "dateSource": "gemini",
       "status": "confirmed",
       "chains": [
         "CGV"
@@ -150,7 +185,7 @@
       "imax": false,
       "presaleActive": false,
       "lsfStatus": "Klasifikasi TMDB ID: 17+",
-      "summary": "Jadwal resmi ID: 2026-12-03. Terdaftar di CGV Indonesia. Berita ID: Sinopsis, Daftar Pemeran, dan Jadwal Tayang Film Hajatan Setan",
+      "summary": "Film horor 'Hajatan Setan' akan tayang di bioskop Indonesia mulai 3 Desember 2026.",
       "sources": [
         {
           "title": "CGV Indonesia",
@@ -158,27 +193,33 @@
         },
         {
           "title": "bing.com",
-          "url": "http://www.bing.com/news/apiclick.aspx?ref=FexRss&aid=&tid=6b0add9c064941f2ab3f05051d72e678&url=https%3a%2f%2fwww.kompas.com%2fhype%2fread%2f2026%2f11%2f19%2f014546766%2fsinopsis-daftar-pemeran-dan-jadwal-tayang-film-hajatan-setan&c=5048249866533348953&mkt=en-id"
+          "url": "http://www.bing.com/news/apiclick.aspx?ref=FexRss&aid=&tid=6b0ae068c46848db85db29c9eeefcf4f&url=https%3a%2f%2fwww.kompas.com%2fhype%2fread%2f2026%2f11%2f19%2f014546766%2fsinopsis-daftar-pemeran-dan-jadwal-tayang-film-hajatan-setan&c=5048249866533348953&mkt=en-id"
         },
         {
           "title": "bing.com",
-          "url": "http://www.bing.com/news/apiclick.aspx?ref=FexRss&aid=&tid=6b0add9c064941f2ab3f05051d72e678&url=https%3a%2f%2fradarkediri.jawapos.com%2fhiburan%2f2611280004%2ftradisi-pembawa-rezeki-berubah-jadi-mimpi-buruk-film-hajatan-setan-tayang-3-desember&c=9821888877764508212&mkt=en-id"
+          "url": "http://www.bing.com/news/apiclick.aspx?ref=FexRss&aid=&tid=6b0ae068c46848db85db29c9eeefcf4f&url=https%3a%2f%2fradarkediri.jawapos.com%2fhiburan%2f2611280004%2ftradisi-pembawa-rezeki-berubah-jadi-mimpi-buruk-film-hajatan-setan-tayang-3-desember&c=9821888877764508212&mkt=en-id"
+        },
+        {
+          "title": "cgv.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGwf2eV8GnGwOrS1yXY6y5-pP5_KapP5W-WSDv-5xw1SYjmGf6FnJyIN0zg2clQPZVxd0mOW2NZnmiOTLS-SNqr0rdQNgybs8xKwXRq6KlLyoOnjyAx-tB9N0nQwvQtxoDFlsbcluZKnNcLWBLupnyakj8srSC0BCg="
         }
       ],
-      "checkedAt": "2026-11-28T13:56:33.986Z"
+      "checkedAt": "2026-11-28T14:08:32.945Z"
     },
     {
       "key": "tmdb_1657112",
       "tmdbId": 1657112,
       "title": "MEJA TANPA LACI",
       "releaseDateId": "2026-12-03",
-      "dateSource": "tmdb_id",
+      "dateSource": "gemini",
       "status": "confirmed",
-      "chains": [],
+      "chains": [
+        "CGV"
+      ],
       "imax": false,
       "presaleActive": false,
       "lsfStatus": "",
-      "summary": "Jadwal resmi ID: 2026-12-03. Terdaftar di Jadwalnonton. Berita ID: Daffa Wardhana Jadi Polisi Jujur di Film Terbaru \"Meja Tanpa Laci\", Simak Sinopsisnya! - RRI.co.id",
+      "summary": "Film drama 'Meja Tanpa Laci' akan tayang di bioskop Indonesia, termasuk CGV Cinemas, mulai 3 Desember 2026.",
       "sources": [
         {
           "title": "Jadwalnonton",
@@ -189,41 +230,49 @@
           "url": "https://news.google.com/rss/articles/CBMixAFBVV95cUxPTjZRZGF2a3ZHM0JwcTA5RDJKTTdubjUya1psUGR6SDRkMlpsZm4wT0puXzlmMWZWUUJBckJoWTNmNGdxSUZTNHRJNjNDZ0FWLUpxTHhHVkE3WVVldHhMckd1NThZTWdXU1NnSXdiX2V6ZGM0X2QwbEJjeG5vTDR6bEhDanV5dW9CU2dyeWxzMWtQUVA1NmRFTjZKQk1qbmRoV012TnNrS1Y5bVRYeTJhcUxhcHNCbUpIaFNWX3loSHVSSkFT?oc=5"
         },
         {
-          "title": "Radar Mojokerto",
-          "url": "https://news.google.com/rss/articles/CBMi3AFBVV95cUxNTEFINFZUc0t0VXNsS0Z1RlI1N2JuVU1sRDd3WkdjdlozdmdZWEhQQlNQX2xXeDFDWWtjVlNsZEI0cmctNTQ4cmQyZC1NakhjVzFuOGpLZ3NScHNwcUI5bDBwR1pFdUZ4enZ3dGd0bDVreHNFQ093MlZoTFN3dFB4bXhJSjVtOEVjV0c0WlpVMG1DTlpkS2JfVDdUcTdzU2MzRFNLOGlmMUVIRVVVVGZCN2I3RVJqck5UQVhXRHdlVFBFamg5NEhTOGJMVktnYUhFNlN2ZElBSEZfSFNE0gHiAUFVX3lxTFBfTm1UcWswRTVjYmZCOFhqSUZ3RlNvMEJQZFp6TW9NSFZIWGRvbnBhc0s4YXJQME4yVGREb3NTNjJRSVkzYmotcVRmcmVlN0VfbUlpVnZ1T2dKcnVzYlVLbHNCWkgtSW13Q0R5Z2haUDlqNXhCam1FUTJuakk0eXgxclFjNkxzZDNJZjNKbEdBclhCblhMRDdRNDNQVkNveUxPY29EVzFPY2dYWFlySE5vWnhpUC1lTGVRMlFfRWx4M01kbmNSa0F6YzctWTM4MEhZZkJQZFlGZUhBdzZ1X0F4ZXc?oc=5"
+          "title": "bing.com",
+          "url": "https://www.idntimes.com/hype/entertainment/sinopsis-film-meja-tanpa-laci-c1c2-01-mlsfx-tqlygj"
+        },
+        {
+          "title": "cgv.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGwf2eV8GnGwOrS1yXY6y5-pP5_KapP5W-WSDv-5xw1SYjmGf6FnJyIN0zg2clQPZVxd0mOW2NZnmiOTLS-SNqr0rdQNgybs8xKwXRq6KlLyoOnjyAx-tB9N0nQwvQtxoDFlsbcluZKnNcLWBLupnyakj8srSC0BCg="
         }
       ],
-      "checkedAt": "2026-11-28T13:56:33.986Z"
+      "checkedAt": "2026-11-28T14:08:32.945Z"
     },
     {
       "key": "tmdb_1586748",
       "tmdbId": 1586748,
       "title": "RATU PETAKA",
       "releaseDateId": "2026-12-03",
-      "dateSource": "cinema_chain",
-      "status": "confirmed",
+      "dateSource": "gemini",
+      "status": "lsf_passed",
       "chains": [
         "CGV"
       ],
       "imax": false,
       "presaleActive": false,
-      "lsfStatus": "",
-      "summary": "Jadwal resmi ID: 2026-12-03. Terdaftar di CGV Indonesia. Berita ID: Gandhi Fernando Debut Jadi Sutradara lewat Film Horor Ratu Petaka - Kompas.com",
+      "lsfStatus": "R13, 91 menit, terbit 10 November 2026",
+      "summary": "Film horor 'Ratu Petaka' akan tayang di bioskop Indonesia pada 3 Desember 2026, telah lulus sensor LSF dengan klasifikasi R13.",
       "sources": [
         {
           "title": "CGV Indonesia",
           "url": "https://www.cgv.id/en/movies/now_playing"
         },
         {
+          "title": "bing.com",
+          "url": "http://www.bing.com/news/apiclick.aspx?ref=FexRss&aid=&tid=6b0ae069e2984c10a88bdaef09357e03&url=https%3a%2f%2fkumparan.com%2fkumparanhits%2fgandhi-fernando-debut-jadi-sutradara-lewat-ratu-petaka-angkat-sisi-gelap-dunia-pageant-28cLyabaJT9&c=8666629369201763279&mkt=en-id"
+        },
+        {
           "title": "Kompas.com",
           "url": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxOUVR1dEFSRHNLSjFnNmkyVHRxLVRYSlVxbld1c1ZkQ0lxSzJnMF9yZF9vMlNPd09VandSWmVGcTYwdE9EZ0hOdnI3T2ZxMWI2S1FUek5BbUJScVgyR0ZuY1EyMnNuMXdvRFppTU1IVDFDZUZiUFprd292anhYSWxXTlN2LTZNS0h1cEo2V2FuQmtsV3RxMEVwNHNzM0lsRmtoX1E3aTlaZGF2RnlHYnlqQVJNclViS2lrS3Zn?oc=5"
         },
         {
-          "title": "bing.com",
-          "url": "http://www.bing.com/news/apiclick.aspx?ref=FexRss&aid=&tid=6b0add9cdfdc49a7967cdd5b2c17c569&url=https%3a%2f%2fwww.msn.com%2fid-id%2fhiburan%2fcelebrity%2ffilm-ratu-petaka-tayang-3-desember-2026-ini-sinopsinya%2far-AA2ijoN6&c=16950865801115569934&mkt=en-id"
+          "title": "cgv.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGwf2eV8GnGwOrS1yXY6y5-pP5_KapP5W-WSDv-5xw1SYjmGf6FnJyIN0zg2clQPZVxd0mOW2NZnmiOTLS-SNqr0rdQNgybs8xKwXRq6KlLyoOnjyAx-tB9N0nQwvQtxoDFlsbcluZKnNcLWBLupnyakj8srSC0BCg="
         }
       ],
-      "checkedAt": "2026-11-28T13:56:33.986Z"
+      "checkedAt": "2026-11-28T14:08:32.945Z"
     },
     {
       "key": "tmdb_1791250",
@@ -238,14 +287,49 @@
       "imax": false,
       "presaleActive": false,
       "lsfStatus": "Klasifikasi TMDB ID: SU",
-      "summary": "Jadwal resmi ID: 2026-12-04. Terdaftar di CGV Indonesia.",
+      "summary": "Jadwal resmi ID: 2026-12-04. Terdaftar di CGV Indonesia. Berita ID: Baby Shark Christmas Special: The Santa Contest",
       "sources": [
         {
           "title": "CGV Indonesia",
           "url": "https://www.cgv.id/en/movies/now_playing"
+        },
+        {
+          "title": "bing.com",
+          "url": "http://www.bing.com/news/apiclick.aspx?ref=FexRss&aid=&tid=6b0ae069397145bfb3a6600b7596e43d&url=https%3a%2f%2fwww.kapanlagi.com%2ffilm%2fbaby-shark-christmas-special-the-santa-contest-id14847.html&c=14327355730151110597&mkt=en-id"
         }
       ],
-      "checkedAt": "2026-11-28T13:56:33.986Z"
+      "checkedAt": "2026-11-28T14:08:32.945Z"
+    },
+    {
+      "key": "title_asterixthekingdomofnubia",
+      "title": "ASTERIX: THE KINGDOM OF NUBIA",
+      "releaseDateId": "2026-12-04",
+      "dateSource": "gemini",
+      "status": "confirmed",
+      "chains": [],
+      "imax": false,
+      "presaleActive": false,
+      "lsfStatus": "",
+      "summary": "Film animasi 'Asterix: The Kingdom of Nubia' dijadwalkan tayang di bioskop Indonesia pada 4 Desember 2026.",
+      "sources": [
+        {
+          "title": "cgv.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGwf2eV8GnGwOrS1yXY6y5-pP5_KapP5W-WSDv-5xw1SYjmGf6FnJyIN0zg2clQPZVxd0mOW2NZnmiOTLS-SNqr0rdQNgybs8xKwXRq6KlLyoOnjyAx-tB9N0nQwvQtxoDFlsbcluZKnNcLWBLupnyakj8srSC0BCg="
+        },
+        {
+          "title": "jadwalnonton.com",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFLErSIJuGkOz4IWNKnixfsqDpjswXiAhc50NVWg4DBh8GwY-13t0Z4CdZ8bSJ57FR2rdLpdyQqv22J5z28cPR02oymD9hHSAMiPUzBc_CPNbLYIOM1Mt24yjY9vkg6yQeClBVRWtWuPh-QuUQh0w=="
+        },
+        {
+          "title": "cnnindonesia.com",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFPdhmCHuJQm0-3ULABaZ0oxGdqPjUaIweWvTMHZvdtn8R-k79x4CjjqN_qKICu5SpKXIklVRtr8pm5VLhFKFk1wKrQL94FWYQ2gI4rBK2eiutpOJAn9hv1iTv_uN1xHcjDNpB9zupNCNkXD77wjCkJxzPcikOGW-evkCPcVO6wgSi_1bANW9pE2w6zJuwY_-l6kQtnkvPxLUnAyUS3CZGvJ-P4R8r-RRAcfMODZScBHULIINwOoFwwfDtpk94="
+        },
+        {
+          "title": "katadata.co.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQG9kySRcnPeXyfj6UMYknffGxnXraNxHNFFOWVdSM-WkvmzHqVHGRMYbpVrIIdTICAhl7WyyPio81wT2qzIWsKw8Euy8WMKk2T55-F3HsCurjGDXVvYhFNTtA-tYYvtfyolE35HoXHik0SWjVvTG6dvZoMnHPeD0cMyWsSpNqmS3qnSntfXvzvmbztVLWCy0DZkRZcTT3vJ5rakJb5YsEjqPQ1NoIjpdP08emfIoc0R-Km4iJTX38E="
+        }
+      ],
+      "checkedAt": "2026-11-28T14:08:32.945Z"
     },
     {
       "key": "tmdb_1299329",
@@ -273,42 +357,79 @@
           "url": "https://news.google.com/rss/articles/CBMitwFBVV95cUxQVVV4cTQtX1M0VVZVbUlQTlhiMzlJQ18xM3RhQ2lOSXAtb21PRjNJN2NESHVXUVBCTmE1bmd1dkVSTlRiVEJtR3RCR1MyRnNFMnVxSmstdjRNeC00M2p0ck5kcWc1VC1WbTlYNGpSRXRfRGJZaExWVHYwenp0TGRkQlRScmlQdmJkdkRIUHBpUEFCS1AtQU9wZjU4Q2ltMG5uejhEZjlBVmNHUGxvUWZSaVBVdE1LOFE?oc=5"
         }
       ],
-      "checkedAt": "2026-11-28T13:56:33.986Z"
+      "checkedAt": "2026-11-28T14:08:32.945Z"
+    },
+    {
+      "key": "title_dune2",
+      "title": "DUNE: PART TWO (REISSUE)",
+      "releaseDateId": "2026-12-09",
+      "dateSource": "gemini",
+      "status": "confirmed",
+      "chains": [],
+      "imax": false,
+      "presaleActive": false,
+      "lsfStatus": "",
+      "summary": "Pemutaran ulang film 'Dune: Part Two' dijadwalkan di bioskop Indonesia pada 9 Desember 2026.",
+      "sources": [
+        {
+          "title": "cgv.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGwf2eV8GnGwOrS1yXY6y5-pP5_KapP5W-WSDv-5xw1SYjmGf6FnJyIN0zg2clQPZVxd0mOW2NZnmiOTLS-SNqr0rdQNgybs8xKwXRq6KlLyoOnjyAx-tB9N0nQwvQtxoDFlsbcluZKnNcLWBLupnyakj8srSC0BCg="
+        },
+        {
+          "title": "jadwalnonton.com",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFLErSIJuGkOz4IWNKnixfsqDpjswXiAhc50NVWg4DBh8GwY-13t0Z4CdZ8bSJ57FR2rdLpdyQqv22J5z28cPR02oymD9hHSAMiPUzBc_CPNbLYIOM1Mt24yjY9vkg6yQeClBVRWtWuPh-QuUQh0w=="
+        },
+        {
+          "title": "cnnindonesia.com",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFPdhmCHuJQm0-3ULABaZ0oxGdqPjUaIweWvTMHZvdtn8R-k79x4CjjqN_qKICu5SpKXIklVRtr8pm5VLhFKFk1wKrQL94FWYQ2gI4rBK2eiutpOJAn9hv1iTv_uN1xHcjDNpB9zupNCNkXD77wjCkJxzPcikOGW-evkCPcVO6wgSi_1bANW9pE2w6zJuwY_-l6kQtnkvPxLUnAyUS3CZGvJ-P4R8r-RRAcfMODZScBHULIINwOoFwwfDtpk94="
+        },
+        {
+          "title": "katadata.co.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQG9kySRcnPeXyfj6UMYknffGxnXraNxHNFFOWVdSM-WkvmzHqVHGRMYbpVrIIdTICAhl7WyyPio81wT2qzIWsKw8Euy8WMKk2T55-F3HsCurjGDXVvYhFNTtA-tYYvtfyolE35HoXHik0SWjVvTG6dvZoMnHPeD0cMyWsSpNqmS3qnSntfXvzvmbztVLWCy0DZkRZcTT3vJ5rakJb5YsEjqPQ1NoIjpdP08emfIoc0R-Km4iJTX38E="
+        }
+      ],
+      "checkedAt": "2026-11-28T14:08:32.945Z"
     },
     {
       "key": "tmdb_1771024",
       "tmdbId": 1771024,
       "title": "12 MILE: GUIDING THE ARCHIPELAGO",
       "releaseDateId": "2026-12-10",
-      "dateSource": "tmdb_id",
+      "dateSource": "gemini",
       "status": "confirmed",
-      "chains": [],
+      "chains": [
+        "XXI"
+      ],
       "imax": false,
       "presaleActive": false,
       "lsfStatus": "Klasifikasi TMDB ID: SU",
-      "summary": "Jadwal resmi ID: 2026-12-10. Berita ID: Film 12 Mile Angkat Perjuangan Mochtar Kusumaatmadja Jaga Keutuhan Wilayah Indonesia - Pikiran Rakyat Koran",
+      "summary": "Film dokumenter-drama '12 Mile: Guiding the Archipelago' akan tayang di bioskop Indonesia pada 10 Desember 2026.",
       "sources": [
         {
-          "title": "Pikiran Rakyat Koran",
-          "url": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxPdDdDN2RpYzBZSEd0WEdJeUQwVVd3UGNEMU5YVXpaNHV0RjN3RVk0LTNRS3pWMVdmMGxsdk9MQ3lNaTVPeHZydVB1WDJoZW5OdGpocDV6Z3RBME1HOEpvUDlzVUxJUk5JVzVSbUZPcmxBaVVrQ3NKU3cyWEQ1b2NmTmN1VnhVaFpvczg2VmJicVRNS1owVF9sODQyeFZtQXg0NVFGSzJHdTl0SVN5Q0ZSSXIySWRpNHVERWJuQUgzQlE5SGlpNGRrR3UzT180RHA3d0tv?oc=5"
+          "title": "bing.com",
+          "url": "https://www.suara.com/entertainment/2026/11/13/164813/12-mile-guiding-the-archipelago-diplomasi-tanpa-peluru-dari-pahlawan-mochtar-kusumaatmadja?page=all"
         },
         {
-          "title": "ANTARA News Megapolitan",
-          "url": "https://news.google.com/rss/articles/CBMiygFBVV95cUxPVm9jNGhWNFpkbmFqQnBJbk9JLWtuSmswS2pGQ3Q1bkdEeFprMjZZc3M4cjdkMC1nOTR3aUlzelBTUVdfaHI0SzFkQ1RFYlJ6TGtGVWliOF96RlpEUjlHRDh6d2tIbkVHZFNnR0tYMlpnZHNUcUF1dGJrY2ZUelQ0YmUtZms4M2x3ZW9Gem4yX01KR24yREViVWl0RFNqNkdWbk5sOG1XZ3p4RXlIR0hJS1NPZWJLYW5HYndFbTZuQnVQU3NONnhRNVd30gHPAUFVX3lxTE9lQmVtUkZQYzlqTTE1RW80RURTR1gyZVJhQjFwTVpHbWcwSnBNUDZSRFU5Q0lpV0pTaVhKR0JXRGRGUDdLbHFkOTdRRk9nUFFadk5Fbm1NRlI2MGZ3X19YM193QnBfUlMtTnJMNFRZWmVVblA0bHE0QnZuY0VSRnF0ZHJoQnhBQkJQMlpWemFiU09iSjMyVmdsYkp6S0xvVEFMMUR0RUxYZEhnOG1Ya0hIekx0N2IzT1F0Q09UR0FpUUVxLWNCMU5NVFVHWFFVTQ?oc=5"
+          "title": "bing.com",
+          "url": "https://megapolitan.antaranews.com/berita/562679/kisah-perjuangan-mochtar-kusumaatmadja-dalam-film-12-mile-guiding-the-archipelago"
         },
         {
-          "title": "Jakartakita.com",
-          "url": "https://news.google.com/rss/articles/CBMi0AFBVV95cUxOUG1tRlpCY01qeGhkaGVVNnlxcmVpX2YxeUo3c3pCbG4tekJUVlEwbHo4TVlNcnVlS0tnQ0EzREZQWnVfZUVuYlR5S3ZDVXRRN2ZSb2UxU3d0WG5GeVptVXBtci0zSVR2STNoWHQyelJMdDIySGQ5cnc1TExmWl9aRE93VHZqQjNpaGkxcXBQNnZyYkNIT1AyUmpVNFR1ZWdrTHNTMTRmT0FCUERqQ0NxUGNnUE5zOXp4MGlGcHBKeV8xN0JnamZYWkc0d3gzdTJz?oc=5"
+          "title": "bing.com",
+          "url": "http://www.bing.com/news/apiclick.aspx?ref=FexRss&aid=&tid=6b0ae069068d4857a1a65c35dac5db18&url=https%3a%2f%2fwww.tabloidbintang.com%2ffilm-tv-musik%2f220021-12-mile-tayang-10-desember-2026-buka-kisah-perjuangan-25-tahun-mochtar-kusumaatmadja&c=6837380159888385488&mkt=en-id"
+        },
+        {
+          "title": "cgv.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGwf2eV8GnGwOrS1yXY6y5-pP5_KapP5W-WSDv-5xw1SYjmGf6FnJyIN0zg2clQPZVxd0mOW2NZnmiOTLS-SNqr0rdQNgybs8xKwXRq6KlLyoOnjyAx-tB9N0nQwvQtxoDFlsbcluZKnNcLWBLupnyakj8srSC0BCg="
         }
       ],
-      "checkedAt": "2026-11-28T13:56:33.986Z"
+      "checkedAt": "2026-11-28T14:08:32.945Z"
     },
     {
       "key": "tmdb_1398505",
       "tmdbId": 1398505,
       "title": "JANI BE GOOD",
       "releaseDateId": "2026-12-10",
-      "dateSource": "cinema_chain",
+      "dateSource": "gemini",
       "status": "confirmed",
       "chains": [
         "CGV"
@@ -316,14 +437,585 @@
       "imax": false,
       "presaleActive": false,
       "lsfStatus": "Klasifikasi TMDB ID: SU",
-      "summary": "Jadwal resmi ID: 2026-12-10. Terdaftar di CGV Indonesia.",
+      "summary": "Film drama Indonesia 'Desember Jani' dijadwalkan tayang di bioskop pada 10 Desember 2026.",
       "sources": [
         {
           "title": "CGV Indonesia",
           "url": "https://www.cgv.id/en/movies/now_playing"
+        },
+        {
+          "title": "cgv.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGwf2eV8GnGwOrS1yXY6y5-pP5_KapP5W-WSDv-5xw1SYjmGf6FnJyIN0zg2clQPZVxd0mOW2NZnmiOTLS-SNqr0rdQNgybs8xKwXRq6KlLyoOnjyAx-tB9N0nQwvQtxoDFlsbcluZKnNcLWBLupnyakj8srSC0BCg="
+        },
+        {
+          "title": "jadwalnonton.com",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFLErSIJuGkOz4IWNKnixfsqDpjswXiAhc50NVWg4DBh8GwY-13t0Z4CdZ8bSJ57FR2rdLpdyQqv22J5z28cPR02oymD9hHSAMiPUzBc_CPNbLYIOM1Mt24yjY9vkg6yQeClBVRWtWuPh-QuUQh0w=="
+        },
+        {
+          "title": "cnnindonesia.com",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFPdhmCHuJQm0-3ULABaZ0oxGdqPjUaIweWvTMHZvdtn8R-k79x4CjjqN_qKICu5SpKXIklVRtr8pm5VLhFKFk1wKrQL94FWYQ2gI4rBK2eiutpOJAn9hv1iTv_uN1xHcjDNpB9zupNCNkXD77wjCkJxzPcikOGW-evkCPcVO6wgSi_1bANW9pE2w6zJuwY_-l6kQtnkvPxLUnAyUS3CZGvJ-P4R8r-RRAcfMODZScBHULIINwOoFwwfDtpk94="
         }
       ],
-      "checkedAt": "2026-11-28T13:56:33.986Z"
+      "checkedAt": "2026-11-28T14:08:32.945Z"
+    },
+    {
+      "key": "tmdb_1289720",
+      "tmdbId": 1289720,
+      "title": "POK AME AME",
+      "releaseDateId": "2026-12-10",
+      "dateSource": "gemini",
+      "status": "confirmed",
+      "chains": [],
+      "imax": false,
+      "presaleActive": false,
+      "lsfStatus": "",
+      "summary": "Film horor 'Pok Ame Ame' akan tayang di bioskop Indonesia mulai 10 Desember 2026.",
+      "sources": [
+        {
+          "title": "cgv.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGwf2eV8GnGwOrS1yXY6y5-pP5_KapP5W-WSDv-5xw1SYjmGf6FnJyIN0zg2clQPZVxd0mOW2NZnmiOTLS-SNqr0rdQNgybs8xKwXRq6KlLyoOnjyAx-tB9N0nQwvQtxoDFlsbcluZKnNcLWBLupnyakj8srSC0BCg="
+        },
+        {
+          "title": "jadwalnonton.com",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFLErSIJuGkOz4IWNKnixfsqDpjswXiAhc50NVWg4DBh8GwY-13t0Z4CdZ8bSJ57FR2rdLpdyQqv22J5z28cPR02oymD9hHSAMiPUzBc_CPNbLYIOM1Mt24yjY9vkg6yQeClBVRWtWuPh-QuUQh0w=="
+        },
+        {
+          "title": "cnnindonesia.com",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFPdhmCHuJQm0-3ULABaZ0oxGdqPjUaIweWvTMHZvdtn8R-k79x4CjjqN_qKICu5SpKXIklVRtr8pm5VLhFKFk1wKrQL94FWYQ2gI4rBK2eiutpOJAn9hv1iTv_uN1xHcjDNpB9zupNCNkXD77wjCkJxzPcikOGW-evkCPcVO6wgSi_1bANW9pE2w6zJuwY_-l6kQtnkvPxLUnAyUS3CZGvJ-P4R8r-RRAcfMODZScBHULIINwOoFwwfDtpk94="
+        },
+        {
+          "title": "katadata.co.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQG9kySRcnPeXyfj6UMYknffGxnXraNxHNFFOWVdSM-WkvmzHqVHGRMYbpVrIIdTICAhl7WyyPio81wT2qzIWsKw8Euy8WMKk2T55-F3HsCurjGDXVvYhFNTtA-tYYvtfyolE35HoXHik0SWjVvTG6dvZoMnHPeD0cMyWsSpNqmS3qnSntfXvzvmbztVLWCy0DZkRZcTT3vJ5rakJb5YsEjqPQ1NoIjpdP08emfIoc0R-Km4iJTX38E="
+        }
+      ],
+      "checkedAt": "2026-11-28T14:08:32.945Z"
+    },
+    {
+      "key": "title_avengersdoomsday",
+      "title": "AVENGERS: DOOMSDAY",
+      "releaseDateId": "2026-12-16",
+      "dateSource": "gemini",
+      "status": "confirmed",
+      "chains": [],
+      "imax": false,
+      "presaleActive": false,
+      "lsfStatus": "",
+      "summary": "Film superhero 'Avengers: Doomsday' dijadwalkan tayang di bioskop Indonesia pada 16 Desember 2026.",
+      "sources": [
+        {
+          "title": "cgv.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGwf2eV8GnGwOrS1yXY6y5-pP5_KapP5W-WSDv-5xw1SYjmGf6FnJyIN0zg2clQPZVxd0mOW2NZnmiOTLS-SNqr0rdQNgybs8xKwXRq6KlLyoOnjyAx-tB9N0nQwvQtxoDFlsbcluZKnNcLWBLupnyakj8srSC0BCg="
+        },
+        {
+          "title": "jadwalnonton.com",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFLErSIJuGkOz4IWNKnixfsqDpjswXiAhc50NVWg4DBh8GwY-13t0Z4CdZ8bSJ57FR2rdLpdyQqv22J5z28cPR02oymD9hHSAMiPUzBc_CPNbLYIOM1Mt24yjY9vkg6yQeClBVRWtWuPh-QuUQh0w=="
+        },
+        {
+          "title": "cnnindonesia.com",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFPdhmCHuJQm0-3ULABaZ0oxGdqPjUaIweWvTMHZvdtn8R-k79x4CjjqN_qKICu5SpKXIklVRtr8pm5VLhFKFk1wKrQL94FWYQ2gI4rBK2eiutpOJAn9hv1iTv_uN1xHcjDNpB9zupNCNkXD77wjCkJxzPcikOGW-evkCPcVO6wgSi_1bANW9pE2w6zJuwY_-l6kQtnkvPxLUnAyUS3CZGvJ-P4R8r-RRAcfMODZScBHULIINwOoFwwfDtpk94="
+        },
+        {
+          "title": "katadata.co.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQG9kySRcnPeXyfj6UMYknffGxnXraNxHNFFOWVdSM-WkvmzHqVHGRMYbpVrIIdTICAhl7WyyPio81wT2qzIWsKw8Euy8WMKk2T55-F3HsCurjGDXVvYhFNTtA-tYYvtfyolE35HoXHik0SWjVvTG6dvZoMnHPeD0cMyWsSpNqmS3qnSntfXvzvmbztVLWCy0DZkRZcTT3vJ5rakJb5YsEjqPQ1NoIjpdP08emfIoc0R-Km4iJTX38E="
+        }
+      ],
+      "checkedAt": "2026-11-28T14:08:32.945Z"
+    },
+    {
+      "key": "title_dune3",
+      "title": "DUNE: PART THREE",
+      "releaseDateId": "2026-12-16",
+      "dateSource": "gemini",
+      "status": "confirmed",
+      "chains": [],
+      "imax": false,
+      "presaleActive": false,
+      "lsfStatus": "",
+      "summary": "Film fiksi ilmiah 'Dune: Part Three' dijadwalkan tayang di bioskop Indonesia pada 16 Desember 2026.",
+      "sources": [
+        {
+          "title": "cgv.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGwf2eV8GnGwOrS1yXY6y5-pP5_KapP5W-WSDv-5xw1SYjmGf6FnJyIN0zg2clQPZVxd0mOW2NZnmiOTLS-SNqr0rdQNgybs8xKwXRq6KlLyoOnjyAx-tB9N0nQwvQtxoDFlsbcluZKnNcLWBLupnyakj8srSC0BCg="
+        },
+        {
+          "title": "jadwalnonton.com",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFLErSIJuGkOz4IWNKnixfsqDpjswXiAhc50NVWg4DBh8GwY-13t0Z4CdZ8bSJ57FR2rdLpdyQqv22J5z28cPR02oymD9hHSAMiPUzBc_CPNbLYIOM1Mt24yjY9vkg6yQeClBVRWtWuPh-QuUQh0w=="
+        },
+        {
+          "title": "cnnindonesia.com",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFPdhmCHuJQm0-3ULABaZ0oxGdqPjUaIweWvTMHZvdtn8R-k79x4CjjqN_qKICu5SpKXIklVRtr8pm5VLhFKFk1wKrQL94FWYQ2gI4rBK2eiutpOJAn9hv1iTv_uN1xHcjDNpB9zupNCNkXD77wjCkJxzPcikOGW-evkCPcVO6wgSi_1bANW9pE2w6zJuwY_-l6kQtnkvPxLUnAyUS3CZGvJ-P4R8r-RRAcfMODZScBHULIINwOoFwwfDtpk94="
+        },
+        {
+          "title": "katadata.co.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQG9kySRcnPeXyfj6UMYknffGxnXraNxHNFFOWVdSM-WkvmzHqVHGRMYbpVrIIdTICAhl7WyyPio81wT2qzIWsKw8Euy8WMKk2T55-F3HsCurjGDXVvYhFNTtA-tYYvtfyolE35HoXHik0SWjVvTG6dvZoMnHPeD0cMyWsSpNqmS3qnSntfXvzvmbztVLWCy0DZkRZcTT3vJ5rakJb5YsEjqPQ1NoIjpdP08emfIoc0R-Km4iJTX38E="
+        }
+      ],
+      "checkedAt": "2026-11-28T14:08:32.945Z"
+    },
+    {
+      "key": "tmdb_1607692",
+      "tmdbId": 1607692,
+      "title": "5CM: REVOLUSI HATI",
+      "releaseDateId": "2026-12-24",
+      "dateSource": "gemini",
+      "status": "confirmed",
+      "chains": [],
+      "imax": false,
+      "presaleActive": false,
+      "lsfStatus": "",
+      "summary": "Film Indonesia '5cm: Revolusi Hati' dijadwalkan tayang pada 24 Desember 2026.",
+      "sources": [
+        {
+          "title": "cgv.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGwf2eV8GnGwOrS1yXY6y5-pP5_KapP5W-WSDv-5xw1SYjmGf6FnJyIN0zg2clQPZVxd0mOW2NZnmiOTLS-SNqr0rdQNgybs8xKwXRq6KlLyoOnjyAx-tB9N0nQwvQtxoDFlsbcluZKnNcLWBLupnyakj8srSC0BCg="
+        },
+        {
+          "title": "jadwalnonton.com",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFLErSIJuGkOz4IWNKnixfsqDpjswXiAhc50NVWg4DBh8GwY-13t0Z4CdZ8bSJ57FR2rdLpdyQqv22J5z28cPR02oymD9hHSAMiPUzBc_CPNbLYIOM1Mt24yjY9vkg6yQeClBVRWtWuPh-QuUQh0w=="
+        },
+        {
+          "title": "cnnindonesia.com",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFPdhmCHuJQm0-3ULABaZ0oxGdqPjUaIweWvTMHZvdtn8R-k79x4CjjqN_qKICu5SpKXIklVRtr8pm5VLhFKFk1wKrQL94FWYQ2gI4rBK2eiutpOJAn9hv1iTv_uN1xHcjDNpB9zupNCNkXD77wjCkJxzPcikOGW-evkCPcVO6wgSi_1bANW9pE2w6zJuwY_-l6kQtnkvPxLUnAyUS3CZGvJ-P4R8r-RRAcfMODZScBHULIINwOoFwwfDtpk94="
+        },
+        {
+          "title": "katadata.co.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQG9kySRcnPeXyfj6UMYknffGxnXraNxHNFFOWVdSM-WkvmzHqVHGRMYbpVrIIdTICAhl7WyyPio81wT2qzIWsKw8Euy8WMKk2T55-F3HsCurjGDXVvYhFNTtA-tYYvtfyolE35HoXHik0SWjVvTG6dvZoMnHPeD0cMyWsSpNqmS3qnSntfXvzvmbztVLWCy0DZkRZcTT3vJ5rakJb5YsEjqPQ1NoIjpdP08emfIoc0R-Km4iJTX38E="
+        }
+      ],
+      "checkedAt": "2026-11-28T14:08:32.945Z"
+    },
+    {
+      "key": "title_datangakanpergi",
+      "title": "DATANG AKAN PERGI",
+      "releaseDateId": "2026-12-24",
+      "dateSource": "gemini",
+      "status": "confirmed",
+      "chains": [],
+      "imax": false,
+      "presaleActive": false,
+      "lsfStatus": "",
+      "summary": "Film 'Datang Akan Pergi' produksi Starvision dijadwalkan tayang di bioskop Indonesia pada 24 Desember 2026.",
+      "sources": [
+        {
+          "title": "cgv.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGwf2eV8GnGwOrS1yXY6y5-pP5_KapP5W-WSDv-5xw1SYjmGf6FnJyIN0zg2clQPZVxd0mOW2NZnmiOTLS-SNqr0rdQNgybs8xKwXRq6KlLyoOnjyAx-tB9N0nQwvQtxoDFlsbcluZKnNcLWBLupnyakj8srSC0BCg="
+        },
+        {
+          "title": "jadwalnonton.com",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFLErSIJuGkOz4IWNKnixfsqDpjswXiAhc50NVWg4DBh8GwY-13t0Z4CdZ8bSJ57FR2rdLpdyQqv22J5z28cPR02oymD9hHSAMiPUzBc_CPNbLYIOM1Mt24yjY9vkg6yQeClBVRWtWuPh-QuUQh0w=="
+        },
+        {
+          "title": "cnnindonesia.com",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFPdhmCHuJQm0-3ULABaZ0oxGdqPjUaIweWvTMHZvdtn8R-k79x4CjjqN_qKICu5SpKXIklVRtr8pm5VLhFKFk1wKrQL94FWYQ2gI4rBK2eiutpOJAn9hv1iTv_uN1xHcjDNpB9zupNCNkXD77wjCkJxzPcikOGW-evkCPcVO6wgSi_1bANW9pE2w6zJuwY_-l6kQtnkvPxLUnAyUS3CZGvJ-P4R8r-RRAcfMODZScBHULIINwOoFwwfDtpk94="
+        },
+        {
+          "title": "katadata.co.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQG9kySRcnPeXyfj6UMYknffGxnXraNxHNFFOWVdSM-WkvmzHqVHGRMYbpVrIIdTICAhl7WyyPio81wT2qzIWsKw8Euy8WMKk2T55-F3HsCurjGDXVvYhFNTtA-tYYvtfyolE35HoXHik0SWjVvTG6dvZoMnHPeD0cMyWsSpNqmS3qnSntfXvzvmbztVLWCy0DZkRZcTT3vJ5rakJb5YsEjqPQ1NoIjpdP08emfIoc0R-Km4iJTX38E="
+        }
+      ],
+      "checkedAt": "2026-11-28T14:08:32.945Z"
+    },
+    {
+      "key": "title_filosofiteras",
+      "title": "FILOSOFI TERAS",
+      "releaseDateId": "2026-12-24",
+      "dateSource": "gemini",
+      "status": "confirmed",
+      "chains": [],
+      "imax": false,
+      "presaleActive": false,
+      "lsfStatus": "",
+      "summary": "Film drama keluarga 'Filosofi Teras' dijadwalkan tayang di bioskop Indonesia pada 24 Desember 2026.",
+      "sources": [
+        {
+          "title": "cgv.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGwf2eV8GnGwOrS1yXY6y5-pP5_KapP5W-WSDv-5xw1SYjmGf6FnJyIN0zg2clQPZVxd0mOW2NZnmiOTLS-SNqr0rdQNgybs8xKwXRq6KlLyoOnjyAx-tB9N0nQwvQtxoDFlsbcluZKnNcLWBLupnyakj8srSC0BCg="
+        },
+        {
+          "title": "jadwalnonton.com",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFLErSIJuGkOz4IWNKnixfsqDpjswXiAhc50NVWg4DBh8GwY-13t0Z4CdZ8bSJ57FR2rdLpdyQqv22J5z28cPR02oymD9hHSAMiPUzBc_CPNbLYIOM1Mt24yjY9vkg6yQeClBVRWtWuPh-QuUQh0w=="
+        },
+        {
+          "title": "cnnindonesia.com",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFPdhmCHuJQm0-3ULABaZ0oxGdqPjUaIweWvTMHZvdtn8R-k79x4CjjqN_qKICu5SpKXIklVRtr8pm5VLhFKFk1wKrQL94FWYQ2gI4rBK2eiutpOJAn9hv1iTv_uN1xHcjDNpB9zupNCNkXD77wjCkJxzPcikOGW-evkCPcVO6wgSi_1bANW9pE2w6zJuwY_-l6kQtnkvPxLUnAyUS3CZGvJ-P4R8r-RRAcfMODZScBHULIINwOoFwwfDtpk94="
+        },
+        {
+          "title": "katadata.co.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQG9kySRcnPeXyfj6UMYknffGxnXraNxHNFFOWVdSM-WkvmzHqVHGRMYbpVrIIdTICAhl7WyyPio81wT2qzIWsKw8Euy8WMKk2T55-F3HsCurjGDXVvYhFNTtA-tYYvtfyolE35HoXHik0SWjVvTG6dvZoMnHPeD0cMyWsSpNqmS3qnSntfXvzvmbztVLWCy0DZkRZcTT3vJ5rakJb5YsEjqPQ1NoIjpdP08emfIoc0R-Km4iJTX38E="
+        }
+      ],
+      "checkedAt": "2026-11-28T14:08:32.945Z"
+    },
+    {
+      "key": "title_gakmasukakal",
+      "title": "GAK MASUK AKAL",
+      "releaseDateId": "2027-01-07",
+      "dateSource": "gemini",
+      "status": "confirmed",
+      "chains": [],
+      "imax": false,
+      "presaleActive": false,
+      "lsfStatus": "",
+      "summary": "Film komedi horor 'Gak Masuk Akal' produksi Leo Pictures dijadwalkan tayang di bioskop Indonesia pada 7 Januari 2027.",
+      "sources": [
+        {
+          "title": "cgv.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGwf2eV8GnGwOrS1yXY6y5-pP5_KapP5W-WSDv-5xw1SYjmGf6FnJyIN0zg2clQPZVxd0mOW2NZnmiOTLS-SNqr0rdQNgybs8xKwXRq6KlLyoOnjyAx-tB9N0nQwvQtxoDFlsbcluZKnNcLWBLupnyakj8srSC0BCg="
+        },
+        {
+          "title": "jadwalnonton.com",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFLErSIJuGkOz4IWNKnixfsqDpjswXiAhc50NVWg4DBh8GwY-13t0Z4CdZ8bSJ57FR2rdLpdyQqv22J5z28cPR02oymD9hHSAMiPUzBc_CPNbLYIOM1Mt24yjY9vkg6yQeClBVRWtWuPh-QuUQh0w=="
+        },
+        {
+          "title": "cnnindonesia.com",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFPdhmCHuJQm0-3ULABaZ0oxGdqPjUaIweWvTMHZvdtn8R-k79x4CjjqN_qKICu5SpKXIklVRtr8pm5VLhFKFk1wKrQL94FWYQ2gI4rBK2eiutpOJAn9hv1iTv_uN1xHcjDNpB9zupNCNkXD77wjCkJxzPcikOGW-evkCPcVO6wgSi_1bANW9pE2w6zJuwY_-l6kQtnkvPxLUnAyUS3CZGvJ-P4R8r-RRAcfMODZScBHULIINwOoFwwfDtpk94="
+        },
+        {
+          "title": "katadata.co.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQG9kySRcnPeXyfj6UMYknffGxnXraNxHNFFOWVdSM-WkvmzHqVHGRMYbpVrIIdTICAhl7WyyPio81wT2qzIWsKw8Euy8WMKk2T55-F3HsCurjGDXVvYhFNTtA-tYYvtfyolE35HoXHik0SWjVvTG6dvZoMnHPeD0cMyWsSpNqmS3qnSntfXvzvmbztVLWCy0DZkRZcTT3vJ5rakJb5YsEjqPQ1NoIjpdP08emfIoc0R-Km4iJTX38E="
+        }
+      ],
+      "checkedAt": "2026-11-28T14:08:32.945Z"
+    },
+    {
+      "key": "title_ibramenembuslangit",
+      "title": "IBRA MENEMBUS LANGIT",
+      "releaseDateId": "2027-01-07",
+      "dateSource": "gemini",
+      "status": "confirmed",
+      "chains": [],
+      "imax": false,
+      "presaleActive": false,
+      "lsfStatus": "",
+      "summary": "Film animasi 'Ibra Menembus Langit' produksi Manara Animation dijadwalkan tayang di bioskop Indonesia pada 7 Januari 2027.",
+      "sources": [
+        {
+          "title": "cgv.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGwf2eV8GnGwOrS1yXY6y5-pP5_KapP5W-WSDv-5xw1SYjmGf6FnJyIN0zg2clQPZVxd0mOW2NZnmiOTLS-SNqr0rdQNgybs8xKwXRq6KlLyoOnjyAx-tB9N0nQwvQtxoDFlsbcluZKnNcLWBLupnyakj8srSC0BCg="
+        },
+        {
+          "title": "jadwalnonton.com",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFLErSIJuGkOz4IWNKnixfsqDpjswXiAhc50NVWg4DBh8GwY-13t0Z4CdZ8bSJ57FR2rdLpdyQqv22J5z28cPR02oymD9hHSAMiPUzBc_CPNbLYIOM1Mt24yjY9vkg6yQeClBVRWtWuPh-QuUQh0w=="
+        },
+        {
+          "title": "cnnindonesia.com",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFPdhmCHuJQm0-3ULABaZ0oxGdqPjUaIweWvTMHZvdtn8R-k79x4CjjqN_qKICu5SpKXIklVRtr8pm5VLhFKFk1wKrQL94FWYQ2gI4rBK2eiutpOJAn9hv1iTv_uN1xHcjDNpB9zupNCNkXD77wjCkJxzPcikOGW-evkCPcVO6wgSi_1bANW9pE2w6zJuwY_-l6kQtnkvPxLUnAyUS3CZGvJ-P4R8r-RRAcfMODZScBHULIINwOoFwwfDtpk94="
+        },
+        {
+          "title": "katadata.co.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQG9kySRcnPeXyfj6UMYknffGxnXraNxHNFFOWVdSM-WkvmzHqVHGRMYbpVrIIdTICAhl7WyyPio81wT2qzIWsKw8Euy8WMKk2T55-F3HsCurjGDXVvYhFNTtA-tYYvtfyolE35HoXHik0SWjVvTG6dvZoMnHPeD0cMyWsSpNqmS3qnSntfXvzvmbztVLWCy0DZkRZcTT3vJ5rakJb5YsEjqPQ1NoIjpdP08emfIoc0R-Km4iJTX38E="
+        }
+      ],
+      "checkedAt": "2026-11-28T14:08:32.945Z"
+    },
+    {
+      "key": "title_theangrybirdsmovie3",
+      "title": "THE ANGRY BIRDS MOVIE 3",
+      "releaseDateId": "2027-01-08",
+      "dateSource": "gemini",
+      "status": "confirmed",
+      "chains": [],
+      "imax": false,
+      "presaleActive": false,
+      "lsfStatus": "",
+      "summary": "Film animasi 'The Angry Birds Movie 3' dijadwalkan tayang di bioskop Indonesia pada 8 Januari 2027.",
+      "sources": [
+        {
+          "title": "cgv.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGwf2eV8GnGwOrS1yXY6y5-pP5_KapP5W-WSDv-5xw1SYjmGf6FnJyIN0zg2clQPZVxd0mOW2NZnmiOTLS-SNqr0rdQNgybs8xKwXRq6KlLyoOnjyAx-tB9N0nQwvQtxoDFlsbcluZKnNcLWBLupnyakj8srSC0BCg="
+        },
+        {
+          "title": "jadwalnonton.com",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFLErSIJuGkOz4IWNKnixfsqDpjswXiAhc50NVWg4DBh8GwY-13t0Z4CdZ8bSJ57FR2rdLpdyQqv22J5z28cPR02oymD9hHSAMiPUzBc_CPNbLYIOM1Mt24yjY9vkg6yQeClBVRWtWuPh-QuUQh0w=="
+        },
+        {
+          "title": "cnnindonesia.com",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFPdhmCHuJQm0-3ULABaZ0oxGdqPjUaIweWvTMHZvdtn8R-k79x4CjjqN_qKICu5SpKXIklVRtr8pm5VLhFKFk1wKrQL94FWYQ2gI4rBK2eiutpOJAn9hv1iTv_uN1xHcjDNpB9zupNCNkXD77wjCkJxzPcikOGW-evkCPcVO6wgSi_1bANW9pE2w6zJuwY_-l6kQtnkvPxLUnAyUS3CZGvJ-P4R8r-RRAcfMODZScBHULIINwOoFwwfDtpk94="
+        },
+        {
+          "title": "katadata.co.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQG9kySRcnPeXyfj6UMYknffGxnXraNxHNFFOWVdSM-WkvmzHqVHGRMYbpVrIIdTICAhl7WyyPio81wT2qzIWsKw8Euy8WMKk2T55-F3HsCurjGDXVvYhFNTtA-tYYvtfyolE35HoXHik0SWjVvTG6dvZoMnHPeD0cMyWsSpNqmS3qnSntfXvzvmbztVLWCy0DZkRZcTT3vJ5rakJb5YsEjqPQ1NoIjpdP08emfIoc0R-Km4iJTX38E="
+        }
+      ],
+      "checkedAt": "2026-11-28T14:08:32.945Z"
+    },
+    {
+      "key": "title_thebeekeeper2",
+      "title": "THE BEEKEEPER 2",
+      "releaseDateId": "2027-01-13",
+      "dateSource": "gemini",
+      "status": "confirmed",
+      "chains": [],
+      "imax": false,
+      "presaleActive": false,
+      "lsfStatus": "",
+      "summary": "Film aksi 'The Beekeeper 2' yang disutradarai Timo Tjahjanto dan dibintangi Jason Statham dijadwalkan tayang di bioskop Indonesia pada 13 Januari 2027.",
+      "sources": [
+        {
+          "title": "cgv.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGwf2eV8GnGwOrS1yXY6y5-pP5_KapP5W-WSDv-5xw1SYjmGf6FnJyIN0zg2clQPZVxd0mOW2NZnmiOTLS-SNqr0rdQNgybs8xKwXRq6KlLyoOnjyAx-tB9N0nQwvQtxoDFlsbcluZKnNcLWBLupnyakj8srSC0BCg="
+        },
+        {
+          "title": "jadwalnonton.com",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFLErSIJuGkOz4IWNKnixfsqDpjswXiAhc50NVWg4DBh8GwY-13t0Z4CdZ8bSJ57FR2rdLpdyQqv22J5z28cPR02oymD9hHSAMiPUzBc_CPNbLYIOM1Mt24yjY9vkg6yQeClBVRWtWuPh-QuUQh0w=="
+        },
+        {
+          "title": "cnnindonesia.com",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFPdhmCHuJQm0-3ULABaZ0oxGdqPjUaIweWvTMHZvdtn8R-k79x4CjjqN_qKICu5SpKXIklVRtr8pm5VLhFKFk1wKrQL94FWYQ2gI4rBK2eiutpOJAn9hv1iTv_uN1xHcjDNpB9zupNCNkXD77wjCkJxzPcikOGW-evkCPcVO6wgSi_1bANW9pE2w6zJuwY_-l6kQtnkvPxLUnAyUS3CZGvJ-P4R8r-RRAcfMODZScBHULIINwOoFwwfDtpk94="
+        },
+        {
+          "title": "katadata.co.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQG9kySRcnPeXyfj6UMYknffGxnXraNxHNFFOWVdSM-WkvmzHqVHGRMYbpVrIIdTICAhl7WyyPio81wT2qzIWsKw8Euy8WMKk2T55-F3HsCurjGDXVvYhFNTtA-tYYvtfyolE35HoXHik0SWjVvTG6dvZoMnHPeD0cMyWsSpNqmS3qnSntfXvzvmbztVLWCy0DZkRZcTT3vJ5rakJb5YsEjqPQ1NoIjpdP08emfIoc0R-Km4iJTX38E="
+        }
+      ],
+      "checkedAt": "2026-11-28T14:08:32.945Z"
+    },
+    {
+      "key": "title_childrenofbloodandbone",
+      "title": "CHILDREN OF BLOOD AND BONE",
+      "releaseDateId": "2027-01-13",
+      "dateSource": "gemini",
+      "status": "confirmed",
+      "chains": [],
+      "imax": false,
+      "presaleActive": false,
+      "lsfStatus": "",
+      "summary": "Film 'Children of Blood and Bone' dijadwalkan tayang di bioskop Indonesia pada 13 atau 22 Januari 2027.",
+      "sources": [
+        {
+          "title": "cgv.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGwf2eV8GnGwOrS1yXY6y5-pP5_KapP5W-WSDv-5xw1SYjmGf6FnJyIN0zg2clQPZVxd0mOW2NZnmiOTLS-SNqr0rdQNgybs8xKwXRq6KlLyoOnjyAx-tB9N0nQwvQtxoDFlsbcluZKnNcLWBLupnyakj8srSC0BCg="
+        },
+        {
+          "title": "jadwalnonton.com",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFLErSIJuGkOz4IWNKnixfsqDpjswXiAhc50NVWg4DBh8GwY-13t0Z4CdZ8bSJ57FR2rdLpdyQqv22J5z28cPR02oymD9hHSAMiPUzBc_CPNbLYIOM1Mt24yjY9vkg6yQeClBVRWtWuPh-QuUQh0w=="
+        },
+        {
+          "title": "cnnindonesia.com",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFPdhmCHuJQm0-3ULABaZ0oxGdqPjUaIweWvTMHZvdtn8R-k79x4CjjqN_qKICu5SpKXIklVRtr8pm5VLhFKFk1wKrQL94FWYQ2gI4rBK2eiutpOJAn9hv1iTv_uN1xHcjDNpB9zupNCNkXD77wjCkJxzPcikOGW-evkCPcVO6wgSi_1bANW9pE2w6zJuwY_-l6kQtnkvPxLUnAyUS3CZGvJ-P4R8r-RRAcfMODZScBHULIINwOoFwwfDtpk94="
+        },
+        {
+          "title": "katadata.co.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQG9kySRcnPeXyfj6UMYknffGxnXraNxHNFFOWVdSM-WkvmzHqVHGRMYbpVrIIdTICAhl7WyyPio81wT2qzIWsKw8Euy8WMKk2T55-F3HsCurjGDXVvYhFNTtA-tYYvtfyolE35HoXHik0SWjVvTG6dvZoMnHPeD0cMyWsSpNqmS3qnSntfXvzvmbztVLWCy0DZkRZcTT3vJ5rakJb5YsEjqPQ1NoIjpdP08emfIoc0R-Km4iJTX38E="
+        }
+      ],
+      "checkedAt": "2026-11-28T14:08:32.945Z"
+    },
+    {
+      "key": "title_banyakanakbanyakrezeki",
+      "title": "BANYAK ANAK BANYAK REZEKI",
+      "releaseDateId": "2027-01-14",
+      "dateSource": "gemini",
+      "status": "confirmed",
+      "chains": [],
+      "imax": false,
+      "presaleActive": false,
+      "lsfStatus": "",
+      "summary": "Film 'Banyak Anak Banyak Rezeki' produksi Black White Pictures dijadwalkan tayang di bioskop Indonesia pada 14 Januari 2027.",
+      "sources": [
+        {
+          "title": "cgv.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGwf2eV8GnGwOrS1yXY6y5-pP5_KapP5W-WSDv-5xw1SYjmGf6FnJyIN0zg2clQPZVxd0mOW2NZnmiOTLS-SNqr0rdQNgybs8xKwXRq6KlLyoOnjyAx-tB9N0nQwvQtxoDFlsbcluZKnNcLWBLupnyakj8srSC0BCg="
+        },
+        {
+          "title": "jadwalnonton.com",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFLErSIJuGkOz4IWNKnixfsqDpjswXiAhc50NVWg4DBh8GwY-13t0Z4CdZ8bSJ57FR2rdLpdyQqv22J5z28cPR02oymD9hHSAMiPUzBc_CPNbLYIOM1Mt24yjY9vkg6yQeClBVRWtWuPh-QuUQh0w=="
+        },
+        {
+          "title": "cnnindonesia.com",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFPdhmCHuJQm0-3ULABaZ0oxGdqPjUaIweWvTMHZvdtn8R-k79x4CjjqN_qKICu5SpKXIklVRtr8pm5VLhFKFk1wKrQL94FWYQ2gI4rBK2eiutpOJAn9hv1iTv_uN1xHcjDNpB9zupNCNkXD77wjCkJxzPcikOGW-evkCPcVO6wgSi_1bANW9pE2w6zJuwY_-l6kQtnkvPxLUnAyUS3CZGvJ-P4R8r-RRAcfMODZScBHULIINwOoFwwfDtpk94="
+        },
+        {
+          "title": "katadata.co.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQG9kySRcnPeXyfj6UMYknffGxnXraNxHNFFOWVdSM-WkvmzHqVHGRMYbpVrIIdTICAhl7WyyPio81wT2qzIWsKw8Euy8WMKk2T55-F3HsCurjGDXVvYhFNTtA-tYYvtfyolE35HoXHik0SWjVvTG6dvZoMnHPeD0cMyWsSpNqmS3qnSntfXvzvmbztVLWCy0DZkRZcTT3vJ5rakJb5YsEjqPQ1NoIjpdP08emfIoc0R-Km4iJTX38E="
+        }
+      ],
+      "checkedAt": "2026-11-28T14:08:32.945Z"
+    },
+    {
+      "key": "tmdb_1627840",
+      "tmdbId": 1627840,
+      "title": "RED ZONE: DEAD CITY",
+      "releaseDateId": "2027-01-14",
+      "dateSource": "gemini",
+      "status": "confirmed",
+      "chains": [],
+      "imax": false,
+      "presaleActive": false,
+      "lsfStatus": "",
+      "summary": "Film horor survival 'Red Zone: Dead City' (Zona Merah) dijadwalkan tayang di bioskop Indonesia pada 14 Januari 2027.",
+      "sources": [
+        {
+          "title": "cgv.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGwf2eV8GnGwOrS1yXY6y5-pP5_KapP5W-WSDv-5xw1SYjmGf6FnJyIN0zg2clQPZVxd0mOW2NZnmiOTLS-SNqr0rdQNgybs8xKwXRq6KlLyoOnjyAx-tB9N0nQwvQtxoDFlsbcluZKnNcLWBLupnyakj8srSC0BCg="
+        },
+        {
+          "title": "jadwalnonton.com",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFLErSIJuGkOz4IWNKnixfsqDpjswXiAhc50NVWg4DBh8GwY-13t0Z4CdZ8bSJ57FR2rdLpdyQqv22J5z28cPR02oymD9hHSAMiPUzBc_CPNbLYIOM1Mt24yjY9vkg6yQeClBVRWtWuPh-QuUQh0w=="
+        },
+        {
+          "title": "cnnindonesia.com",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFPdhmCHuJQm0-3ULABaZ0oxGdqPjUaIweWvTMHZvdtn8R-k79x4CjjqN_qKICu5SpKXIklVRtr8pm5VLhFKFk1wKrQL94FWYQ2gI4rBK2eiutpOJAn9hv1iTv_uN1xHcjDNpB9zupNCNkXD77wjCkJxzPcikOGW-evkCPcVO6wgSi_1bANW9pE2w6zJuwY_-l6kQtnkvPxLUnAyUS3CZGvJ-P4R8r-RRAcfMODZScBHULIINwOoFwwfDtpk94="
+        },
+        {
+          "title": "katadata.co.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQG9kySRcnPeXyfj6UMYknffGxnXraNxHNFFOWVdSM-WkvmzHqVHGRMYbpVrIIdTICAhl7WyyPio81wT2qzIWsKw8Euy8WMKk2T55-F3HsCurjGDXVvYhFNTtA-tYYvtfyolE35HoXHik0SWjVvTG6dvZoMnHPeD0cMyWsSpNqmS3qnSntfXvzvmbztVLWCy0DZkRZcTT3vJ5rakJb5YsEjqPQ1NoIjpdP08emfIoc0R-Km4iJTX38E="
+        }
+      ],
+      "checkedAt": "2026-11-28T14:08:32.945Z"
+    },
+    {
+      "key": "title_berbagisuami20",
+      "title": "BERBAGI SUAMI 2.0",
+      "releaseDateId": "2027-01-21",
+      "dateSource": "gemini",
+      "status": "confirmed",
+      "chains": [],
+      "imax": false,
+      "presaleActive": false,
+      "lsfStatus": "",
+      "summary": "Film 'Berbagi Suami 2.0' produksi Kalyana Shira Films dijadwalkan tayang di bioskop Indonesia pada 21 Januari 2027.",
+      "sources": [
+        {
+          "title": "cgv.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGwf2eV8GnGwOrS1yXY6y5-pP5_KapP5W-WSDv-5xw1SYjmGf6FnJyIN0zg2clQPZVxd0mOW2NZnmiOTLS-SNqr0rdQNgybs8xKwXRq6KlLyoOnjyAx-tB9N0nQwvQtxoDFlsbcluZKnNcLWBLupnyakj8srSC0BCg="
+        },
+        {
+          "title": "jadwalnonton.com",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFLErSIJuGkOz4IWNKnixfsqDpjswXiAhc50NVWg4DBh8GwY-13t0Z4CdZ8bSJ57FR2rdLpdyQqv22J5z28cPR02oymD9hHSAMiPUzBc_CPNbLYIOM1Mt24yjY9vkg6yQeClBVRWtWuPh-QuUQh0w=="
+        },
+        {
+          "title": "cnnindonesia.com",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFPdhmCHuJQm0-3ULABaZ0oxGdqPjUaIweWvTMHZvdtn8R-k79x4CjjqN_qKICu5SpKXIklVRtr8pm5VLhFKFk1wKrQL94FWYQ2gI4rBK2eiutpOJAn9hv1iTv_uN1xHcjDNpB9zupNCNkXD77wjCkJxzPcikOGW-evkCPcVO6wgSi_1bANW9pE2w6zJuwY_-l6kQtnkvPxLUnAyUS3CZGvJ-P4R8r-RRAcfMODZScBHULIINwOoFwwfDtpk94="
+        },
+        {
+          "title": "katadata.co.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQG9kySRcnPeXyfj6UMYknffGxnXraNxHNFFOWVdSM-WkvmzHqVHGRMYbpVrIIdTICAhl7WyyPio81wT2qzIWsKw8Euy8WMKk2T55-F3HsCurjGDXVvYhFNTtA-tYYvtfyolE35HoXHik0SWjVvTG6dvZoMnHPeD0cMyWsSpNqmS3qnSntfXvzvmbztVLWCy0DZkRZcTT3vJ5rakJb5YsEjqPQ1NoIjpdP08emfIoc0R-Km4iJTX38E="
+        }
+      ],
+      "checkedAt": "2026-11-28T14:08:32.945Z"
+    },
+    {
+      "key": "title_fatima",
+      "title": "FATIMA",
+      "releaseDateId": "2027-01-21",
+      "dateSource": "gemini",
+      "status": "confirmed",
+      "chains": [],
+      "imax": false,
+      "presaleActive": false,
+      "lsfStatus": "",
+      "summary": "Film 'Fatima' produksi Pichouse Films dan FMM Studios dijadwalkan tayang di bioskop Indonesia pada 21 Januari 2027.",
+      "sources": [
+        {
+          "title": "cgv.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGwf2eV8GnGwOrS1yXY6y5-pP5_KapP5W-WSDv-5xw1SYjmGf6FnJyIN0zg2clQPZVxd0mOW2NZnmiOTLS-SNqr0rdQNgybs8xKwXRq6KlLyoOnjyAx-tB9N0nQwvQtxoDFlsbcluZKnNcLWBLupnyakj8srSC0BCg="
+        },
+        {
+          "title": "jadwalnonton.com",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFLErSIJuGkOz4IWNKnixfsqDpjswXiAhc50NVWg4DBh8GwY-13t0Z4CdZ8bSJ57FR2rdLpdyQqv22J5z28cPR02oymD9hHSAMiPUzBc_CPNbLYIOM1Mt24yjY9vkg6yQeClBVRWtWuPh-QuUQh0w=="
+        },
+        {
+          "title": "cnnindonesia.com",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFPdhmCHuJQm0-3ULABaZ0oxGdqPjUaIweWvTMHZvdtn8R-k79x4CjjqN_qKICu5SpKXIklVRtr8pm5VLhFKFk1wKrQL94FWYQ2gI4rBK2eiutpOJAn9hv1iTv_uN1xHcjDNpB9zupNCNkXD77wjCkJxzPcikOGW-evkCPcVO6wgSi_1bANW9pE2w6zJuwY_-l6kQtnkvPxLUnAyUS3CZGvJ-P4R8r-RRAcfMODZScBHULIINwOoFwwfDtpk94="
+        },
+        {
+          "title": "katadata.co.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQG9kySRcnPeXyfj6UMYknffGxnXraNxHNFFOWVdSM-WkvmzHqVHGRMYbpVrIIdTICAhl7WyyPio81wT2qzIWsKw8Euy8WMKk2T55-F3HsCurjGDXVvYhFNTtA-tYYvtfyolE35HoXHik0SWjVvTG6dvZoMnHPeD0cMyWsSpNqmS3qnSntfXvzvmbztVLWCy0DZkRZcTT3vJ5rakJb5YsEjqPQ1NoIjpdP08emfIoc0R-Km4iJTX38E="
+        }
+      ],
+      "checkedAt": "2026-11-28T14:08:32.945Z"
+    },
+    {
+      "key": "title_hargateman",
+      "title": "HARGA TEMAN",
+      "releaseDateId": "2027-01-21",
+      "dateSource": "gemini",
+      "status": "confirmed",
+      "chains": [],
+      "imax": false,
+      "presaleActive": false,
+      "lsfStatus": "",
+      "summary": "Film 'Harga Teman' produksi Rekata Studio dijadwalkan tayang di bioskop Indonesia pada 21 Januari 2027.",
+      "sources": [
+        {
+          "title": "cgv.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGwf2eV8GnGwOrS1yXY6y5-pP5_KapP5W-WSDv-5xw1SYjmGf6FnJyIN0zg2clQPZVxd0mOW2NZnmiOTLS-SNqr0rdQNgybs8xKwXRq6KlLyoOnjyAx-tB9N0nQwvQtxoDFlsbcluZKnNcLWBLupnyakj8srSC0BCg="
+        },
+        {
+          "title": "jadwalnonton.com",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFLErSIJuGkOz4IWNKnixfsqDpjswXiAhc50NVWg4DBh8GwY-13t0Z4CdZ8bSJ57FR2rdLpdyQqv22J5z28cPR02oymD9hHSAMiPUzBc_CPNbLYIOM1Mt24yjY9vkg6yQeClBVRWtWuPh-QuUQh0w=="
+        },
+        {
+          "title": "cnnindonesia.com",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFPdhmCHuJQm0-3ULABaZ0oxGdqPjUaIweWvTMHZvdtn8R-k79x4CjjqN_qKICu5SpKXIklVRtr8pm5VLhFKFk1wKrQL94FWYQ2gI4rBK2eiutpOJAn9hv1iTv_uN1xHcjDNpB9zupNCNkXD77wjCkJxzPcikOGW-evkCPcVO6wgSi_1bANW9pE2w6zJuwY_-l6kQtnkvPxLUnAyUS3CZGvJ-P4R8r-RRAcfMODZScBHULIINwOoFwwfDtpk94="
+        },
+        {
+          "title": "katadata.co.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQG9kySRcnPeXyfj6UMYknffGxnXraNxHNFFOWVdSM-WkvmzHqVHGRMYbpVrIIdTICAhl7WyyPio81wT2qzIWsKw8Euy8WMKk2T55-F3HsCurjGDXVvYhFNTtA-tYYvtfyolE35HoXHik0SWjVvTG6dvZoMnHPeD0cMyWsSpNqmS3qnSntfXvzvmbztVLWCy0DZkRZcTT3vJ5rakJb5YsEjqPQ1NoIjpdP08emfIoc0R-Km4iJTX38E="
+        }
+      ],
+      "checkedAt": "2026-11-28T14:08:32.945Z"
+    },
+    {
+      "key": "title_merahsebelumfajar",
+      "title": "MERAH SEBELUM FAJAR",
+      "releaseDateId": "2027-01-21",
+      "dateSource": "gemini",
+      "status": "confirmed",
+      "chains": [],
+      "imax": false,
+      "presaleActive": false,
+      "lsfStatus": "",
+      "summary": "Film 'Merah Sebelum Fajar' produksi Atarui Films dijadwalkan tayang di bioskop Indonesia pada 21 Januari 2027.",
+      "sources": [
+        {
+          "title": "cgv.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGwf2eV8GnGwOrS1yXY6y5-pP5_KapP5W-WSDv-5xw1SYjmGf6FnJyIN0zg2clQPZVxd0mOW2NZnmiOTLS-SNqr0rdQNgybs8xKwXRq6KlLyoOnjyAx-tB9N0nQwvQtxoDFlsbcluZKnNcLWBLupnyakj8srSC0BCg="
+        },
+        {
+          "title": "jadwalnonton.com",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFLErSIJuGkOz4IWNKnixfsqDpjswXiAhc50NVWg4DBh8GwY-13t0Z4CdZ8bSJ57FR2rdLpdyQqv22J5z28cPR02oymD9hHSAMiPUzBc_CPNbLYIOM1Mt24yjY9vkg6yQeClBVRWtWuPh-QuUQh0w=="
+        },
+        {
+          "title": "cnnindonesia.com",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFPdhmCHuJQm0-3ULABaZ0oxGdqPjUaIweWvTMHZvdtn8R-k79x4CjjqN_qKICu5SpKXIklVRtr8pm5VLhFKFk1wKrQL94FWYQ2gI4rBK2eiutpOJAn9hv1iTv_uN1xHcjDNpB9zupNCNkXD77wjCkJxzPcikOGW-evkCPcVO6wgSi_1bANW9pE2w6zJuwY_-l6kQtnkvPxLUnAyUS3CZGvJ-P4R8r-RRAcfMODZScBHULIINwOoFwwfDtpk94="
+        },
+        {
+          "title": "katadata.co.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQG9kySRcnPeXyfj6UMYknffGxnXraNxHNFFOWVdSM-WkvmzHqVHGRMYbpVrIIdTICAhl7WyyPio81wT2qzIWsKw8Euy8WMKk2T55-F3HsCurjGDXVvYhFNTtA-tYYvtfyolE35HoXHik0SWjVvTG6dvZoMnHPeD0cMyWsSpNqmS3qnSntfXvzvmbztVLWCy0DZkRZcTT3vJ5rakJb5YsEjqPQ1NoIjpdP08emfIoc0R-Km4iJTX38E="
+        }
+      ],
+      "checkedAt": "2026-11-28T14:08:32.945Z"
+    },
+    {
+      "key": "title_beneranhoror",
+      "title": "BENERAN HOROR",
+      "status": "confirmed",
+      "chains": [],
+      "imax": false,
+      "presaleActive": false,
+      "lsfStatus": "",
+      "summary": "Film 'Beneran Horor' dijadwalkan tayang di bioskop Indonesia pada 31 Desember 2026.",
+      "sources": [
+        {
+          "title": "cgv.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGwf2eV8GnGwOrS1yXY6y5-pP5_KapP5W-WSDv-5xw1SYjmGf6FnJyIN0zg2clQPZVxd0mOW2NZnmiOTLS-SNqr0rdQNgybs8xKwXRq6KlLyoOnjyAx-tB9N0nQwvQtxoDFlsbcluZKnNcLWBLupnyakj8srSC0BCg="
+        },
+        {
+          "title": "jadwalnonton.com",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFLErSIJuGkOz4IWNKnixfsqDpjswXiAhc50NVWg4DBh8GwY-13t0Z4CdZ8bSJ57FR2rdLpdyQqv22J5z28cPR02oymD9hHSAMiPUzBc_CPNbLYIOM1Mt24yjY9vkg6yQeClBVRWtWuPh-QuUQh0w=="
+        },
+        {
+          "title": "cnnindonesia.com",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFPdhmCHuJQm0-3ULABaZ0oxGdqPjUaIweWvTMHZvdtn8R-k79x4CjjqN_qKICu5SpKXIklVRtr8pm5VLhFKFk1wKrQL94FWYQ2gI4rBK2eiutpOJAn9hv1iTv_uN1xHcjDNpB9zupNCNkXD77wjCkJxzPcikOGW-evkCPcVO6wgSi_1bANW9pE2w6zJuwY_-l6kQtnkvPxLUnAyUS3CZGvJ-P4R8r-RRAcfMODZScBHULIINwOoFwwfDtpk94="
+        },
+        {
+          "title": "katadata.co.id",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQG9kySRcnPeXyfj6UMYknffGxnXraNxHNFFOWVdSM-WkvmzHqVHGRMYbpVrIIdTICAhl7WyyPio81wT2qzIWsKw8Euy8WMKk2T55-F3HsCurjGDXVvYhFNTtA-tYYvtfyolE35HoXHik0SWjVvTG6dvZoMnHPeD0cMyWsSpNqmS3qnSntfXvzvmbztVLWCy0DZkRZcTT3vJ5rakJb5YsEjqPQ1NoIjpdP08emfIoc0R-Km4iJTX38E="
+        }
+      ],
+      "checkedAt": "2026-11-28T14:08:32.945Z"
     }
   ]
 }
