@@ -24,7 +24,7 @@ object CinemaScraperHelper {
     const val RSS_SNIPPET_LIMIT = 1500
     const val MAX_CONCURRENT_REQUESTS = 3
     private val WIB_TZ: TimeZone = TimeZone.getTimeZone("Asia/Jakarta")
-    private const val UA_RADAR = "Mozilla/5.0 (compatible; CinemaTrackerRadar/4.4.0)"
+    private const val UA_RADAR = "Mozilla/5.0 (compatible; CinemaTrackerRadar/4.4.2)"
     private const val UA_MOBILE =
         "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36"
     private const val UA_DESKTOP =
@@ -48,19 +48,27 @@ object CinemaScraperHelper {
         RegexOption.IGNORE_CASE
     )
     private val RUMOR_RE = Regex(
-        "\\b(rumor|rumours?|rumors?|kabarnya|diduga|prediksi|bocoran|diperkirakan|konon|belum\\s+pasti|spekulasi|hoaks?|hoax|fan[-\\s]?made|concept\\s+trailer|estimasi|tidak\\s+(?:akan\\s+)?tayang\\s+di\\s+(?:bioskop\\s+)?indonesia|batal\\s+tayang(?:\\s+di\\s+indonesia)?|hanya\\s+tayang\\s+di\\s+(?:bioskop\\s+)?(?:global|amerika|us))\\b",
+        "\\b(rumor|rumours?|rumors?|kabarnya|diduga|prediksi|bocoran|diperkirakan|konon|belum\\s+pasti|spekulasi|hoaks?|hoax|fan[-\\s]?made|concept\\s+trailer|estimasi|tidak\\s+(?:akan\\s+)?tayang\\s+di\\s+(?:bioskop\\s+)?indonesia|batal\\s+tayang(?:\\s+di\\s+(?:bioskop\\s+)?(?:indonesia|malaysia|singapura))?|dilarang\\s+tayang|(?:tidak|tak|belum|gagal(?:\\s+lolos)?)\\s+(?:lulus|lolos)\\s+sensor|hanya\\s+tayang\\s+(?:di\\s+)?(?:bioskop\\s+)?(?:global|luar\\s+negeri|amerika|us|as))\\b",
         RegexOption.IGNORE_CASE
     )
     private val QUESTION_HEADLINE_RE = Regex(
-        "(?:^\\s*(?:kapan|apakah|bagaimana|mengapa|kenapa|berapa|benarkah|akankah|sudahkah)\\b|\\b(?:tayang\\s+kapan|kapan\\s+tayang(?:\\s+di\\s+indonesia)?|rilis\\s+kapan|kapan\\s+rilis|tayang\\s+di\\s+indonesia\\s*\\?|di\\s+bioskop\\s+indonesia\\s*\\?)\\b|\\?\\s*(?:[-–—|•·]\\s*[^?]{1,40})?$)",
+        "(?:^(?:kapan|kapankah|apakah|bagaimana|mengapa|kenapa|berapa|benarkah|akankah|sudahkah)\\b|\\b(?:tayang\\s+kapan|kapan\\s+(?:tayang|rilis|masuk(?:\\s+bioskop)?)|apa(?:kah)?\\s+benar|bakal\\s+tayang)\\b|\\?(?:\\s*[-–|•·]\\s*[^?]{1,60})?\\s*$)",
         RegexOption.IGNORE_CASE
     )
     private val ABSENCE_RE = Regex(
-        "\\b(belum\\s+(?:ada\\s+(?:informasi|kabar|jadwal|kepastian|tanda(?:-tanda)?)|diketahui|diumumkan|terjadwal|dapat\\s+dipastikan|dipastikan|resmi)(?:\\s+kapan)?(?:\\s+(?:akan|bakal))?(?:\\s+(?:tayang|rilis|masuk))?(?:\\s+di\\s+(?:bioskop\\s+)?indonesia)?|(?:jadwal|tanggal)\\s+(?:tayang|rilis)(?:nya)?\\s+di\\s+(?:bioskop\\s+)?indonesia\\s+(?:belum|masih\\s+belum|tidak)|tidak\\s+(?:ada|akan|tayang|masuk)\\s+(?:jadwal|penayangan)?\\s*(?:di\\s+)?(?:bioskop\\s+)?indonesia|hanya\\s+(?:tayang|rilis)\\s+(?:secara\\s+terbatas|di\\s+festival|di\\s+luar\\s+negeri|secara\\s+global)|belum\\s+tayang\\s+di\\s+(?:bioskop\\s+)?indonesia|belum\\s+masuk\\s+bioskop\\s+indonesia)\\b",
+        "\\b(?:belum\\s+(?:ada|tersedia|diketahui|ditemukan|memiliki|mendapat|mengantongi|menerima)\\s+(?:informasi(?:\\s+lebih\\s+lanjut)?|info(?:\\s+lebih\\s+lanjut)?|kepastian|jadwal|tanggal|kabar|tanda(?:-tanda)?|rencana|pengumuman)(?:\\s+(?:lebih\\s+lanjut|resmi|pasti|terkait|mengenai|soal|penayangan|tayang|rilis))?|belum\\s+mengumumkan(?:\\s+(?:jadwal|tanggal|penayangan|rilis|perilisan|kapan|kepastian))?|belum\\s+(?:dapat\\s+dipastikan|diketahui|diumumkan|dipastikan|terkonfirmasi|resmi|terjadwal|tayang\\s+di\\s+(?:bioskop\\s+)?indonesia|masuk\\s+(?:bioskop\\s+)?indonesia|ada\\s+kepastian)|(?:masih\\s+)?belum\\s+dipastikan(?:\\s+(?:akan|bakal))?(?:\\s+(?:masuk|tayang|rilis))?|(?:tidak\\s+ada|belum\\s+memiliki)\\s+(?:jadwal|tanggal)(?:\\s+(?:tayang|rilis))?|tidak\\s+(?:akan\\s+)?(?:tayang|rilis|masuk)\\s+di\\s+(?:bioskop\\s+)?indonesia|belum\\s+diketahui\\s+kapan\\s+(?:tayang|rilis)|diproyeksikan\\s+(?:segera\\s+)?(?:masuk|tayang)|berpeluang\\s+(?:segera\\s+)?(?:masuk|tayang)|(?:masih\\s+)?menunggu\\s+(?:konfirmasi|jadwal|kepastian|pengumuman)|apakah\\s+(?:akan\\s+)?tayang\\s+di\\s+(?:bioskop\\s+)?indonesia)\\b",
+        RegexOption.IGNORE_CASE
+    )
+    private val FOREIGN_CENSOR_OR_BAN_RE = Regex(
+        "\\b(?:lembaga\\s+penapis\\s+filem|\\blpf\\b|golden\\s+screen\\s+cinemas|\\bgsc\\b|\\btgv\\b|(?:resmi\\s+)?dilarang\\s+tayang|(?:tidak|tak|belum|gagal(?:\\s+lolos)?)\\s+(?:lulus|lolos)\\s+sensor)\\b",
+        RegexOption.IGNORE_CASE
+    )
+    private val OFFICIAL_CONFIRMED_PORTAL_SIGNAL_RE = Regex(
+        "\\b(xxi|cinema\\s*21|cinema\\s*xxi|21cineplex|cgv|cin[eé]polis|tix\\s*id|\\blsf\\b|lembaga\\s+sensor\\s+film|jadwalnonton)\\b",
         RegexOption.IGNORE_CASE
     )
     private val GLOBAL_ONLY_RE = Regex(
-        "\\b((?:di\\s+)?(?:amerika(?:\\s+serikat)?|usa|us|as|global|bioskop\\s+global|rilis\\s+global|secara\\s+global|secara\\s+luas|overseas|worldwide|internasional|dunia|luar\\s+negeri|barat|festival(?:\\s+film)?|sundance|cannes|tiff|venice|berlinale))\\b",
+        "\\b((?:di\\s+)?(?:amerika(?:\\s+serikat)?|usa|us|as|global|bioskop\\s+global|rilis\\s+global|secara\\s+global|secara\\s+luas|overseas|worldwide|internasional|dunia|seluruh\\s+dunia|luar\\s+negeri|barat|inggris|uk|jepang|japan|korea|eropa|kanada|australia|prancis|perancis|jerman|malaysia|singapura|singapore|brunei|thailand|filipina|philippines|vietnam|hong\\s+kong|taiwan|china|tiongkok|festival(?:\\s+film)?|sundance|cannes|tiff|venice|berlinale))\\b",
         RegexOption.IGNORE_CASE
     )
     private val STREAMING_ONLY_RE = Regex(
@@ -68,11 +76,11 @@ object CinemaScraperHelper {
         RegexOption.IGNORE_CASE
     )
     private val EXPLICIT_ID_VENUE_RE = Regex(
-        "\\b(xxi|cinema\\s*21|cinema\\s*xxi|21cineplex|cgv|cin[eé]polis|tix\\s*id|\\blsf\\b|lulus\\s+sensor|bioskop\\s+(?:di\\s+)?indonesia|di\\s+bioskop\\s+indonesia|seluruh\\s+bioskop\\s+indonesia|jaringan\\s+bioskop\\s+indonesia|tanah\\s+air|di\\s+indonesia)\\b",
+        "\\b(xxi|cinema\\s*21|cinema\\s*xxi|21cineplex|cgv|cin[eé]polis|tix\\s*id|\\blsf\\b|lembaga\\s+sensor\\s+film|bioskop\\s+(?:di\\s+)?indonesia|di\\s+bioskop\\s+indonesia|seluruh\\s+bioskop\\s+indonesia|jaringan\\s+bioskop\\s+indonesia|tanah\\s+air|di\\s+indonesia)\\b",
         RegexOption.IGNORE_CASE
     )
     private val FOREIGN_WIRE_RE = Regex(
-        "\\b(imax\\s*70\\s*mm|70\\s*mm\\s+imax|melansir\\s+(?:variety|deadline|hollywood\\s+reporter|collider|screenrant|indiewire|thewrap)|dilansir\\s+dari\\s+(?:variety|deadline|hollywood\\s+reporter|collider|screenrant|indiewire|thewrap)|via\\s+(?:variety|deadline|hollywood\\s+reporter)|amerika\\s+serikat|bioskop\\s+(?:as|amerika|global|inggris|jepang|korea)|festival\\s+film|sundance|cannes|tiff|venice|berlinale)\\b",
+        "\\b(imax\\s*70\\s*mm|70\\s*mm\\s+imax|melansir\\s+(?:variety|deadline|hollywood\\s+reporter|collider|screenrant|indiewire|thewrap)|dilansir\\s+dari\\s+(?:variety|deadline|hollywood\\s+reporter|collider|screenrant|indiewire|thewrap)|mengutip\\s+(?:laporan\\s+)?(?:variety|deadline|hollywood\\s+reporter|collider|screenrant|indiewire|thewrap)|via\\s+(?:variety|deadline|hollywood\\s+reporter)|amerika\\s+serikat|bioskop\\s+(?:as|amerika|global|inggris|jepang|korea|malaysia|singapura)|lembaga\\s+penapis\\s+filem|\\blpf\\b|golden\\s+screen\\s+cinemas|\\bgsc\\b|(?:di\\s+)?(?:malaysia|singapura|singapore|brunei)|festival\\s+film|sundance|cannes|tiff|venice|berlinale)\\b",
         RegexOption.IGNORE_CASE
     )
     private val NOISE_RE = Regex(
@@ -80,12 +88,18 @@ object CinemaScraperHelper {
         RegexOption.IGNORE_CASE
     )
 
+    private fun maskNegatedCensorAndForeignPhrases(text: String): String {
+        return text
+            .replace(Regex("\\b(?:tidak|tak|belum|gagal(?:\\s+lolos)?)\\s+(?:lulus|lolos)\\s+sensor\\b", RegexOption.IGNORE_CASE), " ")
+            .replace(Regex("\\b(?:lembaga\\s+penapis\\s+filem|lpf|golden\\s+screen\\s+cinemas|gsc|tgv)\\b", RegexOption.IGNORE_CASE), " ")
+    }
+
     fun getSourceTierScore(source: String, url: String): Int {
         val s = "$source $url".lowercase(Locale.US)
-        if (Regex("(21cineplex\\.com|cgv\\.id|cinepolis\\.co\\.id|tix\\.id|lsf\\.go\\.id|jadwalnonton\\.com|cinema\\s*xxi|cinema\\s*21)").containsMatchIn(s)) {
+        if (Regex("\\b(?:21cineplex\\.com|m\\.21cineplex\\.com|cgv\\.id|cinepolis\\.co\\.id|tix\\.id|tix\\s*id|lsf\\.go\\.id|jadwalnonton\\.com|cinema\\s*xxi|cinema\\s*21)\\b").containsMatchIn(s)) {
             return 3
         }
-        if (Regex("(kompas\\.com|detik\\.com|kumparan\\.com|tirto\\.id|idntimes\\.com|tempo\\.co|kapanlagi\\.com|antaranews\\.com|merdeka\\.com|liputan6\\.com|cnnindonesia\\.com|cnbcindonesia\\.com|rri\\.co\\.id|katadata\\.co\\.id|hypeabis\\.id|jawapos\\.com|suara\\.com|tribunnews\\.com)").containsMatchIn(s)) {
+        if (Regex("\\b(?:kompas\\.com|kompas|detik\\.com|detikcom|detikhot|kumparan\\.com|kumparan|tirto\\.id|tirto|idntimes\\.com|idn\\s*times|tempo\\.co|tempo|kapanlagi\\.com|kapanlagi|antaranews\\.com|antara|merdeka\\.com|merdeka|liputan6\\.com|liputan6|cnnindonesia\\.com|cnn\\s*indonesia|cnbcindonesia\\.com|cnbc\\s*indonesia|rri\\.co\\.id|katadata\\.co\\.id|katadata|hypeabis\\.id|hypeabis|jawapos\\.com|jawa\\s*pos|suara\\.com|tribunnews\\.com|medcom\\.id|sindonews\\.com|pikiran-rakyat\\.com|cinemags|kincir)\\b").containsMatchIn(s)) {
             return 2
         }
         return 1
@@ -96,19 +110,70 @@ object CinemaScraperHelper {
         return s.isNotEmpty() && QUESTION_HEADLINE_RE.containsMatchIn(s)
     }
 
+    fun hasForeignCensorOrBan(text: String): Boolean = FOREIGN_CENSOR_OR_BAN_RE.containsMatchIn(text)
+
+    fun hasRumorHeadline(text: String): Boolean = RUMOR_RE.containsMatchIn(text)
+
+    fun hasExplicitIdVenue(text: String): Boolean {
+        val masked = maskNegatedCensorAndForeignPhrases(text)
+        if (EXPLICIT_ID_VENUE_RE.containsMatchIn(masked)) return true
+        return Regex("\\blulus\\s+sensor\\b", RegexOption.IGNORE_CASE).containsMatchIn(masked) &&
+            !Regex("\\b(?:malaysia|singapura|singapore|brunei)\\b", RegexOption.IGNORE_CASE).containsMatchIn(masked)
+    }
+
+    fun detectSafeChains(text: String): List<String> {
+        val clauses = text.split(Regex("[\\n\\r]+|(?<=[.!?])\\s+")).map { it.trim() }.filter { it.isNotEmpty() }
+        val out = LinkedHashSet<String>()
+        for (cl in clauses) {
+            if (ABSENCE_RE.containsMatchIn(cl) || RUMOR_RE.containsMatchIn(cl) || isQuestionHeadline(cl) || FOREIGN_CENSOR_OR_BAN_RE.containsMatchIn(cl)) {
+                continue
+            }
+            if (FOREIGN_WIRE_RE.containsMatchIn(cl) && !hasExplicitIdVenue(cl)) continue
+            if (Regex("\\b(xxi|cinema\\s*21|cinema\\s*xxi|21cineplex)\\b", RegexOption.IGNORE_CASE).containsMatchIn(cl)) out.add("XXI")
+            if (Regex("\\bcgv\\b", RegexOption.IGNORE_CASE).containsMatchIn(cl)) out.add("CGV")
+            if (Regex("cin[eé]polis", RegexOption.IGNORE_CASE).containsMatchIn(cl)) out.add("Cinépolis")
+        }
+        return out.toList()
+    }
+
+    fun hasConfirmedLsfMention(text: String): Boolean {
+        val clauses = text.split(Regex("[\\n\\r]+|(?<=[.!?])\\s+")).map { it.trim() }.filter { it.isNotEmpty() }
+        for (cl in clauses) {
+            if (ABSENCE_RE.containsMatchIn(cl) || RUMOR_RE.containsMatchIn(cl) || isQuestionHeadline(cl) ||
+                FOREIGN_CENSOR_OR_BAN_RE.containsMatchIn(cl) ||
+                Regex("\\b(?:malaysia|singapura|singapore|brunei)\\b", RegexOption.IGNORE_CASE).containsMatchIn(cl)
+            ) {
+                continue
+            }
+            val masked = maskNegatedCensorAndForeignPhrases(cl)
+            if (Regex("\\b(lsf|lembaga\\s+sensor\\s+film|lulus\\s+sensor)\\b", RegexOption.IGNORE_CASE).containsMatchIn(masked)) {
+                return true
+            }
+        }
+        return false
+    }
+
     fun isDisqualifiedByAbsence(headline: String, bodyOrFullText: String, source: String = "", url: String = ""): Boolean {
         if (RUMOR_RE.containsMatchIn(headline) || isQuestionHeadline(headline)) return true
         val full = bodyOrFullText.trim()
         if (full.isEmpty()) return false
+        if (FOREIGN_CENSOR_OR_BAN_RE.containsMatchIn(full)) return true
         if (RUMOR_RE.containsMatchIn(full) || ABSENCE_RE.containsMatchIn(full)) {
-            return getSourceTierScore(source, url) < 3
+            val clauses = full.split(Regex("[\\n\\r]+|(?<=[.!?])\\s+")).map { it.trim() }.filter { it.isNotEmpty() }
+            val hasIndependentOfficial = clauses.any { cl ->
+                (OFFICIAL_CONFIRMED_PORTAL_SIGNAL_RE.containsMatchIn(maskNegatedCensorAndForeignPhrases(cl)) || hasConfirmedLsfMention(cl)) &&
+                    !ABSENCE_RE.containsMatchIn(cl) &&
+                    !RUMOR_RE.containsMatchIn(cl) &&
+                    !FOREIGN_CENSOR_OR_BAN_RE.containsMatchIn(cl)
+            }
+            if (!hasIndependentOfficial && getSourceTierScore(source, url) < 3) return true
         }
         return false
     }
 
     fun isGlobalOnlyWithoutId(text: String): Boolean {
         return (FOREIGN_WIRE_RE.containsMatchIn(text) || GLOBAL_ONLY_RE.containsMatchIn(text)) &&
-            !EXPLICIT_ID_VENUE_RE.containsMatchIn(text)
+            !hasExplicitIdVenue(text)
     }
     private val WORD_NUM_MAP = mapOf(
         "one" to "1", "satu" to "1",
@@ -275,12 +340,36 @@ object CinemaScraperHelper {
         RegexOption.IGNORE_CASE
     )
 
-    fun extractIndonesianDateFromText(movieTitle: String, text: String, defaultYear: Int): String {
+    fun extractIndonesianDateFromText(
+        movieTitle: String,
+        text: String,
+        defaultYear: Int,
+        allowQuestionBody: Boolean = false
+    ): String {
         val clean = text.trim()
         if (clean.isEmpty()) return ""
-        val clauses = clean.split(Regex("[\\n\\r]+|(?<=[.!?])\\s+")).map { it.trim() }.filter { it.length >= 4 }
-        if (clauses.isNotEmpty() && isQuestionHeadline(clauses[0])) return ""
-        val wholeItemHasAbsence = ABSENCE_RE.containsMatchIn(clean) || RUMOR_RE.containsMatchIn(clean)
+        val rawClauses = clean.split(Regex("[\\n\\r]+|(?<=[.!?])\\s+")).map { it.trim() }.filter { it.length >= 4 }
+        val clauses = if (allowQuestionBody && rawClauses.isNotEmpty() && isQuestionHeadline(rawClauses[0])) {
+            rawClauses.drop(1)
+        } else {
+            rawClauses
+        }
+        if (clauses.isEmpty()) return ""
+        if (!allowQuestionBody && isQuestionHeadline(rawClauses[0])) return ""
+        val effectiveText = clauses.joinToString("\n")
+        val wholeItemHasAbsence = ABSENCE_RE.containsMatchIn(effectiveText) ||
+            RUMOR_RE.containsMatchIn(effectiveText) ||
+            FOREIGN_CENSOR_OR_BAN_RE.containsMatchIn(effectiveText)
+        if (wholeItemHasAbsence) {
+            val hasIndependentOfficial = clauses.any { cl ->
+                (movieTitle.isEmpty() || titleMatchesHeadline(movieTitle, cl)) &&
+                    (OFFICIAL_CONFIRMED_PORTAL_SIGNAL_RE.containsMatchIn(maskNegatedCensorAndForeignPhrases(cl)) || hasConfirmedLsfMention(cl)) &&
+                    !ABSENCE_RE.containsMatchIn(cl) &&
+                    !RUMOR_RE.containsMatchIn(cl) &&
+                    !FOREIGN_CENSOR_OR_BAN_RE.containsMatchIn(cl)
+            }
+            if (!hasIndependentOfficial) return ""
+        }
         val dateTextRe = Regex(
             "\\b([1-9]|[12]\\d|3[01])(?:\\s*(?:-|–|—|s/d|s\\.d\\.|hingga|sampai)\\s*(?:[1-9]|[12]\\d|3[01]))?\\s+(januari|jan|februari|feb|maret|mar|april|apr|mei|may|juni|jun|juli|jul|agustus|agu|ags|aug|september|sept|sep|oktober|okt|oct|november|nov|desember|des|dec)(?:\\s*,?\\s*(20\\d{2}))?\\b",
             RegexOption.IGNORE_CASE
@@ -303,9 +392,9 @@ object CinemaScraperHelper {
         var bestIso = ""
         for (c in clauses.indices) {
             val clause = clauses[c]
-            if (RUMOR_RE.containsMatchIn(clause) || ABSENCE_RE.containsMatchIn(clause)) continue
-            if (clause.contains("?") || Regex("\\b(kapan|apakah|benarkah|kenapa|akankah)\\b", RegexOption.IGNORE_CASE).containsMatchIn(clause)) continue
-            val hasIdVenueInClause = EXPLICIT_ID_VENUE_RE.containsMatchIn(clause)
+            if (RUMOR_RE.containsMatchIn(clause) || ABSENCE_RE.containsMatchIn(clause) || FOREIGN_CENSOR_OR_BAN_RE.containsMatchIn(clause)) continue
+            if (isQuestionHeadline(clause) || clause.contains("?") || Regex("\\b(kapan|apakah|benarkah|kenapa|akankah)\\b", RegexOption.IGNORE_CASE).containsMatchIn(clause)) continue
+            val hasIdVenueInClause = hasExplicitIdVenue(clause)
             if (wholeItemHasAbsence && !hasIdVenueInClause) continue
             if (FOREIGN_WIRE_RE.containsMatchIn(clause) && !hasIdVenueInClause) continue
 
@@ -498,24 +587,32 @@ object CinemaScraperHelper {
         if (cleanTitle.length < 2) return JSONArray()
 
         val curYear = Calendar.getInstance(WIB_TZ).get(Calendar.YEAR)
-        val bingQuery = "$cleanTitle bioskop Indonesia $curYear"
-        val reissueBingQuery = "$cleanTitle kembali tayang bioskop Indonesia"
-        val googleQuery = "\"$cleanTitle\" (XXI OR CGV OR Cinepolis OR bioskop OR LSF OR \"pre-sale\" OR IMAX OR tayang) when:120d"
+        val compactNumeric = tokenizeNormalizedTitle(cleanTitle).joinToString(" ")
+        val hasDistinctNumeric = compactNumeric.isNotEmpty() &&
+            compactNumeric != cleanTitle.lowercase(Locale.US) &&
+            Regex("\\b\\d+\\b").containsMatchIn(compactNumeric) &&
+            compactNumeric.split(Regex("\\s+")).size >= 2
+        val googleTitleExpr = if (hasDistinctNumeric) "(\"$cleanTitle\" OR \"$compactNumeric\")" else "\"$cleanTitle\""
+        val bingTitleExpr = if (hasDistinctNumeric) "$cleanTitle \"$compactNumeric\"" else cleanTitle
+
+        val bingQuery = "$bingTitleExpr bioskop Indonesia $curYear"
+        val reissueBingQuery = "$bingTitleExpr kembali tayang bioskop Indonesia"
+        val googleQuery = "$googleTitleExpr (XXI OR CGV OR Cinepolis OR bioskop OR LSF OR \"pre-sale\" OR IMAX OR tayang) when:120d"
         val reissueGoogleQuery =
-            "\"$cleanTitle\" (\"tayang kembali\" OR \"kembali hadir\" OR \"kembali ke bioskop\" OR \"tayang ulang\" OR reissue OR \"re-release\") (Indonesia OR bioskop OR XXI OR CGV OR Cinepolis OR IMAX) when:120d"
+            "$googleTitleExpr (\"tayang kembali\" OR \"kembali hadir\" OR \"kembali ke bioskop\" OR \"tayang ulang\" OR reissue OR \"re-release\") (Indonesia OR bioskop OR XXI OR CGV OR Cinepolis OR IMAX) when:120d"
         val urls = listOf(
             "https://www.bing.com/news/search?q=${Uri.encode(bingQuery)}&cc=ID&setlang=id&format=rss",
             "https://www.bing.com/news/search?q=${Uri.encode(reissueBingQuery)}&cc=ID&setlang=id&format=rss",
             "https://news.google.com/rss/search?q=${Uri.encode(googleQuery)}&hl=id&gl=ID&ceid=ID:id",
             "https://news.google.com/rss/search?q=${Uri.encode(reissueGoogleQuery)}&hl=id&gl=ID&ceid=ID:id"
         )
-        val xmlBodies = fetchUrlsConcurrently(urls, UA_MOBILE, maxBytes = 262144)
+        val xmlBodies = fetchUrlsConcurrently(urls, UA_RADAR, maxBytes = 262144)
 
         val seenLinks = HashSet<String>()
         val items = JSONArray()
         for (xml in xmlBodies) {
             if (xml.isEmpty()) continue
-            parseXmlRssItems(xml, maxPerFeed = 8, maxTotal = 18, items = items, seenLinks = seenLinks, requireIdVenue = false)
+            parseXmlRssItems(xml, maxPerFeed = 8, maxTotal = 18, items = items, seenLinks = seenLinks, requireIdVenue = false, allowTier2Questions = true)
         }
         if (items.length() <= 1) return items
         val sortedList = (0 until items.length()).mapNotNull { items.optJSONObject(it) }
@@ -552,7 +649,7 @@ object CinemaScraperHelper {
             "https://news.google.com/rss/search?q=${Uri.encode("$gq2 when:45d")}&hl=id&gl=ID&ceid=ID:id",
             "https://news.google.com/rss/search?q=${Uri.encode("$gq3 when:45d")}&hl=id&gl=ID&ceid=ID:id"
         )
-        val xmlBodies = fetchUrlsConcurrently(urls, UA_MOBILE, maxBytes = 262144)
+        val xmlBodies = fetchUrlsConcurrently(urls, UA_RADAR, maxBytes = 262144)
 
         val seenLinks = HashSet<String>()
         val items = JSONArray()
@@ -569,7 +666,8 @@ object CinemaScraperHelper {
         maxTotal: Int,
         items: JSONArray,
         seenLinks: MutableSet<String>,
-        requireIdVenue: Boolean
+        requireIdVenue: Boolean,
+        allowTier2Questions: Boolean = false
     ) {
         val nowMs = System.currentTimeMillis()
         val maxAgeMs = 45L * 24L * 3600_000L
@@ -625,17 +723,20 @@ object CinemaScraperHelper {
                                 }
                                 val resolvedSource = curSource.ifEmpty { fallbackHost }
                                 val combinedText = "$curTitle $curSnippet $resolvedSource"
-                                val notQuestionOrAbsence = !isDisqualifiedByAbsence(curTitle, combinedText, resolvedSource, curLink)
+                                val tier = getSourceTierScore(resolvedSource, curLink)
+                                val isQHead = isQuestionHeadline(curTitle)
+                                val allowPendingQ = allowTier2Questions && !requireIdVenue && isQHead && tier >= 2 && !RUMOR_RE.containsMatchIn(curTitle) && !FOREIGN_CENSOR_OR_BAN_RE.containsMatchIn(combinedText)
+                                val notQuestionOrAbsence = allowPendingQ || !isDisqualifiedByAbsence(curTitle, combinedText, resolvedSource, curLink)
                                 val passVenueFilter = if (requireIdVenue) {
-                                    val hasIdVenue = EXPLICIT_ID_VENUE_RE.containsMatchIn(combinedText)
+                                    val hasIdVenue = hasExplicitIdVenue(combinedText)
                                     val isForeignOnly = FOREIGN_WIRE_RE.containsMatchIn(combinedText) && !hasIdVenue
                                     val isDecodableCandidate =
                                         (curLink.contains("bing.com/news/apiclick.aspx") || curLink.contains("news.google.com/")) &&
                                             DECODABLE_LISTICLE_OR_REISSUE_RE.containsMatchIn(combinedText) &&
                                             CINEMA_CONTEXT_HINT_RE.containsMatchIn(combinedText)
-                                    notQuestionOrAbsence && (hasIdVenue || isDecodableCandidate) && !isForeignOnly && !NOISE_RE.containsMatchIn(combinedText) && !NOISE_RE.containsMatchIn(curLink)
+                                    notQuestionOrAbsence && (hasIdVenue || isDecodableCandidate) && !isForeignOnly && !FOREIGN_CENSOR_OR_BAN_RE.containsMatchIn(combinedText) && !NOISE_RE.containsMatchIn(combinedText) && !NOISE_RE.containsMatchIn(curLink)
                                 } else {
-                                    notQuestionOrAbsence && !STREAMING_ONLY_RE.containsMatchIn(resolvedSource) && !STREAMING_ONLY_RE.containsMatchIn(curLink)
+                                    notQuestionOrAbsence && !FOREIGN_CENSOR_OR_BAN_RE.containsMatchIn(combinedText) && !STREAMING_ONLY_RE.containsMatchIn(resolvedSource) && !STREAMING_ONLY_RE.containsMatchIn(curLink)
                                 }
                                 if (passVenueFilter) {
                                     seenLinks.add(curLink)
@@ -645,6 +746,7 @@ object CinemaScraperHelper {
                                         put("link", curLink)
                                         put("source", resolvedSource)
                                         put("pubDate", curPubDate)
+                                        if (allowPendingQ) put("pendingQuestionBody", true)
                                     })
                                     added++
                                 }
@@ -683,11 +785,14 @@ object CinemaScraperHelper {
         if (targetUrl.isEmpty() || targetUrl.contains("news.google.com/")) return empty
         val html = fetchTextBounded(targetUrl, UA_MOBILE, HTTP_TIMEOUT_MS, maxBytes = 393216)
         if (html.isEmpty()) return empty
-        val structured = html
+        val rawStructured = html
             .replace(Regex("<script[\\s\\S]*?</script>", RegexOption.IGNORE_CASE), " ")
             .replace(Regex("<style[\\s\\S]*?</style>", RegexOption.IGNORE_CASE), " ")
             .replace(Regex("<svg[\\s\\S]*?</svg>", RegexOption.IGNORE_CASE), " ")
             .replace(Regex("<noscript[\\s\\S]*?</noscript>", RegexOption.IGNORE_CASE), " ")
+            .replace(Regex("<nav\\b[^>]*>[\\s\\S]*?</nav>", RegexOption.IGNORE_CASE), " ")
+            .replace(Regex("<aside\\b[^>]*>[\\s\\S]*?</aside>", RegexOption.IGNORE_CASE), " ")
+            .replace(Regex("<footer\\b[^>]*>[\\s\\S]*?</footer>", RegexOption.IGNORE_CASE), " ")
             .replace(Regex("<!--[\\s\\S]*?-->"), " ")
             .replace(Regex("</(?:t[dh]|td|th)>", RegexOption.IGNORE_CASE), " · ")
             .replace(Regex("</(?:tr|li|h[1-6]|p|div|section|article|blockquote)>", RegexOption.IGNORE_CASE), "\n")
@@ -701,7 +806,24 @@ object CinemaScraperHelper {
             .replace(Regex("\\n[ \\t]+"), "\n")
             .replace(Regex("\\n{2,}"), "\n")
             .trim()
-            .take(28000)
+
+        val rawLines = rawStructured.split('\n').map { it.trim() }.filter { it.isNotEmpty() }
+        val keptLines = ArrayList<String>(rawLines.size)
+        val inlineRelatedPrefixRe = Regex(
+            "^(?:baca\\s+juga|lihat\\s+juga|simak\\s+juga|rekomendasi|iklan|advertisement|bagikan|share)\\s*:",
+            RegexOption.IGNORE_CASE
+        )
+        val trailingSectionRe = Regex(
+            "^(?:artikel\\s+terkait|berita\\s+terkait|topik\\s+terkait|tag\\s+terkait|komentar)\\s*:?\\s*$",
+            RegexOption.IGNORE_CASE
+        )
+        for (i in rawLines.indices) {
+            val ln = rawLines[i]
+            if (inlineRelatedPrefixRe.containsMatchIn(ln)) continue
+            if (i >= (rawLines.size * 45) / 100 && trailingSectionRe.containsMatchIn(ln)) break
+            keptLines.add(ln)
+        }
+        val structured = keptLines.joinToString("\n").take(28000)
 
         return JSONObject().apply {
             put("url", targetUrl)

@@ -383,7 +383,7 @@ class MainActivity : AppCompatActivity() {
                 instanceFollowRedirects = false
                 connectTimeout = connectMs
                 readTimeout = readMs
-                setRequestProperty("User-Agent", "CinemaTracker-Android/4.4.0")
+                setRequestProperty("User-Agent", "CinemaTracker-Android/4.4.2")
             }
             val code = conn.responseCode
             if (code in listOf(301, 302, 303, 307, 308)) {
@@ -912,11 +912,11 @@ class MainActivity : AppCompatActivity() {
                 }
                 JSONObject().apply {
                     put("versionCode", code)
-                    put("versionName", pInfo.versionName ?: "4.4.0")
+                    put("versionName", pInfo.versionName ?: "4.4.2")
                     put("packageName", context.packageName)
                 }.toString()
             } catch (_: Exception) {
-                "{\"versionCode\":46,\"versionName\":\"4.4.0\",\"packageName\":\"com.michael.cinematracker\"}"
+                "{\"versionCode\":48,\"versionName\":\"4.4.2\",\"packageName\":\"com.michael.cinematracker\"}"
             }
         }
 

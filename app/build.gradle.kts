@@ -11,8 +11,8 @@ android {
         applicationId = "com.michael.cinematracker"
         minSdk = 26
         targetSdk = 35
-        versionCode = 46
-        versionName = "4.4.0"
+        versionCode = 48
+        versionName = "4.4.2"
         val overrideCode = (project.findProperty("APP_VERSION_CODE") as String?)?.toIntOrNull()
         if (overrideCode != null && overrideCode > 0) {
             versionCode = overrideCode

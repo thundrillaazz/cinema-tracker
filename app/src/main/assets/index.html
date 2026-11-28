@@ -1893,7 +1893,7 @@
       <div id="apkUpdateCard" class="info-card" style="display:none;">
         <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:4px;">
           <h3 style="margin:0;">Pembaruan Aplikasi</h3>
-          <span id="apkCurrentVerLabel" style="font-size:11px; font-weight:600; color:var(--muted); font-variant-numeric:tabular-nums;">v4.4.0</span>
+          <span id="apkCurrentVerLabel" style="font-size:11px; font-weight:600; color:var(--muted); font-variant-numeric:tabular-nums;">v4.4.2</span>
         </div>
         <p id="apkUpdateStatus" style="margin-bottom:8px;">Cek rilis APK terbaru langsung tanpa buka browser atau ekstrak ZIP.</p>
         <div style="display:flex; gap:8px;">
@@ -1903,7 +1903,7 @@
       </div>
 
       <div style="text-align:center; font-size:11px; color:var(--muted); padding:4px 0 12px; line-height:1.5;">
-        <div>Cinema Tracker v4.4.0 (Stable) · Made by Thundrilla</div>
+        <div>Cinema Tracker v4.4.2 (Stable) · Made by Thundrilla</div>
         <div style="font-size:10px; opacity:0.75;">Jadwal Bioskop Indonesia</div>
       </div>
     </div>
@@ -2259,13 +2259,42 @@
       return { releaseDate: "", releaseChannel: "theatrical", digitalPlatform: undefined, sourceDetail: "TMDB Global" };
     }
 
-    const RUMOR_HEADLINE_RE = /\b(rumor|rumours?|rumors?|kabarnya|diduga|prediksi|bocoran|diperkirakan|konon|belum\s+pasti|spekulasi|hoaks?|hoax|fan[-\s]?made|concept\s+trailer|estimasi|tidak\s+(?:akan\s+)?tayang\s+di\s+(?:bioskop\s+)?indonesia|batal\s+tayang(?:\s+di\s+indonesia)?|hanya\s+tayang\s+di\s+(?:bioskop\s+)?(?:global|amerika|us))\b/i;
-    const QUESTION_HEADLINE_RE = /(?:^\s*(?:kapan|apakah|bagaimana|mengapa|kenapa|berapa|benarkah|akankah|sudahkah)\b|\b(?:tayang\s+kapan|kapan\s+tayang(?:\s+di\s+indonesia)?|rilis\s+kapan|kapan\s+rilis|tayang\s+di\s+indonesia\s*\?|di\s+bioskop\s+indonesia\s*\?)\b|\?\s*(?:[-–—|•·]\s*[^?]{1,40})?$)/i;
-    const INDONESIAN_ABSENCE_PHRASE_RE = /\b(belum\s+(?:ada\s+(?:informasi|kabar|jadwal|kepastian|tanda(?:-tanda)?)|diketahui|diumumkan|terjadwal|dapat\s+dipastikan|dipastikan|resmi)(?:\s+kapan)?(?:\s+(?:akan|bakal))?(?:\s+(?:tayang|rilis|masuk))?(?:\s+di\s+(?:bioskop\s+)?indonesia)?|(?:jadwal|tanggal)\s+(?:tayang|rilis)(?:nya)?\s+di\s+(?:bioskop\s+)?indonesia\s+(?:belum|masih\s+belum|tidak)|tidak\s+(?:ada|akan|tayang|masuk)\s+(?:jadwal|penayangan)?\s*(?:di\s+)?(?:bioskop\s+)?indonesia|hanya\s+(?:tayang|rilis)\s+(?:secara\s+terbatas|di\s+festival|di\s+luar\s+negeri|secara\s+global)|belum\s+tayang\s+di\s+(?:bioskop\s+)?indonesia|belum\s+masuk\s+bioskop\s+indonesia)\b/i;
+    const RUMOR_HEADLINE_RE = /\b(rumor|rumours?|rumors?|kabarnya|diduga|prediksi|bocoran|diperkirakan|konon|belum\s+pasti|spekulasi|hoaks?|hoax|fan[-\s]?made|concept\s+trailer|estimasi|tidak\s+(?:akan\s+)?tayang\s+di\s+(?:bioskop\s+)?indonesia|batal\s+tayang(?:\s+di\s+(?:bioskop\s+)?(?:indonesia|malaysia|singapura))?|dilarang\s+tayang|(?:tidak|tak|belum|gagal(?:\s+lolos)?)\s+(?:lulus|lolos)\s+sensor|hanya\s+tayang\s+(?:di\s+)?(?:bioskop\s+)?(?:global|luar\s+negeri|amerika|us|as))\b/i;
+    const QUESTION_HEADLINE_RE = /(?:^\s*(?:kapan|kapankah|apakah|bagaimana|mengapa|kenapa|berapa|benarkah|akankah|sudahkah)\b|\b(?:tayang\s+kapan|kapan\s+(?:tayang|rilis|masuk(?:\s+bioskop)?)|apa(?:kah)?\s+benar|bakal\s+tayang)\b|\?(?:\s*[-–|•·]\s*[^?]{1,60})?\s*$)/i;
+    const INDONESIAN_ABSENCE_PHRASE_RE = /\b(?:belum\s+(?:ada|tersedia|diketahui|ditemukan|memiliki|mendapat|mengantongi|menerima)\s+(?:informasi(?:\s+lebih\s+lanjut)?|info(?:\s+lebih\s+lanjut)?|kepastian|jadwal|tanggal|kabar|tanda(?:-tanda)?|rencana|pengumuman)(?:\s+(?:lebih\s+lanjut|resmi|pasti|terkait|mengenai|soal|penayangan|tayang|rilis))?|belum\s+mengumumkan(?:\s+(?:jadwal|tanggal|penayangan|rilis|perilisan|kapan|kepastian))?|belum\s+(?:dapat\s+dipastikan|diketahui|diumumkan|dipastikan|terkonfirmasi|resmi|terjadwal|tayang\s+di\s+(?:bioskop\s+)?indonesia|masuk\s+(?:bioskop\s+)?indonesia|ada\s+kepastian)|(?:masih\s+)?belum\s+dipastikan(?:\s+(?:akan|bakal))?(?:\s+(?:masuk|tayang|rilis))?|(?:tidak\s+ada|belum\s+memiliki)\s+(?:jadwal|tanggal)(?:\s+(?:tayang|rilis))?|tidak\s+(?:akan\s+)?(?:tayang|rilis|masuk)\s+di\s+(?:bioskop\s+)?indonesia|belum\s+diketahui\s+kapan\s+(?:tayang|rilis)|diproyeksikan\s+(?:segera\s+)?(?:masuk|tayang)|berpeluang\s+(?:segera\s+)?(?:masuk|tayang)|(?:masih\s+)?menunggu\s+(?:konfirmasi|jadwal|kepastian|pengumuman)|apakah\s+(?:akan\s+)?tayang\s+di\s+(?:bioskop\s+)?indonesia)\b/i;
     const GLOBAL_ONLY_SUMMARY_RE = /\b(bioskop\s+global|rilis\s+global|secara\s+global|global\s+release|worldwide|overseas|sundance|cannes|tiff|venice|berlinale|amerika\s+serikat|bioskop\s+as|tanpa\s+jadwal\s+indonesia)\b/i;
     const LISTICLE_HEADLINE_RE = /\b(\d+\s+film|daftar\s+film|deretan\s+film|rekomendasi\s+film|fenomena\s+\w+\s+\d{1,2})\b/i;
     const STREAMING_ONLY_SOURCE_RE = /\b(disney\s*\+?|netflix|prime\s*video|amazon|apple\s*tv|hbo|max|vidio|viu|wetv|iqiyi|catchplay|hotstar)\b/i;
     const PRESALE_NEGATION_OR_QUESTION_RE = /^\s*(kapan|kapankah|benarkah|apakah|cara|bagaimana|berapa|harga|prediksi)\b|\b(belum\s+(buka|dibuka|tersedia|mulai)|kapan\s+(buka|dibuka|mulai|tayang)|akan\s+segera)\b/i;
+    const FOREIGN_CENSOR_OR_BAN_RE = /\b(?:lembaga\s+penapis\s+filem|\blpf\b|golden\s+screen\s+cinemas|\bgsc\b|\btgv\b|(?:resmi\s+)?dilarang\s+tayang|(?:tidak|tak|belum|gagal(?:\s+lolos)?)\s+(?:lulus|lolos)\s+sensor)\b/i;
+    const OFFICIAL_CONFIRMED_PORTAL_SIGNAL_RE = /\b(xxi|cinema\s*21|cinema\s*xxi|21cineplex|cgv|cin[eé]polis|tix\s*id|\blsf\b|lembaga\s+sensor\s+film|jadwalnonton)\b/i;
+
+    function maskNegatedCensorAndForeignPhrases(text) {
+      return String(text || "")
+        .replace(/\b(?:tidak|tak|belum|gagal(?:\s+lolos)?)\s+(?:lulus|lolos)\s+sensor\b/gi, " ")
+        .replace(/\b(?:lembaga\s+penapis\s+filem|lpf|golden\s+screen\s+cinemas|gsc|tgv)\b/gi, " ");
+    }
+
+    function hasExplicitIndonesiaVenue(text) {
+      const masked = maskNegatedCensorAndForeignPhrases(text);
+      if (/\b(xxi|cinema\s*21|cinema\s*xxi|21cineplex|cgv|cin[eé]polis|tix\s*id|\blsf\b|lembaga\s+sensor\s+film|bioskop\s+(?:di\s+)?indonesia|di\s+bioskop\s+indonesia|seluruh\s+bioskop\s+indonesia|jaringan\s+bioskop\s+indonesia|tanah\s+air|di\s+indonesia)\b/i.test(masked)) {
+        return true;
+      }
+      return /\blulus\s+sensor\b/i.test(masked) && !/\b(?:malaysia|singapura|singapore|brunei)\b/i.test(masked);
+    }
+
+    function hasConfirmedLsfMention(text) {
+      const clauses = String(text || "").split(/[\n\r]+|(?<=[.!?])\s+/).map(s => s.trim()).filter(Boolean);
+      for (let i = 0; i < clauses.length; i++) {
+        const cl = clauses[i];
+        if (hasIndonesianAbsenceOrUncertaintyPhrase(cl) || isQuestionHeadline(cl) || FOREIGN_CENSOR_OR_BAN_RE.test(cl) || /\b(?:malaysia|singapura|singapore|brunei)\b/i.test(cl)) {
+          continue;
+        }
+        const masked = maskNegatedCensorAndForeignPhrases(cl);
+        if (/\b(lsf|lembaga\s+sensor\s+film|lulus\s+sensor)\b/i.test(masked)) return true;
+      }
+      return false;
+    }
 
     function isQuestionHeadline(headline) {
       const s = String(headline || "").trim();
@@ -2279,20 +2308,30 @@
 
     function getSourceTierScore(source, url) {
       const s = `${source || ""} ${url || ""}`.toLowerCase();
-      if (/(21cineplex\.com|cgv\.id|cinepolis\.co\.id|tix\.id|lsf\.go\.id|jadwalnonton\.com|cinema\s*xxi|cinema\s*21)/.test(s)) return 3;
-      if (/(kompas\.com|detik\.com|kumparan\.com|tirto\.id|idntimes\.com|tempo\.co|kapanlagi\.com|antaranews\.com|merdeka\.com|liputan6\.com|cnnindonesia\.com|cnbcindonesia\.com|rri\.co\.id|katadata\.co\.id|hypeabis\.id|jawapos\.com|suara\.com|tribunnews\.com)/.test(s)) return 2;
+      if (/\b(?:21cineplex\.com|m\.21cineplex\.com|cgv\.id|cinepolis\.co\.id|tix\.id|tix\s*id|lsf\.go\\.id|jadwalnonton\.com|cinema\s*xxi|cinema\s*21)\b/.test(s)) return 3;
+      if (/\b(?:kompas\.com|kompas|detik\.com|detikcom|detikhot|kumparan\.com|kumparan|tirto\.id|tirto|idntimes\.com|idn\s*times|tempo\.co|tempo|kapanlagi\.com|kapanlagi|antaranews\.com|antara|merdeka\.com|merdeka|liputan6\.com|liputan6|cnnindonesia\.com|cnn\s*indonesia|cnbcindonesia\.com|cnbc\s*indonesia|rri\.co\.id|katadata\.co\.id|katadata|hypeabis\.id|hypeabis|jawapos\.com|jawa\s*pos|suara\.com|tribunnews\.com|medcom\.id|sindonews\.com|pikiran-rakyat\.com|cinemags|kincir)\b/.test(s)) return 2;
       return 1;
     }
 
-    function isItemDisqualifiedByAbsence(headline, bodyOrSnippet, fullText) {
+    function isItemDisqualifiedByAbsence(headline, bodyOrSnippet, fullText, source = "", url = "") {
       const combined = String(fullText || `${headline || ""}. ${bodyOrSnippet || ""}`).trim();
       if (!combined) return false;
-      if (RUMOR_HEADLINE_RE.test(headline || "") || isQuestionHeadline(headline)) return true;
-      return hasIndonesianAbsenceOrUncertaintyPhrase(combined);
+      if (RUMOR_HEADLINE_RE.test(headline || "") || isQuestionHeadline(headline) || FOREIGN_CENSOR_OR_BAN_RE.test(combined)) return true;
+      if (hasIndonesianAbsenceOrUncertaintyPhrase(combined)) {
+        const clauses = combined.split(/[\n\r]+|(?<=[.!?])\s+/).map(s => s.trim()).filter(Boolean);
+        const hasIndependentOfficial = clauses.some(cl =>
+          (OFFICIAL_CONFIRMED_PORTAL_SIGNAL_RE.test(maskNegatedCensorAndForeignPhrases(cl)) || hasConfirmedLsfMention(cl)) &&
+          !hasIndonesianAbsenceOrUncertaintyPhrase(cl) &&
+          !RUMOR_HEADLINE_RE.test(cl) &&
+          !FOREIGN_CENSOR_OR_BAN_RE.test(cl)
+        );
+        if (!hasIndependentOfficial && getSourceTierScore(source, url) < 3) return true;
+      }
+      return false;
     }
 
     function isRumorOrSpeculativeHeadline(headline) {
-      return RUMOR_HEADLINE_RE.test(String(headline || "")) || isQuestionHeadline(headline);
+      return RUMOR_HEADLINE_RE.test(String(headline || ""));
     }
 
     function isAffirmativePresaleHeadline(text) {
@@ -3536,7 +3575,7 @@
         radarByKey = radarClean.nextMap;
         localStorage.setItem("ct_v43_radar_cache", JSON.stringify(radarByKey));
       }
-      if (localStorage.getItem("ct_reissue_mig_ver") !== "4.4.0-r5") {
+      if (localStorage.getItem("ct_reissue_mig_ver") !== "4.4.2") {
         radarByKey = purgeRssEntriesFromRadarMap(radarByKey);
         localStorage.setItem("ct_v43_radar_cache", JSON.stringify(radarByKey));
         sanitizeWatchlistPollution();
@@ -3572,7 +3611,7 @@
         localStorage.removeItem("ct_v431_global_est");
         localStorage.removeItem("ct_catalog_schema_ver");
         localStorage.removeItem("ct_last_sync_ts");
-        localStorage.setItem("ct_reissue_mig_ver", "4.4.0-r5");
+        localStorage.setItem("ct_reissue_mig_ver", "4.4.2");
       }
       rebuildMovieCatalog();
 
@@ -3640,8 +3679,8 @@
       const lastSync = parseInt(localStorage.getItem("ct_last_sync_ts") || "0", 10);
       const now = Date.now();
       updateLastSyncLabel(lastSync);
-      const needsSchemaUpgrade = localStorage.getItem("ct_catalog_schema_ver") !== "4.4.0-r5";
-      // 2-hour auto-sync threshold to protect battery and mobile data (+ 1-time v4.4.0 catalog upgrade refresh)
+      const needsSchemaUpgrade = localStorage.getItem("ct_catalog_schema_ver") !== "4.4.2";
+      // 2-hour auto-sync threshold to protect battery and mobile data (+ 1-time v4.4.2 catalog upgrade refresh)
       if (needsSchemaUpgrade || (now - lastSync > 2 * 60 * 60 * 1000)) {
         syncTmdbLive(false);
       }
@@ -7058,7 +7097,7 @@
         const SIX_HOURS_MS = 6 * 60 * 60 * 1000;
         const ONE_DAY_MS = 24 * 60 * 60 * 1000;
         const releaseDateOverrides = {};
-        const bypassCache = Boolean(showFeedback) || localStorage.getItem("ct_catalog_schema_ver") !== "4.4.0-r5";
+        const bypassCache = Boolean(showFeedback) || localStorage.getItem("ct_catalog_schema_ver") !== "4.4.2";
 
         const reReleaseCands = [...nowRaw, ...idUpcomingRaw]
           .filter(item => item && item.id && item.poster_path && item.release_date && item.release_date < minDate)
@@ -7753,7 +7792,7 @@
         localStorage.setItem("ct_v392_live_now", JSON.stringify(enrichedNow));
         localStorage.setItem("ct_v392_live_upcoming", JSON.stringify(enrichedUpcoming));
         localStorage.removeItem("ct_v431_global_est");
-        localStorage.setItem("ct_catalog_schema_ver", "4.4.0-r5");
+        localStorage.setItem("ct_catalog_schema_ver", "4.4.2");
 
         rebuildMovieCatalog();
         updateCounts();
@@ -8030,7 +8069,7 @@
           return JSON.parse(window.AndroidBridge.getAppVersionInfoJson() || "{}");
         } catch (_) {}
       }
-      return { versionCode: 46, versionName: "4.4.0" };
+      return { versionCode: 48, versionName: "4.4.2" };
     }
 
     function fetchApkReleaseMeta(metaUrl) {
@@ -8069,7 +8108,7 @@
       const repo = resolveUpdateRepoSlug();
       const metaUrl = `https://github.com/${repo}/releases/download/latest/release-meta.json`;
       const local = getInstalledApkMeta();
-      const localCode = Number(local.versionCode || 46);
+      const localCode = Number(local.versionCode || 48);
 
       if (!silent && statusEl) {
         statusEl.textContent = "Memeriksa rilis terbaru di GitHub...";
@@ -8095,7 +8134,7 @@
           pendingApkUpdateMeta = remote;
           if (statusEl) {
             if (remote.signed) {
-              statusEl.textContent = `Versi baru tersedia: v${remote.versionName || "4.4.0"}${buildSuffix}. Data & Watchlist tetap aman.`;
+              statusEl.textContent = `Versi baru tersedia: v${remote.versionName || "4.4.2"}${buildSuffix}. Data & Watchlist tetap aman.`;
               statusEl.style.color = "var(--emerald-text)";
             } else {
               statusEl.textContent = `Build #${remote.buildNumber || remoteCode} tersedia (belum pakai Keystore tetap — pasang Keystore dulu agar bisa timpa tanpa uninstall).`;
@@ -8112,7 +8151,7 @@
         } else if (!silent && statusEl) {
           pendingApkUpdateMeta = null;
           if (installBtn) installBtn.style.display = "none";
-          statusEl.textContent = `Aplikasi sudah paling baru (v${local.versionName || "4.4.0"} · code ${localCode}).`;
+          statusEl.textContent = `Aplikasi sudah paling baru (v${local.versionName || "4.4.2"} · code ${localCode}).`;
           statusEl.style.color = "var(--emerald-text)";
         }
       } finally {
@@ -8142,7 +8181,7 @@
       const verLabel = document.getElementById("apkCurrentVerLabel");
       if (card) card.style.display = "block";
       const local = getInstalledApkMeta();
-      if (verLabel) verLabel.textContent = `v${local.versionName || "4.4.0"} · code ${local.versionCode || 46}`;
+      if (verLabel) verLabel.textContent = `v${local.versionName || "4.4.2"} · code ${local.versionCode || 48}`;
 
       const lastCheck = parseInt(localStorage.getItem("ct_last_update_check_ts") || "0", 10);
       const ONE_DAY_MS = 24 * 60 * 60 * 1000;
