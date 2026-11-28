@@ -2259,19 +2259,46 @@
       return { releaseDate: "", releaseChannel: "theatrical", digitalPlatform: undefined, sourceDetail: "TMDB Global" };
     }
 
-    const RUMOR_HEADLINE_RE = /\b(rumor|rumours?|rumors?|kabarnya|diduga|prediksi|bocoran|diperkirakan|konon|belum\s+pasti|spekulasi|hoaks?|hoax|fan[-\s]?made|concept\s+trailer|estimasi)\b/i;
+    const RUMOR_HEADLINE_RE = /\b(rumor|rumours?|rumors?|kabarnya|diduga|prediksi|bocoran|diperkirakan|konon|belum\s+pasti|spekulasi|hoaks?|hoax|fan[-\s]?made|concept\s+trailer|estimasi|tidak\s+(?:akan\s+)?tayang\s+di\s+(?:bioskop\s+)?indonesia|batal\s+tayang(?:\s+di\s+indonesia)?|hanya\s+tayang\s+di\s+(?:bioskop\s+)?(?:global|amerika|us))\b/i;
+    const QUESTION_HEADLINE_RE = /(?:^\s*(?:kapan|apakah|bagaimana|mengapa|kenapa|berapa|benarkah|akankah|sudahkah)\b|\b(?:tayang\s+kapan|kapan\s+tayang(?:\s+di\s+indonesia)?|rilis\s+kapan|kapan\s+rilis|tayang\s+di\s+indonesia\s*\?|di\s+bioskop\s+indonesia\s*\?)\b|\?\s*(?:[-–—|•·]\s*[^?]{1,40})?$)/i;
+    const INDONESIAN_ABSENCE_PHRASE_RE = /\b(belum\s+(?:ada\s+(?:informasi|kabar|jadwal|kepastian|tanda(?:-tanda)?)|diketahui|diumumkan|terjadwal|dapat\s+dipastikan|dipastikan|resmi)(?:\s+kapan)?(?:\s+(?:akan|bakal))?(?:\s+(?:tayang|rilis|masuk))?(?:\s+di\s+(?:bioskop\s+)?indonesia)?|(?:jadwal|tanggal)\s+(?:tayang|rilis)(?:nya)?\s+di\s+(?:bioskop\s+)?indonesia\s+(?:belum|masih\s+belum|tidak)|tidak\s+(?:ada|akan|tayang|masuk)\s+(?:jadwal|penayangan)?\s*(?:di\s+)?(?:bioskop\s+)?indonesia|hanya\s+(?:tayang|rilis)\s+(?:secara\s+terbatas|di\s+festival|di\s+luar\s+negeri|secara\s+global)|belum\s+tayang\s+di\s+(?:bioskop\s+)?indonesia|belum\s+masuk\s+bioskop\s+indonesia)\b/i;
+    const GLOBAL_ONLY_SUMMARY_RE = /\b(bioskop\s+global|rilis\s+global|secara\s+global|global\s+release|worldwide|overseas|sundance|cannes|tiff|venice|berlinale|amerika\s+serikat|bioskop\s+as|tanpa\s+jadwal\s+indonesia)\b/i;
     const LISTICLE_HEADLINE_RE = /\b(\d+\s+film|daftar\s+film|deretan\s+film|rekomendasi\s+film|fenomena\s+\w+\s+\d{1,2})\b/i;
     const STREAMING_ONLY_SOURCE_RE = /\b(disney\s*\+?|netflix|prime\s*video|amazon|apple\s*tv|hbo|max|vidio|viu|wetv|iqiyi|catchplay|hotstar)\b/i;
     const PRESALE_NEGATION_OR_QUESTION_RE = /^\s*(kapan|kapankah|benarkah|apakah|cara|bagaimana|berapa|harga|prediksi)\b|\b(belum\s+(buka|dibuka|tersedia|mulai)|kapan\s+(buka|dibuka|mulai|tayang)|akan\s+segera)\b/i;
 
+    function isQuestionHeadline(headline) {
+      const s = String(headline || "").trim();
+      return Boolean(s && QUESTION_HEADLINE_RE.test(s));
+    }
+
+    function hasIndonesianAbsenceOrUncertaintyPhrase(text) {
+      const s = String(text || "").trim();
+      return Boolean(s && INDONESIAN_ABSENCE_PHRASE_RE.test(s));
+    }
+
+    function getSourceTierScore(source, url) {
+      const s = `${source || ""} ${url || ""}`.toLowerCase();
+      if (/(21cineplex\.com|cgv\.id|cinepolis\.co\.id|tix\.id|lsf\.go\.id|jadwalnonton\.com|cinema\s*xxi|cinema\s*21)/.test(s)) return 3;
+      if (/(kompas\.com|detik\.com|kumparan\.com|tirto\.id|idntimes\.com|tempo\.co|kapanlagi\.com|antaranews\.com|merdeka\.com|liputan6\.com|cnnindonesia\.com|cnbcindonesia\.com|rri\.co\.id|katadata\.co\.id|hypeabis\.id|jawapos\.com|suara\.com|tribunnews\.com)/.test(s)) return 2;
+      return 1;
+    }
+
+    function isItemDisqualifiedByAbsence(headline, bodyOrSnippet, fullText) {
+      const combined = String(fullText || `${headline || ""}. ${bodyOrSnippet || ""}`).trim();
+      if (!combined) return false;
+      if (RUMOR_HEADLINE_RE.test(headline || "") || isQuestionHeadline(headline)) return true;
+      return hasIndonesianAbsenceOrUncertaintyPhrase(combined);
+    }
+
     function isRumorOrSpeculativeHeadline(headline) {
-      return RUMOR_HEADLINE_RE.test(String(headline || ""));
+      return RUMOR_HEADLINE_RE.test(String(headline || "")) || isQuestionHeadline(headline);
     }
 
     function isAffirmativePresaleHeadline(text) {
       const s = String(text || "");
       if (!/\b(pre-?sale|presale|tiket\s+(?:sudah|resmi|bisa)\s+(?:dibeli|dipesan|dibuka|tersedia))\b/i.test(s)) return false;
-      if (PRESALE_NEGATION_OR_QUESTION_RE.test(s)) return false;
+      if (PRESALE_NEGATION_OR_QUESTION_RE.test(s) || hasIndonesianAbsenceOrUncertaintyPhrase(s)) return false;
       return /\b(dibuka|tersedia|bisa\s+(?:dibeli|dipesan)|mulai\s+hari\s+ini|sudah\s+(?:dibuka|buka|tersedia|dijual)|resmi\s+dibuka)\b/i.test(s);
     }
 
@@ -2556,15 +2583,84 @@
         }
         const hasChains = Boolean(entry.chains && entry.chains.length > 0);
         const hasExplicitIdInSummary = EXPLICIT_INDONESIA_VENUE_RE.test(summary) || Boolean(entry.lsfStatus);
+        const hasAbsencePollution = hasIndonesianAbsenceOrUncertaintyPhrase(summary) || isQuestionHeadline(headlineToCheck) || RUMOR_HEADLINE_RE.test(headlineToCheck);
         const isForeignWirePollution = FOREIGN_WIRE_RE.test(summary) && !hasChains && !hasExplicitIdInSummary;
+        const isGlobalConfirmedWithoutIdEvidence = Boolean(
+          isRssSourcedRadar(entry) &&
+          ["confirmed", "presale", "lsf_passed"].includes(entry.status) &&
+          !hasChains &&
+          !entry.lsfStatus &&
+          !EXPLICIT_INDONESIA_VENUE_RE.test(summary)
+        );
+        const isGlobalOnlyPollution = GLOBAL_ONLY_SUMMARY_RE.test(summary) && !hasChains && !hasExplicitIdInSummary;
         const isUnconfirmedReissuePollution = Boolean((entry.isReRelease || REISSUE_SIGNAL_RE.test(summary)) && !entry.releaseDateId && !hasChains && !hasExplicitIdInSummary);
-        if (isForeignWirePollution || isUnconfirmedReissuePollution) {
+        if (hasAbsencePollution || isForeignWirePollution || isGlobalConfirmedWithoutIdEvidence || isGlobalOnlyPollution || isUnconfirmedReissuePollution) {
           removedKeys.push(key);
           return;
         }
         nextMap[key] = entry;
       });
       return { nextMap, removedKeys };
+    }
+
+    function sanitizeWatchlistPollution() {
+      let mutated = false;
+      Object.keys(watchlistMap || {}).forEach(wKey => {
+        const entry = watchlistMap[wKey];
+        if (!entry || !entry.movieData) return;
+        const md = entry.movieData;
+        if (md.releaseChannel === "digital") return;
+        const radar = md.radarInfo;
+        const validCachedRadar = findMatchingRadarEntry({ ...md, tmdbId: entry.tmdbId || md.tmdbId });
+        const summary = String((radar && radar.summary) || "").trim();
+        const headlineMatch = /(?:Kabar ID|Berita ID):\s*(.+)$/i.exec(summary);
+        const headline = headlineMatch ? headlineMatch[1].trim() : summary;
+        const hasChains = Boolean(md.chains && md.chains.length > 0);
+        const hasExplicitId = Boolean(
+          EXPLICIT_INDONESIA_VENUE_RE.test(summary) ||
+          (radar && radar.lsfStatus) ||
+          md.lsfStatus ||
+          hasChains
+        );
+        const hasRadarPollution = Boolean(
+          radar && (
+            hasIndonesianAbsenceOrUncertaintyPhrase(summary) ||
+            (headline && isQuestionHeadline(headline)) ||
+            (headline && RUMOR_HEADLINE_RE.test(headline)) ||
+            (GLOBAL_ONLY_SUMMARY_RE.test(summary) && !hasExplicitId) ||
+            (isRssSourcedRadar(radar) && !validCachedRadar && !hasExplicitId)
+          )
+        );
+        const hasStaleRssBadgeWithoutValidRadar = Boolean(md.sourceBadge === "Radar Bioskop ID" && !validCachedRadar);
+        if (hasRadarPollution || hasStaleRssBadgeWithoutValidRadar) {
+          mutated = true;
+          watchlistMap[wKey] = {
+            ...entry,
+            isTba: true,
+            lastKnownReleaseDate: "TBA",
+            movieData: {
+              ...md,
+              tba: true,
+              releaseChannel: "theatrical",
+              releaseDate: "TBA",
+              dateLabel: "TBA ID",
+              status: "upcoming",
+              chains: [],
+              imax: false,
+              presale: false,
+              lsfStatus: undefined,
+              confirmedText: "Jadwal bioskop ID belum terkonfirmasi",
+              sourceBadge: "Estimasi / TBA",
+              radarInfo: undefined
+            }
+          };
+        }
+      });
+      if (mutated) {
+        persistWatchlist();
+        syncWatchlistToNative();
+      }
+      return mutated;
     }
 
     function purgeRssEntriesFromRadarMap(radarMap) {
@@ -2578,7 +2674,7 @@
     }
 
     const ID_DATE_LOCAL_CTX_RE = /\b(di\s+indonesia|bioskop\s+indonesia|tanah\s+air|lebih\s+awal|xxi|cinema\s*21|cinema\s*xxi|cgv|cinepolis|cinépolis|imax|tix\s*id|resmi)\b/gi;
-    const GLOBAL_DATE_LOCAL_CTX_RE = /\b((?:di\s+)?(?:amerika(?:\s+serikat)?|usa|us|as|global|internasional|dunia|luar\s+negeri|barat))\b/gi;
+    const GLOBAL_DATE_LOCAL_CTX_RE = /\b((?:di\s+)?(?:amerika(?:\s+serikat)?|usa|us|as|global|bioskop\s+global|rilis\s+global|secara\s+luas|overseas|worldwide|internasional|dunia|luar\s+negeri|barat|festival(?:\s+film)?|sundance|cannes|tiff|venice|berlinale))\b/gi;
     const SCREENING_VERB_RE = /\b(tayang|rilis|dirilis|mulai|resmi|pre-?sale|buka|hadir)\b/i;
     const REISSUE_SCHEDULE_TAG_RE = /\(\s*(?:reissue|re-?release|tayang\s+(?:ulang|kembali)|remaster(?:ed)?)\s*\)/i;
     const SCHEDULE_ROW_PREFIX_RE = /^\s*(?:\d{1,2}[.)]\s+|(?:[1-9]|[12]\d|3[01])\s+(?:jan|feb|mar|apr|mei|may|jun|jul|agu|ags|aug|sep|sept|okt|oct|nov|des|dec)[a-z]*\s*[·|:\-–—])/i;
@@ -2632,7 +2728,9 @@
         return bStart > aEnd ? bStart - aEnd : aStart - bEnd;
       };
 
-      return matches.map(m => {
+      const scoredOut = [];
+      for (let mi = 0; mi < matches.length; mi++) {
+        const m = matches[mi];
         let minIdDist = Infinity;
         for (let hi = 0; hi < idHits.length; hi++) {
           const d = distToRange(m.start, m.end, idHits[hi].start, idHits[hi].end);
@@ -2656,8 +2754,10 @@
         if (segHasGlobal && !segHasId) proximityScore -= 85;
         if (minIdDist <= 55) proximityScore += 120 - minIdDist * 2;
         if (minGlobalDist <= 28 && minGlobalDist < minIdDist) proximityScore -= 95 - minGlobalDist * 2;
-        return { iso: m.iso, proximityScore, seg };
-      });
+        if (proximityScore < 0 || (segHasGlobal && !segHasId)) continue;
+        scoredOut.push({ iso: m.iso, proximityScore, seg });
+      }
+      return scoredOut;
     }
 
     function extractDateForMovieFromTexts(movieTitle, items) {
@@ -2669,6 +2769,12 @@
         const headline = String((it && it.title) || "").trim();
         const snippet = String((it && it.snippet) || "").trim();
         if (!headline && !snippet) continue;
+        if (isQuestionHeadline(headline)) continue;
+        const tierScore = getSourceTierScore(it && it.source, it && it.link);
+        const fullItemText = `${headline}. ${snippet}`;
+        const itemHasAbsence = isItemDisqualifiedByAbsence(headline, snippet, fullItemText);
+        if (itemHasAbsence && tierScore < 3) continue;
+
         const isListicle = LISTICLE_HEADLINE_RE.test(headline);
         if (isListicle && !(it && it.allowListicle)) continue;
         const isVsClash = !movieHasVs && /\bvs\b/i.test(headline);
@@ -2682,10 +2788,12 @@
           }
         }
         const headlineMatchesTitle = titleMatchesHeadlineAndroid(movieTitle, headline);
-        const clauses = `${headline}. ${snippet}`.split(/[\n\r]+|(?<=[.!?])\s+/).map(s => s.trim()).filter(Boolean);
+        const clauses = fullItemText.split(/[\n\r]+|(?<=[.!?])\s+/).map(s => s.trim()).filter(Boolean);
         const mSeqInfo = extractSequelInfo(movieTitle);
         for (let c = 0; c < clauses.length; c++) {
           const clause = clauses[c];
+          if (isRumorOrSpeculativeHeadline(clause) || hasIndonesianAbsenceOrUncertaintyPhrase(clause)) continue;
+          if (/\b(kapan|apakah|benarkah|kenapa|akankah)\b|\?/i.test(clause)) continue;
           const clauseMatchesTitle = titleMatchesHeadlineAndroid(movieTitle, clause);
           const prevClauseMatched = c > 0 && titleMatchesHeadlineAndroid(movieTitle, clauses[c - 1]);
           const hasContextualMoviePronoun = /\b(?:film(?:\s+[a-z0-9-]+){0,10}|animasi(?:\s+[a-z0-9-]+){0,5}|sekuel(?:\s+[a-z0-9-]+){0,4}|prekuel(?:\s+[a-z0-9-]+){0,4}|tayangan(?:\s+[a-z0-9-]+){0,3}|karya(?:\s+[a-z0-9-]+){0,3})\s+(?:ini|tersebut)\b/i.test(clause);
@@ -2702,10 +2810,10 @@
             ((headlineMatchesTitle && !isListicle && !isVsClash && clauses.length <= 5) || prevClauseMatched) &&
             noPronounSequelConflict;
           if (!clauseMatchesTitle && !isLeadPronounClause) continue;
-          if (isRumorOrSpeculativeHeadline(clause)) continue;
           const hasExplicitIdContext = /\b(di\s+indonesia|bioskop\s+indonesia|tanah\s+air|lebih\s+awal|xxi|cinema\s*21|cinema\s*xxi|cgv|cinepolis|cinépolis|tix\s*id|resmi)\b/i.test(clause);
+          if (itemHasAbsence && !hasExplicitIdContext) continue;
           if (isVsClash && !hasExplicitIdContext) continue;
-          let tierBase = hasExplicitIdContext ? 300 : 200;
+          let tierBase = (hasExplicitIdContext ? 300 : 200) + tierScore * 150;
           if (!clauseMatchesTitle) tierBase -= 80;
           if (isVsClash) tierBase -= 120;
           const isEnumerationClause = isListicle || /\b(?:yakni|yaitu|seperti|adalah|meliputi|antara\s+lain)\b/i.test(clause);
@@ -2730,7 +2838,6 @@
     const REISSUE_NOISE_RE = /\b(disney\s*\+?|netflix|prime\s*video|amazon|apple\s*tv|hbo|max|vidio|viu|wetv|iqiyi|catchplay|hotstar|bioskop\s+trans\s*tv|trans\s*tv|lk21|indoxxi|link\s+nonton|sub\s+indo|episode\s+\d+|sortir\s*[aà]\s*paris)\b/i;
     const REISSUE_SIGNAL_RE = /\(\s*(?:reissue|re-?release|tayang\s+ulang|tayang\s+kembali|remaster(?:ed)?)\s*\)|\b(tayang\s+(?:kembali|ulang|lagi)|kembali\s+(?:tayang|hadir|ke\s+bioskop)|dirilis\s+ulang|re-?release|reissue|remaster(?:ed)?|4k\s+(?:remaster|restorasi|imax)|anniversary|encore)\b/i;
     const REISSUE_CINEMA_ID_RE = /\b(xxi|cinema\s*21|cinema\s*xxi|21cineplex|cgv|cin[eé]polis|imax|tix\s*id|bioskop|indonesia)\b/i;
-    const QUESTION_HEADLINE_RE = /^(?:kapan|apakah|bagaimana|mengapa|kenapa|berapa|benarkah)\b|\?\s*$/i;
     const REISSUE_TRAILING_DATE_RE = /\s+(?:mulai\s+|pada\s+|tanggal\s+)?([1-9]|[12]\d|3[01])(?:\s*(?:-|–|—|s\/d|s\.d\.|hingga|sampai)\s*(?:[1-9]|[12]\d|3[01]))?\s+(januari|jan|februari|feb|maret|mar|april|apr|mei|may|juni|jun|juli|jul|agustus|agu|ags|aug|september|sept|sep|oktober|okt|oct|november|nov|desember|des|dec)(?:\s*,?\s*(20\d{2}))?\s*$/i;
 
     function isValidReReleasePair(primaryReleaseDate, idReleaseDate) {
@@ -2919,12 +3026,13 @@
         const snippet = String((item && item.snippet) || "").trim();
         const source = String((item && item.source) || "").trim();
         const link = String((item && item.link) || "").trim();
-        if (!headline || QUESTION_HEADLINE_RE.test(headline)) return;
+        if (!headline || isQuestionHeadline(headline)) return;
         const isListicle = LISTICLE_HEADLINE_RE.test(headline);
         const combined = `${headline}. ${snippet}`;
         const isFullBody = snippet.length > 400;
         if (REISSUE_NOISE_RE.test(isFullBody ? `${headline} ${source} ${link}` : `${combined} ${source} ${link}`)) return;
         if (isRumorOrSpeculativeHeadline(isFullBody ? headline : combined)) return;
+        if (!isFullBody && hasIndonesianAbsenceOrUncertaintyPhrase(combined)) return;
         const hasExplicitIdVenue = EXPLICIT_INDONESIA_VENUE_RE.test(`${combined} ${source}`);
         if (FOREIGN_WIRE_RE.test(combined) && !hasExplicitIdVenue) return;
         const hasExplicitReissue = REISSUE_SIGNAL_RE.test(combined);
@@ -3428,9 +3536,10 @@
         radarByKey = radarClean.nextMap;
         localStorage.setItem("ct_v43_radar_cache", JSON.stringify(radarByKey));
       }
-      if (localStorage.getItem("ct_reissue_mig_ver") !== "4.4.0-r4") {
+      if (localStorage.getItem("ct_reissue_mig_ver") !== "4.4.0-r5") {
         radarByKey = purgeRssEntriesFromRadarMap(radarByKey);
         localStorage.setItem("ct_v43_radar_cache", JSON.stringify(radarByKey));
+        sanitizeWatchlistPollution();
         const migWin = getCatalogWindow(getLocalTodayIso());
         let wlMigMutated = false;
         Object.keys(watchlistMap).forEach(wk => {
@@ -3463,7 +3572,7 @@
         localStorage.removeItem("ct_v431_global_est");
         localStorage.removeItem("ct_catalog_schema_ver");
         localStorage.removeItem("ct_last_sync_ts");
-        localStorage.setItem("ct_reissue_mig_ver", "4.4.0-r4");
+        localStorage.setItem("ct_reissue_mig_ver", "4.4.0-r5");
       }
       rebuildMovieCatalog();
 
@@ -3531,7 +3640,7 @@
       const lastSync = parseInt(localStorage.getItem("ct_last_sync_ts") || "0", 10);
       const now = Date.now();
       updateLastSyncLabel(lastSync);
-      const needsSchemaUpgrade = localStorage.getItem("ct_catalog_schema_ver") !== "4.4.0-r4";
+      const needsSchemaUpgrade = localStorage.getItem("ct_catalog_schema_ver") !== "4.4.0-r5";
       // 2-hour auto-sync threshold to protect battery and mobile data (+ 1-time v4.4.0 catalog upgrade refresh)
       if (needsSchemaUpgrade || (now - lastSync > 2 * 60 * 60 * 1000)) {
         syncTmdbLive(false);
@@ -5365,7 +5474,7 @@
             delete androidRssPending[cbId];
             resolve([]);
           }
-        }, 8500);
+        }, 15000);
         androidRssPending[cbId] = items => {
           clearTimeout(timer);
           resolve(Array.isArray(items) ? items : []);
@@ -5392,7 +5501,7 @@
             delete androidRssPending[cbId];
             resolve([]);
           }
-        }, 9500);
+        }, 15000);
         androidRssPending[cbId] = items => {
           clearTimeout(timer);
           resolve(Array.isArray(items) ? items : []);
@@ -5446,7 +5555,7 @@
             delete androidArticleTextPending[cbId];
             resolve({ url: "", text: "" });
           }
-        }, 9000);
+        }, 18000);
         androidArticleTextPending[cbId] = payload => {
           clearTimeout(timer);
           resolve(payload && typeof payload === "object" ? payload : { url: "", text: "" });
@@ -5634,9 +5743,17 @@
 
     async function verifyViaNativeAndroidRadar(m, resolvedId, tmdbKey, cacheKey, silentToast = false) {
       if (radarFeedUrl) {
-        await fetchCloudRadarFeed(true);
+        if (!silentToast) {
+          await fetchCloudRadarFeed(true);
+        }
         const fromFeed = findMatchingRadarEntry(m);
-        if (fromFeed) {
+        const feedHasId = Boolean(
+          fromFeed &&
+          ["confirmed", "presale", "lsf_passed"].includes(fromFeed.status) &&
+          ((fromFeed.releaseDateId && !isPlaceholderDate(fromFeed.releaseDateId)) ||
+            (fromFeed.chains && fromFeed.chains.length > 0))
+        );
+        if (feedHasId) {
           if (!silentToast) {
             showToast(fromFeed.releaseDateId ? `Radar ID: ${formatShortDate(fromFeed.releaseDateId)}` : "Sinkron dari Cloud Radar Feed");
           }
@@ -5663,12 +5780,16 @@
         if (STREAMING_ONLY_SOURCE_RE.test(srcStr)) return false;
         const hasIdVenue = EXPLICIT_INDONESIA_VENUE_RE.test(combinedIt);
         if (FOREIGN_WIRE_RE.test(combinedIt) && !hasIdVenue) return false;
-        return !isRumorOrSpeculativeHeadline(it.title);
+        if (isQuestionHeadline(it.title) || isRumorOrSpeculativeHeadline(it.title)) return false;
+        if (isItemDisqualifiedByAbsence(it.title, it.snippet || "", combinedIt) && getSourceTierScore(it.source, it.link) < 3) return false;
+        return true;
       });
 
       const matched = rawCandidates
-        .filter(it => titleMatchesHeadlineAndroid(m.title, it.title))
+        .filter(it => titleMatchesHeadlineAndroid(m.title, `${it.title}. ${it.snippet || ""}`))
         .sort((a, b) => {
+          const tierDiff = getSourceTierScore(b.source, b.link) - getSourceTierScore(a.source, a.link);
+          if (tierDiff !== 0) return tierDiff;
           const aScore = (EXPLICIT_INDONESIA_VENUE_RE.test(`${a.title} ${a.snippet || ""}`) ? 2 : 0) + (!LISTICLE_HEADLINE_RE.test(a.title) ? 1 : 0);
           const bScore = (EXPLICIT_INDONESIA_VENUE_RE.test(`${b.title} ${b.snippet || ""}`) ? 2 : 0) + (!LISTICLE_HEADLINE_RE.test(b.title) ? 1 : 0);
           return bScore - aScore;
@@ -5677,6 +5798,8 @@
       const mapForExtract = (list, allowListicleOverride = false) => list.map(it => ({
         title: it.title,
         snippet: it.snippet || "",
+        source: it.source || "",
+        link: it.link || "",
         pubDate: isArchivalMovie ? undefined : it.pubDate,
         refDateIso: todayIso,
         allowListicle: allowListicleOverride
@@ -5687,7 +5810,14 @@
         parsedRssDate = "";
       }
 
-      if (!parsedRssDate && window.AndroidBridge && typeof window.AndroidBridge.fetchArticleScheduleText === "function") {
+      const preDeepJoined = matched.map(x => `${x.title} ${x.snippet || ""}`).join(" | ");
+      const needsThoroughDeepFetch = Boolean(
+        window.AndroidBridge &&
+        typeof window.AndroidBridge.fetchArticleScheduleText === "function" &&
+        (!parsedRssDate || !EXPLICIT_INDONESIA_VENUE_RE.test(preDeepJoined) || matched.some(x => getSourceTierScore(x.source, x.link) >= 2))
+      );
+
+      if (needsThoroughDeepFetch) {
         const deepCands = [...matched];
         rawCandidates.forEach(it => {
           if (deepCands.length >= 8 || deepCands.some(d => d.link === it.link)) return;
@@ -5702,44 +5832,80 @@
         });
         const gNewsCands = deepCands
           .filter(it => /^https?:\/\//i.test(String(it.link || "")))
-          .sort((a, b) => (String(a.link || "").includes("bing.com/news/apiclick.aspx") ? 0 : 1) - (String(b.link || "").includes("bing.com/news/apiclick.aspx") ? 0 : 1))
+          .sort((a, b) => {
+            const tierDiff = getSourceTierScore(b.source, b.link) - getSourceTierScore(a.source, a.link);
+            if (tierDiff !== 0) return tierDiff;
+            return (String(a.link || "").includes("bing.com/news/apiclick.aspx") ? 0 : 1) - (String(b.link || "").includes("bing.com/news/apiclick.aspx") ? 0 : 1);
+          })
           .slice(0, 5);
         if (gNewsCands.length > 0) {
+          const disqualifiedLinks = new Set();
           const deepExtractItems = [];
           await mapWithConcurrency(gNewsCands, 3, async (cand) => {
             const art = await fetchNativeArticleScheduleText(cand.link);
             if (!art || !art.text) return;
-            const artHasId = EXPLICIT_INDONESIA_VENUE_RE.test(`${cand.title} ${art.text}`);
-            if (FOREIGN_WIRE_RE.test(art.text) && !artHasId) return;
+            const resolvedUrl = (art.url && /^https?:\/\//i.test(art.url)) ? art.url : cand.link;
+            const fullCombo = `${cand.title}. ${art.text}`;
+            const tierScore = getSourceTierScore(cand.source, resolvedUrl);
+            const artHasId = EXPLICIT_INDONESIA_VENUE_RE.test(fullCombo);
+            if (isItemDisqualifiedByAbsence(cand.title, art.text, fullCombo) && tierScore < 3) {
+              disqualifiedLinks.add(cand.link);
+              return;
+            }
+            if ((FOREIGN_WIRE_RE.test(fullCombo) || GLOBAL_ONLY_SUMMARY_RE.test(fullCombo)) && !artHasId) {
+              disqualifiedLinks.add(cand.link);
+              return;
+            }
             if (!titleMatchesHeadlineAndroid(m.title, art.text)) return;
-            if (isArchivalMovie && !artHasId) return;
+            if (isArchivalMovie && !artHasId) {
+              disqualifiedLinks.add(cand.link);
+              return;
+            }
             const enrichedCand = {
               ...cand,
               snippet: art.text,
-              link: (art.url && /^https?:\/\//i.test(art.url)) ? art.url : cand.link
+              link: resolvedUrl
             };
-            if (!matched.some(x => x.link === cand.link || x.link === enrichedCand.link)) {
-              matched.push(enrichedCand);
-            } else {
-              const idx = matched.findIndex(x => x.link === cand.link);
-              if (idx >= 0) matched[idx] = enrichedCand;
-            }
+            const idx = matched.findIndex(x => x.link === cand.link);
+            if (idx >= 0) matched[idx] = enrichedCand;
+            else matched.push(enrichedCand);
             deepExtractItems.push({
               title: cand.title,
               snippet: art.text,
+              source: cand.source || "",
+              link: resolvedUrl,
               pubDate: isArchivalMovie ? undefined : cand.pubDate,
               refDateIso: todayIso,
               allowListicle: true
             });
           });
+          if (disqualifiedLinks.size > 0) {
+            for (let mi = matched.length - 1; mi >= 0; mi--) {
+              if (disqualifiedLinks.has(matched[mi].link)) {
+                matched.splice(mi, 1);
+              }
+            }
+          }
           if (deepExtractItems.length > 0) {
             const deepDate = extractDateForMovieFromTexts(m.title, deepExtractItems);
             if (deepDate && !isPlaceholderDate(deepDate) && deepDate >= minDate && deepDate <= maxDate) {
               parsedRssDate = deepDate;
+            } else {
+              parsedRssDate = extractDateForMovieFromTexts(m.title, mapForExtract(matched, false));
+              if (parsedRssDate && (parsedRssDate < minDate || parsedRssDate > maxDate)) {
+                parsedRssDate = "";
+              }
+            }
+          } else if (disqualifiedLinks.size > 0) {
+            parsedRssDate = extractDateForMovieFromTexts(m.title, mapForExtract(matched, false));
+            if (parsedRssDate && (parsedRssDate < minDate || parsedRssDate > maxDate)) {
+              parsedRssDate = "";
             }
           }
         }
       }
+
+      matched.sort((a, b) => getSourceTierScore(b.source, b.link) - getSourceTierScore(a.source, a.link));
 
       const feedDate = (feedMatch && feedMatch.releaseDateId && !isPlaceholderDate(feedMatch.releaseDateId) && feedMatch.releaseDateId >= minDate) ? feedMatch.releaseDateId : "";
       const officialTmdbDate = (idMeta && idMeta.releaseDateId) || "";
@@ -5778,6 +5944,9 @@
       if (matched.length === 0 && !effectiveIdDate && !feedMatch) {
         return false;
       }
+      if (!effectiveIdDate && chains.length === 0 && !lsfMention && !feedMatch && !hasIdContext) {
+        return false;
+      }
 
       let status = "upcoming_global";
       if (presaleActive) status = "presale";
@@ -5795,10 +5964,15 @@
       else if (feedMatch) summaryParts.push(`Terdaftar tayang di ${feedMatch.source}.`);
       if (matched[0] && matched[0].title) summaryParts.push(`Kabar ID: ${matched[0].title}`);
 
-      const srcList = matched.slice(0, 3).map(x => ({ title: (x.source || "Berita ID").slice(0, 64), url: x.link }));
-      if (feedMatch && feedMatch.sourceUrl && !srcList.some(s => s.url === feedMatch.sourceUrl)) {
-        srcList.unshift({ title: (feedMatch.source || "Bioskop ID").slice(0, 64), url: feedMatch.sourceUrl });
+      const srcList = [];
+      if (feedMatch && feedMatch.sourceUrl) {
+        srcList.push({ title: (feedMatch.source || "Bioskop ID").slice(0, 64), url: feedMatch.sourceUrl });
       }
+      matched.forEach(x => {
+        if (!srcList.some(s => s.url === x.link)) {
+          srcList.push({ title: (x.source || "Berita ID").slice(0, 64), url: x.link });
+        }
+      });
 
       const rawEntry = {
         key: cacheKey,
@@ -6884,7 +7058,7 @@
         const SIX_HOURS_MS = 6 * 60 * 60 * 1000;
         const ONE_DAY_MS = 24 * 60 * 60 * 1000;
         const releaseDateOverrides = {};
-        const bypassCache = Boolean(showFeedback) || localStorage.getItem("ct_catalog_schema_ver") !== "4.4.0-r4";
+        const bypassCache = Boolean(showFeedback) || localStorage.getItem("ct_catalog_schema_ver") !== "4.4.0-r5";
 
         const reReleaseCands = [...nowRaw, ...idUpcomingRaw]
           .filter(item => item && item.id && item.poster_path && item.release_date && item.release_date < minDate)
@@ -7561,6 +7735,7 @@
           }
         }
 
+        sanitizeWatchlistPollution();
         const newlyConfirmedRadar = applyRadarToWatchlist(todayIso);
         if (newlyConfirmedRadar.length > 0 && window.AndroidBridge && typeof window.AndroidBridge.sendCustomNotification === "function") {
           newlyConfirmedRadar.forEach(wKey => {
@@ -7578,7 +7753,7 @@
         localStorage.setItem("ct_v392_live_now", JSON.stringify(enrichedNow));
         localStorage.setItem("ct_v392_live_upcoming", JSON.stringify(enrichedUpcoming));
         localStorage.removeItem("ct_v431_global_est");
-        localStorage.setItem("ct_catalog_schema_ver", "4.4.0-r4");
+        localStorage.setItem("ct_catalog_schema_ver", "4.4.0-r5");
 
         rebuildMovieCatalog();
         updateCounts();

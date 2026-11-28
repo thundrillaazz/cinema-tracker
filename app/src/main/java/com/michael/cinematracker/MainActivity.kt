@@ -70,7 +70,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var rootContainer: FrameLayout
     private lateinit var webView: WebView
-    private val executor = Executors.newSingleThreadExecutor()
+    private val executor = Executors.newFixedThreadPool(6)
     private var isPageLoaded = false
     private var pendingMovieId: String? = null
     private var pendingTab: String? = null

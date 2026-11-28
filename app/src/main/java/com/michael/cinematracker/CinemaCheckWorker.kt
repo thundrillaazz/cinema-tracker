@@ -46,7 +46,7 @@ class CinemaCheckWorker(
         val forceNetwork = inputData.getBoolean("force_network_sync", false)
 
         return try {
-            val today = LocalDate.now()
+            val today = LocalDate.now(java.time.ZoneId.of("Asia/Jakarta"))
             val todayStr = today.toString()
             val fullDateFmt = DateTimeFormatter.ofPattern("dd/MM/yyyy")
             val shortDateFmt = DateTimeFormatter.ofPattern("dd MMM")
@@ -598,7 +598,9 @@ class CinemaCheckWorker(
                 var hasImaxRss = false
                 var hasIdConfirmRss = false
                 val detectedChains = LinkedHashSet<String>()
-                val deepBodyCandidates = ArrayList<Pair<String, String>>()
+                val deepBodyCandidates = ArrayList<Triple<String, String, String>>()
+                val cleanBodies = ArrayList<Pair<String, String>>()
+                val disqualifiedSnippetLinks = HashSet<String>()
 
                 fun harvestSignalsFromText(txt: String, itemHead: String, itemBody: String) {
                     if (CinemaScraperHelper.isAffirmativePresaleText(txt)) hasPresaleRss = true
@@ -614,47 +616,76 @@ class CinemaCheckWorker(
                     val rHead = rObj.optString("title", "")
                     val rSnip = rObj.optString("snippet", "")
                     val rLink = rObj.optString("link", "")
+                    val rSrc = rObj.optString("source", "")
+                    if (CinemaScraperHelper.isDisqualifiedByAbsence(rHead, "$rHead. $rSnip", rSrc, rLink)) continue
                     val titleMatched = CinemaScraperHelper.titleMatchesHeadline(title, rHead) ||
                         CinemaScraperHelper.titleMatchesHeadline(title, rSnip)
-                    if (titleMatched) {
-                        val combo = "$rHead. $rSnip"
-                        val hasIdCtx = idVenueRe.containsMatchIn(combo)
-                        if (!foreignWireRe.containsMatchIn(combo) || hasIdCtx) {
-                            harvestSignalsFromText(combo, rHead, rSnip)
-                            if (bestDate.isEmpty() && (!isArchivalRss || hasIdCtx)) {
-                                val cand = CinemaScraperHelper.extractIndonesianDateFromText(title, combo, today.year)
-                                if (cand.isNotEmpty() && cand >= minCatalogDate && cand <= maxCatalogDate) {
-                                    bestDate = cand
-                                }
-                            }
-                        }
-                    }
-                    if (bestDate.isEmpty() && rLink.startsWith("http") &&
-                        (rLink.contains("bing.com/news/apiclick.aspx") || rLink.contains("news.google.com/")) &&
-                        (titleMatched || listicleOrReissueHintRe.containsMatchIn("$rHead $rSnip"))
+                    if (titleMatched && rLink.startsWith("http") &&
+                        (rLink.contains("bing.com/news/apiclick.aspx") || rLink.contains("news.google.com/") || CinemaScraperHelper.getSourceTierScore(rSrc, rLink) >= 2)
                     ) {
-                        deepBodyCandidates.add(rHead to rLink)
+                        deepBodyCandidates.add(Triple(rHead, rLink, rSrc))
+                    } else if (rLink.startsWith("http") &&
+                        (rLink.contains("bing.com/news/apiclick.aspx") || rLink.contains("news.google.com/")) &&
+                        listicleOrReissueHintRe.containsMatchIn("$rHead $rSnip")
+                    ) {
+                        deepBodyCandidates.add(Triple(rHead, rLink, rSrc))
                     }
                 }
 
-                if (bestDate.isEmpty() && deepBodyCandidates.isNotEmpty()) {
+                if (deepBodyCandidates.isNotEmpty()) {
                     val sortedLinks = deepBodyCandidates
-                        .sortedBy { if (it.second.contains("bing.com/news/apiclick.aspx")) 0 else 1 }
-                        .take(2)
-                    for ((candHead, candLink) in sortedLinks) {
+                        .sortedWith(
+                            compareByDescending<Triple<String, String, String>> { CinemaScraperHelper.getSourceTierScore(it.third, it.second) }
+                                .thenBy { if (it.second.contains("bing.com/news/apiclick.aspx")) 0 else 1 }
+                        )
+                        .take(3)
+                    for ((candHead, candLink, candSrc) in sortedLinks) {
                         val art = CinemaScraperHelper.resolveArticleScheduleText(candLink)
                         val bodyText = art.optString("text", "")
                         if (bodyText.isEmpty()) continue
+                        val resolvedUrl = art.optString("url", candLink)
                         val fullCombo = "$candHead. $bodyText"
+                        if (CinemaScraperHelper.isDisqualifiedByAbsence(candHead, fullCombo, candSrc, resolvedUrl)) {
+                            disqualifiedSnippetLinks.add(candLink)
+                            continue
+                        }
                         val hasIdCtx = idVenueRe.containsMatchIn(fullCombo)
-                        if (foreignWireRe.containsMatchIn(fullCombo) && !hasIdCtx) continue
+                        if ((foreignWireRe.containsMatchIn(fullCombo) || CinemaScraperHelper.isGlobalOnlyWithoutId(fullCombo)) && !hasIdCtx) {
+                            disqualifiedSnippetLinks.add(candLink)
+                            continue
+                        }
                         if (!CinemaScraperHelper.titleMatchesHeadline(title, bodyText)) continue
                         if (isArchivalRss && !hasIdCtx) continue
+                        cleanBodies.add(candHead to bodyText)
                         harvestSignalsFromText(fullCombo, candHead, bodyText)
-                        val cand = CinemaScraperHelper.extractIndonesianDateFromText(title, fullCombo, today.year)
+                        if (bestDate.isEmpty()) {
+                            val cand = CinemaScraperHelper.extractIndonesianDateFromText(title, fullCombo, today.year)
+                            if (cand.isNotEmpty() && cand >= minCatalogDate && cand <= maxCatalogDate) {
+                                bestDate = cand
+                            }
+                        }
+                    }
+                }
+
+                for (ri in 0 until rssArr.length()) {
+                    val rObj = rssArr.optJSONObject(ri) ?: continue
+                    val rHead = rObj.optString("title", "")
+                    val rSnip = rObj.optString("snippet", "")
+                    val rLink = rObj.optString("link", "")
+                    val rSrc = rObj.optString("source", "")
+                    if (disqualifiedSnippetLinks.contains(rLink)) continue
+                    val combo = "$rHead. $rSnip"
+                    if (CinemaScraperHelper.isDisqualifiedByAbsence(rHead, combo, rSrc, rLink)) continue
+                    val titleMatched = CinemaScraperHelper.titleMatchesHeadline(title, rHead) ||
+                        CinemaScraperHelper.titleMatchesHeadline(title, rSnip)
+                    if (!titleMatched) continue
+                    val hasIdCtx = idVenueRe.containsMatchIn(combo)
+                    if ((foreignWireRe.containsMatchIn(combo) || CinemaScraperHelper.isGlobalOnlyWithoutId(combo)) && !hasIdCtx) continue
+                    harvestSignalsFromText(combo, rHead, rSnip)
+                    if (bestDate.isEmpty() && (!isArchivalRss || hasIdCtx)) {
+                        val cand = CinemaScraperHelper.extractIndonesianDateFromText(title, combo, today.year)
                         if (cand.isNotEmpty() && cand >= minCatalogDate && cand <= maxCatalogDate) {
                             bestDate = cand
-                            break
                         }
                     }
                 }

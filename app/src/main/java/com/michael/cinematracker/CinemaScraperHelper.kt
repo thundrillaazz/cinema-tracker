@@ -13,6 +13,7 @@ import java.nio.charset.StandardCharsets
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import java.util.TimeZone
 import java.util.concurrent.Callable
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -22,6 +23,7 @@ object CinemaScraperHelper {
     const val CINEMA_FEED_CACHE_TTL_MS = 2L * 3600_000L
     const val RSS_SNIPPET_LIMIT = 1500
     const val MAX_CONCURRENT_REQUESTS = 3
+    private val WIB_TZ: TimeZone = TimeZone.getTimeZone("Asia/Jakarta")
     private const val UA_RADAR = "Mozilla/5.0 (compatible; CinemaTrackerRadar/4.4.0)"
     private const val UA_MOBILE =
         "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36"
@@ -46,7 +48,19 @@ object CinemaScraperHelper {
         RegexOption.IGNORE_CASE
     )
     private val RUMOR_RE = Regex(
-        "\\b(rumor|rumours?|rumors?|kabarnya|diduga|prediksi|bocoran|diperkirakan|konon|belum\\s+pasti|spekulasi|hoaks?|hoax|fan[-\\s]?made|concept\\s+trailer|estimasi)\\b",
+        "\\b(rumor|rumours?|rumors?|kabarnya|diduga|prediksi|bocoran|diperkirakan|konon|belum\\s+pasti|spekulasi|hoaks?|hoax|fan[-\\s]?made|concept\\s+trailer|estimasi|tidak\\s+(?:akan\\s+)?tayang\\s+di\\s+(?:bioskop\\s+)?indonesia|batal\\s+tayang(?:\\s+di\\s+indonesia)?|hanya\\s+tayang\\s+di\\s+(?:bioskop\\s+)?(?:global|amerika|us))\\b",
+        RegexOption.IGNORE_CASE
+    )
+    private val QUESTION_HEADLINE_RE = Regex(
+        "(?:^\\s*(?:kapan|apakah|bagaimana|mengapa|kenapa|berapa|benarkah|akankah|sudahkah)\\b|\\b(?:tayang\\s+kapan|kapan\\s+tayang(?:\\s+di\\s+indonesia)?|rilis\\s+kapan|kapan\\s+rilis|tayang\\s+di\\s+indonesia\\s*\\?|di\\s+bioskop\\s+indonesia\\s*\\?)\\b|\\?\\s*(?:[-–—|•·]\\s*[^?]{1,40})?$)",
+        RegexOption.IGNORE_CASE
+    )
+    private val ABSENCE_RE = Regex(
+        "\\b(belum\\s+(?:ada\\s+(?:informasi|kabar|jadwal|kepastian|tanda(?:-tanda)?)|diketahui|diumumkan|terjadwal|dapat\\s+dipastikan|dipastikan|resmi)(?:\\s+kapan)?(?:\\s+(?:akan|bakal))?(?:\\s+(?:tayang|rilis|masuk))?(?:\\s+di\\s+(?:bioskop\\s+)?indonesia)?|(?:jadwal|tanggal)\\s+(?:tayang|rilis)(?:nya)?\\s+di\\s+(?:bioskop\\s+)?indonesia\\s+(?:belum|masih\\s+belum|tidak)|tidak\\s+(?:ada|akan|tayang|masuk)\\s+(?:jadwal|penayangan)?\\s*(?:di\\s+)?(?:bioskop\\s+)?indonesia|hanya\\s+(?:tayang|rilis)\\s+(?:secara\\s+terbatas|di\\s+festival|di\\s+luar\\s+negeri|secara\\s+global)|belum\\s+tayang\\s+di\\s+(?:bioskop\\s+)?indonesia|belum\\s+masuk\\s+bioskop\\s+indonesia)\\b",
+        RegexOption.IGNORE_CASE
+    )
+    private val GLOBAL_ONLY_RE = Regex(
+        "\\b((?:di\\s+)?(?:amerika(?:\\s+serikat)?|usa|us|as|global|bioskop\\s+global|rilis\\s+global|secara\\s+global|secara\\s+luas|overseas|worldwide|internasional|dunia|luar\\s+negeri|barat|festival(?:\\s+film)?|sundance|cannes|tiff|venice|berlinale))\\b",
         RegexOption.IGNORE_CASE
     )
     private val STREAMING_ONLY_RE = Regex(
@@ -58,13 +72,44 @@ object CinemaScraperHelper {
         RegexOption.IGNORE_CASE
     )
     private val FOREIGN_WIRE_RE = Regex(
-        "\\b(imax\\s*70\\s*mm|70\\s*mm\\s+imax|melansir\\s+(?:variety|deadline|hollywood\\s+reporter|collider|screenrant|indiewire|thewrap)|dilansir\\s+dari\\s+(?:variety|deadline|hollywood\\s+reporter|collider|screenrant|indiewire|thewrap)|via\\s+(?:variety|deadline|hollywood\\s+reporter)|amerika\\s+serikat|bioskop\\s+(?:as|amerika|global|inggris|jepang|korea))\\b",
+        "\\b(imax\\s*70\\s*mm|70\\s*mm\\s+imax|melansir\\s+(?:variety|deadline|hollywood\\s+reporter|collider|screenrant|indiewire|thewrap)|dilansir\\s+dari\\s+(?:variety|deadline|hollywood\\s+reporter|collider|screenrant|indiewire|thewrap)|via\\s+(?:variety|deadline|hollywood\\s+reporter)|amerika\\s+serikat|bioskop\\s+(?:as|amerika|global|inggris|jepang|korea)|festival\\s+film|sundance|cannes|tiff|venice|berlinale)\\b",
         RegexOption.IGNORE_CASE
     )
     private val NOISE_RE = Regex(
         "\\b(disney\\s*\\+?|netflix|prime\\s*video|amazon|apple\\s*tv|hbo|max|vidio|viu|wetv|iqiyi|catchplay|hotstar|bioskop\\s+trans\\s*tv|trans\\s*tv|lk21|indoxxi|link\\s+nonton|sub\\s+indo|episode\\s+\\d+|sortir\\s*[aà]\\s*paris)\\b",
         RegexOption.IGNORE_CASE
     )
+
+    fun getSourceTierScore(source: String, url: String): Int {
+        val s = "$source $url".lowercase(Locale.US)
+        if (Regex("(21cineplex\\.com|cgv\\.id|cinepolis\\.co\\.id|tix\\.id|lsf\\.go\\.id|jadwalnonton\\.com|cinema\\s*xxi|cinema\\s*21)").containsMatchIn(s)) {
+            return 3
+        }
+        if (Regex("(kompas\\.com|detik\\.com|kumparan\\.com|tirto\\.id|idntimes\\.com|tempo\\.co|kapanlagi\\.com|antaranews\\.com|merdeka\\.com|liputan6\\.com|cnnindonesia\\.com|cnbcindonesia\\.com|rri\\.co\\.id|katadata\\.co\\.id|hypeabis\\.id|jawapos\\.com|suara\\.com|tribunnews\\.com)").containsMatchIn(s)) {
+            return 2
+        }
+        return 1
+    }
+
+    fun isQuestionHeadline(headline: String): Boolean {
+        val s = headline.trim()
+        return s.isNotEmpty() && QUESTION_HEADLINE_RE.containsMatchIn(s)
+    }
+
+    fun isDisqualifiedByAbsence(headline: String, bodyOrFullText: String, source: String = "", url: String = ""): Boolean {
+        if (RUMOR_RE.containsMatchIn(headline) || isQuestionHeadline(headline)) return true
+        val full = bodyOrFullText.trim()
+        if (full.isEmpty()) return false
+        if (RUMOR_RE.containsMatchIn(full) || ABSENCE_RE.containsMatchIn(full)) {
+            return getSourceTierScore(source, url) < 3
+        }
+        return false
+    }
+
+    fun isGlobalOnlyWithoutId(text: String): Boolean {
+        return (FOREIGN_WIRE_RE.containsMatchIn(text) || GLOBAL_ONLY_RE.containsMatchIn(text)) &&
+            !EXPLICIT_ID_VENUE_RE.containsMatchIn(text)
+    }
     private val WORD_NUM_MAP = mapOf(
         "one" to "1", "satu" to "1",
         "two" to "2", "dua" to "2",
@@ -199,7 +244,7 @@ object CinemaScraperHelper {
 
     fun isAffirmativePresaleText(text: String): Boolean {
         val txt = text.trim()
-        if (txt.isEmpty() || RUMOR_RE.containsMatchIn(txt)) return false
+        if (txt.isEmpty() || RUMOR_RE.containsMatchIn(txt) || ABSENCE_RE.containsMatchIn(txt)) return false
         if (txt.contains("?") || Regex("\\b(kapan|apakah|benarkah|kenapa|berapa)\\b", RegexOption.IGNORE_CASE).containsMatchIn(txt)) {
             return false
         }
@@ -234,6 +279,8 @@ object CinemaScraperHelper {
         val clean = text.trim()
         if (clean.isEmpty()) return ""
         val clauses = clean.split(Regex("[\\n\\r]+|(?<=[.!?])\\s+")).map { it.trim() }.filter { it.length >= 4 }
+        if (clauses.isNotEmpty() && isQuestionHeadline(clauses[0])) return ""
+        val wholeItemHasAbsence = ABSENCE_RE.containsMatchIn(clean) || RUMOR_RE.containsMatchIn(clean)
         val dateTextRe = Regex(
             "\\b([1-9]|[12]\\d|3[01])(?:\\s*(?:-|–|—|s/d|s\\.d\\.|hingga|sampai)\\s*(?:[1-9]|[12]\\d|3[01]))?\\s+(januari|jan|februari|feb|maret|mar|april|apr|mei|may|juni|jun|juli|jul|agustus|agu|ags|aug|september|sept|sep|oktober|okt|oct|november|nov|desember|des|dec)(?:\\s*,?\\s*(20\\d{2}))?\\b",
             RegexOption.IGNORE_CASE
@@ -256,8 +303,10 @@ object CinemaScraperHelper {
         var bestIso = ""
         for (c in clauses.indices) {
             val clause = clauses[c]
-            if (RUMOR_RE.containsMatchIn(clause)) continue
+            if (RUMOR_RE.containsMatchIn(clause) || ABSENCE_RE.containsMatchIn(clause)) continue
+            if (clause.contains("?") || Regex("\\b(kapan|apakah|benarkah|kenapa|akankah)\\b", RegexOption.IGNORE_CASE).containsMatchIn(clause)) continue
             val hasIdVenueInClause = EXPLICIT_ID_VENUE_RE.containsMatchIn(clause)
+            if (wholeItemHasAbsence && !hasIdVenueInClause) continue
             if (FOREIGN_WIRE_RE.containsMatchIn(clause) && !hasIdVenueInClause) continue
 
             val matchesTitle = movieTitle.isEmpty() || titleMatchesHeadline(movieTitle, clause)
@@ -274,7 +323,43 @@ object CinemaScraperHelper {
             if (movieTitle.isEmpty() && !hasScheduleSignal) continue
             if (!hasScheduleSignal) continue
 
-            val baseTier = (if (matchesTitle) 200 else 120) + (if (hasIdVenueInClause) 100 else 0)
+            val idHits = EXPLICIT_ID_VENUE_RE.findAll(clause).map { it.range }.toList()
+            val globalHits = GLOBAL_ONLY_RE.findAll(clause).map { it.range }.toList()
+            fun distTo(r: IntRange, list: List<IntRange>): Int {
+                var minD = Int.MAX_VALUE
+                for (h in list) {
+                    val d = when {
+                        r.last >= h.first && h.last >= r.first -> 0
+                        h.first > r.last -> h.first - r.last
+                        else -> r.first - h.last
+                    }
+                    if (d < minD) minD = d
+                }
+                return minD
+            }
+            fun evaluateMatch(startIdx: Int, endIdx: Int, iso: String, baseExtra: Int) {
+                val segStart = maxOf(clause.lastIndexOf(',', startIdx), clause.lastIndexOf(';', startIdx)) + 1
+                val nextComma = clause.indexOf(',', endIdx).let { if (it == -1) clause.length else it }
+                val nextSemi = clause.indexOf(';', endIdx).let { if (it == -1) clause.length else it }
+                val segEnd = minOf(nextComma, nextSemi)
+                val seg = clause.substring(segStart, segEnd)
+                val segHasId = EXPLICIT_ID_VENUE_RE.containsMatchIn(seg)
+                val segHasGlobal = GLOBAL_ONLY_RE.containsMatchIn(seg)
+                val minIdDist = distTo(startIdx..endIdx, idHits)
+                val minGlobalDist = distTo(startIdx..endIdx, globalHits)
+                var prox = 0
+                if (segHasId) prox += 80
+                if (segHasGlobal && !segHasId) prox -= 85
+                if (minIdDist <= 55) prox += 120 - minIdDist * 2
+                if (minGlobalDist <= 28 && minGlobalDist < minIdDist) prox -= 95 - minGlobalDist * 2
+                if (prox < 0 || (segHasGlobal && !segHasId)) return
+                val baseTier = (if (matchesTitle) 200 else 120) + (if (hasIdVenueInClause) 100 else 0)
+                val score = baseTier + baseExtra + prox
+                if (score > bestScore) {
+                    bestScore = score
+                    bestIso = iso
+                }
+            }
 
             for (m in dateTextRe.findAll(clause)) {
                 val day = m.groupValues[1].toIntOrNull() ?: continue
@@ -283,11 +368,7 @@ object CinemaScraperHelper {
                 if (day !in 1..31 || month !in 1..12) continue
                 val iso = validIso(String.format(Locale.US, "%04d-%02d-%02d", yr, month, day))
                 if (iso.isEmpty()) continue
-                val score = baseTier + 30
-                if (score > bestScore) {
-                    bestScore = score
-                    bestIso = iso
-                }
+                evaluateMatch(m.range.first, m.range.last + 1, iso, 30)
             }
             for (sm in slashDateRe.findAll(clause)) {
                 val day = sm.groupValues[1].toIntOrNull() ?: continue
@@ -296,11 +377,7 @@ object CinemaScraperHelper {
                 if (day !in 1..31 || month !in 1..12) continue
                 val iso = validIso(String.format(Locale.US, "%04d-%02d-%02d", yr, month, day))
                 if (iso.isEmpty()) continue
-                val score = baseTier + 20
-                if (score > bestScore) {
-                    bestScore = score
-                    bestIso = iso
-                }
+                evaluateMatch(sm.range.first, sm.range.last + 1, iso, 20)
             }
         }
         return bestIso
@@ -372,31 +449,44 @@ object CinemaScraperHelper {
         timeoutMs: Int = HTTP_TIMEOUT_MS,
         maxBytes: Int = 327680
     ): String {
-        var conn: HttpURLConnection? = null
-        return try {
-            conn = (URL(urlStr).openConnection() as HttpURLConnection).apply {
-                connectTimeout = timeoutMs
-                readTimeout = timeoutMs
-                instanceFollowRedirects = true
-                setRequestProperty("User-Agent", ua)
-                setRequestProperty("Accept", "text/html,application/xhtml+xml,application/json,application/xml")
-            }
-            if (conn.responseCode !in 200..299) return ""
-            val buf = ByteArray(maxBytes)
-            var total = 0
-            conn.inputStream.use { input ->
-                while (total < maxBytes) {
-                    val read = input.read(buf, total, maxBytes - total)
-                    if (read <= 0) break
-                    total += read
+        var currentUrl = urlStr
+        for (hop in 0 until 5) {
+            var conn: HttpURLConnection? = null
+            try {
+                val parsedUrl = URL(currentUrl)
+                conn = (parsedUrl.openConnection() as HttpURLConnection).apply {
+                    connectTimeout = timeoutMs
+                    readTimeout = timeoutMs
+                    instanceFollowRedirects = false
+                    setRequestProperty("User-Agent", ua)
+                    setRequestProperty("Accept", "text/html,application/xhtml+xml,application/json,application/xml")
                 }
+                val code = conn.responseCode
+                if (code in listOf(301, 302, 303, 307, 308)) {
+                    val loc = conn.getHeaderField("Location")?.trim() ?: ""
+                    conn.disconnect()
+                    if (loc.isEmpty()) return ""
+                    currentUrl = URL(parsedUrl, loc).toString()
+                    continue
+                }
+                if (code !in 200..299) return ""
+                val buf = ByteArray(maxBytes)
+                var total = 0
+                conn.inputStream.use { input ->
+                    while (total < maxBytes) {
+                        val read = input.read(buf, total, maxBytes - total)
+                        if (read <= 0) break
+                        total += read
+                    }
+                }
+                return String(buf, 0, total, StandardCharsets.UTF_8)
+            } catch (_: Exception) {
+                return ""
+            } finally {
+                conn?.disconnect()
             }
-            String(buf, 0, total, StandardCharsets.UTF_8)
-        } catch (_: Exception) {
-            ""
-        } finally {
-            conn?.disconnect()
         }
+        return ""
     }
 
     fun fetchMovieNewsRss(movieTitle: String): JSONArray {
@@ -407,7 +497,7 @@ object CinemaScraperHelper {
             .take(100)
         if (cleanTitle.length < 2) return JSONArray()
 
-        val curYear = Calendar.getInstance().get(Calendar.YEAR)
+        val curYear = Calendar.getInstance(WIB_TZ).get(Calendar.YEAR)
         val bingQuery = "$cleanTitle bioskop Indonesia $curYear"
         val reissueBingQuery = "$cleanTitle kembali tayang bioskop Indonesia"
         val googleQuery = "\"$cleanTitle\" (XXI OR CGV OR Cinepolis OR bioskop OR LSF OR \"pre-sale\" OR IMAX OR tayang) when:120d"
@@ -427,11 +517,14 @@ object CinemaScraperHelper {
             if (xml.isEmpty()) continue
             parseXmlRssItems(xml, maxPerFeed = 8, maxTotal = 18, items = items, seenLinks = seenLinks, requireIdVenue = false)
         }
-        return items
+        if (items.length() <= 1) return items
+        val sortedList = (0 until items.length()).mapNotNull { items.optJSONObject(it) }
+            .sortedByDescending { obj -> getSourceTierScore(obj.optString("source", ""), obj.optString("link", "")) }
+        return JSONArray(sortedList)
     }
 
     fun fetchIndonesianReissueNewsRss(): JSONArray {
-        val cal = Calendar.getInstance()
+        val cal = Calendar.getInstance(WIB_TZ)
         val curYear = cal.get(Calendar.YEAR)
         val curMonthIdx = cal.get(Calendar.MONTH)
         val curDay = cal.get(Calendar.DAY_OF_MONTH)
@@ -532,6 +625,7 @@ object CinemaScraperHelper {
                                 }
                                 val resolvedSource = curSource.ifEmpty { fallbackHost }
                                 val combinedText = "$curTitle $curSnippet $resolvedSource"
+                                val notQuestionOrAbsence = !isDisqualifiedByAbsence(curTitle, combinedText, resolvedSource, curLink)
                                 val passVenueFilter = if (requireIdVenue) {
                                     val hasIdVenue = EXPLICIT_ID_VENUE_RE.containsMatchIn(combinedText)
                                     val isForeignOnly = FOREIGN_WIRE_RE.containsMatchIn(combinedText) && !hasIdVenue
@@ -539,9 +633,9 @@ object CinemaScraperHelper {
                                         (curLink.contains("bing.com/news/apiclick.aspx") || curLink.contains("news.google.com/")) &&
                                             DECODABLE_LISTICLE_OR_REISSUE_RE.containsMatchIn(combinedText) &&
                                             CINEMA_CONTEXT_HINT_RE.containsMatchIn(combinedText)
-                                    (hasIdVenue || isDecodableCandidate) && !isForeignOnly && !NOISE_RE.containsMatchIn(combinedText) && !NOISE_RE.containsMatchIn(curLink)
+                                    notQuestionOrAbsence && (hasIdVenue || isDecodableCandidate) && !isForeignOnly && !NOISE_RE.containsMatchIn(combinedText) && !NOISE_RE.containsMatchIn(curLink)
                                 } else {
-                                    !STREAMING_ONLY_RE.containsMatchIn(resolvedSource) && !STREAMING_ONLY_RE.containsMatchIn(curLink)
+                                    notQuestionOrAbsence && !STREAMING_ONLY_RE.containsMatchIn(resolvedSource) && !STREAMING_ONLY_RE.containsMatchIn(curLink)
                                 }
                                 if (passVenueFilter) {
                                     seenLinks.add(curLink)
@@ -709,7 +803,8 @@ object CinemaScraperHelper {
             return cachedJson
         }
 
-        val todayIso = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(java.util.Date())
+        val wibFmt = SimpleDateFormat("yyyy-MM-dd", Locale.US).apply { timeZone = WIB_TZ }
+        val todayIso = wibFmt.format(java.util.Date())
         val currentYear = todayIso.take(4).toIntOrNull() ?: 2026
         val byKey = LinkedHashMap<String, JSONObject>()
 
