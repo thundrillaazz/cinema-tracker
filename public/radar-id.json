@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-28T13:49:50.547Z",
+  "updatedAt": "2026-11-28T13:56:33.986Z",
   "source": "cloud-radar-rss-tmdb",
   "entries": [
     {
@@ -14,8 +14,12 @@
       "imax": false,
       "presaleActive": false,
       "lsfStatus": "",
-      "summary": "Jadwal resmi ID: 2026-12-02. Berita ID: Wicker Alexander Skarsgard Tayang 2 Desember di Bioskop Indonesia - CNN Indonesia",
+      "summary": "Jadwal resmi ID: 2026-12-02. Berita ID: Wicker Alexander Skarsgard Tayang 2 Desember di Bioskop Indonesia",
       "sources": [
+        {
+          "title": "bing.com",
+          "url": "https://www.cnnindonesia.com/hiburan/20261124082234-220-1430657/wicker-alexander-skarsgard-tayang-2-desember-di-bioskop-indonesia"
+        },
         {
           "title": "CNN Indonesia",
           "url": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxQSjNvQnhpNFowcG9nd2xQWUhCZHRoNUFlb1E2a2ZlYTZKT2NBd0J4bmhmQ053S19lcUN3dGhuRnhwYnRZdWl0MUg2TXBMWE5OQ2Y2MWlQajBLN1pOQ3BvUDlGTjE1emp3X01FcmgwSERJZzdWcHpmLWRUMDQzcFNFTDlUUkVYcVh0S240R3ZGaFJTazU4cDRjRk1XQk1SSjIxdzhXV0FnWHFRNnloZUVtaGliUmdCR2VCS1Y5Y19aNnRLdzhaZ3YzTNIBzgFBVV95cUxNM0VxNDZ4d24wZkJaYVRGRGRLYmRtX3UtOXhkWjYzeU51Y0VuNHVhQjZNcnZfWnUyRVZXLUlpeUo2cUo2VTdQUWd5MEt3QzdkTm42T2NnX2xuR0hGZ0c2ZENaaHdvOF9PTGpfdVNyVF9sTXZOd0s2OTdpcXBqbGUzZWh6YWtHWUdlaEh4aVkzLW52MmRlRVlxdS1xbWowR1hqaGR2cnlrQmVRMHhxVU5lWUwwVFhsY0Z3SEVNOEp3a1ZjeXVnV3FscDFmcnYxdw?oc=5"
@@ -23,13 +27,9 @@
         {
           "title": "MerahPutih",
           "url": "https://news.google.com/rss/articles/CBMipgFBVV95cUxPekw3WVZwQXJ0SEJTNEd4Z1FGSWN4emk0RHZNdXk2ZVdPQlpGbEdnSS1yZVpqbVBaRXY1eENjcS1DTHVFcnZoT0hfVFFKQ1k4STBXczFRNllVYjg2NmY4RFd1VVZCaVdVU3cwMG9HNnpMdjdROFJFSV9lWDNWWEdlcEpCeXFUX0VNdVJWaGRmWmxfdHV6aGV6RUhKVUtKTHpKLTBaSk9B0gGkAUFVX3lxTE8zRnZieGl6RnEycjVhRTEwUGRheEtVS3BfR0Y1RUpKcVFlU3JjYU5rUXBTMFdaX2taOE84TDU4cUY1bnc4ODlQTGZ3OG14dmFVbXg0NWQyVjNBeXVCU0NVeWFycngwTFVBWEx2WWJ6am5TV1JPR25MNTRqTDFNV1hteDd3clZJbkFBY0hDVGwtYTVfdXBoSl9xNFU3RUhqdjBSRlFn?oc=5"
-        },
-        {
-          "title": "JournalArta",
-          "url": "https://news.google.com/rss/articles/CBMiggFBVV95cUxOVkNhSFRsakVIcl9sbGZHeF82bnhjZ3Q5ODAwaExmSDVpT0gwNU9aQml0SGY4S3Jza1ZhM0tWcEZtNkNtb0pMVUd3UmNpNW1nUHd1Y0MtSzE2UkV6YTBpakdTZWx3bGpGNGgzWU1tUS1neThpYTlORHdyMWptS0hmMklR?oc=5"
         }
       ],
-      "checkedAt": "2026-11-28T13:49:50.547Z"
+      "checkedAt": "2026-11-28T13:56:33.986Z"
     },
     {
       "key": "tmdb_1078446",
@@ -48,14 +48,14 @@
       "sources": [
         {
           "title": "CGV Indonesia",
-          "url": "https://www.cgv.id/movies"
+          "url": "https://www.cgv.id/en/movies/now_playing"
         },
         {
           "title": "Sortir à Paris",
           "url": "https://news.google.com/rss/articles/CBMizwFBVV95cUxNcUVYd2g1RUNBS2FieUlfZ0pSdW82WlRxSGgxQS1MYnUtTjIzdERqR19xbWt4Y0lGZXdsVE1SMVBLNGVnQ2hfZF9vWTJ5YU1Qd0loN1R5SElWTmxxZnRNTVF2YklLUGRZcGhJcGpfcDhrQnNTVEt2cnJEM0M4a2Y0dW01eVNTN2ZqbFNsLXhfei1Fa3ZUVUNBZ3VxMkxJME9wUlIxb0JwS0NHZFBlVWd5bFhUWVprc0M3RnVZaVdXR29yYjFTWmdyS3BNdlgtZHM?oc=5"
         }
       ],
-      "checkedAt": "2026-11-28T13:49:50.547Z"
+      "checkedAt": "2026-11-28T13:56:33.986Z"
     },
     {
       "key": "tmdb_372058",
@@ -70,22 +70,22 @@
       "imax": false,
       "presaleActive": false,
       "lsfStatus": "Klasifikasi TMDB ID: 13+",
-      "summary": "Jadwal resmi ID: 2026-12-02. Terdaftar di CGV Indonesia. Berita ID: Rayakan 10 Tahun, Anime ‘Legend’ Your Name Hadir Lagi di Bioskop dalam Versi 4k - RRI.co.id",
+      "summary": "Jadwal resmi ID: 2026-12-02. Terdaftar di CGV Indonesia. Berita ID: Your Name Tayang Ulang Versi 4K di Bioskop Indonesia - Limapagi",
       "sources": [
         {
           "title": "CGV Indonesia",
-          "url": "https://www.cgv.id/movies"
-        },
-        {
-          "title": "RRI.co.id",
-          "url": "https://news.google.com/rss/articles/CBMirwFBVV95cUxQZGg2c01ZRVhNWjRWcEd1MGZ6YVllTVZDemZhcGNFT1BQdVFfcTI0NUNhX054NUF1WFBMbU5raExMLXhBbWlfSUJMNjFjVDdkT3dpdDNvdzZLM1RPcFk5bDJkdEg5emEzVnpEaUQwR2oyRGJJcE4xd1RRbF9MZl9hRzNXLUZuaUp0OFgwR3E4OFJlRzdFSG1MNFJ6V3Fla3ZsWXpkY280ak0yOW9PTEVn?oc=5"
+          "url": "https://www.cgv.id/en/movies/now_playing"
         },
         {
           "title": "Limapagi",
           "url": "https://news.google.com/rss/articles/CBMiZkFVX3lxTE9UR2FsQndVWW1fYzdaUHlYWV9GemRBQ1ExSDY2SjhyUEJWQm51NUdQTlRoc21yaUFwWjVMU2JiMTFZUEd2UkxXTnFmV241bS0yTTU2aW5oZF9vLU1LTVp2bjI0ZjdEdw?oc=5"
+        },
+        {
+          "title": "CNN Indonesia",
+          "url": "https://news.google.com/rss/articles/CBMivwFBVV95cUxQdC11c1ZWaWEtcmhFbk1LYTFoNUs4SnNuOXZDY3JRRnI5TWozUU03Y3hHUHBqU3Y4endBeTZ1S0pPS1k2dXhpODdiRl9qb3NWay1VVjRQOWdyTURvZVM2QVEzQ3hjc1JaRjBOM0puOXJNSmdXcTcxXzRVcllXSHVkR2hrUUhOc01KTWhhYVcwM0k5b21KSm5EZmlfX1hMUDZYR21WWEtqSUZOdnN4RUdaekQweHhyZWNfczN3Q0xia9IBxAFBVV95cUxOYkdiQWM2WDhJTmZkNnlTREVOdzZVR2UyWVhXNEJGekxjd19LUjc2LXFnN0RpYmE2YmV2dWdFTWJnaUYyaTJPY1B3dWlteEJXZGRWUDRsSjM4Z0E4TWpRbDNMMDVvZS0xTjRGNGtTdV82SEVFOWZ6ZTV5MHNwMVJaVzJJNm9vZVQ0OFp4emREb0k5dWVYTGlYRnFpNDVNS2lDMVVCN1NCSE0za055eDltNHFkWjdXZEw4VlZpZGdYU0NyQVJD?oc=5"
         }
       ],
-      "checkedAt": "2026-11-28T13:49:50.547Z"
+      "checkedAt": "2026-11-28T13:56:33.986Z"
     },
     {
       "key": "tmdb_1732866",
@@ -104,18 +104,18 @@
       "sources": [
         {
           "title": "CGV Indonesia",
-          "url": "https://www.cgv.id/movies"
+          "url": "https://www.cgv.id/en/movies/now_playing"
         },
         {
           "title": "bing.com",
-          "url": "http://www.bing.com/news/apiclick.aspx?ref=FexRss&aid=&tid=6b0adc0760424b7fab9be99108acf32e&url=https%3a%2f%2fwww.topik.id%2ffilm-3726-mdpl-tayang-di-bioskop-3-desember-angkat-kisah-cinta-di-gunung-rinjani&c=7571314993164898442&mkt=en-id"
+          "url": "http://www.bing.com/news/apiclick.aspx?ref=FexRss&aid=&tid=6b0add9b45da4394876612d7b45f0e68&url=https%3a%2f%2fwww.topik.id%2ffilm-3726-mdpl-tayang-di-bioskop-3-desember-angkat-kisah-cinta-di-gunung-rinjani&c=7571314993164898442&mkt=en-id"
         },
         {
           "title": "bing.com",
-          "url": "http://www.bing.com/news/apiclick.aspx?ref=FexRss&aid=&tid=6b0adc0760424b7fab9be99108acf32e&url=https%3a%2f%2fwww.topik.id%2fsinopsis-film-3726-mdpl-perjuangan-cinta-rangga-dan-andini-di-puncak-rinjani&c=7263311818679725571&mkt=en-id"
+          "url": "http://www.bing.com/news/apiclick.aspx?ref=FexRss&aid=&tid=6b0add9b45da4394876612d7b45f0e68&url=https%3a%2f%2fwww.topik.id%2fsinopsis-film-3726-mdpl-perjuangan-cinta-rangga-dan-andini-di-puncak-rinjani&c=7263311818679725571&mkt=en-id"
         }
       ],
-      "checkedAt": "2026-11-28T13:49:50.547Z"
+      "checkedAt": "2026-11-28T13:56:33.986Z"
     },
     {
       "key": "tmdb_1718454",
@@ -135,7 +135,7 @@
           "url": "https://jadwalnonton.com/film/2026/yang-datang-dan-yang-pergi/"
         }
       ],
-      "checkedAt": "2026-11-28T13:49:50.547Z"
+      "checkedAt": "2026-11-28T13:56:33.986Z"
     },
     {
       "key": "tmdb_1691495",
@@ -154,18 +154,18 @@
       "sources": [
         {
           "title": "CGV Indonesia",
-          "url": "https://www.cgv.id/movies"
+          "url": "https://www.cgv.id/en/movies/now_playing"
         },
         {
           "title": "bing.com",
-          "url": "http://www.bing.com/news/apiclick.aspx?ref=FexRss&aid=&tid=6b0adc078be84cda89002d091a7046b3&url=https%3a%2f%2fwww.kompas.com%2fhype%2fread%2f2026%2f11%2f19%2f014546766%2fsinopsis-daftar-pemeran-dan-jadwal-tayang-film-hajatan-setan&c=5048249866533348953&mkt=en-id"
+          "url": "http://www.bing.com/news/apiclick.aspx?ref=FexRss&aid=&tid=6b0add9c064941f2ab3f05051d72e678&url=https%3a%2f%2fwww.kompas.com%2fhype%2fread%2f2026%2f11%2f19%2f014546766%2fsinopsis-daftar-pemeran-dan-jadwal-tayang-film-hajatan-setan&c=5048249866533348953&mkt=en-id"
         },
         {
           "title": "bing.com",
-          "url": "http://www.bing.com/news/apiclick.aspx?ref=FexRss&aid=&tid=6b0adc078be84cda89002d091a7046b3&url=https%3a%2f%2fradarkediri.jawapos.com%2fhiburan%2f2611280004%2ftradisi-pembawa-rezeki-berubah-jadi-mimpi-buruk-film-hajatan-setan-tayang-3-desember&c=9821888877764508212&mkt=en-id"
+          "url": "http://www.bing.com/news/apiclick.aspx?ref=FexRss&aid=&tid=6b0add9c064941f2ab3f05051d72e678&url=https%3a%2f%2fradarkediri.jawapos.com%2fhiburan%2f2611280004%2ftradisi-pembawa-rezeki-berubah-jadi-mimpi-buruk-film-hajatan-setan-tayang-3-desember&c=9821888877764508212&mkt=en-id"
         }
       ],
-      "checkedAt": "2026-11-28T13:49:50.547Z"
+      "checkedAt": "2026-11-28T13:56:33.986Z"
     },
     {
       "key": "tmdb_1657112",
@@ -189,11 +189,11 @@
           "url": "https://news.google.com/rss/articles/CBMixAFBVV95cUxPTjZRZGF2a3ZHM0JwcTA5RDJKTTdubjUya1psUGR6SDRkMlpsZm4wT0puXzlmMWZWUUJBckJoWTNmNGdxSUZTNHRJNjNDZ0FWLUpxTHhHVkE3WVVldHhMckd1NThZTWdXU1NnSXdiX2V6ZGM0X2QwbEJjeG5vTDR6bEhDanV5dW9CU2dyeWxzMWtQUVA1NmRFTjZKQk1qbmRoV012TnNrS1Y5bVRYeTJhcUxhcHNCbUpIaFNWX3loSHVSSkFT?oc=5"
         },
         {
-          "title": "bing.com",
-          "url": "http://www.bing.com/news/apiclick.aspx?ref=FexRss&aid=&tid=6b0adc072292446bb52e7cddeffd5062&url=https%3a%2f%2fwww.msn.com%2fid-id%2fnews%2fother%2fsinopsis-film-meja-tanpa-laci-dibintangi-daffa-wardhana-hingga-roy-marten-tayang-3-desember-2026%2far-AA2gROBj&c=12342266778770002068&mkt=en-id"
+          "title": "Radar Mojokerto",
+          "url": "https://news.google.com/rss/articles/CBMi3AFBVV95cUxNTEFINFZUc0t0VXNsS0Z1RlI1N2JuVU1sRDd3WkdjdlozdmdZWEhQQlNQX2xXeDFDWWtjVlNsZEI0cmctNTQ4cmQyZC1NakhjVzFuOGpLZ3NScHNwcUI5bDBwR1pFdUZ4enZ3dGd0bDVreHNFQ093MlZoTFN3dFB4bXhJSjVtOEVjV0c0WlpVMG1DTlpkS2JfVDdUcTdzU2MzRFNLOGlmMUVIRVVVVGZCN2I3RVJqck5UQVhXRHdlVFBFamg5NEhTOGJMVktnYUhFNlN2ZElBSEZfSFNE0gHiAUFVX3lxTFBfTm1UcWswRTVjYmZCOFhqSUZ3RlNvMEJQZFp6TW9NSFZIWGRvbnBhc0s4YXJQME4yVGREb3NTNjJRSVkzYmotcVRmcmVlN0VfbUlpVnZ1T2dKcnVzYlVLbHNCWkgtSW13Q0R5Z2haUDlqNXhCam1FUTJuakk0eXgxclFjNkxzZDNJZjNKbEdBclhCblhMRDdRNDNQVkNveUxPY29EVzFPY2dYWFlySE5vWnhpUC1lTGVRMlFfRWx4M01kbmNSa0F6YzctWTM4MEhZZkJQZFlGZUhBdzZ1X0F4ZXc?oc=5"
         }
       ],
-      "checkedAt": "2026-11-28T13:49:50.547Z"
+      "checkedAt": "2026-11-28T13:56:33.986Z"
     },
     {
       "key": "tmdb_1586748",
@@ -208,22 +208,22 @@
       "imax": false,
       "presaleActive": false,
       "lsfStatus": "",
-      "summary": "Jadwal resmi ID: 2026-12-03. Terdaftar di CGV Indonesia. Berita ID: Film Ratu Petaka Tayang 3 Desember 2026, Ini Sinopsinya",
+      "summary": "Jadwal resmi ID: 2026-12-03. Terdaftar di CGV Indonesia. Berita ID: Gandhi Fernando Debut Jadi Sutradara lewat Film Horor Ratu Petaka - Kompas.com",
       "sources": [
         {
           "title": "CGV Indonesia",
-          "url": "https://www.cgv.id/movies"
+          "url": "https://www.cgv.id/en/movies/now_playing"
+        },
+        {
+          "title": "Kompas.com",
+          "url": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxOUVR1dEFSRHNLSjFnNmkyVHRxLVRYSlVxbld1c1ZkQ0lxSzJnMF9yZF9vMlNPd09VandSWmVGcTYwdE9EZ0hOdnI3T2ZxMWI2S1FUek5BbUJScVgyR0ZuY1EyMnNuMXdvRFppTU1IVDFDZUZiUFprd292anhYSWxXTlN2LTZNS0h1cEo2V2FuQmtsV3RxMEVwNHNzM0lsRmtoX1E3aTlaZGF2RnlHYnlqQVJNclViS2lrS3Zn?oc=5"
         },
         {
           "title": "bing.com",
-          "url": "http://www.bing.com/news/apiclick.aspx?ref=FexRss&aid=&tid=6b0adc0794d84659afef08c0e36f39b7&url=https%3a%2f%2fwww.msn.com%2fid-id%2fhiburan%2fcelebrity%2ffilm-ratu-petaka-tayang-3-desember-2026-ini-sinopsinya%2far-AA2ijoN6&c=16950865801115569934&mkt=en-id"
-        },
-        {
-          "title": "bing.com",
-          "url": "http://www.bing.com/news/apiclick.aspx?ref=FexRss&aid=&tid=6b0adc0794d84659afef08c0e36f39b7&url=https%3a%2f%2fkutip.co%2fread%2f5957%2fratu-petaka-tayang-3-desember-horor-kontes-kecantikan-r13&c=17446707988243833107&mkt=en-id"
+          "url": "http://www.bing.com/news/apiclick.aspx?ref=FexRss&aid=&tid=6b0add9cdfdc49a7967cdd5b2c17c569&url=https%3a%2f%2fwww.msn.com%2fid-id%2fhiburan%2fcelebrity%2ffilm-ratu-petaka-tayang-3-desember-2026-ini-sinopsinya%2far-AA2ijoN6&c=16950865801115569934&mkt=en-id"
         }
       ],
-      "checkedAt": "2026-11-28T13:49:50.547Z"
+      "checkedAt": "2026-11-28T13:56:33.986Z"
     },
     {
       "key": "tmdb_1791250",
@@ -238,18 +238,14 @@
       "imax": false,
       "presaleActive": false,
       "lsfStatus": "Klasifikasi TMDB ID: SU",
-      "summary": "Jadwal resmi ID: 2026-12-04. Terdaftar di CGV Indonesia. Berita ID: Baby Shark Christmas Special: The Santa Contest (2026) - Film - KapanLagi.com",
+      "summary": "Jadwal resmi ID: 2026-12-04. Terdaftar di CGV Indonesia.",
       "sources": [
         {
           "title": "CGV Indonesia",
-          "url": "https://www.cgv.id/movies"
-        },
-        {
-          "title": "KapanLagi.com",
-          "url": "https://news.google.com/rss/articles/CBMilAFBVV95cUxQRHVzWDVZS2hiVkVpcC1kWDF2bU45YXZzQ2l2elJqVXNJcDVfLXVnTmZEdDZ5eVVMRHRvcXF2TDUxMjI1NnpCb0ljQmh1UnZKc3NpdUlPQUZKVUtCNUp6NlNRZlNaREJJdGczVnRRVmFFcFVWOEk0N0phbGdGeXVMUXpTUEtJQzhpTDBtVG5EbTRHdWlx?oc=5"
+          "url": "https://www.cgv.id/en/movies/now_playing"
         }
       ],
-      "checkedAt": "2026-11-28T13:49:50.547Z"
+      "checkedAt": "2026-11-28T13:56:33.986Z"
     },
     {
       "key": "tmdb_1299329",
@@ -269,15 +265,15 @@
           "url": "https://news.google.com/rss/articles/CBMingFBVV95cUxQRDYtNUNpX2dpQ1o2eVhqSXo3Sk8yV0RhbFM3Yjk2bWVpUDR1Wmk1REZHdVFhV29GMjJDTkZGV2otVTFXcU9qa25wLW9hZGhVSzJFRkU0QVNvZl9yZHhMRGZ2a0Z0blFoRlpIRV9tajVQcU5PT2VyOXJpUFA0WEpubWZiVGVtNGRCSXVKQ0xuSEpBaGYySGZDdDZXSmdUQQ?oc=5"
         },
         {
-          "title": "Hypebeast",
-          "url": "https://news.google.com/rss/articles/CBMitwFBVV95cUxQVVV4cTQtX1M0VVZVbUlQTlhiMzlJQ18xM3RhQ2lOSXAtb21PRjNJN2NESHVXUVBCTmE1bmd1dkVSTlRiVEJtR3RCR1MyRnNFMnVxSmstdjRNeC00M2p0ck5kcWc1VC1WbTlYNGpSRXRfRGJZaExWVHYwenp0TGRkQlRScmlQdmJkdkRIUHBpUEFCS1AtQU9wZjU4Q2ltMG5uejhEZjlBVmNHUGxvUWZSaVBVdE1LOFE?oc=5"
-        },
-        {
           "title": "Sortir à Paris",
           "url": "https://news.google.com/rss/articles/CBMi5gFBVV95cUxQOHcydlViUjFubjI3Ykh2RHVUVW9PNm9LN1EzdFBVZElKVVZUa3QyeVNyNjc3MUd5YjNmLXBaU0lqWC1lRTlfS3dtMGc2eVlicndMWTN5MlNnYWFSVU1iVnhSYkZJTHgyTlcteDgxd2JCOVl0Z2dacEJuYjVHWE9MczNGRGl4X1FhcjlWUGtJUGlTRGRzajJUSXh2ckNPd2sydnA5WDhlQU04dEljYlFaWFROQ0lfaU1FZUJUWEpsUjYtY3dnZUFtYmRVT0tscE04QU1Va1ZfNGRkMjUtS2dOV2FRTWJnUQ?oc=5"
+        },
+        {
+          "title": "Hypebeast",
+          "url": "https://news.google.com/rss/articles/CBMitwFBVV95cUxQVVV4cTQtX1M0VVZVbUlQTlhiMzlJQ18xM3RhQ2lOSXAtb21PRjNJN2NESHVXUVBCTmE1bmd1dkVSTlRiVEJtR3RCR1MyRnNFMnVxSmstdjRNeC00M2p0ck5kcWc1VC1WbTlYNGpSRXRfRGJZaExWVHYwenp0TGRkQlRScmlQdmJkdkRIUHBpUEFCS1AtQU9wZjU4Q2ltMG5uejhEZjlBVmNHUGxvUWZSaVBVdE1LOFE?oc=5"
         }
       ],
-      "checkedAt": "2026-11-28T13:49:50.547Z"
+      "checkedAt": "2026-11-28T13:56:33.986Z"
     },
     {
       "key": "tmdb_1771024",
@@ -290,11 +286,11 @@
       "imax": false,
       "presaleActive": false,
       "lsfStatus": "Klasifikasi TMDB ID: SU",
-      "summary": "Jadwal resmi ID: 2026-12-10. Berita ID: 12 Mile: Guiding the Archipelago: Diplomasi tanpa Peluru dari Pahlawan Mochtar Kusumaatmadja - Suara.com",
+      "summary": "Jadwal resmi ID: 2026-12-10. Berita ID: Film 12 Mile Angkat Perjuangan Mochtar Kusumaatmadja Jaga Keutuhan Wilayah Indonesia - Pikiran Rakyat Koran",
       "sources": [
         {
-          "title": "Suara.com",
-          "url": "https://news.google.com/rss/articles/CBMi3AFBVV95cUxONXdER0JlQmd4UzhmYUdLVXV0MUhidi1OcHJsZlAyV0FWWFQ3RzNRS3VvZ1QyR1Z1UXlpbUtNMTdsdThzZjZlWGpYVUtEVWhvUXdicGh3a3RteWwzVG5xZmRnZUxpSU9iM3E4RGtlOUxqR2otMFpKUlQxUE9Qajg2NGJOLS1MS1RDRkZBX2lueFV0QkoyVGpjQ0pDSnNfLVFvOGhxQ1BaTHRNcjl5Wk40RlFJc04xLTdTQ2lUcjE5aG5yUXFmSW9Ka3hFX2pZNXh0UlJPaWp4a0lndDkz0gHcAUFVX3lxTE1heVptQUJXeHhmSEZKR1FTSHJweXRJeWtBcVB5dzAtaEw3R0tGR0RRc0hLTXY3ODhBZnB3WUdsTjNpdGtWQ1ZoZndnc0Nvd2NPMHhIV3pUS1ZNM1dPSFI0bi1CYWF2SVBpYmp6NEdmeG8xQlVvQUxNQk0ybUJDT2drSFpkTnlnS3o0UnBRdV9ZUUtpWjV3N0U3eFo0XzU2SDNIZTNxLXpTT2l2UWVZLUNwRmVrbkRBeG5VUFNhZjFuNF9VRS1VXzUwM05CNnk2dE1oamoydWpNOGROOF8?oc=5"
+          "title": "Pikiran Rakyat Koran",
+          "url": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxPdDdDN2RpYzBZSEd0WEdJeUQwVVd3UGNEMU5YVXpaNHV0RjN3RVk0LTNRS3pWMVdmMGxsdk9MQ3lNaTVPeHZydVB1WDJoZW5OdGpocDV6Z3RBME1HOEpvUDlzVUxJUk5JVzVSbUZPcmxBaVVrQ3NKU3cyWEQ1b2NmTmN1VnhVaFpvczg2VmJicVRNS1owVF9sODQyeFZtQXg0NVFGSzJHdTl0SVN5Q0ZSSXIySWRpNHVERWJuQUgzQlE5SGlpNGRrR3UzT180RHA3d0tv?oc=5"
         },
         {
           "title": "ANTARA News Megapolitan",
@@ -305,7 +301,7 @@
           "url": "https://news.google.com/rss/articles/CBMi0AFBVV95cUxOUG1tRlpCY01qeGhkaGVVNnlxcmVpX2YxeUo3c3pCbG4tekJUVlEwbHo4TVlNcnVlS0tnQ0EzREZQWnVfZUVuYlR5S3ZDVXRRN2ZSb2UxU3d0WG5GeVptVXBtci0zSVR2STNoWHQyelJMdDIySGQ5cnc1TExmWl9aRE93VHZqQjNpaGkxcXBQNnZyYkNIT1AyUmpVNFR1ZWdrTHNTMTRmT0FCUERqQ0NxUGNnUE5zOXp4MGlGcHBKeV8xN0JnamZYWkc0d3gzdTJz?oc=5"
         }
       ],
-      "checkedAt": "2026-11-28T13:49:50.547Z"
+      "checkedAt": "2026-11-28T13:56:33.986Z"
     },
     {
       "key": "tmdb_1398505",
@@ -324,10 +320,10 @@
       "sources": [
         {
           "title": "CGV Indonesia",
-          "url": "https://www.cgv.id/movies"
+          "url": "https://www.cgv.id/en/movies/now_playing"
         }
       ],
-      "checkedAt": "2026-11-28T13:49:50.547Z"
+      "checkedAt": "2026-11-28T13:56:33.986Z"
     }
   ]
 }
